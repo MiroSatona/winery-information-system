@@ -10,6 +10,10 @@ RUN apt-get update && apt-get install -y \
 
 RUN a2enmod rewrite
 
+# Allow .htaccess overrides in DocumentRoot
+RUN sed -i '/<Directory \/var\/www\/>/,/<\/Directory>/ s/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+
+
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 ENV APACHE_DOCUMENT_ROOT /var/www/html/www
