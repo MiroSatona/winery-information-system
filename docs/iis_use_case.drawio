@@ -1,0 +1,180 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/26.1.1 Chrome/132.0.6834.210 Electron/34.3.3 Safari/537.36" version="26.1.1">
+  <diagram name="Page-1" id="3YM1uT4Cz7yAHMy32nwi">
+    <mxGraphModel dx="870" dy="589" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-9" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="34" y="30" width="90" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-8" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-9">
+          <mxGeometry width="90" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-1" value="Uživatel" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-9">
+          <mxGeometry x="30" y="30" width="30" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-10" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="30" y="850" width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-11" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-10">
+          <mxGeometry width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-12" value="Administrátor" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-10">
+          <mxGeometry x="33.333333333333336" y="30" width="33.333333333333336" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-13" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="34" y="220" width="90" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-14" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-13">
+          <mxGeometry width="90" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-15" value="Zákazník" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-13">
+          <mxGeometry x="30" y="20" width="30" height="70" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-18" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="29" y="415" width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-19" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-18">
+          <mxGeometry width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-20" value="Pracovník" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-18">
+          <mxGeometry x="33.333333333333336" y="30" width="33.333333333333336" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-21" value="" style="group" vertex="1" connectable="0" parent="1">
+          <mxGeometry x="29" y="600" width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-22" value="" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-21">
+          <mxGeometry width="100" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-23" value="Vinař" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;" vertex="1" parent="LapN3B0Qs1bzDbfsEOKu-21">
+          <mxGeometry x="33.333333333333336" y="30" width="33.333333333333336" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-25" value="Zobrazit nabídku vinařství" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="50" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-27" value="Zobrazit informace o vinařství" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="90" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-30" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;startSize=12;endSize=12;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-14" target="LapN3B0Qs1bzDbfsEOKu-8">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="80" y="210" />
+              <mxPoint x="80" y="210" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-31" value="Objednává víno, spravuje objednávku" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="220" width="246" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-33" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-14" target="LapN3B0Qs1bzDbfsEOKu-31">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-34" value="Zobrazit vlastní historii objednávek" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="270" width="246" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-35" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-14" target="LapN3B0Qs1bzDbfsEOKu-34">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-37" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-8" target="LapN3B0Qs1bzDbfsEOKu-25">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-38" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-8" target="LapN3B0Qs1bzDbfsEOKu-27">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-40" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;endArrow=block;endFill=1;endSize=12;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-19">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-42" value="Zaznamenává vykonané úkony (ošetření, sklizeň, lahvování)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="400" width="550" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-44" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-19" target="LapN3B0Qs1bzDbfsEOKu-42">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-46" value="Plánuje úkony (ošetření, sklizeň, lahvování)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="515" width="266" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-48" value="Spravuje řádky" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="597" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-49" value="Spravuje víno (likviduje, zařazuje do prodeje, informace o víně)" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="770" width="376" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-50" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-51" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-48">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-53" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-49">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-55" value="Spravuje uživatele systému a jejich role&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="900" width="266" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-56" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-11" target="LapN3B0Qs1bzDbfsEOKu-55">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-61" value="Spravuje vinohrady" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="635" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-62" value="Spravuje odrůdy" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="680" width="110" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-64" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" target="LapN3B0Qs1bzDbfsEOKu-61">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="129" y="665" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-65" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-62">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-66" value="Spravuje hnojiva a postřiky" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="720" width="176" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-67" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-66">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-72" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-71" target="LapN3B0Qs1bzDbfsEOKu-42">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="259" y="445" />
+              <mxPoint x="447" y="445" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-71" value="Naplánovaných" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="224.5" y="465" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-74" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-73" target="LapN3B0Qs1bzDbfsEOKu-42">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="565" y="445" />
+              <mxPoint x="447" y="445" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-73" value="Adhoc" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="500" y="465" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-75" value="Spravuje záznamy o sklizních" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="557" width="186" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-79" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1.027;exitY=0.484;exitDx=0;exitDy=0;exitPerimeter=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-22" target="LapN3B0Qs1bzDbfsEOKu-75">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-80" value="Zobrazit informace o produktu" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="214" y="130" width="200" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-82" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-8" target="LapN3B0Qs1bzDbfsEOKu-80">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-83" value="Zobrazit kalendář plánovaných a vykonaných úkonů" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="350" width="320" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="LapN3B0Qs1bzDbfsEOKu-84" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-19" target="LapN3B0Qs1bzDbfsEOKu-83">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
