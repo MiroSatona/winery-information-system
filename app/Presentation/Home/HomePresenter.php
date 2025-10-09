@@ -18,7 +18,5 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
-        $data = $this->database->table('test')->fetchAll();
-        bdump($data);
     }
 }
