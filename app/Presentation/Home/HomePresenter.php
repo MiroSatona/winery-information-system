@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Home;
 
 use Nette;
-
+use App\Model\ROLE;
 
 final class HomePresenter extends Nette\Application\UI\Presenter
 {
@@ -18,5 +18,6 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
+        $this->user->isInRole(ROLE::GUEST->name);
     }
 }
