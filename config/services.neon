@@ -2,6 +2,7 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Model\AuthorizatorFactory::create
 	- App\Model\MainAuthenticator
+	- App\Model\HomePageContentModel
 
 	security.passwords: Nette\Security\Passwords(::PASSWORD_ARGON2ID, [memory_cost: 65536, time_cost: 4, threads: 3])
 

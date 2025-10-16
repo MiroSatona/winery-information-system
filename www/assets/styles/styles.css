@@ -2,3 +2,5 @@
     max-width: 50px;
     max-height: 50px;
 }
+
+body { background: "#ffffff"; height: 100%; width: 100%; margin: 0; padding: 0;}
