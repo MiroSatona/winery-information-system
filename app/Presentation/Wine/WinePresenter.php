@@ -18,8 +18,6 @@ final class WinePresenter extends Nette\Application\UI\Presenter
         $this->items = $items; 
     }
     
-   
-    
     public function renderDetail(int $id): void 
     {
        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);

@@ -6,7 +6,7 @@
         <div class="wine-card">
             <a class="wine-detail" n:href="Wine:detail $wine->id">
                 <div class="wine-image">
-                    <img src="https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="{$wine->name}" />
+                    <img src="{$wine->img->src}" alt="{$wine->img->description}" />
                 </div>
                 <div class="wine-info">
                     <h2 class="wine-name">{$wine->name}</h2>

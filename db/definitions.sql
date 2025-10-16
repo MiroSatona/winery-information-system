@@ -302,15 +302,16 @@ VALUES
 -- picture table
 INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
-(1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), (2, 'Wine Bottle', 'https://example.com/winebottle.jpg', 'A bottle of red wine ready for sale'),
-(3, 'Harvesting Grapes', 'https://example.com/harvest.jpg', 'Harvesting grapes in the field');
+(1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), 
+(2, 'Milujeme iis', 'https://ih1.redbubble.net/image.2806615933.5785/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg', 'A bottle of red wine ready for sale'),
+(3, 'Cerne vino', 'https://i.pinimg.com/236x/05/1c/0b/051c0b074549db9017495e63563cf92c.jpg', 'mega cerne vino');
 
 -- wine table 
-INSERT INTO WINE (ID, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
+INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, 1, 3, 2, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'A robust red wine perfect for dinners', 'Grown in the heart of the vineyard'),
-(2, 2, 3, 1, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'A smooth white wine with a hint of sweetness', 'Made from late-harvested grapes'),
-(3, 3, 1, 3, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'A sweet rosé wine, perfect for light meals', 'Produced from selected varieties');
+(1, "milujeme iis", 1, 3, 2, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'A robust red wine perfect for dinners', 'Grown in the heart of the vineyard'),
+(2, "cervene vino",2, 3, 1, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'A smooth white wine with a hint of sweetness', 'Made from late-harvested grapes'),
+(3, "cerne vino", 3, 1, 3, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'A sweet rosé wine, perfect for light meals', 'Produced from selected varieties');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)
