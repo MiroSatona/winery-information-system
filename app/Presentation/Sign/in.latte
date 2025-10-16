@@ -22,10 +22,16 @@
                             <div class="mb-3">
                                 {label username /}
                                 {input username}
+                                <span class="invalid-feedback">
+                                    {inputError username}
+                                </span>
                             </div>
                             <div class="mb-4">
                                 {label password /}
                                 {input password}
+                                <span class="invalid-feedback">
+                                    {inputError password}
+                                </span>
                             </div>
                             <div class="d-grid">
                                 {input send}

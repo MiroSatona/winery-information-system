@@ -4,17 +4,13 @@ namespace App\Presentation\Shop;
 
 use Nette;
 use App\Model\ProductRepository;
-use App\Model\ROLE;
 use App\Presentation\BasePresenter;
 
 final class ShopPresenter extends  BasePresenter
 {
-    private ProductRepository $wineRepository;
-
-    public function __construct(ProductRepository $wineRepository) 
+    public function __construct(private ProductRepository $wineRepository) 
     {
-      parent::__construct();
-      $this->wineRepository = $wineRepository;
+        parent::__construct();
     }
 
     public function startup(): void

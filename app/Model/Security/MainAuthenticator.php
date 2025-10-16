@@ -2,32 +2,21 @@
 
 declare(strict_types=1);
 
-namespace App\Model;
+namespace App\Model\Security;
 
-use Nette;
 use Nette\Security\SimpleIdentity;
+use Nette\Security\Passwords;
+use Nette\Database\Explorer;
+use Nette\Security\AuthenticationException;
+use Nette\Security\Authenticator;
+use App\Model\Security\Role;
 
-enum ROLE : string {
-    case ADMIN = "admin";
-    case USER = "user";
-    case WORKER = "worker";
-    case VINTNER = "vintner";
-    case GUEST = "guest";
-}
 
-enum RESOURCE : string {
-    case ADMIN_PAGE = "admin_page";
-    case USER_PAGE = "user_page";
-    case WORKER_PAGE = "worker_page";
-    case VINTNER_PAGE = "vintner_page";
-    case GUEST_PAGE = "guest_page";
-}
-
-class MainAuthenticator implements Nette\Security\Authenticator
+class MainAuthenticator implements Authenticator
 {
 	public function __construct(
-		private Nette\Database\Explorer $database,
-		private Nette\Security\Passwords $passwords,
+		private Explorer $database,
+		private Passwords $passwords,
 	) {
 	}
 
@@ -38,33 +27,32 @@ class MainAuthenticator implements Nette\Security\Authenticator
 			->fetch();
 
 		if (!$row) {
-			throw new Nette\Security\AuthenticationException('User not found.');
+			throw new AuthenticationException('User not found.');
 		}
 
-        bdump($row);
         $saltedPassword = $password . $row->PSWD_SALT;
 
 		if (!$this->passwords->verify($saltedPassword, $row->PSWD_HASH)) {
-			throw new Nette\Security\AuthenticationException('Invalid password.');
+			throw new AuthenticationException('Invalid password.');
 		}
 
         $roles = [];
 
         // user always has guest role
-        $roles[] = ROLE::GUEST->name;
+        $roles[] = Role::GUEST->name;
 
         // setup roles based on db data
         if ($row->ROLE_ADMIN) {
-            $roles[] = ROLE::ADMIN->name;
+            $roles[] = Role::ADMIN->name;
         }
         if ($row->ROLE_USER) {
-            $roles[] = ROLE::USER->name;
+            $roles[] = Role::USER->name;
         }
         if ($row->ROLE_WORKER) {
-            $roles[] = ROLE::WORKER->name;
+            $roles[] = Role::WORKER->name;
         }
         if ($row->ROLE_VINTNER) {
-            $roles[] = ROLE::VINTNER->name;
+            $roles[] = Role::VINTNER->name;
         }
 
 		return new SimpleIdentity(

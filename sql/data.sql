@@ -34,11 +34,11 @@ VALUES
 (3, 3, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky');
 
 -- WINE_VARIETY table 
-INSERT INTO WINE_VARIETY (ID, ID_PICTURE, NAME, DESCRIPTION)
+INSERT INTO WINE_VARIETY (ID, ID_PICTURE, COLOR, NAME, DESCRIPTION)
 VALUES
-(1, 1, 'Cabernet Sauvignon', 'Plnotělé červené víno s vysokými taniny'),
-(2, 2, 'Chardonnay', 'Populární bílé víno s ovocnými tóny'),
-(3, 3, 'Pinot Noir', 'Lehké červené víno se zemitými tóny');
+(1, 1, 'RED', 'Cabernet Sauvignon', 'Plnotělé červené víno s vysokými taniny'),
+(2, 2, 'WHITE', 'Chardonnay', 'Populární bílé víno s ovocnými tóny'),
+(3, 3, 'RED', 'Pinot Noir', 'Lehké červené víno se zemitými tóny');
 
 -- WINE_ROW
 INSERT INTO WINE_ROW (CODE, ID_VINEYARD, ID_WINE_VARIETY, HEAD_COUNT, PLANTING_YEAR)

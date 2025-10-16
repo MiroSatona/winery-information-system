@@ -6,8 +6,7 @@ namespace App\Presentation;
 
 use Nette;
 use Nette\Application\UI\Presenter;
-use Nette\Database\Explorer;
-use App\Model\ROLE;
+use App\Model\Security\Role;
 
 class BasePresenter extends Presenter
 {

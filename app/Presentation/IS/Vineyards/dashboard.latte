@@ -1,0 +1,26 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Vinohrady
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <h2>Přehled vinohradů</h2>
+    <p>Zde budou funkce, možná ...</p>
+
+    {foreach $vineyards as $vineyard}
+        <div>
+            <div>
+                {if $vineyard->getImage() !== null}
+                    <img src="{$vineyard->getImage()->src}" class="me-3" style="width: 100px; height: auto; object-fit: cover; border-radius: 8px;">
+                {/if}
+                <h5>{$vineyard->getName()}</h5>
+            </div>
+            <p><strong>Lokace:</strong> {$vineyard->getLocation()}</p>
+            {if $vineyard->getDescription() !== null}
+                <p><strong>Popis:</strong> {$vineyard->getDescription()}</p>
+            {/if}
+        </div>
+    {/foreach}
+
+{/block isMainPanel}

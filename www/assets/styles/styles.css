@@ -123,6 +123,14 @@ html {
     margin-bottom: 1rem !important;
 }
 
+/* Input error styling */
+.invalid-feedback {
+    color: #dc3545 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
 /* Text effects */
 .text-shadow {
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);

@@ -1,0 +1,38 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Model\Security;
+
+use Nette\Security\Permission;
+use App\Model\Security\Role;
+
+class AuthorizatorFactory
+{
+	public static function create(): Permission
+	{
+		$acl = new Permission;
+
+        $acl->addRole(Role::GUEST->name);
+        $acl->addRole(Role::USER->name);
+        $acl->addRole(Role::WORKER->name);
+        $acl->addRole(Role::VINTNER->name);
+        $acl->addRole(Role::ADMIN->name);
+
+        //  define resources
+        $acl->addResource(Resource::GUEST_PAGE->name);
+        $acl->addResource(Resource::USER_PAGE->name);
+        $acl->addResource(Resource::WORKER_PAGE->name);
+        $acl->addResource(Resource::VINTNER_PAGE->name);
+        $acl->addResource(Resource::ADMIN_PAGE->name);
+
+        // define permissions
+        $acl->allow(Role::GUEST->name, Resource::GUEST_PAGE->name);
+        $acl->allow(Role::USER->name, Resource::USER_PAGE->name);
+        $acl->allow(Role::WORKER->name, Resource::WORKER_PAGE->name);
+        $acl->allow(Role::VINTNER->name, Resource::VINTNER_PAGE->name);
+        $acl->allow(Role::ADMIN->name, Resource::ADMIN_PAGE->name);
+
+		return $acl;
+	}
+}

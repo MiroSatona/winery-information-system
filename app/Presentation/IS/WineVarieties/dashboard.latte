@@ -1,0 +1,20 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <h2>Přehled odrůd vín</h2>
+    <p>Zde budou funkce, možná ...</p>
+
+    {foreach $wineVarieties as $variety}
+        <div>
+            <div>
+                <h5>{$variety->getName()} <span>{$variety->getColor()->value}</span></h5>
+                <p>{$variety->getDescription()}</p>
+            </div>
+        </div>
+    {/foreach}
+
+{/block isMainPanel}

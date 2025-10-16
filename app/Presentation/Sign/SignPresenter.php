@@ -5,20 +5,18 @@ declare(strict_types=1);
 namespace App\Presentation\Sign;
 
 use Nette;
-use App\Model\ROLE;
 use App\Model\FlashMsgType;
 use App\Presentation\BasePresenter;
+use App\Model\Security\SignUpData;
+use App\Model\Security\SignUpWorker;
 use Nette\Application\UI\Form;
+use Nette\Security\AuthenticationException;
 
 final class SignPresenter extends BasePresenter
 {
-    private Nette\Database\Explorer $database;
-    private Nette\Security\Passwords $passwords;
-
-    public function __construct(Nette\Database\Explorer $database, Nette\Security\Passwords $passwords)
+    public function __construct(private SignUpWorker $signUpWorker)
     {
-        $this->database = $database;
-        $this->passwords = $passwords;
+        parent::__construct();
     }
 
     public function startup(): void
@@ -79,7 +77,7 @@ final class SignPresenter extends BasePresenter
             $this->getUser()->login($values->username, $values->password);
             $this->flashMessage('Byli jste úspěšně přihlášeni.', 'success');
             $this->redirect('Home:default');
-        } catch (Nette\Security\AuthenticationException $e) {
+        } catch (AuthenticationException $e) {
             $this->flashMessage('Přihlášení se nezdařilo. Zkontrolujte své uživatelské jméno a heslo.', FlashMsgType::ERROR->value);
         }
     }
@@ -173,40 +171,25 @@ final class SignPresenter extends BasePresenter
 
     public function processSignUpForm(Form $form, \stdClass $values): void
     {
-        // Check if username or email already exists
-        $existingUser = $this->database->table('USER')
-            ->where('username', $values->username)
-            ->where('email', $values->email)
-            ->fetch();
+        $data = new SignUpData(
+            $values->name,
+            $values->surname,
+            $values->username,
+            $values->email,
+            $values->phone,
+            $values->city,
+            $values->street,
+            $values->houseNumber,
+            $values->postalCode,
+            $values->password
+        );
 
-        if ($existingUser) {
+        $result = $this->signUpWorker->signUp($data);
+
+        if (!$result) {
             $this->flashMessage('Uživatelské jméno nebo e-mail již existuje.', FlashMsgType::ERROR->value);
             return;
         }
-
-        // Generate salt and hash the password
-        $salt = bin2hex(random_bytes(16));
-        $saltedPassword = $values->password . $salt;
-        $hashedPassword = $this->passwords->hash($saltedPassword);
-
-        // Insert new user into the database
-        $this->database->table('USER')->insert([
-            'name' => $values->name,
-            'surname' => $values->surname,
-            'email' => $values->email,
-            'phone_number' => $values->phone,
-            'username' => $values->username,
-            'city' => $values->city,
-            'post_code' => $values->postalCode,
-            'street' => $values->street,
-            'house_number' => $values->houseNumber,
-            'pswd_salt' => $salt,
-            'pswd_hash' => $hashedPassword,
-            'role_user' => true, // Default role
-            'role_admin' => false,
-            'role_worker' => false,
-            'role_vintner' => false,
-        ]);
 
         $this->flashMessage('Registrace proběhla úspěšně. Nyní se můžete přihlásit.', FlashMsgType::SUCCESS->value);
         $this->redirect('Sign:in');
