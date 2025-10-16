@@ -10,15 +10,14 @@
 
 	{asset 'styles/styles.css'}
 
-	<title>{ifset title}{include title|stripHtml} | {/ifset}VINO IS</title>
+	<title>{ifset title}{include title|stripHtml} | {/ifset}Vinařství Andrej</title>
 </head>
 
 <body>
 	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
-	<!-- todo add Top Menu -->
 
 	{block topMenuBar}
-		<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+		<nav class="mainMenu navbar navbar-expand-lg navbar-light bg-light border-bottom position-fixed w-100">
 			<div class="container-fluid">
 				<!-- LEFT home link-->
 				<a href="{link Home:default}" class="text-decoration-none">
@@ -26,7 +25,7 @@
 						{block topMenuLeft}
 							
 							<img src="{asset 'icons/appIcon.jpg'}" class="appIcon" >
-							<strong>VINO IS</strong>
+							<strong>Vinařství Andrej</strong>
 						{/block topMenuLeft}
 					</div>
 				</a>
@@ -66,7 +65,8 @@
 	
 
 
-
-	{include content}
+	<div class="main-content">
+		{include content}
+	</div>
 </body>
 </html>

@@ -6,9 +6,10 @@ namespace App\Presentation\Sign;
 
 use Nette;
 use App\Model\ROLE;
+use App\Presentation\BasePresenter;
 use Nette\Application\UI\Form;
 
-final class SignPresenter extends Nette\Application\UI\Presenter
+final class SignPresenter extends BasePresenter
 {
     private Nette\Database\Explorer $database;
     private Nette\Security\Passwords $passwords;
@@ -19,28 +20,24 @@ final class SignPresenter extends Nette\Application\UI\Presenter
         $this->passwords = $passwords;
     }
 
+    public function startup(): void
+    {
+        parent::startup();
+    }
+
     public function renderDefault(): void
     {
-        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
-        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
-        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
-        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+
     }
 
     public function renderIn(): void
     {
-        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
-        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
-        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
-        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+
     }
 
     public function renderUp(): void
     {
-        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
-        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
-        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
-        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+        
     }
 
     public function createComponentSignInForm(): Form
