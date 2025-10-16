@@ -4,6 +4,19 @@
 	IS
 {/block}
 
+{block topMenuLeft}
+	<i class="fas fa-arrow-left me-2"></i>Zpět Domů
+{/block topMenuLeft}
+
+{block topMenuCenter}
+	<a href="#" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
+		<i class="fas fa-cogs me-2"></i>Informační systém
+		{block topMenuISAdditional}
+
+		{/block topMenuISAdditional}
+	</a>
+{/block topMenuCenter}
+
 {block content}
 	<div class="is-layout-container h-100">
 		<div class="row g-0 h-100">
@@ -14,30 +27,46 @@
 					</h5>
 				</div>
 				<nav class="sidebar-nav flex-grow-1 p-2">
-					<a href="{link IS:mainDashboard}" class="is-nav-btn">
-						<i class="fas fa-tachometer-alt me-2"></i>Přehled
-					</a>
+					{if $userWorker || $userVintner || $userAdmin}
+						<a href="{link IS:mainDashboard}" class="is-nav-btn">
+							<i class="fas fa-tachometer-alt me-2"></i>Přehled
+						</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:viewCalendar}" class="is-nav-btn">
 						<i class="fas fa-calendar-alt me-2"></i>Kalendář
 					</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:tasksDashboard}" class="is-nav-btn">
 						<i class="fas fa-tasks me-2"></i>Úkony
 					</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:wineDashboard}" class="is-nav-btn">
 						<i class="fas fa-wine-glass me-2"></i>Víno
 					</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:vineyardsDashboard}" class="is-nav-btn">
 						<i class="fas fa-mountain me-2"></i>Vinohrady
 					</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:wineVarietiesDashboard}" class="is-nav-btn">
 						<i class="fas fa-seedling me-2"></i>Odrůdy
 					</a>
+					{/if}
+					{if $userAdmin}
 					<a href="{link IS:usersDashboard}" class="is-nav-btn">
 						<i class="fas fa-users me-2"></i>Uživatelé
 					</a>
+					{/if}
+					{if $userWorker || $userVintner}
 					<a href="{link IS:ordersDashboard}" class="is-nav-btn">
 						<i class="fas fa-shopping-cart me-2"></i>Objednávky
 					</a>
+					{/if}
 				</nav>
 			</div>
 			<div class="col-md-10 is-main-content">
