@@ -14,11 +14,11 @@ body {
 .mainMenu {
     top: 0;
     z-index: 1000;
-    max-height: 100px;
+    height: 80px;
+    max-height: 80px;
 }
 
 .main-content {
-    padding-top: 20px;
     margin-top: 80px;
 }
 
