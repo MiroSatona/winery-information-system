@@ -1,7 +1,110 @@
+{block title}
+    Registrace
+{/block}
+
 {block content}
+    <div class="auth-background position-relative">
+        <img src="{asset 'images/home_picture.jpg'}" alt="Vinařství pozadí" class="auth-bg-image">
+        <div class="auth-overlay"></div>
+        
+        <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-5 position-relative">
+            <div class="row w-100 justify-content-center">
+                <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-lg border-0 auth-card">
+                        <div class="card-header bg-success text-white text-center py-4">
+                            <h1 class="mb-0 fs-3 fw-bold">
+                                <i class="fas fa-user-plus me-2"></i>Registrace
+                            </h1>
+                        </div>
+                        <div class="card-body p-4">
+                            {form signUpForm}
+                                {* Personal Information Section *}
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-user me-2"></i>Osobní údaje
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label name /}
+                                        {input name}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label surname /}
+                                        {input surname}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label email /}
+                                        {input email}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label phone /}
+                                        {input phone}
+                                    </div>
+                                </div>
 
-<h1>Sign Up</h1>
+                                {* Address Section *}
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Adresa
+                                        </h5>
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        {label street /}
+                                        {input street}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {label houseNumber /}
+                                        {input houseNumber}
+                                    </div>
+                                    <div class="col-md-8 mb-3">
+                                        {label city /}
+                                        {input city}
+                                    </div>
+                                    <div class="col-md-4 mb-3">
+                                        {label postalCode /}
+                                        {input postalCode}
+                                    </div>
+                                </div>
 
-{control signUpForm}
+                                {* Account Section *}
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-key me-2"></i>Přihlašovací údaje
+                                        </h5>
+                                    </div>
+                                    <div class="col-12 mb-3">
+                                        {label username /}
+                                        {input username}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label password /}
+                                        {input password}
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        {label passwordConfirm /}
+                                        {input passwordConfirm}
+                                    </div>
+                                </div>
 
+                                <div class="d-grid gap-2">
+                                    {input send}
+                                </div>
+                            {/form}
+                        </div>
+                    </div>
+                    <div class="card-footer text-center bg-light py-3">
+                        <small class="text-muted">
+                            Již máte účet? 
+                            <a href="{link Sign:in}" class="text-primary text-decoration-none fw-bold">
+                                Přihlásit se
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block content}

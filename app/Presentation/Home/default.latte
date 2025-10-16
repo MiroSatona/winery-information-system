@@ -1,12 +1,17 @@
 {layout ../@layout.latte}
 
+{block title}
+    Domů
+{/block}
+
+
 {block content}
     
     <div class="position-relative">
         <!-- Picture -->
         <img src="{asset $homeImage}" alt="Home" class="w-100 vh-100 object-fit-cover">
 
-        <!-- Overlay  of the imige -->
+        <!-- Overlay  of the image -->
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
         <!-- Text over the image -->
         <div class="position-absolute top-50 start-50 translate-middle">

@@ -24,6 +24,11 @@ final class ISPresenter extends BasePresenter
         }
     }
 
+    public function renderViewCalendar(): void
+    {
+        
+    }
+
     public function renderOrdersDashboard(): void
     {
         

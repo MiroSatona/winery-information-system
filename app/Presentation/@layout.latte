@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-100">
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width">
@@ -10,63 +10,149 @@
 
 	{asset 'styles/styles.css'}
 
+	{block additionalHeadContent}
+
+	{/block additionalHeadContent}
+
 	<title>{ifset title}{include title|stripHtml} | {/ifset}Vinařství Andrej</title>
 </head>
 
-<body>
-	<div n:foreach="$flashes as $flash" n:class="flash, $flash->type">{$flash->message}</div>
+<body class="d-flex flex-column h-100">
+	{* Flash messages *}
+	<div class="flash-container">
+        <div n:foreach="$flashes as $flash" class="flash-message alert-{$flash->type}">
+		{switch $flash->type}
+			{case 'success'}
+				<div class="flash-content">
+					<i class="flash-icon fas fa-check-circle"></i>
+					<span class="flash-text">{$flash->message}</span>
+				</div>
+				<button type="button" class="flash-close" onclick="this.parentElement.remove()">
+					<i class="fas fa-times"></i>
+				</button>
 
+			{case 'error'}
+				<div class="flash-content">
+					<i class="flash-icon fas fa-exclamation-circle"></i>
+					<span class="flash-text">{$flash->message}</span>
+				</div>
+				<button type="button" class="flash-close" onclick="this.parentElement.remove()">
+					<i class="fas fa-times"></i>
+				</button>
+
+			{case 'info'}
+				<div class="flash-content">
+					<i class="flash-icon fas fa-info-circle"></i>
+					<span class="flash-text">{$flash->message}</span>
+				</div>
+				<button type="button" class="flash-close" onclick="this.parentElement.remove()">
+					<i class="fas fa-times"></i>
+				</button>
+
+			{case 'warning'}
+				<div class="flash-content">
+					<i class="flash-icon fas fa-exclamation-triangle"></i>
+					<span class="flash-text">{$flash->message}</span>
+				</div>
+				<button type="button" class="flash-close" onclick="this.parentElement.remove()">
+					<i class="fas fa-times"></i>
+				</button>
+		{/switch}
+		</div>
+    </div>
+	
+	{* Top Menu Bar *}
 	{block topMenuBar}
-		<nav class="mainMenu navbar navbar-expand-lg navbar-light bg-light border-bottom position-fixed w-100">
-			<div class="container-fluid">
+		<nav class="mainMenu navbar navbar-expand-lg navbar-light bg-light border-bottom position-fixed w-100 shadow">
+			<div class="container-fluid px-4">
 				<!-- LEFT home link-->
 				<a href="{link Home:default}" class="text-decoration-none">
-					<div class="navbar-brand">
+					<div class="navbar-brand d-flex align-items-center">
 						{block topMenuLeft}
-							
-							<img src="{asset 'icons/appIcon.jpg'}" class="appIcon" >
-							<strong>Vinařství Andrej</strong>
+							<img src="{asset 'icons/appIcon.jpg'}" class="appIcon me-3" >
+							<strong class="fs-4">Vinařství Andrej</strong>
 						{/block topMenuLeft}
 					</div>
 				</a>
 
-				<!-- CENTRE - main navigation -->
-				<div class="navbar-nav mx-auto">
-					{block topMenuCenter}
-						<a href="{link Home:default}" class="nav-link mx-2">Domů</a>
-						<a href="{link Shop:default}" class="nav-link mx-2">Obchod</a>
-						{if $userWorker || $userVintner || $userAdmin}
-							<a href="{link IS:mainDashboard}" class="nav-link mx-2">IS</a>
-						{/if}
-					{/block topMenuCenter}
-				</div>
+				<!-- Mobile toggle button -->
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+						aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
 
-				<!-- RIGHT - user info and auth -->
-				<div class="navbar-nav">
-					{block topMenuRight}
-						{if $user->isLoggedIn()}
-							<div class="nav-item dropdown">
-								<a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-									<i class="fas fa-user-circle me-2"></i>
-									<span>{$user->getIdentity()->name} {$user->getIdentity()->surname}</span>
-								</a>
-								<a class="dropdown-item" href="{link Sign:out}"><i class="fas fa-sign-out-alt me-2"></i>Odhlásit se</a>
-							</div>
-						{else}
-							<a href="{link Sign:in}" class="nav-link">
-								<i class="fas fa-sign-in-alt me-2"></i>Přihlásit se
+				<div class="collapse navbar-collapse" id="navbarNav">
+					<!-- CENTRE - main navigation -->
+					<div class="navbar-nav mx-auto">
+						{block topMenuCenter}
+							<a href="{link Home:default}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
+								<i class="fas fa-home me-2"></i>Domů
 							</a>
-						{/if}
-					{/block topMenuRight}
+							<div class="nav-separator"></div>
+							<a href="{link Shop:default}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
+								<i class="fas fa-shopping-cart me-2"></i>Obchod
+							</a>
+							{if $userWorker || $userVintner || $userAdmin}
+								<div class="nav-separator"></div>
+								<a href="{link IS:mainDashboard}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
+									<i class="fas fa-cogs me-2"></i>Informační systém
+								</a>
+							{/if}
+						{/block topMenuCenter}
+					</div>
+
+					<!-- RIGHT - user info and auth -->
+					<div class="navbar-nav">
+						{block topMenuRight}
+							{if $user->isLoggedIn()}
+								<div class="nav-separator me-3"></div>
+								<span class="nav-link d-flex align-items-center fw-semibold text-dark me-2">
+									<i class="fas fa-user-circle me-2 text-primary"></i>
+									<span>{$user->getIdentity()->name} {$user->getIdentity()->surname}</span>
+								</span>
+								<a class="nav-link nav-button auth-button px-3 py-2 fw-bold" href="{link Sign:out}">
+									<i class="fas fa-right-from-bracket me-2"></i>Odhlásit se
+								</a>
+							{else}
+								<div class="nav-separator me-3"></div>
+								<a href="{link Sign:in}" class="nav-link nav-button auth-button mx-1 px-3 py-2 fw-bold">
+									<i class="fas fa-right-to-bracket me-2"></i>Přihlásit se
+								</a>
+								<a href="{link Sign:up}" class="nav-link nav-button auth-button mx-1 px-3 py-2 fw-bold">
+									<i class="fas fa-user-plus me-2"></i>Registrovat se
+								</a>
+							{/if}
+						{/block topMenuRight}
+					</div>
 				</div>
 			</div>
 		</nav>
 	{/block topMenuBar}
 	
 
-
-	<div class="main-content">
+	{* Main Content Area *}
+	<div class="main-content flex-grow-1">
 		{include content}
 	</div>
+
+	{* Footer *}
+	<footer class="site-footer bg-white border-top py-3 mt-auto">
+		<div class="container-fluid">
+			<div class="row align-items-center">
+				<div class="col-12 text-center">
+					{block specializedFooter}
+					{* Optional content can be added in sub-templates *}
+					{/block specializedFooter}
+					<div class="footer-content">
+						<span class="fw-bold fs-6">
+							Vinařství Andrej
+						</span>
+						<span class="text-muted mx-2">|</span>
+						<span class="text-muted">© 2025</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</footer>
 </body>
 </html>

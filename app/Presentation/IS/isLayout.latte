@@ -1,23 +1,49 @@
 {layout '../@layout.latte'}
 
+{block title}
+	IS
+{/block}
 
 {block content}
-	<div class="container-fluid">
-		<div class="row" style="min-height: 80vh;">
-			<div class="col-md-2 bg-light d-flex flex-column align-items-start py-4" style="border-right: 1px solid #dee2e6; min-width: 180px;">
-				<!-- Menu Panel -->
-				<a href="{link IS:mainDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Přehled</a>
-				<a href="{link IS:tasksDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Úkony</a>
-				<a href="{link IS:wineDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Víno</a>
-				<a href="{link IS:vineyardsDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Vinohrady</a>
-				<a href="{link IS:wineVarietiesDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Odrůdy</a>
-                <a href="{link IS:usersDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Uživatelé</a>
-                <a href="{link IS:ordersDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Objednávky</a>
-				<!-- Add more buttons as needed -->
+	<div class="is-layout-container h-100">
+		<div class="row g-0 h-100">
+			<div class="col-md-2 is-sidebar bg-light border-end d-flex flex-column">
+				<div class="sidebar-header p-3 border-bottom bg-primary text-white">
+					<h5 class="mb-0 fw-bold">
+						<i class="fas fa-cogs me-2"></i>IS Panel
+					</h5>
+				</div>
+				<nav class="sidebar-nav flex-grow-1 p-2">
+					<a href="{link IS:mainDashboard}" class="is-nav-btn">
+						<i class="fas fa-tachometer-alt me-2"></i>Přehled
+					</a>
+					<a href="{link IS:viewCalendar}" class="is-nav-btn">
+						<i class="fas fa-calendar-alt me-2"></i>Kalendář
+					</a>
+					<a href="{link IS:tasksDashboard}" class="is-nav-btn">
+						<i class="fas fa-tasks me-2"></i>Úkony
+					</a>
+					<a href="{link IS:wineDashboard}" class="is-nav-btn">
+						<i class="fas fa-wine-glass me-2"></i>Víno
+					</a>
+					<a href="{link IS:vineyardsDashboard}" class="is-nav-btn">
+						<i class="fas fa-mountain me-2"></i>Vinohrady
+					</a>
+					<a href="{link IS:wineVarietiesDashboard}" class="is-nav-btn">
+						<i class="fas fa-seedling me-2"></i>Odrůdy
+					</a>
+					<a href="{link IS:usersDashboard}" class="is-nav-btn">
+						<i class="fas fa-users me-2"></i>Uživatelé
+					</a>
+					<a href="{link IS:ordersDashboard}" class="is-nav-btn">
+						<i class="fas fa-shopping-cart me-2"></i>Objednávky
+					</a>
+				</nav>
 			</div>
-			<div class="col-md-10 py-4">
-				<!-- Main Content Section -->
-				{include isMainPanel}
+			<div class="col-md-10 is-main-content">
+				<div class="content-wrapper p-4 h-100">
+					{include isMainPanel}
+				</div>
 			</div>
 		</div>
 	</div>
