@@ -3,4 +3,25 @@
     max-height: 50px;
 }
 
-body { background: "#ffffff"; height: 100%; width: 100%; margin: 0; padding: 0;}
+body {
+    background: "#ffffff";
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.mainMenu {
+    top: 0;
+    z-index: 1000;
+    max-height: 100px;
+}
+
+.main-content {
+    padding-top: 20px;
+    margin-top: 80px;
+}
+
+html {
+    scroll-behavior: smooth;
+}

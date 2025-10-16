@@ -5,12 +5,10 @@ declare(strict_types=1);
 namespace App\Presentation\Home;
 
 use Nette;
-use App\Model\ROLE;
 use App\Model\HomePageContentModel;
-use Nette\Application\UI\Presenter;
+use App\Presentation\BasePresenter;
 
-
-final class HomePresenter extends Presenter
+final class HomePresenter extends BasePresenter
 {   
     /** @var HomePageContentModel $content Content model for getting home page content about vineyards and wine varieties. */
     private HomePageContentModel $content;
@@ -24,23 +22,21 @@ final class HomePresenter extends Presenter
      * @param HomePageContentModel $content Content model for getting home page content about vineyards and wine varieties.
      */
     public function __construct(HomePageContentModel $content)
-    {   
+    {
+        parent::__construct();
         $this->content = $content;
         $this->homeImage = 'images/home_picture.jpg';
     }
 
+    public function startup(): void
+    {
+        parent::startup();
+    }
+
     public function renderDefault(): void
     {
-        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
-        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
-        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
-        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
-
         $this->template->content = $this->content;
         $this->template->homeImage = $this->homeImage;
-      
-        
-        
     }
 
 
