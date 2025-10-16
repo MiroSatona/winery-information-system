@@ -1,13 +1,32 @@
 {layout ../@layout.latte}
 
 {block content}
-
+    
     <div class="position-relative">
+        <!-- Picture -->
         <img src="{asset $homeImage}" alt="Home" class="w-100 vh-100 object-fit-cover">
-        <div class="position-absolute top-50 start-50 translate-middle">
 
-            <h1 class="text-white">Andrejovo vinařství</h1>
-            <p>Vítejte v našem vynařství!</p>
+        <!-- Overlay  of the imige -->
+        <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
+        <!-- Text over the image -->
+        <div class="position-absolute top-50 start-50 translate-middle">
+            <h1 class="text-white display-1 fw-bold">Andrejovo vinařství</h1>
+            <p class="text-white text-center display-6">Vítejte v našem vynařství!</p>
         </div>
     </div>
+
+    <div class="container my-5">
+        <div class="row">
+                <h2>O nás</h2>
+                <p class="fs-5 text-muted">
+                    Ahoj jsem Andrej, vímtám vás v našem vinařsvtí, o které se staráme po století. 
+                    Naše vinařství navazuje na práci našich předků s pokorou a respektem k přírodě. 
+                    Každý hrozen zraje na slunci Jižní Moravy, odkud čerpá sílu, chuť i vůni našeho kraje. 
+                    Vyrábíme vína s důrazem na poctivost, tradici a kvalitu, přičemž se snažíme zachytit jedinečný charakter každého ročníku. 
+                    Každá láhev, kterou držíte v ruce, je výsledkem naší vášně, trpělivosti a rodinného dědictví, které s hrdostí předáváme dál.
+                </p>
+                
+        </div>
+    </div>
+    
 {/block}
