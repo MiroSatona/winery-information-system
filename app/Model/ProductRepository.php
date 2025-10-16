@@ -8,6 +8,7 @@ use App\Model\Wine;
 final class ProductRepository
 {
     private Explorer $database;
+    private array $allWines;
 
     public function __construct(Explorer $database)
     {
@@ -18,10 +19,19 @@ final class ProductRepository
     {
         $rows = $this->database->table("WINE");
         
-        // create the wine class for ease of use 
         $wines = [];
+        
         foreach ($rows as $row) {
-            $wines[] = new Wine(
+            $imgRow = $this->database->table("PICTURE")->get($row->ID_PICTURE);
+            
+            $img = new Image(
+                id: (int)$imgRow->ID,
+                src: (string)$imgRow->LINK,
+                name: (string)$imgRow->IMAGE_NAME,
+                description: (string)$imgRow->DESCRIPTION
+            );
+
+            $wines[(int)$row->ID] = new Wine(
                 id: (int)$row->ID,
                 idLiquidator: $row->ID_LIQUIDATOR,
                 idSellApprover: $row->ID_SELL_APPROVER,
@@ -39,10 +49,16 @@ final class ProductRepository
                 leftSugar: $row->LEFT_SUGAR,
                 acidContents: $row->ACID_CONTENTS,
                 salesDescription: $row->SALES_DESCRIPTION,
-                productionNote: (string)$row->PRODUCTION_NOTE
+                productionNote: (string)$row->PRODUCTION_NOTE,
+                name: (string)$row->WINE_NAME,
+                img: $img
             );
         }
-        
         return $wines;
+    }
+    
+    public function findById(int $id): ?Wine 
+    {
+        return $this->getAllProducts()[$id];
     }
 }
