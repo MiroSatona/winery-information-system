@@ -110,7 +110,7 @@ final class SignPresenter extends BasePresenter
             ->setRequired('Zadejte prosím své telefonní číslo.')
             ->addRule($form::Pattern, 'Zadejte prosím platné telefonní číslo.', '\+?[0-9]{9}')
             ->setHtmlAttribute('class', 'form-control')
-            ->setHtmlAttribute('placeholder', '+420123456789');
+            ->setHtmlAttribute('placeholder', '123456789');
 
         // Address section
         $form->addText('city', 'Město:')

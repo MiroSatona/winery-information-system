@@ -16,6 +16,7 @@ services:
       - db
   db:
     image: mysql:latest
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_czech_ci
     environment:
       MYSQL_DATABASE: iis_winery
       MYSQL_USER: iis_winery

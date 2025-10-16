@@ -1,3 +1,16 @@
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+-- all users have password 111111111
+-- Set database character set and collation
+ALTER DATABASE iis_winery CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci;
+
 -- Things to discuss:
 -- My TODOs in the code
 -- Deletes
@@ -36,7 +49,9 @@ CREATE TABLE USER (
         CHECK (
             REGEXP_LIKE(POST_CODE, '^[0-9]{5}$')
         )
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE TASK (
     ID INTEGER AUTO_INCREMENT,
@@ -70,7 +85,9 @@ CREATE TABLE TASK (
             OR 
             EXECUTION_TIMESTAMP IS NOT NULL
         )
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE PICTURE (
     ID INTEGER AUTO_INCREMENT,
@@ -78,7 +95,9 @@ CREATE TABLE PICTURE (
     LINK TEXT NOT NULL DEFAULT(''),
     DESCRIPTION TEXT NOT NULL DEFAULT(''),
     CONSTRAINT PK_PICTURE PRIMARY KEY (ID)
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE WINE (
     ID INTEGER AUTO_INCREMENT,
@@ -116,7 +135,9 @@ CREATE TABLE WINE (
         FOREIGN KEY (ID_PICTURE)
         REFERENCES PICTURE (ID)
         ON DELETE SET NULL
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE VINEYARD(
     ID INTEGER AUTO_INCREMENT,
@@ -130,7 +151,9 @@ CREATE TABLE VINEYARD(
         FOREIGN KEY (ID_PICTURE)
         REFERENCES PICTURE (ID)
         ON DELETE SET NULL
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE WINE_VARIETY(
     ID INTEGER AUTO_INCREMENT,
@@ -143,7 +166,9 @@ CREATE TABLE WINE_VARIETY(
         FOREIGN KEY (ID_PICTURE)
         REFERENCES PICTURE (ID)
         ON DELETE SET NULL
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE WINE_ROW (
     CODE INTEGER,
@@ -164,7 +189,9 @@ CREATE TABLE WINE_ROW (
 
     CONSTRAINT CHK_WINE_ROAD_HEAD_COUNT
         CHECK (HEAD_COUNT > 0)
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE TREATMENT(
     ID_TASK INT PRIMARY KEY,
@@ -175,7 +202,9 @@ CREATE TABLE TREATMENT(
     CONSTRAINT FK_TREATMENT_TASK
         FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
         ON DELETE CASCADE
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE HARVEST(
     ID_TASK INT PRIMARY KEY,
@@ -200,7 +229,9 @@ CREATE TABLE HARVEST(
     CONSTRAINT FK_HARVEST_WINE
         FOREIGN KEY (ID_WINE) REFERENCES WINE(ID) 
         ON DELETE SET NULL
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE BOTTLING(
     ID_TASK INT PRIMARY KEY,
@@ -217,7 +248,9 @@ CREATE TABLE BOTTLING(
         CHECK (BOTTLES_COUNT > 0),
     CONSTRAINT CHK_BOTTLING_BOTTLE_VOLUME
         CHECK (BOTTLE_VOLUME > 0)
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 
 CREATE TABLE TASK_ROAD (
@@ -237,7 +270,9 @@ CREATE TABLE TASK_ROAD (
         FOREIGN KEY (ID_VINEYARD, CODE_ROW)
         REFERENCES WINE_ROW (ID_VINEYARD, CODE)
         ON DELETE CASCADE
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE WORKER(
     ID_USER INTEGER,
@@ -251,7 +286,9 @@ CREATE TABLE WORKER(
         FOREIGN KEY (ID_TASK)
         REFERENCES TASK (ID)
         ON DELETE CASCADE
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 
 CREATE TABLE CUSTOMER_ORDER (
@@ -267,7 +304,9 @@ CREATE TABLE CUSTOMER_ORDER (
     CONSTRAINT FK_ORDER_CUSTOMER
         FOREIGN KEY (ID_CUSTOMER) REFERENCES USER(ID)
         ON DELETE SET NULL
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE ORDER_ITEM (
     ID_ORDER         INTEGER NOT NULL,
@@ -283,14 +322,16 @@ CREATE TABLE ORDER_ITEM (
         FOREIGN KEY (ID_WINE)  REFERENCES WINE(ID)
         ON DELETE CASCADE
         
-);
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 -- users
-INSERT INTO USER (ID, NAME, SURNAME, USERNAME, EMAIL, PSWD_HASH, PSWD_SALT, PHONE_NUMBER, CITY, POST_CODE, STREET, HOUSE_NUMBER, REGISTRATION_TIMESTAMP, ROLE_USER, ROLE_WORKER, ROLE_VINTNER, ROLE_ADMIN)
-VALUES
-(1, 'John', 'Doe', 'johndoe', 'johndoe@email.com', 'hashed_password_1', 'salt_1', '123456789', 'New York', '10001', '5th Ave', '101', '2023-10-01 12:00:00', TRUE, FALSE, TRUE, FALSE),
-(2, 'Jane', 'Smith', 'janesmith', 'janesmith@email.com', 'hashed_password_2', 'salt_2', '987654321', 'Los Angeles', '90001', 'Sunset Blvd', '202', '2023-10-02 14:00:00', TRUE, TRUE, FALSE, FALSE),
-(3, 'Alice', 'Brown', 'alicebrown', 'alicebrown@email.com', 'hashed_password_3', 'salt_3', '555555555', 'Chicago', '60001', 'Lake Shore Dr', '303', '2023-10-03 16:00:00', FALSE, TRUE, FALSE, TRUE);
+INSERT INTO `USER` (`ID`, `NAME`, `SURNAME`, `USERNAME`, `EMAIL`, `PSWD_HASH`, `PSWD_SALT`, `PHONE_NUMBER`, `CITY`, `POST_CODE`, `STREET`, `HOUSE_NUMBER`, `REGISTRATION_TIMESTAMP`, `ROLE_USER`, `ROLE_WORKER`, `ROLE_VINTNER`, `ROLE_ADMIN`) VALUES
+(1, 'Andrej', 'Kokožka', 'andrej', 'kokozka@vinarstvi.cz', '$argon2id$v=19$m=65536,t=4,p=3$aDBSY0UxNjVoOU42alFodw$eboCEGjKnAp9IlqcUcaV7O+DR4vM/cb4sQDVQpIe/18', 'aa1dab2f594a43cbb3926cc7f8963474', '111111111', 'Znojmo', '12345', 'Vinařská', '99', '2025-10-16 14:40:30', 1, 1, 1, 1),
+(2, 'Josef', 'Navrátil', 'navratil', 'navratil@vinarstvi.cz', '$argon2id$v=19$m=65536,t=4,p=3$TWtCN0F4SVFZS3Rsd05aUg$HUciIOgyHJXTmTh9p0uX7MPaXIXgCYzKtZ9vJvv+mNs', 'f7b641e6d5fa5f05b578e2ec2463f017', '222222222', 'Vinařská Nová Ves', '74581', 'Sudařská', '999', '2025-10-16 14:43:27', 1, 1, 1, 0),
+(3, 'Kamil', 'Pečinka', 'pecinka', 'pecinka@vinarstvi.cz', '$argon2id$v=19$m=65536,t=4,p=3$ZWgxN0Ntb0hiMDFPNC4zbQ$i63r58BNKLbpAw5+qChy9jJh2H4kuSocdccsXuj2PXY', 'bebc5de3871b5bba95adb0555c29de70', '333333333', 'Znojmo', '45632', 'Dlouhá', '9999', '2025-10-16 14:45:30', 1, 1, 0, 0),
+(4, 'Bohumil', 'Klobása', 'klobasa', 'klobas.bohumil@atlas.cz', '$argon2id$v=19$m=65536,t=4,p=3$QmtpTk93am1qMnRDR25kaw$S9pwKYOUnJYq9JYpWN6uBlEEbxtPNkbTVRn80Gw21I8', 'bfc45138b62f36a79266e804e6257f66', '555555555', 'Krátká', '14587', 'Brno', '999999', '2025-10-16 14:47:08', 1, 0, 0, 0);
 
 -- task table
 INSERT INTO TASK (ID, NAME, STATE, CREATION_TIMESTAMP, LAST_CHANGE_TIMESTAMP, PLANNED_EXECUTION_TIMESTAMP, EXECUTION_TIMESTAMP, NOTE, ID_TASK_ISSUER, ID_TASK_CONFIRMER)
@@ -309,23 +350,23 @@ VALUES
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, "milujeme iis", 1, 3, 2, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'A robust red wine perfect for dinners', 'Grown in the heart of the vineyard'),
-(2, "cervene vino",2, 3, 1, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'A smooth white wine with a hint of sweetness', 'Made from late-harvested grapes'),
-(3, "cerne vino", 3, 1, 3, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'A sweet rosé wine, perfect for light meals', 'Produced from selected varieties');
+(1, 'milujeme iis', 1, 3, 2, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
+(2, 'červené víno', 2, 3, 1, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
+(3, 'černé víno', 3, 1, 3, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)
 VALUES
-(1, 1, 'Golden Vineyards', 'Napa Valley, CA', 'A beautiful vineyard known for its rich reds'),
-(2, 2, 'Sunny Vineyards', 'Sonoma, CA', 'A sunny vineyard famous for its white wines'),
-(3, 3, 'Riverbank Vineyards', 'Bordeaux, France', 'A small vineyard located near the riverbank');
+(1, 1, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny'),
+(2, 2, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny'),
+(3, 3, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky');
 
 -- WINE_VARIETY table 
 INSERT INTO WINE_VARIETY (ID, ID_PICTURE, NAME, DESCRIPTION)
 VALUES
-(1, 1, 'Cabernet Sauvignon', 'A full-bodied red wine with high tannins'),
-(2, 2, 'Chardonnay', 'A popular white wine with fruity notes'),
-(3, 3, 'Pinot Noir', 'A light-bodied red wine with earthy notes');
+(1, 1, 'Cabernet Sauvignon', 'Plnotělé červené víno s vysokými taniny'),
+(2, 2, 'Chardonnay', 'Populární bílé víno s ovocnými tóny'),
+(3, 3, 'Pinot Noir', 'Lehké červené víno se zemitými tóny');
 
 -- WINE_ROW
 INSERT INTO WINE_ROW (CODE, ID_VINEYARD, ID_WINE_VARIETY, HEAD_COUNT, PLANTING_YEAR)
@@ -370,3 +411,12 @@ VALUES
 (1, 2, 2, 5, 18.00),
 (2, 1, 1, 15, 12.00),
 (2, 2, 3, 10, 20.00);
+
+-- Restore MySQL settings
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
