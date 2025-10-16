@@ -35,7 +35,7 @@ final class HomePresenter extends BasePresenter
 
     public function renderDefault(): void
     {
-        $this->template->content = $this->content;
+        $this->template->content = $this->content->getHomePageContent();
         $this->template->homeImage = $this->homeImage;
     }
 

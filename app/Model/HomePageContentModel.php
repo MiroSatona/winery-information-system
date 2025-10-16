@@ -25,23 +25,18 @@ class HomePageContentModel{
      */
     public function __construct(Explorer $database) {
         $this->database = $database;
-        $this->sql_query = 'SELECT VINEYARD.ID, VINEYARD.NAME, VINEYARD.DESCRIPTION,
-                            GROUP_CONCAT(
-                                DISTINCT WINE_VARIETY.NAME 
-                                ORDER BY WINE_VARIETY.NAME 
-                                SEPARATOR ", "
-                            ) AS varietiesText
-                            FROM VINEYARD
-                            LEFT JOIN PLANTING 
-                                ON PLANTING.ID_VINEYARD = VINEYARD.ID
-                            LEFT JOIN WINE_VARIETY 
-                                ON WINE_VARIETY.ID = PLANTING.ID_WINE_VARIETY
-                            GROUP BY 
-                                VINEYARD.ID, 
-                                VINEYARD.NAME, 
-                                VINEYARD.DESCRIPTION
-                            ORDER BY 
-                                VINEYARD.NAME;';
+        $this->sql_query = 'SELECT V.ID, V.NAME, V.DESCRIPTION,
+                                GROUP_CONCAT(
+                                    DISTINCT WV.NAME
+                                    ORDER BY WV.NAME
+                                    SEPARATOR ", "
+                                ) AS varietiesText
+                                FROM `VINEYARD` AS V
+                                LEFT JOIN `WINE_ROW`     AS WR ON WR.ID_VINEYARD    = V.ID
+                                LEFT JOIN `WINE_VARIETY` AS WV ON WV.ID             = WR.ID_WINE_VARIETY
+                                GROUP BY V.ID, V.NAME, V.DESCRIPTION
+                                ORDER BY V.NAME;';
+
     }
 
     /**
