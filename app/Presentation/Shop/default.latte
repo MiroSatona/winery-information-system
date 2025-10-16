@@ -1,0 +1,30 @@
+{block content}
+<h1>Wine Shop</h1>
+
+<table>
+    <thead>
+        <tr>
+            <th>Year</th>
+            <th>Color</th>
+            <th>Type</th>
+            <th>Price</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        {foreach $wines as $wine}
+            <tr>
+                <td>{$wine->year}</td>
+                <td>{$wine->color}</td>
+                <td>{$wine->type}</td>
+                <td>{$wine->currentPrice ?? 'N/A'} €</td>
+                <td><a n:href="addToCart! $wine->id">Add to Cart</a></td>
+            </tr>
+        {/foreach}
+    </tbody>
+</table>
+
+{foreach $flashes as $flash}
+    <div class="flash {$flash->type}">{$flash->message}</div>
+{/foreach}
+{/block}
