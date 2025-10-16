@@ -2,6 +2,8 @@
 
 namespace App\Model;
 
+use App\Model\Image;
+
 final class Wine
 {
     public function __construct(
@@ -22,6 +24,8 @@ final class Wine
         public ?int $leftSugar,
         public ?int $acidContents,
         public ?string $salesDescription,
-        public string $productionNote
+        public string $productionNote,
+        public string $name,
+        public Image $img
     ) {}
 }

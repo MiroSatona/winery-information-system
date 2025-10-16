@@ -1,0 +1,30 @@
+{block content}
+<h1>{$wine->name}</h1>
+
+<div class="wine-detail-view">
+    <img src="https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600" alt="{$wine->name}">
+    <p><strong>Year:</strong> {$wine->year}</p>
+    <p><strong>Type:</strong> {$wine->type}</p>
+    <p><strong>Color:</strong> {$wine->color}</p>
+    <p><strong>Price:</strong> {$wine->currentPrice} €</p>
+</div>
+
+<p><a n:href="Home:default">← Back to Wine List</a></p>
+
+<style>
+.wine-detail-view {
+    max-width: 500px;
+    margin: 2rem auto;
+    background: #fff;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    text-align: center;
+}
+.wine-detail-view img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+</style>
+{/block}

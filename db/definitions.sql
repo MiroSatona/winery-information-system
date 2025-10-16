@@ -82,6 +82,7 @@ CREATE TABLE PICTURE (
 
 CREATE TABLE WINE (
     ID INTEGER AUTO_INCREMENT,
+    WINE_NAME VARCHAR(50) NOT NULL DEFAULT('TURBO vino'),
     ID_LIQUIDATOR INTEGER,
     ID_SELL_APPROVER INTEGER,
     ID_PICTURE INTEGER,
@@ -301,8 +302,7 @@ VALUES
 -- picture table
 INSERT INTO PICTURE (ID, NAME, LINK, DESCRIPTION)
 VALUES
-(1, 'Vineyard View', 'https://example.com/vineyard1.jpg', 'Beautiful vineyard view during sunset'),
-(2, 'Wine Bottle', 'https://example.com/winebottle.jpg', 'A bottle of red wine ready for sale'),
+(1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), (2, 'Wine Bottle', 'https://example.com/winebottle.jpg', 'A bottle of red wine ready for sale'),
 (3, 'Harvesting Grapes', 'https://example.com/harvest.jpg', 'Harvesting grapes in the field');
 
 -- wine table 

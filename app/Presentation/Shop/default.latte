@@ -1,30 +1,140 @@
 {block content}
-<h1>Wine Shop</h1>
+<h1 class="page-title">🍷 Wine Shop</h1>
 
-<table>
-    <thead>
-        <tr>
-            <th>Year</th>
-            <th>Color</th>
-            <th>Type</th>
-            <th>Price</th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        {foreach $wines as $wine}
-            <tr>
-                <td>{$wine->year}</td>
-                <td>{$wine->color}</td>
-                <td>{$wine->type}</td>
-                <td>{$wine->currentPrice ?? 'N/A'} €</td>
-                <td><a n:href="addToCart! $wine->id">Add to Cart</a></td>
-            </tr>
-        {/foreach}
-    </tbody>
-</table>
+<div class="wine-grid">
+    {foreach $wines as $wine}
+        <div class="wine-card">
+            <a class="wine-detail" n:href="Wine:detail $wine->id">
+                <div class="wine-image">
+                    <img src="https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="{$wine->name}" />
+                </div>
+                <div class="wine-info">
+                    <h2 class="wine-name">{$wine->name}</h2>
+                    <p class="wine-price">
+                        {ifset $wine->currentPrice}
+                            {$wine->currentPrice} €
+                        {else}
+                            <span class="price-na">N/A</span>
+                        {/ifset}
+                    </p>
+                </div>
+            </a>
+            <div class="wine-actions">
+                <a class="add-to-cart" n:href="addToCart! $wine->id">🛒 Add to Cart</a>
+                <!-- TODO: Implement add-to-cart action -->
+            </div>
+        </div>
+    {/foreach}
+</div>
 
 {foreach $flashes as $flash}
     <div class="flash {$flash->type}">{$flash->message}</div>
 {/foreach}
+
+<style>
+    .page-title {
+        text-align: center;
+        margin: 2rem 0;
+        font-size: 2.2rem;
+        color: #4a2c2a;
+        font-weight: 600;
+    }
+
+    .wine-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1.5rem;
+        padding: 0 2rem 2rem;
+    }
+
+    .wine-card {
+        display: flex;
+        flex-direction: column;
+        background: #fff;
+        border: 1px solid #eee;
+        border-radius: 12px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        transition: all 0.2s ease;
+        overflow: hidden;
+    }
+
+    .wine-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .wine-detail {
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        flex-grow: 1;
+    }
+
+    .wine-image img {
+        width: 100%;
+        border-radius: 8px;
+        object-fit: cover;
+        aspect-ratio: 3/4;
+        background-color: #f7f7f7;
+    }
+
+    .wine-info {
+        margin-top: 0.75rem;
+        padding: 0 0.5rem 1rem;
+    }
+
+    .wine-name {
+        font-size: 1.1rem;
+        color: #333;
+        margin: 0.3rem 0;
+        font-weight: 500;
+    }
+
+    .wine-price {
+        font-size: 1rem;
+        color: #7a1c1c;
+        font-weight: 600;
+    }
+
+    .wine-actions {
+        display: flex;
+        justify-content: center;
+        padding: 0.75rem;
+        border-top: 1px solid #eee;
+        background: #fafafa;
+    }
+
+    .add-to-cart {
+        display: inline-block;
+        background: #7a1c1c;
+        color: #fff;
+        font-weight: 600;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        text-decoration: none;
+        transition: background 0.2s ease;
+    }
+
+    .add-to-cart:hover {
+        background: #8e2323;
+    }
+
+    .price-na {
+        color: #999;
+    }
+
+    .flash {
+        margin: 1rem auto;
+        padding: 1rem 1.5rem;
+        max-width: 500px;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: 500;
+    }
+
+    .flash.success { background: #e8f7ec; color: #246b2c; }
+    .flash.error { background: #fdeaea; color: #8b1a1a; }
+</style>
 {/block}
