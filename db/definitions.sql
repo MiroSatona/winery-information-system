@@ -74,7 +74,7 @@ CREATE TABLE TASK (
 
 CREATE TABLE PICTURE (
     ID INTEGER AUTO_INCREMENT,
-    NAME VARCHAR(31) NOT NULL DEFAULT(''),
+    IMAGE_NAME VARCHAR(31) NOT NULL DEFAULT(''),
     LINK TEXT NOT NULL DEFAULT(''),
     DESCRIPTION TEXT NOT NULL DEFAULT(''),
     CONSTRAINT PK_PICTURE PRIMARY KEY (ID)
@@ -300,7 +300,7 @@ VALUES
 (3, 'Wine Quality Check', 'CANCELED', '2023-10-03 15:00:00', '2023-10-03 16:00:00', '2023-10-10 10:00:00', NULL, 'Quality check canceled due to logistics issues', NULL, NULL);
 
 -- picture table
-INSERT INTO PICTURE (ID, NAME, LINK, DESCRIPTION)
+INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
 (1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), (2, 'Wine Bottle', 'https://example.com/winebottle.jpg', 'A bottle of red wine ready for sale'),
 (3, 'Harvesting Grapes', 'https://example.com/harvest.jpg', 'Harvesting grapes in the field');

@@ -24,7 +24,7 @@ final class ShopPresenter extends  BasePresenter
     
     public function renderDefault(): void
     {
-        
+       $this->template->wines = $this->wineRepository->getAllProducts();
     }
 
     public function handleAddToCart(int $id): void
