@@ -18,6 +18,9 @@ final class HomePresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
-        $this->user->isInRole(ROLE::GUEST->name);
+        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
+        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
+        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
+        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
     }
 }

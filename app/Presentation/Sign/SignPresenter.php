@@ -21,7 +21,26 @@ final class SignPresenter extends Nette\Application\UI\Presenter
 
     public function renderDefault(): void
     {
-        $this->user->isInRole(ROLE::GUEST->name);
+        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
+        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
+        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
+        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+    }
+
+    public function renderIn(): void
+    {
+        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
+        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
+        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
+        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+    }
+
+    public function renderUp(): void
+    {
+        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
+        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
+        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
+        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
     }
 
     public function createComponentSignInForm(): Form
@@ -141,5 +160,12 @@ final class SignPresenter extends Nette\Application\UI\Presenter
 
         $this->flashMessage('Registrace proběhla úspěšně. Nyní se můžete přihlásit.', 'success');
         $this->redirect('Sign:in');
+    }
+
+    public function actionOut(): void
+    {
+        $this->getUser()->logout();
+        $this->flashMessage('Byli jste odhlášeni.', 'success');
+        $this->redirect('Home:default');
     }
 }

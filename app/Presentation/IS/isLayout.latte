@@ -1,0 +1,24 @@
+{layout '../@layout.latte'}
+
+
+{block content}
+	<div class="container-fluid">
+		<div class="row" style="min-height: 80vh;">
+			<div class="col-md-2 bg-light d-flex flex-column align-items-start py-4" style="border-right: 1px solid #dee2e6; min-width: 180px;">
+				<!-- Menu Panel -->
+				<a href="{link IS:mainDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Přehled</a>
+				<a href="{link IS:tasksDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Úkony</a>
+				<a href="{link IS:wineDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Víno</a>
+				<a href="{link IS:vineyardsDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Vinohrady</a>
+				<a href="{link IS:wineVarietiesDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Odrůdy</a>
+                <a href="{link IS:usersDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Uživatelé</a>
+                <a href="{link IS:ordersDashboard}" class="btn btn-outline-primary mb-2 w-100 text-decoration-none">Objednávky</a>
+				<!-- Add more buttons as needed -->
+			</div>
+			<div class="col-md-10 py-4">
+				<!-- Main Content Section -->
+				{include isMainPanel}
+			</div>
+		</div>
+	</div>
+{/block}
