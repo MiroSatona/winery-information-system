@@ -11,7 +11,7 @@ use App\Model\Image;
 final class WineVariety
 {
     public function __construct(
-        private int $id,
+        private ?int $id,
         private string $name,
         private WineVarietyType $color,
         private ?Image $image,

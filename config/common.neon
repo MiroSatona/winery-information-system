@@ -1,6 +1,7 @@
 # see https://doc.nette.org/en/configuring
 
 parameters:
+	uploadsDir: 'uploads'
 
 
 application:

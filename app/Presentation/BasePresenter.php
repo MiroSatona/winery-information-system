@@ -18,10 +18,10 @@ class BasePresenter extends Presenter
     public function startup(): void
     {
         parent::startup();
-        $this->template->userWorker = $this->user->isInRole(ROLE::WORKER->name);
-        $this->template->userVintner = $this->user->isInRole(ROLE::VINTNER->name);
-        $this->template->userAdmin = $this->user->isInRole(ROLE::ADMIN->name);
-        $this->template->userUser = $this->user->isInRole(ROLE::USER->name);
+        $this->template->userWorker = $this->user->isInRole(Role::WORKER->name);
+        $this->template->userVintner = $this->user->isInRole(Role::VINTNER->name);
+        $this->template->userAdmin = $this->user->isInRole(Role::ADMIN->name);
+        $this->template->userUser = $this->user->isInRole(Role::USER->name);
     }
 
     public function renderDefault(): void

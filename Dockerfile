@@ -8,6 +8,13 @@ RUN apt-get update && apt-get install -y \
     git \
     && docker-php-ext-install pdo pdo_mysql mysqli
 
+RUN apt-get update && apt-get install -y libjpeg-dev libpng-dev libwebp-dev libfreetype6-dev \
+    && docker-php-ext-configure gd --with-jpeg --with-webp --with-freetype \
+    && docker-php-ext-install gd
+
+RUN apt-get update && apt-get install -y libicu-dev \
+    && docker-php-ext-install intl
+
 RUN a2enmod rewrite
 
 # Allow .htaccess overrides in DocumentRoot
