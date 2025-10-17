@@ -1,16 +1,17 @@
 {layout ../@layout.latte}
 
+<!-- Title of the page -->
 {block title}
     Domů
 {/block}
 
 
 {block content}
-    
+
+    <!-- Main image with the overlay and -->
     <div class="position-relative">
         <!-- Picture -->
         <img src="{asset $homeImage}" alt="Home" class="w-100 vh-100 object-fit-cover">
-
         <!-- Overlay  of the image -->
         <div class="position-absolute top-0 start-0 w-100 h-100 bg-dark opacity-50"></div>
         <!-- Text over the image -->
@@ -24,7 +25,7 @@
         <div class="row">
                 <h2>O nás</h2>
                 <p class="fs-5 text-muted">
-                    Ahoj jsem Andrej, vímtám vás v našem vinařsvtí, o které se staráme po století. 
+                    Ahoj jsem Andrej, vítám vás v našem vinařsvtí, o které se staráme po století. 
                     Naše vinařství navazuje na práci našich předků s pokorou a respektem k přírodě. 
                     Každý hrozen zraje na slunci Jižní Moravy, odkud čerpá sílu, chuť i vůni našeho kraje. 
                     Vyrábíme vína s důrazem na poctivost, tradici a kvalitu, přičemž se snažíme zachytit jedinečný charakter každého ročníku. 
@@ -34,47 +35,98 @@
         </div>
     </div>
 
+
     <div class="container my-5">
-    <div class="row mb-4">
-        <div class="col text-center">
-            <h2 class="fw-bold">Naše vinohrady</h2>
-            <p class="text-muted">Objevte, kde se rodí naše vína</p>
+        <div class="row mb-4">
+            <div class="col text-left">
+                <h2 >Naše vinohrady</h2>
+                <p class="fs-5 text-muted">Prozkoumejte naše vinohrady, objevte jejich jedinečný příběh a odrůdy, které zde pěstujeme.</p>
+            </div>
+
+            {if $wineYards}
+                <div class="container my-4">
+                    {foreach $wineYards as $yard}
+                        <div class="card mb-4 shadow-lg border-0 rounded-4 overflow-hidden">
+                            {if $yard->PICTURE_LINK}
+                                <img src="{$yard->PICTURE_LINK}" class="card-img-top" alt="{$yard->NAME}" style="object-fit: cover; height: 500px; width: 100%;">
+                            {else}
+                                <p class="text-muted fst-italic">Obrázek se nepodařilo načíst.</p>
+                            {/if}
+
+                            <div class="card-body p-4">
+                                <h3 class="card-title mb-2 fw-bold text-primary">
+                                    {$yard->NAME}
+                                </h3>
+
+                                {if $yard->DESCRIPTION}
+                                    <p class="card-text text-muted mb-3">
+                                        {$yard->DESCRIPTION}
+                                    </p>
+                                {else}
+                                    <p class="text-muted fst-italic">Popis se nepodařilo načíst.</p>
+                                {/if}
+
+                                {if $yard->varietiesText}
+                                    <div class="mt-3">
+                                        <h6 class="fw-semibold">Pěstované odrůdy:</h6>
+                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                            {foreach explode(', ', $yard->varietiesText) as $variety}
+                                                <span class="badge bg-light text-dark border rounded-pill px-3 py-2">
+                                                    {$variety}
+                                                </span>
+                                            {/foreach}
+                                        </div>
+                                    </div>
+                                {else}
+                                    <p class="text-muted fst-italic mt-2">Žádné odrůdy nejsou evidovány.</p>
+                                {/if}
+                            </div>
+                        </div>
+                    {/foreach}
+                </div>
+            {else}
+                <div class="container py-5 text-center text-muted">
+                    <h4>Žádné vinohrady nejsou evidovány.</h4>
+                    <p>Přidej první vinohrad v administraci.</p>
+                </div>
+            {/if}
         </div>
     </div>
 
-    {if $content}
-        <div class="row g-4">
-            {foreach $content as $v}
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-body">
-                            <h3 class="h5 fw-bold mb-2">{$v->NAME}</h3>
-                            <p class="text-muted mb-3">{$v->DESCRIPTION}</p>
+    {if $wineVarieties}
+    <div class="container my-5">
+        <div class="col text-left">
+                <h2 >Naše  odrůdy</h2>
+                <p class="fs-5 text-muted">Prozkoumejte naše odrůdy, které pěstujeme v našich vinohradech a objevte jejich jedinečné vlastnosti.</p>
+            </div>
 
-                            {if $v->varietiesText}
-                                <div class="fw-semibold mb-2">Pěstované odrůdy</div>
-                                <div class="d-flex flex-wrap gap-2">
-                                    {foreach explode(',', $v->varietiesText) as $variety}
-                                        <span class="badge text-bg-light border">
-                                            {trim($variety)}
-                                        </span>
-                                    {/foreach}
-                                </div>
-                            {else}
-                                <div class="alert alert-light border small mb-0">
-                                    <span class="text-muted">Žádné odrůdy nejsou zapsány.</span>
-                                </div>
-                            {/if}
+        <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-4">
+            {foreach $wineVarieties as $var}
+                <div class="col">
+                    <div class="card variety-card h-100 shadow-lg border-0 rounded-4 overflow-hidden">
+                        <div class="ratio ratio-16x9">
+                            <img
+                                src="{$var->PICTURE_LINK ?? '/assets/placeholder-variety.jpg'}"
+                                alt="{$var->NAME}"
+                                class="w-100 h-100 object-fit-cover" loading="lazy">
+                        </div>
+
+                        <div class="card-body p-3 p-md-4">
+                            <h5 class="card-title mb-1 fw-bold text-primary">{$var->NAME}</h5>
+                            <p class="card-text text-muted mb-0">
+                                {$var->DESCRIPTION|truncate:160}
+                            </p>
                         </div>
                     </div>
                 </div>
             {/foreach}
-            </div>
-        {else}
-            <div class="alert alert-secondary text-center" role="alert">
-                Nejsou dostupné žádné informace o vinohradech.
-            </div>
-        {/if}
+        </div>
     </div>
-    
+    {else}
+    <div class="container py-5 text-center text-muted">
+        <h4>Žádné odrůdy nejsou evidovány.</h4>
+        <p>Přidej první odrůdu v administraci.</p>
+    </div>
+    {/if}
+
 {/block}

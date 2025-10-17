@@ -17,7 +17,10 @@ INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
 (1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), 
 (2, 'Milujeme iis', 'https://ih1.redbubble.net/image.2806615933.5785/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg', 'A bottle of red wine ready for sale'),
-(3, 'Cerne vino', 'https://i.pinimg.com/236x/05/1c/0b/051c0b074549db9017495e63563cf92c.jpg', 'mega cerne vino');
+(3, 'Cerne vino', 'https://i.pinimg.com/236x/05/1c/0b/051c0b074549db9017495e63563cf92c.jpg', 'mega cerne vino'),
+(4, 'Ricni vimhorad', 'https://zemesveta.cz/wp-content/uploads/2021/01/Hodoninsko-vinice.jpg', 'Reka vyschla'),
+(5, 'Slunecny vinohrad', 'https://www.janmiklin.cz/photos/palavske-vinohrady-6864.jpg', 'Slunečný vinohrad se slunečními paprsky'),
+(6, 'Zlaty vinohrad', 'https://img.ephoto.sk/data/users/a1/63943/photos/f345e4f1e3a6bcb4b9f980cb44eb82ee0787f6ae.jpg', 'Zlaty vinohrad s plotem');
 
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
@@ -29,9 +32,9 @@ VALUES
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)
 VALUES
-(1, 1, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny'),
-(2, 2, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny'),
-(3, 3, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky');
+(1, 4, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny'),
+(2, 5, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny'),
+(3, 6, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky');
 
 -- WINE_VARIETY table 
 INSERT INTO WINE_VARIETY (ID, ID_PICTURE, COLOR, NAME, DESCRIPTION)
