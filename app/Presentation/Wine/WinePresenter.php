@@ -8,15 +8,18 @@ use Nette;
 use App\Model\ProductRepository;
 use App\Model\Security\Role;
 use App\Presentation\BasePresenter;
+use App\Model\Image\ImageRepository;
 
 final class WinePresenter extends BasePresenter 
 {
     private ProductRepository $items;
+    private ImageRepository $imageRepository;
 
-    public function __construct(ProductRepository $items)
+    public function __construct(ProductRepository $items, ImageRepository $imageRepository)
     {
         parent::__construct();
         $this->items = $items; 
+        $this->imageRepository = $imageRepository;
     }
     public function startup(): void
     {
@@ -28,6 +31,7 @@ final class WinePresenter extends BasePresenter
 
         
         $this->template->wine = $this->items->findById($id); 
+        $this->template->imageRepository = $this->imageRepository;
     }
     
     public function handleAddToCart(int $id): void

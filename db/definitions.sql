@@ -349,14 +349,17 @@ VALUES
 (3, 'Tramín Červený', 'traminCerveny.jpg', 'Obrázek odrůdy Tramín Červený'),
 (4, 'Zlaté vinohrady', 'vinohrad1.jpg', 'Obrázek vinohradu Zlaté vinohrady'),
 (5, 'Slunečné vinohrady', 'vinohrad2.jpg', 'Obrázek vinohradu Slunečné vinohrady'),
-(6, 'Říční vinohrady', 'vinohrad3.jpg', 'Obrázek vinohradu Říční vinohrady');
+(6, 'Říční vinohrady', 'vinohrad3.jpg', 'Obrázek vinohradu Říční vinohrady'),
+(7, 'Irsai Oliver', 'irsaiOliverVino.png', 'Obrázek láhve Irsai Oliver'),
+(8, 'Modrý Portugal', 'modryPortugalVino.jpeg', 'Obrázek láhve Modrý Portugal'),
+(9, 'Tramín Červený', 'traminCervenyVino.png', 'Obrázek láhve Tramín Červený');
 
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, 'milujeme iis', 1, 3, 2, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
-(2, 'červené víno', 2, 3, 1, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
-(3, 'černé víno', 3, 1, 3, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
+(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
+(2, 'Modrý Portugal', 2, 3, 8, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
+(3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)

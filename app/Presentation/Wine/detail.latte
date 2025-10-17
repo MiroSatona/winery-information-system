@@ -3,7 +3,7 @@
 
 <div class="wine-detail-container">
     <div class="wine-image">
-        <img src="{$wine->img->src}" alt="{$wine->img->description}">
+        <img src="{asset $imageRepository->getPathForImage($wine->img)}" alt="{$wine->img->description}">
     </div>
 
     <div class="wine-info">

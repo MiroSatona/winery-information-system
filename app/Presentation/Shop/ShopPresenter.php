@@ -2,6 +2,7 @@
 
 namespace App\Presentation\Shop;
 
+use App\Model\Image\ImageRepository;
 use Nette;
 use App\Model\ProductRepository;
 use App\Presentation\BasePresenter;
@@ -9,7 +10,7 @@ use App\Model\Orders\OrderRepository;
 
 final class ShopPresenter extends  BasePresenter
 {
-    public function __construct(private ProductRepository $wineRepository, private OrderRepository $orderRep) 
+    public function __construct(private ProductRepository $wineRepository, private OrderRepository $orderRep, private ImageRepository $imageRepository) 
     {
         parent::__construct();
     }
@@ -22,6 +23,7 @@ final class ShopPresenter extends  BasePresenter
     public function renderDefault(): void
     {
        $this->template->wines = $this->wineRepository->getAllProducts();
+       $this->template->imageRepository = $this->imageRepository;
     }
 
     public function handleAddToCart(int $id): void

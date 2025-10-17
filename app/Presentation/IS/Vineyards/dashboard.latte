@@ -10,9 +10,9 @@
 
     {foreach $vineyards as $vineyard}
         <div>
-            <div>
+            <div>   
                 {if $vineyard->getImage() !== null}
-                    <img src="{$vineyard->getImage()->src}" class="me-3" style="width: 100px; height: auto; object-fit: cover; border-radius: 8px;">
+                    <img src="{asset $imageRepository->getPathForImage($vineyard->getImage())}" class="me-3" style="width: 100px; height: auto; object-fit: cover; border-radius: 8px;">
                 {/if}
                 <h5>{$vineyard->getName()}</h5>
             </div>

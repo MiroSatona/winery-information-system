@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Vineyards;
 
+use App\Model\Image\ImageRepository;
 use Nette;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
@@ -13,7 +14,7 @@ use App\Model\Vineyard\Vineyard;
 final class VineyardsPresenter extends BasePresenter
 {
 
-    public function __construct(private VineyardRepository $vineyardRepository)
+    public function __construct(private VineyardRepository $vineyardRepository, private ImageRepository $imageRepository)
     {
         parent::__construct();
     }
@@ -29,5 +30,6 @@ final class VineyardsPresenter extends BasePresenter
     public function renderDashboard(): void
     {
         $this->template->vineyards = $this->vineyardRepository->fetchAll();
+        $this->template->imageRepository = $this->imageRepository;
     }
 }

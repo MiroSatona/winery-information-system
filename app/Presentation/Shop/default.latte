@@ -13,7 +13,7 @@
             <a class="wine-detail" n:href="Wine:detail $wine->id">
                 <div class="wine-image">
                     {if $wine->img}
-                        <img src="{$wine->img->src}" alt="{$wine->img->description}" />
+                        <img src="{asset $imageRepository->getPathForImage($wine->img)}" alt="{$wine->img->description}" />
                     {else}
                         <img src="{asset 'images/tempWine.jpg'}" alt="Default Wine Image" />
                     {/if}
