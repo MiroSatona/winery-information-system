@@ -25,6 +25,6 @@ final class Wine
         public ?string $salesDescription,
         public string $productionNote,
         public string $name,
-        public Image $img
+        public ?Image $img
     ) {}
 }

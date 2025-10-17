@@ -344,12 +344,12 @@ VALUES
 -- picture table
 INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
-(1, 'Turbo vino', 'https://images.pexels.com/photos/2912108/pexels-photo-2912108.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=600', 'Beautiful vineyard view during sunset'), 
-(2, 'Milujeme iis', 'https://ih1.redbubble.net/image.2806615933.5785/bg,f8f8f8-flat,750x,075,f-pad,750x1000,f8f8f8.jpg', 'A bottle of red wine ready for sale'),
-(3, 'Cerne vino', 'https://i.pinimg.com/236x/05/1c/0b/051c0b074549db9017495e63563cf92c.jpg', 'mega cerne vino'),
-(4, 'Ricni vimhorad', 'https://zemesveta.cz/wp-content/uploads/2021/01/Hodoninsko-vinice.jpg', 'Reka vyschla'),
-(5, 'Slunecny vinohrad', 'https://www.janmiklin.cz/photos/palavske-vinohrady-6864.jpg', 'Slunečný vinohrad se slunečními paprsky'),
-(6, 'Zlaty vinohrad', 'https://img.ephoto.sk/data/users/a1/63943/photos/f345e4f1e3a6bcb4b9f980cb44eb82ee0787f6ae.jpg', 'Zlaty vinohrad s plotem');
+(1, 'Irsai Oliver', 'irsaiOliver.webp', 'Obrázek odrůdy Irsai Oliver'),
+(2, 'Modrý Portugal', 'modryPortugal.jpg', 'Obrázek odrůdy Modrý Portugal'),
+(3, 'Tramín Červený', 'traminCerveny.jpg', 'Obrázek odrůdy Tramín Červený'),
+(4, 'Zlaté vinohrady', 'vinohrad1.jpg', 'Obrázek vinohradu Zlaté vinohrady'),
+(5, 'Slunečné vinohrady', 'vinohrad2.jpg', 'Obrázek vinohradu Slunečné vinohrady'),
+(6, 'Říční vinohrady', 'vinohrad3.jpg', 'Obrázek vinohradu Říční vinohrady');
 
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
@@ -368,9 +368,9 @@ VALUES
 -- WINE_VARIETY table 
 INSERT INTO WINE_VARIETY (ID, ID_PICTURE, COLOR, NAME, DESCRIPTION)
 VALUES
-(1, 1, 'RED', 'Cabernet Sauvignon', 'Plnotělé červené víno s vysokými taniny'),
-(2, 2, 'WHITE', 'Chardonnay', 'Populární bílé víno s ovocnými tóny'),
-(3, 3, 'RED', 'Pinot Noir', 'Lehké červené víno se zemitými tóny');
+(1, 1, 'WHITE', 'Irsai Oliver', 'Aromatic white grape variety known for its floral and fruity notes.'),
+(2, 2, 'BLUE', 'Modrý Portugal', 'A red grape variety producing light and fruity wines with a hint of spice.'),
+(3, 3, 'GREY', 'Tramín Červený', 'A pink-skinned grape variety used to make aromatic wines with a spicy character.');
 
 -- WINE_ROW
 INSERT INTO WINE_ROW (CODE, ID_VINEYARD, ID_WINE_VARIETY, HEAD_COUNT, PLANTING_YEAR)

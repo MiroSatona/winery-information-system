@@ -12,7 +12,11 @@
         <div class="wine-card">
             <a class="wine-detail" n:href="Wine:detail $wine->id">
                 <div class="wine-image">
-                    <img src="{$wine->img->src}" alt="{$wine->img->description}" />
+                    {if $wine->img}
+                        <img src="{$wine->img->src}" alt="{$wine->img->description}" />
+                    {else}
+                        <img src="{asset 'images/tempWine.jpg'}" alt="Default Wine Image" />
+                    {/if}
                 </div>
                 <div class="wine-info">
                     <h2 class="wine-name">{$wine->name}</h2>

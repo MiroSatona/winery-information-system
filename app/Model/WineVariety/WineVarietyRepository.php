@@ -7,13 +7,15 @@ namespace App\Model\WineVariety;
 use App\Model\Image\Image;
 use Nette\Database\Explorer;
 use App\Model\WineVariety\WineVariety;
+use App\Model\Image\ImageRepository;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
 final class WineVarietyRepository
 {
     public function __construct(
-        private Explorer $database
+        private Explorer $database,
+        private ImageRepository $imageRepository
     ) {
     }
 
@@ -78,7 +80,7 @@ final class WineVarietyRepository
         );
     }
 
-    public function addWine(WineVariety $wineVariety): bool
+    public function addWineVariety(WineVariety $wineVariety): bool
     {
         try {
             return $this->database->transaction(function () use ($wineVariety) {
@@ -110,7 +112,7 @@ final class WineVarietyRepository
         }
     }
 
-    public function updateWine(WineVariety $wineVariety): bool
+    public function updateWineVariety(WineVariety $wineVariety): bool
     {
         try {
             return $this->database->transaction(function () use ($wineVariety) {
@@ -144,7 +146,7 @@ final class WineVarietyRepository
                 } else {
                     // Remove reference and delete from database
                     if ($pictureId !== null) {
-                        $this->database->table('PICTURE')->get($pictureId)->delete();
+                        $this->imageRepository->removeImage($pictureId);
                     }
                     $pictureId = null;
                 }
@@ -165,7 +167,7 @@ final class WineVarietyRepository
         }
     }
 
-    public function deleteWine(int $id): bool
+    public function deleteWineVariety(int $id): bool
     {
         try {
             return $this->database->transaction(function () use ($id) {
@@ -181,7 +183,8 @@ final class WineVarietyRepository
                 
                 // Delete picture as well
                 if ($pictureId !== null) {
-                    $this->database->table('PICTURE')->get($pictureId)->delete();
+                    $this->imageRepository->removeImage($pictureId);
+
                 }
                 return true;
             });

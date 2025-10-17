@@ -1,9 +1,68 @@
 {layout '../isLayout.latte'}
 
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
+    <i class="fas fa-arrow-right me-2 ms-2"></i>Přidat odrůdu
+{/block topMenuISAdditional}
+
 {block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-wine-glass me-2"></i>
+                        Přidání odrůdy vína
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form addWineVariety}
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">
+                                <i class="fas fa-tag me-2 text-muted"></i>{label name /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input name}
+                        </div>
 
-    <h2>Přidání odrůdy vína</h2>
+                        <div class="mb-3">
+                            <label for="color" class="form-label fw-semibold">
+                                <i class="fas fa-palette me-2 text-muted"></i>{label color /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input color}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">
+                                <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
+                            </label>
+                            {input description}
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="image" class="form-label fw-semibold">
+                                <i class="fas fa-camera me-2 text-muted"></i>{label image /}
+                            </label>
+                            {input image}
+                        </div>
 
-    {control addWineVariety}
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <a href="{link WineVarieties:dashboard}" class="btn btn-outline-secondary btn-lg w-100 fw-bold">
+                                        <i class="fas fa-times me-2"></i>Zrušit
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {input send}
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
 
 {/block isMainPanel}
