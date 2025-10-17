@@ -4,6 +4,7 @@ services:
 	- App\Model\Security\MainAuthenticator
 	- App\Model\HomePageContentModel
 	- App\Model\Security\SignUpWorker
+	- App\Model\Image\ImageHandler(%uploadsDir%)
 
 	security.passwords: Nette\Security\Passwords(::PASSWORD_ARGON2ID, [memory_cost: 65536, time_cost: 4, threads: 3])
 
