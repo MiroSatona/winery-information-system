@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\WineVariety;
 
-use App\Model\Image;
+use App\Model\Image\Image;
 use Nette\Database\Explorer;
 use App\Model\WineVariety\WineVariety;
 use Tracy\Debugger;

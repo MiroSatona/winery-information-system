@@ -3,7 +3,8 @@
 namespace App\Model;
 
 use Nette\Database\Explorer;
-use App\Model\Wine;
+use App\Model\Image\Image;
+use App\Model\Wine\Wine;
 
 final class ProductRepository
 {

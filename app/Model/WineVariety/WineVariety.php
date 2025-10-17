@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Model\WineVariety;
 
 use App\Model\WineVariety\WineVarietyType;
-use App\Model\Image;
+use App\Model\Image\Image;
 
 
 final class WineVariety

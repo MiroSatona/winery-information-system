@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\Vineyard;
 
-use App\Model\Image;
+use App\Model\Image\Image;
 use Tracy\Debugger;
 use Tracy\ILogger;
 use Nette\Database\Explorer;

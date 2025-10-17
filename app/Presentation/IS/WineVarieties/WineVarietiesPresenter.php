@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\WineVarieties;
 
-use App\Model\Image;
+use App\Model\Image\Image;
 use App\Model\Image\ImageHandler;
 use Nette;
 use Nette\Application\UI\Form;
@@ -118,6 +118,11 @@ final class WineVarietiesPresenter extends BasePresenter
             // todo maybe use flashmessage as well????????
         }
         // todo
+    }
+
+    public function handleDelete(int $id): void
+    {
+
     }
 
 }
