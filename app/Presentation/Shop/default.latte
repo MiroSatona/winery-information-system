@@ -26,16 +26,16 @@
                 </div>
             </a>
             <div class="wine-actions">
+            {if $userUser} 
                 <a class="add-to-cart" n:href="addToCart! $wine->id">🛒 Add to Cart</a>
                 <!-- TODO: Implement add-to-cart action -->
+            {else}
+                <a class="add-to-cart" n:href="Sign:in">🛒 Add to Cart</a>
+            {/if}
             </div>
         </div>
     {/foreach}
 </div>
-
-{foreach $flashes as $flash}
-    <div class="flash {$flash->type}">{$flash->message}</div>
-{/foreach}
 
 <style>
     .page-title {

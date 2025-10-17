@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Model;
+namespace App\Model\Wine;
 
-use App\Model\Image;
+use App\Model\Image\Image;
 
 final class Wine
 {
@@ -10,7 +10,6 @@ final class Wine
         public int $id,
         public ?int $idLiquidator,
         public ?int $idSellApprover,
-        public ?int $idPicture,
         public int $year,
         public int $alcoholPercentage,
         public string $type,
