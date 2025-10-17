@@ -2,9 +2,10 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Model\Security\AuthorizatorFactory::create
 	- App\Model\Security\MainAuthenticator
-	- App\Model\HomePageContentModel
 	- App\Model\Security\SignUpWorker
 	- App\Model\Image\ImageHandler(%uploadsDir%)
+	- App\Model\Vineyard\VineyardRepository
+	- App\Model\WineVariety\WineVarietyRepository
 
 	security.passwords: Nette\Security\Passwords(::PASSWORD_ARGON2ID, [memory_cost: 65536, time_cost: 4, threads: 3])
 

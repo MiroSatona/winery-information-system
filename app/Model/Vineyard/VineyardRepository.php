@@ -179,4 +179,39 @@ final class VineyardRepository
             return false;
         }
     }
+
+    /**
+     * @return array
+     */
+    public function joinWithVarieties(): array{
+
+        /** @var Vineyard $vineyards Array of all vineyards in database*/
+        $vineyards = $this->fetchAll();
+        $joinedData = [];
+
+        foreach ($vineyards as $yard) {
+            /** @var Row[] $wineRows Fetched rows of current vine yard <-> yard */
+            $wineRows = $this->database->table('WINE_ROW')
+                ->where('ID_VINEYARD', $yard->getId())
+                ->fetchAll();
+
+            /** @var Row[] $varietyNames Fetched rows of current vine yard <-> yard */
+            $varietyNames = [];
+
+            foreach ($wineRows as $row) {
+                /** @var Row $variety Fetched variety of the current wine row <-> row */
+                $variety = $this->database->table('WINE_VARIETY')->where('ID', $row->ID_WINE_VARIETY)->fetch();
+                if ($variety && !in_array($variety->NAME, $varietyNames, true)) {
+                    $varietyNames[] = $variety->NAME;
+                }
+            }
+
+            /** @var array $joinedData Array of vineyards with theirs varieties. */
+            $joinedData[] = [
+                'vineyard' => $yard,
+                'varieties' => $varietyNames
+            ];
+        }
+        return $joinedData;
+    }
 }
