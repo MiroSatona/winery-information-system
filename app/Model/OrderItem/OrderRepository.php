@@ -53,4 +53,52 @@ final class OrderItemRepository
             pricePerBottle: (float) $row->PRICE_PER_BOTTLE
         );
     }
+    
+    private function fetchItemRow(int $itemId, int $orderId) {
+        return $this->db->table('ORDER_ITEM')
+            ->where('ID_ORDER', $orderId)
+            ->where('ID_ITEM', $itemId)
+            ->fetch();
+    }
+    
+    public function deleteOrderItemById(int $itemID, int $orderId): bool {
+        $row = $this->fetchItemRow($itemID, $orderId);
+        if ($row == null) {
+            return false;
+        }
+        
+        $row->delete();
+        return true;
+    }
+
+    public function changeItemAmount(int $itemId, int $orderId, int $newAmount): bool {
+        $row = $this->fetchItemRow($itemId, $orderId);
+        if ($row == null) {
+            return false;
+        }
+        
+        $row->update([
+            "BOTTLES_COUNT" => $newAmount
+        ]);
+        return true;
+    }
+
+
+
+    public function addItem(int $orderId, int $wineId, int $amount): bool {
+        // get all the items in the order 
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine == null) {
+            return false;
+        }
+        $row = [
+            "ID_ORDER" => $orderId,
+            "ID_ITEM" => 0,
+            "ID_WINE" => $wineId,
+            "BOTTLES_COUNT" => $amount,
+            "PRICE_PRE_BOTTLE" => $wine->bottlePrice
+        ];
+        $this->db->table("ORDER_ITEM")->insert($row);
+        return true;
+    }
 }
