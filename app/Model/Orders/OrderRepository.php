@@ -60,4 +60,8 @@ final class CustomerOrderRepository
             billingInfo: (string) $row->BILLING_INFO
         );
     }
+    
+    public function fetchCustomerOrder() {
+        
+    }
 }
