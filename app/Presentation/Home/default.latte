@@ -56,7 +56,9 @@
                             <img src="{asset $imageRepository->getPathForImage($image)}" alt="{$image->description}" class="card-img-top" style="object-fit: cover; height: 400px; width: 100%;">
                         <!-- If image does not exist -->
                         {else}
-                            <p class="text-muted fst-italic">Obrázek se nepodařilo načíst.</p>
+                            <div class="py-5 text-center text-muted">
+                                <h4>Žádné odrůdy nejsou evidovány.</h4>
+                            </div>
                         {/if}
                         
                         <!-- Card body with vineyard details -->
