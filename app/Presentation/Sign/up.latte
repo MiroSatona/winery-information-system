@@ -11,7 +11,7 @@
             <div class="row w-100 justify-content-center">
                 <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
                     <div class="card shadow-lg border-0 auth-card">
-                        <div class="card-header bg-success text-white text-center py-4">
+                        <div class="card-header bg-primary text-white text-center py-4">
                             <h1 class="mb-0 fs-3 fw-bold">
                                 <i class="fas fa-user-plus me-2"></i>Registrace
                             </h1>
@@ -26,28 +26,28 @@
                                         </h5>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label name /}
+                                        {label name /} *
                                         {input name}
                                         <span class="invalid-feedback">
                                             {inputError name}
                                         </span>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label surname /}
+                                        {label surname /} *
                                         {input surname}
                                         <span class="invalid-feedback">
                                             {inputError surname}
                                         </span>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label email /}
+                                        {label email /} *
                                         {input email}
                                         <span class="invalid-feedback">
                                             {inputError email}
                                         </span>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label phone /}
+                                        {label phone /} *
                                         {input phone}
                                         <span class="invalid-feedback">
                                             {inputError phone}
@@ -100,21 +100,21 @@
                                         </h5>
                                     </div>
                                     <div class="col-12 mb-3">
-                                        {label username /}
+                                        {label username /} *
                                         {input username}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError username}
                                         </span>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label password /}
+                                        {label password /} *
                                         {input password}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError password}
                                         </span>
                                     </div>
                                     <div class="col-md-6 mb-3">
-                                        {label passwordConfirm /}
+                                        {label passwordConfirm /} *
                                         {input passwordConfirm}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError passwordConfirm}
@@ -122,19 +122,34 @@
                                     </div>
                                 </div>
 
+                                {* Information Section *}
+                                <div class="alert alert-info mb-4">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace k registraci
+                                    </h6>
+                                    <small class="mb-0">
+                                        • Heslo musí mít minimálně 8 znaků<br>
+                                        • Uživatelské jméno musí být dlouhé 4 - 30 znaků<br>
+                                        • Uživatelské jméno může obsahovat pouze písmena, číslice a podtržítka<br>
+                                        • Adresní údaje lze vynechat a doplnit později v profilu
+                                    </small>
+                                </div>
+
                                 <div class="d-grid gap-2">
                                     {input send}
                                 </div>
                             {/form}
+                            
+                            {* Sign in link *}
+                            <div class="text-center mt-4 pt-3 border-top">
+                                <small class="text-muted">
+                                    Již máte účet? 
+                                    <a href="{link Sign:in}" class="text-primary text-decoration-none fw-bold">
+                                        Přihlásit se
+                                    </a>
+                                </small>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-footer text-center bg-light py-3">
-                        <small class="text-muted">
-                            Již máte účet? 
-                            <a href="{link Sign:in}" class="text-primary text-decoration-none fw-bold">
-                                Přihlásit se
-                            </a>
-                        </small>
                     </div>
                 </div>
             </div>

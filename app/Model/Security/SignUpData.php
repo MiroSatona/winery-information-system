@@ -12,10 +12,10 @@ class SignUpData
         private string $username,
         private string $email,
         private string $phone,
-        private string $city,
-        private string $street,
-        private string $houseNumber,
-        private string $postalCode,
+        private ?string $city,
+        private ?string $street,
+        private ?string $houseNumber,
+        private ?string $postalCode,
         private string $password
     ) {
     }
@@ -45,22 +45,22 @@ class SignUpData
         return $this->phone;
     }
 
-    public function getCity(): string
+    public function getCity(): ?string
     {
         return $this->city;
     }
 
-    public function getStreet(): string
+    public function getStreet(): ?string
     {
         return $this->street;
     }
 
-    public function getHouseNumber(): string
+    public function getHouseNumber(): ?string
     {
         return $this->houseNumber;
     }
 
-    public function getPostalCode(): string
+    public function getPostalCode(): ?string
     {
         return $this->postalCode;
     }
