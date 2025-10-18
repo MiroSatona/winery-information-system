@@ -2,6 +2,7 @@ services:
 	- App\Core\RouterFactory::createRouter
 	- App\Model\Security\AuthorizatorFactory::create
 	- App\Model\Security\MainAuthenticator
+	- App\Model\Validation\ValidationDefinitions
 	- App\Model\Security\SignUpWorker
 	- App\Model\Vineyard\VineyardRepository
 	- App\Model\WineVariety\WineVarietyRepository

@@ -8,12 +8,16 @@ use App\Model\Image\Image;
 
 final class Vineyard
 {
+    private array $wineRows = [];
+    private int $wineVarietiesCount = 0;
+
     public function __construct(
         private int $id,
         private string $name,
         private string $location,
         private ?Image $image,
-        private string $description
+        private string $description,
+        private int $yearEstablished
     ) {
     }
 
@@ -60,5 +64,30 @@ final class Vineyard
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getYearEstablished(): int
+    {
+        return $this->yearEstablished;
+    }
+
+    public function getWineRows(): array
+    {
+        return $this->wineRows;
+    }
+
+    public function setWineRows(array $wineRows): void
+    {
+        $this->wineRows = $wineRows;
+    }
+
+    public function getWineVarietiesCount(): int
+    {
+        return $this->wineVarietiesCount;
+    }
+
+    public function setWineVarietiesCount(int $count): void
+    {
+        $this->wineVarietiesCount = $count;
     }
 }

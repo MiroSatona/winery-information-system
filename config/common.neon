@@ -36,3 +36,13 @@ di:
 	export:
 		parameters: no
 		tags: no
+
+
+security:
+	authentication:
+		# period of inactivity after which the user will be logged out
+		expiration: 30 minutes
+
+		# where to store information about the logged-in user
+		storage: session
+
