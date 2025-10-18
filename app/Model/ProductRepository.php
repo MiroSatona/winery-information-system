@@ -5,6 +5,7 @@ namespace App\Model;
 use Nette\Database\Explorer;
 use App\Model\Wine\Wine;
 use App\Model\Wine\WineRepository;
+use App\Model\Wine\WineState;
 
 final class ProductRepository
 {
@@ -15,7 +16,17 @@ final class ProductRepository
     
     public function getAllProducts(): array 
     {
-        return $this->wineRep->fetchAllWines();
+        $result = $this->database->table('WINE')
+        ->where("STATE", WineState::sale->value)
+        ->where("BOTTLES_LEFT > ?", 0)
+        ->fetchAll();
+       
+        $wines = [];
+        foreach ($result as $row) {
+            $wine = $this->wineRep->createWineFromRow($row);
+            $wines[] = $wine;
+        }
+        return $wines;
     }
     
     public function findById(int $id): ?Wine 

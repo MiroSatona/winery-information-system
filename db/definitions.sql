@@ -311,11 +311,10 @@ COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE ORDER_ITEM (
     ID_ORDER         INTEGER NOT NULL,
-    ID_ITEM          INTEGER,
     ID_WINE          INTEGER NOT NULL,
     BOTTLES_COUNT    INT NOT NULL,
     PRICE_PER_BOTTLE DECIMAL(10,2) NOT NULL,
-    CONSTRAINT PK_ORDER_ITEM PRIMARY KEY (ID_ORDER, ID_ITEM),
+    CONSTRAINT PK_ORDER_ITEM PRIMARY KEY (ID_ORDER, ID_WINE),
     CONSTRAINT FK_ORDER_ITEM_ORDER
         FOREIGN KEY (ID_ORDER) REFERENCES CUSTOMER_ORDER(ID)
         ON DELETE CASCADE,
@@ -357,9 +356,9 @@ VALUES
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 500, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
+(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 100, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
 (2, 'Modrý Portugal', 2, 3, 8, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
-(3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
+(3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 150, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)
@@ -412,12 +411,12 @@ VALUES
 
 
 -- ORDER_ITEM
-INSERT INTO ORDER_ITEM (ID_ORDER, ID_ITEM, ID_WINE, BOTTLES_COUNT, PRICE_PER_BOTTLE)
+INSERT INTO ORDER_ITEM (ID_ORDER, ID_WINE, BOTTLES_COUNT, PRICE_PER_BOTTLE)
 VALUES
-(1, 1, 1, 10, 15.00),
-(1, 2, 2, 5, 18.00),
-(2, 1, 1, 15, 12.00),
-(2, 2, 3, 10, 20.00);
+(1, 1, 10, 15.00),
+(1, 2, 5, 18.00),
+(2, 1, 15, 12.00),
+(2, 3, 10, 20.00);
 
 -- Restore MySQL settings
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;

@@ -24,6 +24,10 @@
                 <p class="wine-price na">Price N/A</p>
             {/ifset}
             
+            {ifset $wine->bottlesLeft}
+                <p>In stock: {$wine->bottlesLeft}</p>
+            {/ifset}
+            
             {if $userUser} 
                 <a class="add-to-cart" n:href="addToCart! $wine->id">🛒 Add to Cart</a>
             {else}

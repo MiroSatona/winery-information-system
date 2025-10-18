@@ -4,13 +4,16 @@ namespace App\Model\Wine;
 
 use App\Model\Image\ImageRepository;
 use App\Model\Wine\Wine;
+use App\Model\Bottle\BottleRepository;
 use Nette\Database\Explorer;
+use Tracy\Debugger;
 
 final class WineRepository
 {
     public function __construct(
         private Explorer $db,
-        private ImageRepository $imageRepository
+        private ImageRepository $imageRepository,
+        private BottleRepository $btlRep
     ) {}
 
     public function fetchWineById(int $wineId): ?Wine
@@ -30,8 +33,8 @@ final class WineRepository
 
         return $wines;
     }
-
-    private function createWineFromRow($row): Wine
+    
+    public function createWineFromRow($row): Wine
     {
         // Fetch associated image (via foreign key ID_PICTURE)
         $image = null;
@@ -60,5 +63,50 @@ final class WineRepository
             name: (string) $row->WINE_NAME,
             img: $image
         );
+    }
+    
+    public function getWineAllBottleCount(int $idWine) {
+        $result = $this->btlRep->fetchByWineId($idWine);
+        $count = 0;
+        foreach($result as $oneItem) {
+            $count += $oneItem->bottlesCount;
+        }
+        return $count;
+    }
+    
+    public function updateWineFreeBottles(int $idWine, int $amount, bool $add): bool {
+
+        $wine = $this->fetchWineById($idWine);        
+        if ($wine == null) {
+            Debugger::log('Failed to find specified wine');
+            return false;
+        }
+        
+        $currentCount = $wine->bottlesLeft;
+        
+        if ($add) {
+            $newAmount = $currentCount + $amount;
+        } else {
+            $newAmount = $currentCount - $amount;
+        }
+        
+        if ($newAmount < 0) {
+            Debugger::log('the new amount < 0');
+            return false;
+        }
+       
+        $maxVal = $this->getWineAllBottleCount($idWine);
+            
+        if ($newAmount > $maxVal) {
+            Debugger::log("the new amount is: $newAmount");
+            Debugger::log("the max amount is : $maxVal");
+            Debugger::log('the amount is > than max');
+            return false;
+        }
+        
+        $this->db->table("WINE")->where("ID", $idWine)->update([
+           "BOTTLES_LEFT" => $newAmount,
+        ]);
+        return true;
     }
 }

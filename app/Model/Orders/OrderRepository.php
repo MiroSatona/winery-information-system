@@ -95,24 +95,32 @@ final class OrderRepository
         return $this->createOrderFromRow($newRow);
     }
 
-    public function removeItemFromOrder(int $userId, int $itemId): bool
+    public function removeItemFromOrder(int $userId, int $wineId): bool
     {
         $order = $this->fetchCustomerOrder($userId);
         if ($order == null) {
             return false;
         }
         
-        return $this->orderItemRepository->deleteOrderItemById($itemId, $order->id);
+        $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
+        if ($result) {
+            $this->updateOrderPrice($order->id);
+        }
+        return $result;
     }
 
-    public function editAmountOrItemInOrder(int $userId, int $itemId, int $newAmount): bool 
+    public function editAmountOrItemInOrder(int $userId, int $wineId, int $diff, bool $add): bool 
     {
         $order = $this->fetchCustomerOrder($userId);
         if ($order == null) {
             return false;
         }
         
-        return $this->orderItemRepository->changeItemAmount($itemId, $order->id, $newAmount);
+        $result = $this->orderItemRepository->changeItemAmount($wineId, $order->id, $diff, $add);
+        if ($result) {
+            $this->updateOrderPrice($order->id);
+        }
+        return $result;
     }
     
     public function addToCart(int $userId, int $wineId, int $amount): bool {
@@ -120,6 +128,24 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        return $this->orderItemRepository->addItem($order->id, $wineId, $amount);
+        $result = $this->orderItemRepository->addItem($order->id, $wineId, $amount);
+        if ($result) {
+            $this->updateOrderPrice($order->id);
+        }
+        return $result;
+    }
+    
+    public function updateOrderPrice(int $orderId) {
+        $order = $this->fetchOrderById($orderId, true);
+        
+        $totalPrice = 0;
+        // calculate the full price of the order 
+        foreach ($order->items as $item) {
+            $totalPrice += $item->wine->bottlePrice * $item->bottlesCount;
+        }
+        $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId);
+        $row->update([
+            "TOTAL_PRICE" => $totalPrice,
+        ]);
     }
 }

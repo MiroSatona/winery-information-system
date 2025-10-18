@@ -26,17 +26,17 @@
                             </a>
                         </td>
                         <td>
-                            <img src="{$item->wine->img->src}" alt="{$item->wine->img->name}" width="80">
+                            <img src="{asset $imageRepository->getPathForImage($item->wine->img)}" alt="{$item->wine->img->description}" width="80">
                         </td>
                         <td>
                             {$item->bottlesCount}
-                            <a n:href="changeAmount! $item->idItem, $item->bottlesCount + 1">+</a>
-                            <a n:href="changeAmount! $item->idItem, $item->bottlesCount - 1">−</a>
+                            <a n:href="changeAmount! $item->wine->id, true">+</a>
+                            <a n:href="changeAmount! $item->wine->id, false">−</a>
                         </td>
                         <td>{$item->pricePerBottle|number:2} €</td>
                         <td>{($item->pricePerBottle * $item->bottlesCount)|number:2} €</td>
                         <td>
-                            <a n:href="removeItem! $item->idItem" class="btn btn-danger btn-sm">Remove</a>
+                            <a n:href="removeItem! $item->wine->id" class="btn btn-danger btn-sm">Remove</a>
                         </td>
                     </tr>
                 {/foreach}

@@ -6,11 +6,14 @@ namespace App\Presentation\Cart;
 use Nette;
 use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
+use App\Model\FlashMsgType;
+use App\Model\Image\ImageRepository;
 
 final class CartPresenter extends BasePresenter 
 {
     public function __construct(
-        private OrderRepository $orderRepository
+        private OrderRepository $orderRepository,
+        private ImageRepository $imageRepository
     ) {
         parent::__construct();
     }
@@ -32,6 +35,8 @@ final class CartPresenter extends BasePresenter
             $this->template->message = 'Your cart is empty.';
             return;
         }
+        
+        $this->orderRepository->updateOrderPrice($order->id);
 
         // Optionally fetch all items for that order
         $order->items = $this->orderRepository
@@ -39,31 +44,33 @@ final class CartPresenter extends BasePresenter
             ->items;
 
         $this->template->order = $order;
+        $this->template->imageRepository = $this->imageRepository;
     }
 
-    public function handleRemoveItem(int $itemId): void
+    public function handleRemoveItem(int $wineId): void
     {
         $userId = $this->getUser()->getId();
-        $success = $this->orderRepository->removeItemFromOrder($userId, $itemId);
+        
+        $success = $this->orderRepository->removeItemFromOrder($userId, $wineId);
 
         if ($success) {
-            $this->flashMessage('Item removed from your cart.', 'success');
+            $this->flashMessage('Item removed from your cart.', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Could not remove item.', 'error');
+            $this->flashMessage('Could not remove item.', FlashMsgType::ERROR->value);
         }
 
         $this->redirect('this');
     }
 
-    public function handleChangeAmount(int $itemId, int $newAmount): void
+    public function handleChangeAmount(int $wineId, bool $add): void
     {
         $userId = $this->getUser()->getId();
-        $success = $this->orderRepository->editAmountOrItemInOrder($userId, $itemId, $newAmount);
+        $success = $this->orderRepository->editAmountOrItemInOrder($userId, $wineId, 1, $add);
 
         if ($success) {
-            $this->flashMessage('Item amount updated.', 'success');
+            $this->flashMessage('Item amount updated.', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Could not update item amount.', 'error');
+            $this->flashMessage('Could not update item amount.', FlashMsgType::ERROR->value); 
         }
 
         $this->redirect('this');
