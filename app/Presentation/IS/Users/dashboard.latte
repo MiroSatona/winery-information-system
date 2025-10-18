@@ -5,7 +5,83 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    <h2>Přehled uživatelů</h2>
-    <p>Zde budou funkce, možná ...</p>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <span class="text-muted">Celkem uživatelů: <strong>{count($users)}</strong></span>
+        </div>
+
+        <div>
+            {control filterForm}
+        </div>
+
+        <a href="{link Users:add}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>Přidat nového uživatele
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-primary">
+                        <tr>
+                            <th scope="col" class="fw-bold">
+                                <i class="fas fa-users me-2"></i>Jméno uživatele
+                            </th>
+                            <th scope="col" class="fw-bold">
+                                <i class="fas fa-user me-2"></i>Login
+                            </th>
+                            <th scope="col" class="fw-bold">
+                                <i class="fas fa-crown me-2"></i>Role
+                            </th>
+                            <th scope="col" class="fw-bold">
+                                <i class="fas fa-calendar me-2"></i>Registrován od
+                            </th>
+                            <th scope="col" class="fw-bold text-center" style="width: 200px;">
+                                <i class="fas fa-cogs me-2"></i>Akce
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $users as $us}
+                            <tr class="align-middle ">
+                                <td>
+                                    <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getFullName()}</p>
+                                </td>
+                                <td>
+                                    <p class="mb-0 text-dark px-3 py-2">{$us->getUsername()}</p>
+                                </td>
+                                <td>
+                                    {foreach $us->getRoles() as $role}
+                                        <span class="badge text-white" style="background-color:#0d6efd; m-0">{$role}</span>
+                                    {/foreach}
+                                </td>
+                                <td>
+                                    <p class="mb-0 text-dark px-3 py-2">{$us->getTimeStamp()->format('d.m.Y H:i')}</p>
+                                </td>
+                                <td>
+                                    <div class="d-flex gap-2 justify-content-center">
+                                        <a href="{}" 
+                                           class="btn btn-outline-primary btn-sm" 
+                                           title="Upravit odrůdu">
+                                            <i class="fas fa-edit me-1"></i>Upravit
+                                        </a>
+                                        <button type="button" 
+                                                class="btn btn-outline-danger btn-sm" 
+                                                data-bs-toggle="modal" 
+                                                data-bs-target=""
+                                                title="Smazat odrůdu">
+                                            <i class="fas fa-trash me-1"></i>Smazat
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
 
 {/block isMainPanel}

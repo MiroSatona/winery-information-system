@@ -6,6 +6,7 @@ services:
 	- App\Model\Security\SignUpWorker
 	- App\Model\Vineyard\VineyardRepository
 	- App\Model\WineVariety\WineVarietyRepository
+	- App\Model\User\UserRepository
 	- App\Model\Image\ImageRepository(%uploadsDir%, %uploadsDirWeb%)
 
 	security.passwords: Nette\Security\Passwords(::PASSWORD_ARGON2ID, [memory_cost: 65536, time_cost: 4, threads: 3])
