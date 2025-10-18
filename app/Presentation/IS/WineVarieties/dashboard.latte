@@ -12,7 +12,7 @@
             <span class="text-muted">Celkem odrůd: <strong>{count($wineVarieties)}</strong></span>
         </div>
         <a href="{link WineVarieties:add}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Přidat novou odrůdu vína
+            <i class="fas fa-plus me-2"></i>Přidat odrůdu
         </a>
     </div>
     
@@ -23,7 +23,7 @@
                     <thead class="table-primary">
                         <tr>
                             <th scope="col" class="fw-bold">
-                                <i class="fas fa-wine-glass me-2"></i>Název odrůdy
+                                <i class="fas fa-seedling me-2"></i>Název
                             </th>
                             <th scope="col" class="fw-bold">
                                 <i class="fas fa-palette me-2"></i>Barva
@@ -50,20 +50,18 @@
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info text-dark fs-6 px-3 py-2">
-                                        {switch $variety->getColor()}
-                                            {case $WineVarietyType::WHITE}
-                                                Bílé
-                                            {case $WineVarietyType::RED}
-                                                Červené
-                                            {case $WineVarietyType::PINK}
-                                                Růžové
-                                            {case $WineVarietyType::GREY}
-                                                Šedé
-                                            {case $WineVarietyType::BLUE}
-                                                Modré
-                                        {/switch}
-                                    </span>
+                                    {switch $variety->getColor()}
+                                        {case $WineVarietyType::WHITE}
+                                            Bílé
+                                        {case $WineVarietyType::RED}
+                                            Červené
+                                        {case $WineVarietyType::PINK}
+                                            Růžové
+                                        {case $WineVarietyType::GREY}
+                                            Šedé
+                                        {case $WineVarietyType::BLUE}
+                                            Modré
+                                    {/switch}
                                 </td>
                                 <td>
                                     <p class="mb-0 text-muted" style="max-width: 300px;">
@@ -76,13 +74,9 @@
                                 </td>
                                 <td class="text-center">
                                     {if $variety->getImage()}
-                                        <span class="badge bg-success">
-                                            <i class="fas fa-check me-1"></i>Ano
-                                        </span>
+                                        <i class="fas fa-check me-1"></i>
                                     {else}
-                                        <span class="badge bg-secondary">
-                                            <i class="fas fa-times me-1"></i>Ne
-                                        </span>
+                                        <i class="fas fa-times me-1"></i>
                                     {/if}
                                 </td>
                                 <td>
@@ -138,7 +132,8 @@
                             <h5>Opravdu chcete smazat odrůdu?</h5>
                             <p class="text-muted">
                                 <strong>{$variety->getName()}</strong><br>
-                                Tato akce je nevratná.
+                                Tato akce je nevratná. Společně s odrůdou budou odstraněny i všechny položky, které je využívají.
+                                Toto zahrnuje řádky, vína, atd.
                             </p>
                         </div>
                     </div>

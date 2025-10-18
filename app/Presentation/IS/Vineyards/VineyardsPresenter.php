@@ -30,6 +30,17 @@ final class VineyardsPresenter extends BasePresenter
     public function renderDashboard(): void
     {
         $this->template->vineyards = $this->vineyardRepository->fetchAll();
+        foreach ($this->template->vineyards as $vineyard) {
+            /** @var Vineyard $vineyard */
+            $vineyardId = $vineyard->getId();
+            $this->template->wineRows[$vineyardId] = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
+            $this->template->wineVarietiesCount[$vineyardId] = $this->vineyardRepository->getWineVarietiesCountOnVineyard($vineyardId);
+        }
         $this->template->imageRepository = $this->imageRepository;
+    }
+
+    public function handleDelete(int $vineyardId): void
+    {
+        // todo
     }
 }

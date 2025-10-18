@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Model\Vineyard;
 
 use App\Model\Image\Image;
+use App\Model\WineRow\WineRow;
 use Tracy\Debugger;
 use Tracy\ILogger;
 use Nette\Database\Explorer;
@@ -217,5 +218,34 @@ final class VineyardRepository
             ];
         }
         return $joinedData;
+    }
+
+    public function getWineRowsOnVineyard(int $vineyardId): array
+    {
+        /** @var WineRow[] $wineRows Array of wine rows on the given vineyard */
+        $wineRows = [];
+        $rows = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->fetchAll();
+
+        foreach ($rows as $row) {
+            $wineRows[] = new WineRow(
+                $row->CODE,
+                $row->ID_VINEYARD,
+                $row->ID_WINE_VARIETY,
+                $row->HEAD_COUNT,
+                $row->PLANTING_YEAR
+            );
+        }
+
+        return $wineRows;
+    }
+
+    public function getWineVarietiesCountOnVineyard(int $vineyardId): int
+    {
+       return $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->select('DISTINCT ID_WINE_VARIETY')
+            ->count();
     }
 }
