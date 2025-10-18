@@ -148,4 +148,56 @@ final class OrderRepository
             "TOTAL_PRICE" => $totalPrice,
         ]);
     }
+
+    public function updateDeliveryAdress(int $userId, string $type, ?string $addres): bool 
+    {
+        $order = $this->fetchCustomerOrder($userId);
+        if (!$order) {
+            return false;
+        }
+
+        // update the delivery type 
+        $row = $this->db->table("CUSTOMER_ORDER")
+        ->where("ID_CUSTOMER", $userId)
+        ->where("ID", $order->id)
+        ->fetch();
+    
+        if (!$row) {
+            return false;
+        }
+
+        $row->update(
+            ["DELIVERY_TYPE" => $type]
+        );
+        
+        if (!$addres) {
+            $row->update([
+                "DELIVERY_DATA" => ""
+            ]);
+            return true;
+        }
+        
+        $row->update([
+            "DELIVERY_DATA" => $addres
+        ]);
+        return true;
+    }
+    
+    public function clientPaydForOrder(int $userId): bool {
+        $order = $this->fetchCustomerOrder($userId);
+        if (!$order) {
+            return false;
+        }
+        $row = $this->db->table("CUSTOMER_ORDER")
+        ->where("ID_CUSTOMER", $userId)
+        ->where("ID", $order->id)
+        ->fetch(); 
+        
+        $row->update(
+            [
+                "STATE" => "PAID"
+            ]
+            );
+        return true;
+    }
 }

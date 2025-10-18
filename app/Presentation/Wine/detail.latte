@@ -1,178 +1,115 @@
 {block content}
-<h1 class="wine-title">{$wine->name}</h1>
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Zpět -->
+        <a n:href="Shop:default" class="btn btn-outline-primary d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Zpět na nabídku vín</span>
+        </a>
 
-<div class="wine-detail-container">
-    <div class="wine-image">
-        <img src="{asset $imageRepository->getPathForImage($wine->img)}" alt="{$wine->img->description}">
+        <!-- Košík -->
+        <a n:href=":Cart:default" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-2">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Košík</span>
+        </a>
     </div>
 
-    <div class="wine-info">
-        <h2 class="wine-info-title">Wine Details</h2>
-        <ul class="wine-specs">
-            <li><strong>Year:</strong> {$wine->year}</li>
-            <li><strong>Type:</strong> {$wine->type}</li>
-            <li><strong>Color:</strong> {$wine->color}</li>
-            <li><strong>Grade:</strong> {$wine->grade}</li>
-            <li><strong>Alcohol:</strong> {$wine->alcoholPercentage}%</li>
-            <li><strong>Volume:</strong> {$wine->volume} ml</li>
-        </ul>
+    <!-- Detail vína -->
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="row g-4 align-items-start">
 
-        <div class="wine-price-section">
-            {ifset $wine->currentPrice}
-                <p class="wine-price">{$wine->currentPrice} €</p>
-            {else}
-                <p class="wine-price na">Price N/A</p>
-            {/ifset}
-            
-            {ifset $wine->bottlesLeft}
-                <p>In stock: {$wine->bottlesLeft}</p>
-            {/ifset}
-            
-            {if $userUser} 
-                <a class="add-to-cart" n:href="addToCart! $wine->id">🛒 Add to Cart</a>
-            {else}
-                <a class="add-to-cart" n:href="Sign:in">🛒 Add to Cart</a>
-            {/if} 
+            <!-- Obrázek vína -->
+            <div class="col-12 col-md-5">
+                <img src="{asset $imageRepository->getPathForImage($wine->img)}"
+                     alt="{$wine->img->description}"
+                     class="img-fluid rounded-4 shadow-sm w-100"
+                     style="aspect-ratio: 3/4; object-fit: cover; background: #f7f9fc;">
+            </div>
+
+            <!-- Informace o víně -->
+            <div class="col-12 col-md-7">
+                <h1 class="fw-bold text-primary mb-3">{$wine->name}</h1>
+
+                <ul class="list-unstyled text-secondary mb-4">
+                    <li><strong>Rok:</strong> {$wine->year}</li>
+                    <li><strong>Typ:</strong> {$wine->type}</li>
+                    <li><strong>Barva:</strong> {$wine->color}</li>
+                    <li><strong>Odrůda:</strong> {$wine->grade}</li>
+                    <li><strong>Obsah alkoholu:</strong> {$wine->alcoholPercentage}%</li>
+                    <li><strong>Objem:</strong> {$wine->volume} ml</li>
+                </ul>
+
+                <div class="mb-4">
+                    {ifset $wine->currentPrice}
+                        <p class="fs-3 fw-bold text-primary mb-2">
+                            {$wine->currentPrice},-
+                        </p>
+                    {else}
+                        <p class="fs-5 text-secondary mb-2">Cena není dostupná</p>
+                    {/ifset}
+
+                    {ifset $wine->bottlesLeft}
+                        <p class="text-muted mb-3">
+                            <i class="fa-solid fa-box-open me-1"></i>
+                            Skladem: <strong>{$wine->bottlesLeft}</strong> lahví
+                        </p>
+                    {/ifset}
+                </div>
+
+                <!-- Přidat do košíku -->
+                <div class="mb-4">
+                    {if $userUser}
+                        <form n:name="addToCartForm" class="text-center">
+                            <input type="hidden" n:name="wineId" value="{$wine->id}">
+                            <div class="input-group mb-2 justify-content-center">
+                                <input type="number" n:name="count" class="form-control w-50 text-center border-primary"
+                                    min="1" max="{$wine->bottlesLeft}" value="1">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Přidat do košíku</span>
+                            </button>
+                        </form>
+                    {else}
+                        <div class="text-center">
+                            <a n:href="Sign:in" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Přihlásit se pro nákup</span>
+                            </a>
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- Popis vína -->
+                {ifset $wine->salesDescription}
+                    <div>
+                        <h5 class="fw-semibold text-primary mb-2">Popis vína</h5>
+                        <p class="text-secondary" style="white-space: pre-line;">{$wine->salesDescription}</p>
+                    </div>
+                {/ifset}
+
+            </div>
         </div>
-
-        {ifset $wine->salesDescription}
-            <p class="wine-description">{$wine->salesDescription}</p>
-        {/ifset}
-
-        <a n:href="Shop:default" class="back-link">← Back to Wine List</a>
     </div>
 </div>
 
 <style>
-/* Layout */
-.wine-detail-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 2rem;
-    align-items: start;
-    max-width: 1000px;
-    margin: 3rem auto;
-    padding: 2rem;
-    background: #fff;
-    border-radius: 16px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+.card {
+    transition: all 0.2s ease-in-out;
 }
-
-/* Title */
-.wine-title {
-    text-align: center;
-    font-size: 2.5rem;
-    color: #4a2c2a;
-    font-weight: 600;
-    margin-top: 2rem;
-}
-
-/* Image */
-.wine-image img {
-    width: 100%;
-    border-radius: 12px;
-    object-fit: cover;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-/* Info section */
-.wine-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.wine-info-title {
-    font-size: 1.5rem;
-    color: #4a2c2a;
-    font-weight: 500;
-    margin-bottom: 0.5rem;
-}
-
-.wine-specs {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    line-height: 1.8;
-    color: #444;
-    font-size: 1rem;
-}
-
-/* Price & Button */
-.wine-price-section {
-    margin-top: 1.5rem;
-}
-
-.wine-price {
-    font-size: 1.8rem;
-    font-weight: 600;
-    color: #7a1c1c;
-    margin-bottom: 1rem;
-}
-
-.wine-price.na {
-    color: #999;
-}
-
-.btn-add-cart {
-    background: #7a1c1c;
-    color: #fff;
-    border: none;
-    padding: 0.8rem 1.8rem;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 1rem;
-    transition: all 0.2s ease;
-}
-
-.btn-add-cart:hover {
-    background: #631414;
+.card:hover {
     transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
 }
 
-/* Description */
-.wine-description {
-    margin-top: 1.5rem;
-    font-size: 1rem;
-    color: #555;
-    line-height: 1.6;
+ul li strong {
+    color: #2a2a2a;
 }
 
-/* Back link */
-.back-link {
-    display: inline-block;
-    margin-top: 2rem;
-    color: #4a2c2a;
-    font-weight: 500;
-    text-decoration: none;
-    transition: color 0.2s ease;
-}
-
-.back-link:hover {
-    color: #7a1c1c;
-}
-
-.add-to-cart {
-        display: inline-block;
-        background: #7a1c1c;
-        color: #fff;
-        font-weight: 600;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        text-decoration: none;
-        transition: background 0.2s ease;
-    }
-
-/* Responsive */
-@media (max-width: 800px) {
-    .wine-detail-container {
-        grid-template-columns: 1fr;
+@media (max-width: 768px) {
+    .card {
         padding: 1.5rem;
     }
 }
 </style>
 {/block}
-
-{block specializedFooter}
-
-{/block specializedFooter}

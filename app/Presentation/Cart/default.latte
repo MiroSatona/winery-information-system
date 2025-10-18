@@ -1,55 +1,171 @@
 {block content}
 
-<h1>Your Shopping Cart</h1>
+<div class="container my-5">
 
-{if $order === null}
-    <p>{$message}</p>
-{else}
-    <div class="cart-items">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Wine</th>
-                    <th>Image</th>
-                    <th>Quantity</th>
-                    <th>Price per Bottle</th>
-                    <th>Total</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {foreach $order->items as $item}
-                    <tr>
-                        <td>
-                            <a class="wine-detail" n:href="Wine:detail $item->wine->id">
-                                {$item->wine->name}
-                            </a>
-                        </td>
-                        <td>
-                            <img src="{asset $imageRepository->getPathForImage($item->wine->img)}" alt="{$item->wine->img->description}" width="80">
-                        </td>
-                        <td>
-                            {$item->bottlesCount}
-                            <a n:href="changeAmount! $item->wine->id, true">+</a>
-                            <a n:href="changeAmount! $item->wine->id, false">−</a>
-                        </td>
-                        <td>{$item->pricePerBottle|number:2} €</td>
-                        <td>{($item->pricePerBottle * $item->bottlesCount)|number:2} €</td>
-                        <td>
-                            <a n:href="removeItem! $item->wine->id" class="btn btn-danger btn-sm">Remove</a>
-                        </td>
-                    </tr>
-                {/foreach}
-            </tbody>
-        </table>
+    <!-- Header and Navigation -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <a n:href="Shop:default" class="btn btn-outline-primary d-flex align-items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Zpět na nabídku vín</span>
+        </a>
 
-        <hr>
+        <h2 class="fw-bold text-primary m-0">Váš nákupní košík</h2>
 
-        <h3>Total price: {$order->totalPrice|number:2} €</h3>
-
-        <!--<a n:href="Checkout:default" class="btn btn-primary">Proceed to Checkout</a>-->
-        <a class="btn btn-primary">Proceed to Checkout</a>
+        <a n:href=":Cart:default" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+            <i class="fa fa-info-circle"></i>
+            <span>Historie nákupů</span>
+        </a>
     </div>
-{/if}
+
+    {if $order === null}
+        <div class="alert alert-info text-center py-4">
+            {$message}
+        </div>
+    {else}
+
+        <!-- Cart Table -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body p-0">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Víno</th>
+                            <th class="text-center">Obrázek</th>
+                            <th class="text-center">Množství</th>
+                            <th class="text-center">Cena / Láhev</th>
+                            <th class="text-center">Celkem</th>
+                            <th class="text-center">Akce</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {foreach $order->items as $item}
+                            <tr>
+                                <td class="fw-semibold">
+                                    <a class="text-decoration-none text-primary" n:href="Wine:detail $item->wine->id">
+                                        {$item->wine->name}
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <img src="{asset $imageRepository->getPathForImage($item->wine->img)}"
+                                         alt="{$item->wine->img->description}" class="rounded shadow-sm" width="80">
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-light">
+                                        <a n:href="changeAmount! $item->wine->id, false" class="btn btn-sm btn-outline-secondary px-2">−</a>
+                                        <span class="mx-2 fw-semibold">{$item->bottlesCount}</span>
+                                        <a n:href="changeAmount! $item->wine->id, true" class="btn btn-sm btn-outline-secondary px-2">+</a>
+                                    </div>
+                                </td>
+                                <td class="text-center">{$item->pricePerBottle|number:2} €</td>
+                                <td class="text-center fw-semibold text-success">{($item->pricePerBottle * $item->bottlesCount)|number:2} €</td>
+                                <td class="text-center">
+                                    <a n:href="removeItem! $item->wine->id" class="btn btn-sm btn-danger">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {/foreach}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Delivery Options -->
+        <div class="card shadow-sm border-0 mb-4">
+            <div class="card-body">
+                <h4 class="fw-bold text-primary mb-3">Způsob doručení</h4>
+                <form n:name="deliveryForm" class="d-flex flex-column gap-3">
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                            type="radio" 
+                            name="deliveryType" 
+                            id="pickup" 
+                            value="PICKUP"
+                            {if $order->deliveryType === 'PICKUP'}checked{/if}>
+                        <label class="form-check-label fw-semibold" for="pickup">
+                            Osobní odběr
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                            type="radio" 
+                            name="deliveryType" 
+                            id="courier" 
+                            value="COURIER"
+                            {if $order->deliveryType === 'COURIER'}checked{/if}>
+                        <label class="form-check-label fw-semibold" for="courier">
+                            Kurýr
+                        </label>
+                    </div>
+
+                    <div class="form-check">
+                        <input class="form-check-input" 
+                            type="radio" 
+                            name="deliveryType" 
+                            id="post" 
+                            value="POST"
+                            {if $order->deliveryType === 'POST'}checked{/if}>
+                        <label class="form-check-label fw-semibold" for="post">
+                            Pošta
+                        </label>
+                    </div>
+
+                    <div id="addressField" class="mt-3" style="display: none;">
+                        <label for="address" class="form-label fw-semibold text-secondary">Adresa doručení:</label>
+                        <input type="text" 
+                            id="address" 
+                            name="address" 
+                            class="form-control border-primary"
+                            placeholder="Zadejte vaši doručovací adresu"
+                            value="{$order->deliveryData|escape}">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Uložit způsob doručení</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Total + Checkout -->
+        <div class="card shadow-sm border-0">
+            <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <h4 class="m-0">Celková cena:
+                    <span class="text-primary fw-bold">{$order->totalPrice|number:2} €</span>
+                </h4>
+                <a class="btn btn-lg btn-primary fw-bold d-flex align-items-center gap-2" n:href="Payment:default">
+                    <i class="fa-solid fa-credit-card"></i>
+                    <span>Pokračovat k pokladně</span>
+                </a>
+            </div>
+        </div>
+
+    {/if}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const deliveryInputs = document.querySelectorAll('input[name="deliveryType"]');
+    const addressField = document.getElementById('addressField');
+    const addressInput = document.getElementById('address');
+
+    function toggleAddress() {
+        const checked = document.querySelector('input[name="deliveryType"]:checked');
+        if (checked && (checked.value === 'COURIER' || checked.value === 'POST')) {
+            addressField.style.display = 'block';
+        } else {
+            // Hide field and clear value
+            addressField.style.display = 'none';
+            addressInput.value = '';
+        }
+    }
+
+    // Attach change event to all radio buttons
+    deliveryInputs.forEach(input => input.addEventListener('change', toggleAddress));
+
+    // Set initial state based on database value
+    toggleAddress();
+});
+</script>
+
 
 {/block}

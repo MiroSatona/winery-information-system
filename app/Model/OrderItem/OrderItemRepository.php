@@ -113,7 +113,7 @@ final class OrderItemRepository
         // find out if an order allready exists, if so, just change the amount ... 
         $orderItem = $this->fetchItem($wineId, $orderId);
         if ($orderItem !== null) {
-            return $this->changeItemAmount($wineId, $orderId, 1, true);
+            return $this->changeItemAmount($wineId, $orderId, $amount, true);
         }
         $row = [
             "ID_ORDER" => $orderId,
@@ -122,6 +122,6 @@ final class OrderItemRepository
             "PRICE_PER_BOTTLE" => $wine->bottlePrice
         ];
         $this->db->table("ORDER_ITEM")->insert($row);
-        return $this->wineRepository->updateWineFreeBottles($wineId, 1, false);
-    }
-}
+        return $this->wineRepository->updateWineFreeBottles($wineId, $amount, false);
+    }    
+} 

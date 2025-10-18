@@ -11,24 +11,35 @@ final class ProductRepository
 {
     public function __construct(private Explorer $database, private WineRepository $wineRep)
     {
-       $this->database = $database; 
+    $this->database = $database; 
     }
     
-    public function getAllProducts(): array 
+    public function getAllProducts(string $searchTerm = ''): array
     {
-        $result = $this->database->table('WINE')
-        ->where("STATE", WineState::sale->value)
-        ->where("BOTTLES_LEFT > ?", 0)
-        ->fetchAll();
-       
+        // Start the query
+        $query = $this->database->table('WINE')
+            ->where("STATE", WineState::sale->value)
+            ->where("BOTTLES_LEFT > ?", 0);
+
+        // If a search term is provided, apply fuzzy search
+        if (!empty($searchTerm)) {
+            // Add wildcards before and after for partial match
+            $likeTerm = '%' . $searchTerm . '%';
+            $query->where("WINE_NAME LIKE ?", $likeTerm);
+        }
+
+        // Fetch results
+        $result = $query->fetchAll();
+
+        // Convert rows into Wine objects
         $wines = [];
         foreach ($result as $row) {
-            $wine = $this->wineRep->createWineFromRow($row);
-            $wines[] = $wine;
+            $wines[] = $this->wineRep->createWineFromRow($row);
         }
+
         return $wines;
     }
-    
+
     public function findById(int $id): ?Wine 
     {
         return $this->wineRep->fetchWineById($id);
