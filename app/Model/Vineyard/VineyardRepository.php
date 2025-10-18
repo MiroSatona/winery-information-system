@@ -41,7 +41,8 @@ final class VineyardRepository
                 $row->NAME,
                 $row->LOCATION,
                 $image,
-                $row->DESCRIPTION
+                $row->DESCRIPTION,
+                $row->YEAR
             );
         }
         return $vineyards;
@@ -71,7 +72,8 @@ final class VineyardRepository
             $row->NAME,
             $row->LOCATION,
             $image,
-            $row->DESCRIPTION
+            $row->DESCRIPTION,
+            $row->YEAR
         );
     }
 
@@ -96,7 +98,8 @@ final class VineyardRepository
                     'NAME' => $vineyard->getName(),
                     'LOCATION' => $vineyard->getLocation(),
                     'ID_PICTURE' => $pictureId,
-                    'DESCRIPTION' => $vineyard->getDescription()
+                    'DESCRIPTION' => $vineyard->getDescription(),
+                    'YEAR' => $vineyard->getYearEstablished()
                 ];
                 $this->database->table('VINEYARD')->insert($data);
                 return true;
@@ -148,7 +151,8 @@ final class VineyardRepository
                     'NAME' => $vineyard->getName(),
                     'LOCATION' => $vineyard->getLocation(),
                     'ID_PICTURE' => $pictureId,
-                    'DESCRIPTION' => $vineyard->getDescription()
+                    'DESCRIPTION' => $vineyard->getDescription(),
+                    'YEAR' => $vineyard->getYearEstablished()
                 ]);
                 return true;
             });

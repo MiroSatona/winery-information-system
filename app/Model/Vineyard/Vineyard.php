@@ -13,7 +13,8 @@ final class Vineyard
         private string $name,
         private string $location,
         private ?Image $image,
-        private string $description
+        private string $description,
+        private int $yearEstablished
     ) {
     }
 
@@ -60,5 +61,15 @@ final class Vineyard
     public function setDescription(string $description): void
     {
         $this->description = $description;
+    }
+
+    public function getYearEstablished(): int
+    {
+        return $this->yearEstablished;
+    }
+
+    public function setYearEstablished(int $yearEstablished): void
+    {
+        $this->yearEstablished = $yearEstablished;
     }
 }

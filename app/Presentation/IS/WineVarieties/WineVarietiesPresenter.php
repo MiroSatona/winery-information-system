@@ -10,18 +10,22 @@ use Nette;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
+use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine;
 use App\Model\WineVariety\WineVarietyRepository;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\WineVariety\WineVariety;
 use Nette\Http\FileUpload;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class WineVarietiesPresenter extends BasePresenter
 {
 
     public function __construct(
         private WineVarietyRepository $wineVarietyRepository,
-        private ImageRepository $imageRepository
+        private ImageRepository $imageRepository,
+        private ValidationDefinitions $validationDefinitions
     ) {
         parent::__construct();
     }
@@ -70,6 +74,8 @@ final class WineVarietiesPresenter extends BasePresenter
         $form = new Form;
 
         $form->addText('name', 'Název odrůdy')
+            ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
+            ->addRule($form::MaxLength, 'Název odrůdy nesmí přesáhnout %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MAX)
             ->setRequired('Zadejte prosím název odrůdy vína.')
             ->setHtmlAttribute('class', 'form-control form-control-lg')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
@@ -113,9 +119,9 @@ final class WineVarietiesPresenter extends BasePresenter
         if ($image->hasFile()) {
             $imagePath = $this->imageRepository->uploadImage($values->image);
             if ($imagePath === '') {
+                Debugger::log('Image upload failed', ILogger::ERROR);
                 $form->addError('Obrázek se nepodařilo nahrát.');
-                return; 
-                // todo correct?????????
+                return;
             }
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek odrůdy vína ' . $values->name);
         }
@@ -136,7 +142,7 @@ final class WineVarietiesPresenter extends BasePresenter
             $this->redirect('WineVarieties:dashboard');
         } else {
             $form->addError('Přidání odrůdy vína se nezdařilo.');
-            // todo maybe use flashmessage as well????????
+            $this->flashMessage('Přidání odrůdy vína se nezdařilo.', 'error');
         }
         // todo
     }
@@ -158,6 +164,8 @@ final class WineVarietiesPresenter extends BasePresenter
         $form = new Form;
 
         $form->addText('name', 'Název odrůdy:')
+            ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
+            ->addRule($form::MaxLength, 'Název odrůdy nesmí přesáhnout %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MAX)
             ->setRequired('Zadejte prosím název odrůdy vína.')
             ->setHtmlAttribute('class', 'form-control form-control-lg')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
@@ -196,14 +204,15 @@ final class WineVarietiesPresenter extends BasePresenter
     public function processEditWineVarietyForm(Form $form, \stdClass $values): void
     {
         $id = (int)$this->getParameter('id');
-        bdump($id);
         if (!$id) {
-            $this->flashMessage('Neplatný identifikátor odrůdy vína.', 'error');
+            Debugger::log('Invalid ID for editing wine variety: ' . $id, ILogger::ERROR);
+            $this->flashMessage('Otevření detailu odrůdy vína se nezdařilo.', 'error');
             $this->redirect('WineVarieties:dashboard');
         }
 
         $wineVariety = $this->wineVarietyRepository->fetchById($id);
         if (!$wineVariety) {
+            Debugger::log('Wine variety not found: ' . $id, ILogger::ERROR);
             $this->flashMessage('Odrůda vína nebyla nalezena.', 'error');
             $this->redirect('WineVarieties:dashboard');
         }
@@ -216,7 +225,9 @@ final class WineVarietiesPresenter extends BasePresenter
             // Upload new image
             $imagePath = $this->imageRepository->uploadImage($newImage);
             if ($imagePath === '') {
+                Debugger::log('Image upload failed', ILogger::ERROR);
                 $form->addError('Obrázek se nepodařilo nahrát.');
+                $this->flashMessage('Obrázek se nepodařilo nahrát.', 'error');
                 return;
             }
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek odrůdy vína ' . $values->name);
@@ -238,6 +249,7 @@ final class WineVarietiesPresenter extends BasePresenter
             $this->redirect('WineVarieties:dashboard');
         } else {
             $form->addError('Úprava odrůdy vína se nezdařila.');
+            $this->flashMessage('Úprava odrůdy vína se nezdařila.', 'error');
         }
     }
 
@@ -245,6 +257,7 @@ final class WineVarietiesPresenter extends BasePresenter
     {
         $wineVariety = $this->wineVarietyRepository->fetchById($id);
         if (!$wineVariety) {
+            Debugger::log('Wine variety not found: ' . $id, ILogger::ERROR);
             $this->flashMessage('Odrůda vína nebyla nalezena.', 'error');
             $this->redirect('WineVarieties:dashboard');
         }

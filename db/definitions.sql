@@ -149,6 +149,7 @@ CREATE TABLE VINEYARD(
     NAME VARCHAR(30) NOT NULL UNIQUE,
     LOCATION TEXT NOT NULL,
     DESCRIPTION TEXT NOT NULL,
+    YEAR SMALLINT NOT NULL,
     CONSTRAINT PK_VINEYARD PRIMARY KEY (ID),
     CONSTRAINT
         FK_ID_VINEYARD_PICTURE
@@ -366,11 +367,11 @@ VALUES
 (3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 300, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
-INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION)
+INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION, YEAR)
 VALUES
-(1, 4, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny'),
-(2, 5, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny'),
-(3, 6, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky');
+(1, 4, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny', 2015),
+(2, 5, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny', 2016),
+(3, 6, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky', 2017);
 
 -- WINE_VARIETY table 
 INSERT INTO WINE_VARIETY (ID, ID_PICTURE, COLOR, NAME, DESCRIPTION)
