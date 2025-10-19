@@ -4,9 +4,15 @@ declare(strict_types=1);
 
 namespace App\Model\WineRow;
 
+use App\Model\Wine\Wine;
+use App\Model\WineVariety\WineVariety;
+use App\Model\WineVariety\WineVarietyType;
+
 
 final class WineRow
 {
+    private WineVariety $wineVarietyType;
+
     public function __construct(
         private int $id,
         private int $vineyardId,
@@ -40,5 +46,15 @@ final class WineRow
     public function getYearPlanted(): int
     {
         return $this->yearPlanted;
+    }
+
+    public function getWineVariety(): WineVariety
+    {
+        return $this->wineVarietyType;
+    }
+
+    public function setWineVariety(WineVariety $wineVarietyType): void
+    {
+        $this->wineVarietyType = $wineVarietyType;
     }
 }
