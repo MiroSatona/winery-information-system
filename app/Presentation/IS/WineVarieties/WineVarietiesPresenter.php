@@ -77,10 +77,10 @@ final class WineVarietiesPresenter extends BasePresenter
             ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Název odrůdy nesmí přesáhnout %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MAX)
             ->setRequired('Zadejte prosím název odrůdy vína.')
-            ->setHtmlAttribute('class', 'form-control form-control-lg')
+            ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
         
-        $form->addSelect('color', 'Barva bobulí:', [
+        $form->addSelect('color', 'Barva bobulí', [
             WineVarietyType::WHITE->value => 'Bílé',
             WineVarietyType::RED->value => 'Červené',
             WineVarietyType::PINK->value => 'Růžové',
@@ -88,17 +88,17 @@ final class WineVarietiesPresenter extends BasePresenter
             WineVarietyType::BLUE->value => 'Modré',
         ])
             ->setRequired('Zadejte prosím barvu bobulí.')
-            ->setHtmlAttribute('class', 'form-select form-select-lg')
+            ->setHtmlAttribute('class', 'form-select')
             ->setHtmlAttribute('placeholder', 'Zadejte barvu bobulí.');
         
-        $form->addTextArea('description', 'Popis odrůdy:')
+        $form->addTextArea('description', 'Popis odrůdy')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis odrůdy vína');
         
-        $form->addUpload('image', 'Obrázek odrůdy vína:')
+        $form->addUpload('image', 'Obrázek odrůdy vína')
             ->addRule($form::Image, 'Nahrajte prosím platný obrázek.')
-            ->setHtmlAttribute('class', 'form-control form-control-lg')
+            ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Nahrajte obrázek odrůdy vína');
         
         $form->addSubmit('send', 'Přidat odrůdu vína')
@@ -144,7 +144,6 @@ final class WineVarietiesPresenter extends BasePresenter
             $form->addError('Přidání odrůdy vína se nezdařilo.');
             $this->flashMessage('Přidání odrůdy vína se nezdařilo.', 'error');
         }
-        // todo
     }
 
     public function handleDelete(int $id): void
@@ -163,14 +162,14 @@ final class WineVarietiesPresenter extends BasePresenter
     {
         $form = new Form;
 
-        $form->addText('name', 'Název odrůdy:')
+        $form->addText('name', 'Název odrůdy')
             ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Název odrůdy nesmí přesáhnout %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MAX)
             ->setRequired('Zadejte prosím název odrůdy vína.')
-            ->setHtmlAttribute('class', 'form-control form-control-lg')
+            ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
         
-        $form->addSelect('color', 'Barva bobulí:', [
+        $form->addSelect('color', 'Barva bobulí', [
             WineVarietyType::WHITE->value => 'Bílé',
             WineVarietyType::RED->value => 'Červené',
             WineVarietyType::PINK->value => 'Růžové',
@@ -178,15 +177,15 @@ final class WineVarietiesPresenter extends BasePresenter
             WineVarietyType::BLUE->value => 'Modré',
         ])
             ->setRequired('Zadejte prosím barvu bobulí.')
-            ->setHtmlAttribute('class', 'form-select form-select-lg')
+            ->setHtmlAttribute('class', 'form-select')
             ->setHtmlAttribute('placeholder', 'Zadejte barvu bobulí.');
         
-        $form->addTextArea('description', 'Popis odrůdy:')
+        $form->addTextArea('description', 'Popis odrůdy')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis odrůdy vína');
         
-        $form->addUpload('image', 'Obrázek odrůdy vína:')
+        $form->addUpload('image', 'Obrázek odrůdy vína')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('accept', 'image/*');
         

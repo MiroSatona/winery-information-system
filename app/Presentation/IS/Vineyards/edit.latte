@@ -1,0 +1,145 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Vinohrady
+    <i class="fas fa-arrow-right me-2 ms-2"></i>Upravit vinohrad
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        Úprava vinohradu {$vineyard->getName()}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row">
+                        
+
+                        {* Edit form *}
+                        <div class="col-12 col-md-8">
+                            {form editVineyardForm}
+                                <div class="mb-3">
+                                    <label for="name" class="form-label fw-semibold">
+                                        <i class="fas fa-tag me-2 text-muted"></i>Název vinohradu
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input name}
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="location" class="form-label fw-semibold">
+                                        <i class="fas fa-map-marker-alt me-2 text-muted"></i>Lokalita
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input location}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="year" class="form-label fw-semibold">
+                                        <i class="fas fa-calendar-alt me-2 text-muted"></i>Rok založení
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input year}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="description" class="form-label fw-semibold">
+                                        <i class="fas fa-file-alt me-2 text-muted"></i>Detailní popis
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input description}
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="image" class="form-label fw-semibold">
+                                        <i class="fas fa-camera me-2 text-muted"></i>
+                                        {if $vineyard->getImage()}
+                                            Změnit obrázek
+                                        {else}
+                                            Přidat obrázek
+                                        {/if}
+                                    </label>
+                                    {input image}
+                                </div>
+
+                                <div class="border-top pt-4">
+                                    <div class="row">
+                                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                            <a href="{link Vineyards:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                                <i class="fas fa-times me-2"></i>Zrušit
+                                            </a>
+                                        </div>
+                                        <div class="col-12 col-md-6">
+                                            {input send}
+                                        </div>
+                                    </div>
+                                </div>
+                            {/form}
+                        </div>
+
+                        {* Current image *}
+                        <div class="col-12 col-md-4 mb-4">
+                            <div class="text-center">
+                                <div class="current-image-container border rounded p-3 bg-light">
+                                    {if $vineyard->getImage()}
+                                        <img src="{asset $imageRepository->getPathForImage($vineyard->getImage())}" 
+                                             alt="{$vineyard->getImage()->description}" 
+                                             class="img-fluid rounded shadow-sm current-vineyard-image">
+                                        <div class="mt-3">
+                                            <button type="button" 
+                                                    class="btn btn-outline-danger btn-sm" 
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#removeImageModal">
+                                                <i class="fas fa-trash me-1"></i>Odstranit obrázek
+                                            </button>
+                                        </div>
+                                    {else}
+                                        <div class="no-image-placeholder">
+                                            <i class="fas fa-image fa-4x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Žádný obrázek</p>
+                                        </div>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {* Confirmation modal for removing image *}
+    {if $vineyard->getImage()}
+        <div class="modal fade" id="removeImageModal" tabindex="-1" aria-labelledby="removeImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="removeImageModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Odstranit obrázek
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <i class="fas fa-image fa-3x text-danger mb-3"></i>
+                        <h5>Opravdu chcete odstranit obrázek?</h5>
+                        <p class="text-muted">Obrázek bude trvale odstraněn z vinohradu <strong>{$vineyard->getName()}</strong>.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link removeImage!, id => $vineyard->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Odstranit obrázek
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+
+{/block isMainPanel}

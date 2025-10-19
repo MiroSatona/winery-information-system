@@ -8,11 +8,12 @@ use App\Model\Image\Image;
 
 final class Vineyard
 {
-    private array $wineRows = [];
+    private int $wineRowsCount = 0;
     private int $wineVarietiesCount = 0;
+    private int $totalHeadCount = 0;
 
     public function __construct(
-        private int $id,
+        private ?int $id,
         private string $name,
         private string $location,
         private ?Image $image,
@@ -71,14 +72,14 @@ final class Vineyard
         return $this->yearEstablished;
     }
 
-    public function getWineRows(): array
+    public function getWineRowsCount(): int
     {
-        return $this->wineRows;
+        return $this->wineRowsCount;
     }
 
-    public function setWineRows(array $wineRows): void
+    public function setWineRowsCount(int $count): void
     {
-        $this->wineRows = $wineRows;
+        $this->wineRowsCount = $count;
     }
 
     public function getWineVarietiesCount(): int
@@ -89,5 +90,15 @@ final class Vineyard
     public function setWineVarietiesCount(int $count): void
     {
         $this->wineVarietiesCount = $count;
+    }
+
+    public function getTotalHeadCount(): int
+    {
+        return $this->totalHeadCount;
+    }
+
+    public function setTotalHeadCount(int $count): void
+    {
+        $this->totalHeadCount = $count;
     }
 }

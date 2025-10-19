@@ -6,6 +6,8 @@ namespace App\Model\Vineyard;
 
 use App\Model\Image\Image;
 use App\Model\WineRow\WineRow;
+use App\Model\WineVariety\WineVariety;
+use App\Model\WineVariety\WineVarietyRepository;
 use Tracy\Debugger;
 use Tracy\ILogger;
 use Nette\Database\Explorer;
@@ -14,10 +16,14 @@ use Nette\Database\Explorer;
 final class VineyardRepository
 {
     public function __construct(
-        private Explorer $database
+        private Explorer $database,
+        private WineVarietyRepository $wineVarietyRepository
     ) {
     }
 
+    /**
+     * @return Vineyard[]
+     */
     public function fetchAll(): array
     {
         /** @var Vineyard[] $vineyards */
@@ -241,11 +247,46 @@ final class VineyardRepository
         return $wineRows;
     }
 
+    public function getUniqueWineVarietiesOnVineyard(int $vineyardId): array
+    {
+        /** @var WineVariety[] $wineVarieties */
+        $wineVarieties = [];
+        
+        $rows = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->select('DISTINCT ID_WINE_VARIETY')
+            ->fetchAll();
+
+        foreach ($rows as $row) {
+            $variety = $this->wineVarietyRepository->fetchById($row->ID_WINE_VARIETY);
+            if ($variety) {
+                $wineVarieties[] = $variety;
+            }
+        }
+
+        return $wineVarieties;
+    }
+
     public function getWineVarietiesCountOnVineyard(int $vineyardId): int
     {
        return $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
             ->select('DISTINCT ID_WINE_VARIETY')
             ->count();
+    }
+
+    public function getWineVarietyForWineRow(int $vineyardId, int $wineRowCode): ?WineVariety
+    {
+        // For composite primary keys, use where() with both key parts
+        $row = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->where('CODE', $wineRowCode)
+            ->fetch();
+            
+        if ($row === null) {
+            return null;
+        }
+
+        return $this->wineVarietyRepository->fetchById($row->ID_WINE_VARIETY);
     }
 }
