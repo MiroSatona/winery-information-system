@@ -26,6 +26,9 @@
                     <thead class="table-primary">
                         <tr>
                             <th scope="col" class="fw-bold">
+                                <i class="fas fa-id-card-clip me-2"></i>ID
+                            </th>
+                            <th scope="col" class="fw-bold">
                                 <i class="fas fa-users me-2"></i>Jméno uživatele
                             </th>
                             <th scope="col" class="fw-bold">
@@ -46,6 +49,9 @@
                         {foreach $users as $us}
                             <tr class="align-middle ">
                                 <td>
+                                    <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getId()}</p>
+                                </td>
+                                <td>
                                     <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getFullName()}</p>
                                 </td>
                                 <td>
@@ -61,17 +67,17 @@
                                 </td>
                                 <td>
                                     <div class="d-flex gap-2 justify-content-center">
-                                        <a href="{}" 
+                                        <a href="{link edit, id => $us->getId()}" 
                                            class="btn btn-outline-primary btn-sm" 
                                            title="Upravit odrůdu">
                                             <i class="fas fa-edit me-1"></i>Upravit
                                         </a>
                                         <button type="button" 
                                                 class="btn btn-outline-danger btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target=""
-                                                title="Smazat odrůdu">
-                                            <i class="fas fa-trash me-1"></i>Smazat
+                                                    data-bs-toggle="modal" 
+                                                    data-bs-target="#deleteUserModal{$us->getId()}"
+                                                    title="Smazat uživatele">
+                                                <i class="fas fa-trash me-1"></i>Smazat
                                         </button>
                                     </div>
                                 </td>
@@ -82,6 +88,37 @@
             </div>
         </div>
     </div>
-
-
+     {* Delete confirmation modals *}
+    {foreach $users as $us}
+        <div class="modal fade" id="deleteUserModal{$us->getId()}" tabindex="-1" aria-labelledby="deleteUserModalLabel{$us->getId()}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteUserModalLabel{$us->getId()}">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potvrdit smazání uživatele
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="fas fa-user fa-3x text-danger mb-3"></i>
+                            <h5>Opravdu chcete smazat uživatele?</h5>
+                            <p class="text-muted">
+                                <strong>{$us->getFullName()}</strong><br>
+                                {$us->getUsername()}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link deleteUser!, $us->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Smazat uživatele
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/foreach}
 {/block isMainPanel}

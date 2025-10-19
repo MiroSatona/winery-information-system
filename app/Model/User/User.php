@@ -10,7 +10,7 @@ class User{
     private string $surname;
     private string $username;
     private string $email;
-
+    private string $phoneNumber;
     private ?string $city;
     private ?string $postcode;
     private ?string $street;
@@ -29,6 +29,7 @@ class User{
         string $surname,
         string $username,
         string $email,
+        string $phoneNumber,
         ?string $city,
         ?string $postcode,
         ?string $street,
@@ -44,6 +45,7 @@ class User{
         $this->surname = $surname;
         $this->username = $username;
         $this->email = $email;
+        $this->phoneNumber = $phoneNumber;
         $this->city = $city;
         $this->postcode = $postcode;
         $this->street = $street;
@@ -130,14 +132,9 @@ class User{
         return $this->name . ' ' . $this->surname;
     }
 
-    /**
-     * Undocumented function
-     *
-     * @return string[]
-     */
     public function getRoles(): array
-    {   
-        /** @var string[] $roles */
+    {
+        /** @var string[] $roles Array of user roles */
         $roles = [];
 
         if ($this->isUser) {

@@ -6,5 +6,147 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    
+     <div class="d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-lg-8 col-xl-6">
+        <div class="card border-0 shadow-lg">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-user-plus me-2"></i>
+                    Přidání uživatele
+                </h4>
+            </div>
+            
+            <div class="card-body p-4">
+                {form addUserForm}
+                {* Section of "Základní informace" *}
+                <div class="d-flex justify-content-start align-items-center flex-row mt-2 mb-2">
+                    <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
+                        <i class="fas fa-person me-2"></i> Základní informace
+                    </h4>
+                </div>
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-muted"></i>{label name/}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input name}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="surname" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-muted"></i>{label surname/}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input surname}
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-muted"></i>{label email/}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input email}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label fw-semibold">
+                                <i class="fas fa-user me-2 text-muted"></i>{label phone/}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input phone}
+                        </div>
+                    </div>
+                    {* Section of "Kontaktní informace" *}
+                    <div class="d-flex justify-content-start align-items-center flex-row mt-4 mb-2">
+                        <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
+                            <i class="fas fa-phone me-2"></i> Kontaktní informace
+                        </h4>
+                    </div>
+                     <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <label for="city" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-2 text-muted"></i>{label city/}
+                            </label>
+                            {input city}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="street" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-2 text-muted"></i>{label street/}
+                            </label>
+                            {input street}
+                        </div>
+                    </div>
+                    <div class="row g-3 mb-2">
+                        <div class="col-md-6">
+                            <label for="houseNumber" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-2 text-muted"></i>{label houseNumber/}
+                            </label>
+                            {input houseNumber}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="postalCode" class="form-label fw-semibold">
+                                <i class="fas fa-phone me-2 text-muted"></i>{label postalCode/}
+                            </label>
+                            {input postalCode}
+                        </div>
+                    </div>
+                    {* Section of "Uživatelské informace" *}
+                    <div class="d-flex justify-content-start align-items-center flex-row mt-4 mb-2">
+                        <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
+                            <i class="fas fa-user-shield me-2"></i> Uživatelské informace
+                        </h4>
+                    </div>
+                    <div class="col mb-3">
+                            <label for="username" class="form-label fw-semibold">
+                                <i class="fas fa-user-shield me-2 text-muted"></i>{label username/}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input username}
+                        </div>
+                    <div class="row g-3 mb-3">
+                        <div class="col-12">
+                            <div class="d-flex flex-wrap gap-4">
+
+                                <div class="form-check">
+                                    {input isUser}
+                                    {label isUser/}
+                                </div>
+
+                                <div class="form-check">
+                                    {input isWorker}
+                                    {label isWorker/}
+                                </div>
+
+                                <div class="form-check">
+                                    {input isVintner}
+                                    {label isVintner/}
+                                </div>
+
+                                <div class="form-check">
+                                    {input isAdmin}
+                                    {label isAdmin/}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row g-2 mt-4">
+                        <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <a href="{link Users:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                <i class="fas fa-times me-2"></i>Zrušit
+                            </a>
+                        </div>
+
+                        <div class="col-12 col-md-6">
+                            <div class="d-grid">
+                                {input send}
+                            </div>
+                        </div>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+</div>
+
+
 {/block isMainPanel}
