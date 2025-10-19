@@ -61,7 +61,6 @@ final class OrderRepository
             deliveryType: $row->DELIVERY_TYPE !== null ? (string) $row->DELIVERY_TYPE : null,
             orderTimestamp: (string) $row->ORDER_TIMESTAMP,
             deliveryData: (string) $row->DELIVERY_DATA,
-            billingInfo: (string) $row->BILLING_INFO
         );
     }
     
@@ -83,7 +82,6 @@ final class OrderRepository
             "STATE" => OrderState::reserved,
             "DELIVERY_TYPE" => "PICKUP",      // Required (no default)
             "DELIVERY_DATA" => "",
-            "BILLING_INFO" => "",
         ];
 
         $newRow = $this->db->table("CUSTOMER_ORDER")->insert($insertData);

@@ -14,7 +14,6 @@ final class CustomerOrder
         public ?string $deliveryType,   // PICKUP | COURIER | POST | NULL
         public string $orderTimestamp,  // store as string (from DB)
         public string $deliveryData,
-        public string $billingInfo,
         /** @var OrderItem[] */
         public array $items = []        // optional list of related items
     ) {}
