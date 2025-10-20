@@ -81,7 +81,7 @@
 
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
-                                            <i class="fas fa-calculator me-2"></i>Celkový počet keřů {$vineyard->getTotalHeadCount()}
+                                            <i class="fas fa-calculator me-2"></i>Celkový počet keřů: {$vineyard->getTotalHeadCount()}
                                         </label>
                                     </div>
                                 </div>
@@ -164,7 +164,7 @@
                                                     </span>
                                                 </td>
                                                 <td>
-                                                    <p class="mb-0 text-muted" style="max-width: 500px;">
+                                                    <p class="mb-0 text-muted">
                                                         {if strlen($variety->getDescription()) > 120}
                                                             {$variety->getDescription()|truncate:120}
                                                         {else}
@@ -216,12 +216,12 @@
                                                 <i class="fas fa-calendar-alt me-2"></i>Rok výsadby
                                             </th>
                                             <th scope="col" class="fw-bold">
-                                                <i class="fas fa-wine-glass me-2"></i>Odrůda
+                                                <i class="fas fa-seedling me-2"></i>Odrůda
                                             </th>
                                             <th scope="col" class="fw-bold">
-                                                <i class="fas fa-seedling me-2"></i>Počet keřů
+                                                <i class="fas fa-calculator me-2"></i>Počet keřů
                                             </th>
-                                            <th scope="col" class="fw-bold text-center" style="width: 200px;">
+                                            <th scope="col" class="fw-bold text-center" style="width: 250px;">
                                                 <i class="fas fa-cogs me-2"></i>Akce
                                             </th>
                                         </tr>
@@ -245,7 +245,7 @@
                                                 </td>
                                                 <td>
                                                     <div class="d-flex gap-2 justify-content-center">
-                                                        <a href="{link editWineRow, vineyardId => $vineyard->getId(), code => $row->getId()}" 
+                                                        <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
                                                            class="btn btn-outline-primary btn-sm" 
                                                            title="Upravit řádek">
                                                             <i class="fas fa-edit me-1"></i>Upravit
@@ -293,11 +293,11 @@
                             <i class="fas fa-grip-lines fa-3x text-danger mb-3"></i>
                             <h5>Opravdu chcete smazat řádek vína?</h5>
                             <p class="text-muted">
-                                <strong>Řádek #{$row->getId()}</strong><br>
+                                <strong>Řádek {$row->getId()}</strong><br>
                                 Odrůda: <strong>{$row->getWineVariety()->getName()}</strong><br>
                                 Rok výsadby: <strong>{$row->getYearPlanted()}</strong><br>
                                 Počet keřů: <strong>{$row->getHeadCount()}</strong><br>
-                                Tato akce je nevratná.
+                                Tato akce je nevratná. Společně s řádkem budou odstraněny i všechny související záznamy (např. ošetření, sklizně).
                             </p>
                         </div>
                     </div>
@@ -305,7 +305,7 @@
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Zrušit
                         </button>
-                        <a href="{link deleteWineRow, vineyardId => $vineyard->getId(), code => $row->getId()}" class="btn btn-danger">
+                        <a href="{link deleteWineRow! $row->getId()}" class="btn btn-danger">
                             <i class="fas fa-trash me-1"></i>Smazat řádek
                         </a>
                     </div>

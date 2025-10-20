@@ -247,6 +247,26 @@ final class VineyardRepository
         return $wineRows;
     }
 
+    public function getWineRowById(int $vineyardId, int $wineRowCode): ?WineRow
+    {
+        $row = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->where('CODE', $wineRowCode)
+            ->fetch();
+
+        if ($row === null) {
+            return null;
+        }
+
+        return new WineRow(
+            $row->CODE,
+            $row->ID_VINEYARD,
+            $row->ID_WINE_VARIETY,
+            $row->HEAD_COUNT,
+            $row->PLANTING_YEAR
+        );
+    }
+
     public function getUniqueWineVarietiesOnVineyard(int $vineyardId): array
     {
         /** @var WineVariety[] $wineVarieties */
@@ -275,6 +295,24 @@ final class VineyardRepository
             ->count();
     }
 
+    public function deleteWineRowFromVineyard(int $vineyardId, int $wineRowCode): bool
+    {
+        try {
+            $row = $this->database->table('WINE_ROW')
+                ->where('ID_VINEYARD', $vineyardId)
+                ->where('CODE', $wineRowCode)
+                ->fetch();
+            if ($row === null) {
+                return false;
+            }
+            $row->delete();
+            return true;
+        } catch (\Exception $e) {
+            Debugger::log('Failed to delete wine row from vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
+            return false;
+        }
+    }
+
     public function getWineVarietyForWineRow(int $vineyardId, int $wineRowCode): ?WineVariety
     {
         // For composite primary keys, use where() with both key parts
@@ -288,5 +326,46 @@ final class VineyardRepository
         }
 
         return $this->wineVarietyRepository->fetchById($row->ID_WINE_VARIETY);
+    }
+
+    public function addWineRowToVineyard(WineRow $wineRow): bool
+    {
+        try {
+            $data = [
+                'CODE' => $wineRow->getId(),
+                'ID_VINEYARD' => $wineRow->getVineyardId(),
+                'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
+                'HEAD_COUNT' => $wineRow->getHeadCount(),
+                'PLANTING_YEAR' => $wineRow->getYearPlanted()
+            ];
+            $this->database->table('WINE_ROW')->insert($data);
+            return true;
+        } catch (\Exception $e) {
+            Debugger::log('Failed to add wine row to vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $wineRow->getVineyardId(), ILogger::ERROR);
+            return false;
+        }
+    }
+
+    public function updateWineRowOnVineyard(WineRow $wineRow): bool
+    {
+        try {
+            $row = $this->database->table('WINE_ROW')
+                ->where('ID_VINEYARD', $wineRow->getVineyardId())
+                ->where('CODE', $wineRow->getId())
+                ->fetch();
+            if ($row === null) {
+                return false;
+            }
+            $row->update([
+                'CODE' => $wineRow->getId(),
+                'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
+                'HEAD_COUNT' => $wineRow->getHeadCount(),
+                'PLANTING_YEAR' => $wineRow->getYearPlanted()
+            ]);
+            return true;
+        } catch (\Exception $e) {
+            Debugger::log('Failed to edit wine row on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $wineRow->getVineyardId() . ' | Wine Row Code: ' . $wineRow->getId(), ILogger::ERROR);
+            return false;
+        }
     }
 }

@@ -41,6 +41,8 @@ final class ValidationDefinitions
     public const VINEYARD_NAME_LENGTH_MAX = 30;
     public const YEAR_MIN = 0;
     public const YEAR_MAX = 32767;
+    public const HEAD_COUNT_MIN = 1;
+    public const HEAD_COUNT_MAX = 32767;
     public const WINE_VARIETY_NAME_LENGTH_MIN = 1;
     public const WINE_VARIETY_NAME_LENGTH_MAX = 20;
     public const TREATMENT_CATEGORY_LENGTH_MIN = 1;

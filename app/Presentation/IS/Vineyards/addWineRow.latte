@@ -7,7 +7,90 @@
 
 
 {block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        Přidání řádku vinné révy
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form addWineRowForm}
+                        <div class="mb-3">
+                            <label for="rowNumber" class="form-label fw-semibold">
+                                <i class="fas fa-hashtag me-2 text-muted"></i>Číslo řádku
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input rowNumber}
+                            <span class="invalid-feedback">
+                                {inputError rowNumber}
+                            </span>
+                        </div>
 
+                        <div class="mb-3">
+                            <label for="variety" class="form-label fw-semibold">
+                                <i class="fas fa-seedling me-2 text-muted"></i>Odrůda
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input variety}
+                            <span class="invalid-feedback">
+                                {inputError variety}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="year" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>Rok vysazení
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input year}
+                            <span class="invalid-feedback">
+                                {inputError year}
+                            </span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="headCount" class="form-label fw-semibold">
+                                <i class="fas fa-calculator me-2 text-muted"></i>Počet keřů
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input headCount}
+                            <span class="invalid-feedback">
+                                {inputError headCount}
+                            </span>
+                        </div>
 
+                        
+                        {* Information note *}
+                        <div class="alert alert-info mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Informace
+                            </h6>
+                            <small class="mb-0">
+                                • Řádek bude přidán do vybraného vinohradu<br>
+                                • Číslo řádku musí být jedinečné<br>
+                                • Výchozí číslo řádku je nastaveno na první volné v rámci vinohradu
+                            </small>
+                        </div>
+
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <a href="{link show $vineyard->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <i class="fas fa-times me-2"></i>Zrušit
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {input save class => 'btn btn-primary text-white w-100 fw-bold'}
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
 
 {/block isMainPanel}
