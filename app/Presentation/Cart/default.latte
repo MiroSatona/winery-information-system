@@ -11,7 +11,7 @@
 
         <h2 class="fw-bold text-primary m-0">Váš nákupní košík</h2>
 
-        <a n:href=":Cart:default" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
+        <a n:href=":OrderHistory:default" class="btn btn-primary d-flex align-items-center gap-2 shadow-sm">
             <i class="fa fa-info-circle"></i>
             <span>Historie nákupů</span>
         </a>
@@ -56,8 +56,8 @@
                                         <a n:href="changeAmount! $item->wine->id, true" class="btn btn-sm btn-outline-secondary px-2">+</a>
                                     </div>
                                 </td>
-                                <td class="text-center">{$item->pricePerBottle|number:2} €</td>
-                                <td class="text-center fw-semibold text-success">{($item->pricePerBottle * $item->bottlesCount)|number:2} €</td>
+                                <td class="text-center">{$item->pricePerBottle|number:2},-</td>
+                                <td class="text-center fw-semibold text-success">{($item->pricePerBottle * $item->bottlesCount)|number:2},-</td>
                                 <td class="text-center">
                                     <a n:href="removeItem! $item->wine->id" class="btn btn-sm btn-danger">
                                         <i class="fa-solid fa-trash"></i>
@@ -130,7 +130,7 @@
         <div class="card shadow-sm border-0">
             <div class="card-body d-flex justify-content-between align-items-center flex-wrap gap-3">
                 <h4 class="m-0">Celková cena:
-                    <span class="text-primary fw-bold">{$order->totalPrice|number:2} €</span>
+                    <span class="text-primary fw-bold">{$order->totalPrice|number:2},-</span>
                 </h4>
                 <a class="btn btn-lg btn-primary fw-bold d-flex align-items-center gap-2" n:href="Payment:default">
                     <i class="fa-solid fa-credit-card"></i>

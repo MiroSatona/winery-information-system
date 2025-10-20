@@ -23,7 +23,7 @@ final class CartPresenter extends BasePresenter
         $user = $this->user;
 
         if (!$user->isLoggedIn()) {
-            $this->redirect('Sign:in');
+            $this->redirect(':Sign:in');
             return;
         }
 
@@ -32,7 +32,7 @@ final class CartPresenter extends BasePresenter
 
         if (!$order) {
             $this->template->order = null;
-            $this->template->message = 'Your cart is empty.';
+            $this->template->message = 'nákupní košík je prázdný';
             return;
         }
         
