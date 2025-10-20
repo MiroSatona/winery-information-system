@@ -12,7 +12,6 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\Vineyard\VineyardRepository;
 use App\Model\Vineyard\Vineyard;
 use App\Model\WineRow\WineRow;
-use App\Model\Wine\Wine;
 use App\Model\WineVariety\WineVariety;
 use App\Model\WineVariety\WineVarietyRepository;
 use App\Model\WineVariety\WineVarietyType;
@@ -23,6 +22,11 @@ use Tracy\ILogger;
 
 final class VineyardsPresenter extends BasePresenter
 {
+
+    /** @var string $patternVineyards */
+    private string $patternVineyards = '';
+    /** @var string $patternWineRows */
+    private string $patternWineRows = '';
 
     public function __construct(
         private VineyardRepository $vineyardRepository,
@@ -42,10 +46,31 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->WineVarietyType = WineVarietyType::class;
     }
 
+    public function createComponentSearchVineyardsForm(): Form
+    {
+        $form = new Form();
+
+        $form->addText('search', 'Hledat vinohrad')
+            ->setHtmlAttribute('class', 'form-control form-control-sm')
+            ->setHtmlAttribute('placeholder', 'Vyhledávejte podle názvu nebo lokace ...');
+
+        $form->addSubmit('send', 'Hledat')
+            ->setHtmlAttribute('class', 'btn btn-sm btn-primary');
+
+        $form->onSuccess[] = [$this, 'searchVineyardsFormSucceeded'];
+
+        return $form;
+    }
+
+    public function searchVineyardsFormSucceeded(Form $form, \stdClass $values): void
+    {
+        $this->patternVineyards = $values->search;
+    }
+
     public function renderDashboard(): void
     {
         /** @var Vineyard[] $vineyards */
-        $vineyards = $this->vineyardRepository->fetchAll();
+        $vineyards = $this->vineyardRepository->fetchAllWithPattern($this->patternVineyards);
         foreach ($vineyards as $vineyard) {
             /** @var Vineyard $vineyard */
             $vineyardId = $vineyard->getId();
@@ -61,12 +86,25 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleDelete(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění smazat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
+
         if ($this->vineyardRepository->deleteVineyard($vineyardId)) {
             $this->flashMessage('Vinohrad byl úspěšně smazán.', 'success');
         } else {
             $this->flashMessage('Vinohrad se nepodařilo smazat.', 'error');
         }
         
+    }
+
+    public function renderAdd(): void
+    {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
     }
 
     public function createComponentAddVineyardForm(): Form
@@ -80,18 +118,18 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název vinohradu');
 
-        $form->addText('location', 'Lokace vinohradu')
+        $form->addText('location', 'Lokace')
             ->setRequired('Zadejte lokaci vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte lokaci vinohradu');
 
-        $form->addTextArea('description', 'Popis vinohradu')
+        $form->addTextArea('description', 'Detailní popis')
             ->setRequired('Zadejte popis vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
 
-        $form->addInteger('year', 'Rok založení vinohradu')
+        $form->addInteger('year', 'Rok založení')
             ->addRule(Form::Min, "Rok založení vinohradu musí být alespoň %d.", $this->validationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, "Rok založení vinohradu nesmí být větší než %d.", $this->validationDefinitions::YEAR_MAX)
             ->setDefaultValue(date('Y'))
@@ -99,7 +137,7 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte rok založení vinohradu');
 
-        $form->addUpload('image', 'Obrázek vinohradu')
+        $form->addUpload('image', 'Obrázek')
             ->addRule($form::Image, "Nahrajte prosím platný obrázek.")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Nahrajte obrázek vinohradu');
@@ -114,6 +152,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function addVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
+
         /** @var FileUpload $image */
         $image = $values->image;
         $imagePath = null;
@@ -154,6 +197,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderEdit(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -183,25 +231,25 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název vinohradu');
 
-        $form->addText('location', 'Lokace vinohradu')
+        $form->addText('location', 'Lokace')
             ->setRequired('Zadejte lokaci vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte lokaci vinohradu');
 
-        $form->addTextArea('description', 'Popis vinohradu')
+        $form->addTextArea('description', 'Detailní popis')
             ->setRequired('Zadejte popis vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
 
-        $form->addInteger('year', 'Rok založení vinohradu')
+        $form->addInteger('year', 'Rok založení')
             ->addRule(Form::Min, "Rok založení vinohradu musí být alespoň %d.", $this->validationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, "Rok založení vinohradu nesmí být větší než %d.", $this->validationDefinitions::YEAR_MAX)
             ->setRequired('Zadejte rok založení vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte rok založení vinohradu');
 
-        $form->addUpload('image', 'Obrázek vinohradu')
+        $form->addUpload('image', 'Obrázek')
             ->addRule($form::Image, "Nahrajte prosím platný obrázek.")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Nahrajte obrázek vinohradu');
@@ -216,6 +264,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function editVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
         
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
@@ -263,6 +316,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleRemoveImage(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $id);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($id);
         if ($vineyard === null) {
             $this->flashMessage('Vinohrad nebyl nalezen.', 'error');
@@ -306,15 +364,21 @@ final class VineyardsPresenter extends BasePresenter
 
         // Get wine rows and varieties for this vineyard
         /** @var WineRow[] $wineRows */
-        $wineRows = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
+        $wineRows = $this->vineyardRepository->getWineRowsOnVineyardWithPattern($vineyardId, $this->patternWineRows);
         $wineVarieties = $this->vineyardRepository->getUniqueWineVarietiesOnVineyard($vineyardId);
         $vineyard->setWineRowsCount(count($wineRows));
         $vineyard->setWineVarietiesCount(count($wineVarieties));
 
-        // Get total head count for each wine variety
+        // Get total head count for each wine variety on this vineyard
+        $wineVarietiesHeadCount = [];
+        foreach ($wineVarieties as $variety) {
+            /** @var WineVariety $variety */
+            $totalHeadCount = $this->vineyardRepository->getWineVarietyTotalHeadCountOnVineyard($vineyardId, $variety->getId());
+            $wineVarietiesHeadCount[$variety->getId()] = $totalHeadCount;
+        }
 
+        // Get total head count on vineyard and setup wine variety for each row
         $totalHeadCount = 0;
-        
         foreach ($wineRows as $row) {
             /** @var WineRow $row */
             $totalHeadCount += $row->getHeadCount();
@@ -326,6 +390,7 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->vineyard = $vineyard;
         $this->template->wineVarieties = $wineVarieties;
         $this->template->wineRows = $wineRows;
+        $this->template->wineVarietiesHeadCount = $wineVarietiesHeadCount;
         $this->template->imageRepository = $this->imageRepository;
     }
 
@@ -339,20 +404,20 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte číslo řádku');
 
-        $form->addInteger("year", "Rok")
+        $form->addInteger("year", "Rok výsadby")
             ->setDefaultValue(date('Y'))
             ->addRule(Form::Min, "Rok musí být alespoň %d.", $this->validationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, "Rok nesmí být větší než %d.", $this->validationDefinitions::YEAR_MAX)
-            ->setRequired('Zadejte rok.')
+            ->setRequired('Zadejte rok výsadby.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte rok výsadby');
 
-        $form->addInteger('headCount', 'Počet hlav')
-            ->addRule(Form::Min, "Počet hlav musí být alespoň %d.", $this->validationDefinitions::HEAD_COUNT_MIN)
-            ->addRule(Form::Max, "Počet hlav nesmí být větší než %d.", $this->validationDefinitions::HEAD_COUNT_MAX)
-            ->setRequired('Zadejte počet hlav.')
+        $form->addInteger('headCount', 'Počet keřů')
+            ->addRule(Form::Min, "Počet keřů musí být alespoň %d.", $this->validationDefinitions::HEAD_COUNT_MIN)
+            ->addRule(Form::Max, "Počet keřů nesmí být větší než %d.", $this->validationDefinitions::HEAD_COUNT_MAX)
+            ->setRequired('Zadejte počet keřů.')
             ->setHtmlAttribute('class', 'form-control')
-            ->setHtmlAttribute('placeholder', 'Zadejte počet hlav');
+            ->setHtmlAttribute('placeholder', 'Zadejte počet keřů');
 
         /** @var WineVariety[] $wineVarieties */
         $wineVarieties = $this->wineVarietyRepository->fetchAll();
@@ -365,10 +430,9 @@ final class VineyardsPresenter extends BasePresenter
             ->setItems($selectItems)
             ->setRequired('Vyberte odrůdu vína.')
             ->setHtmlAttribute('class', 'form-control');
-        // todo items
 
         $form->addSubmit('save', 'Přidat řádek')
-            ->setHtmlAttribute('class', 'btn btn-success w-100 fw-bold');
+            ->setHtmlAttribute('class', 'btn btn-primary text-white w-100 fw-bold');
 
         $form->onSuccess[] = [$this, 'addWineRowFormSucceeded'];
 
@@ -377,6 +441,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function addWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show ', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
 
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
@@ -421,19 +490,19 @@ final class VineyardsPresenter extends BasePresenter
             ->setDisabled(true)
             ->setHtmlAttribute('class', 'form-control');
 
-        $form->addInteger("year", "Rok")
+        $form->addInteger("year", "Rok výsadby")
             ->addRule(Form::Min, "Rok musí být alespoň %d.", $this->validationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, "Rok nesmí být větší než %d.", $this->validationDefinitions::YEAR_MAX)
-            ->setRequired('Zadejte rok.')
+            ->setRequired('Zadejte rok výsadby.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte rok výsadby');
 
-        $form->addInteger('headCount', 'Počet hlav')
-            ->addRule(Form::Min, "Počet hlav musí být alespoň %d.", $this->validationDefinitions::HEAD_COUNT_MIN)
-            ->addRule(Form::Max, "Počet hlav nesmí být větší než %d.", $this->validationDefinitions::HEAD_COUNT_MAX)
-            ->setRequired('Zadejte počet hlav.')
+        $form->addInteger('headCount', 'Počet keřů')
+            ->addRule(Form::Min, "Počet keřů musí být alespoň %d.", $this->validationDefinitions::HEAD_COUNT_MIN)
+            ->addRule(Form::Max, "Počet keřů nesmí být větší než %d.", $this->validationDefinitions::HEAD_COUNT_MAX)
+            ->setRequired('Zadejte počet keřů.')
             ->setHtmlAttribute('class', 'form-control')
-            ->setHtmlAttribute('placeholder', 'Zadejte počet hlav');
+            ->setHtmlAttribute('placeholder', 'Zadejte počet keřů');
 
         /** @var WineVariety[] $wineVarieties */
         $wineVarieties = $this->wineVarietyRepository->fetchAll();
@@ -448,7 +517,7 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control');
 
         $form->addSubmit('save', 'Upravit řádek')
-            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold text-white');
 
         $form->onSuccess[] = [$this, 'editWineRowFormSucceeded'];
 
@@ -457,6 +526,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function editWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show ', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
         $rowId = (int)$this->getParameter('rowId');
 
@@ -468,7 +542,7 @@ final class VineyardsPresenter extends BasePresenter
         }
 
         // check with row id exists
-        $existingWineRow = $this->vineyardRepository->getWineRowById($vineyardId, $values->rowNumber);
+        $existingWineRow = $this->vineyardRepository->getWineRowById($vineyardId, $rowId);
         if ($existingWineRow === null) {
             $form->addError('Řádek s tímto číslem neexistuje.');
             $this->flashMessage('Řádek s tímto číslem neexistuje.', 'error');
@@ -497,6 +571,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderEditWineRow(int $vineyardId, int $rowId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -525,6 +604,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderAddWineRow(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -559,6 +643,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleDeleteWineRow(int $rowId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
 
         if ($this->vineyardRepository->deleteWineRowFromVineyard($vineyardId, $rowId)) {
@@ -568,5 +657,26 @@ final class VineyardsPresenter extends BasePresenter
         }
 
         $this->redirect('show', $vineyardId);
+    }
+
+    public function createComponentSearchWineRowsForm(): Form
+    {
+        $form = new Form();
+
+        $form->addText('search', 'Hledat řádky')
+            ->setHtmlAttribute('class', 'form-control form-control-sm')
+            ->setHtmlAttribute('placeholder', 'Vyhledávejte podle čísla řádku, roku nebo odrůdy ...');
+
+        $form->addSubmit('send', 'Hledat')
+            ->setHtmlAttribute('class', 'btn btn-sm btn-primary');
+
+        $form->onSuccess[] = [$this, 'searchWineRowsFormSucceeded'];
+
+        return $form;
+    }
+
+    public function searchWineRowsFormSucceeded(Form $form, \stdClass $values): void
+    {
+        $this->patternWineRows = $values->search;
     }
 }

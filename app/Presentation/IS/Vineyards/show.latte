@@ -22,9 +22,11 @@
                                 <a href="{link Vineyards:dashboard}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
-                                <a href="{link Vineyards:edit, vineyardId => $vineyard->getId()}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-edit me-2"></i>Upravit vinohrad
-                                </a>
+                                {if $userVintner}
+                                    <a href="{link Vineyards:edit, vineyardId => $vineyard->getId()}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit me-2"></i>Upravit vinohrad
+                                    </a>
+                                {/if}
                             </div>
                         </div>
                     </div>
@@ -62,8 +64,6 @@
                                         </label>
                                         <p class="text-dark mb-2">{$vineyard->getDescription()}</p>
                                     </div>
-
-                                    
 
                                     <hr>
 
@@ -139,6 +139,9 @@
                                             <th scope="col" class="fw-bold">
                                                 <i class="fas fa-align-left me-2"></i>Popis
                                             </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-calculator me-2"></i>Počet keřů
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -172,6 +175,11 @@
                                                         {/if}
                                                     </p>
                                                 </td>
+                                                <td>
+                                                    <p class="mb-0 fw-semibold text-dark">
+                                                        {$wineVarietiesHeadCount[$variety->getId()]}
+                                                    </p>
+                                                </td>
                                             </tr>
                                         {/foreach}
                                     </tbody>
@@ -198,9 +206,20 @@
                             <h5 class="mb-0 fw-bold">
                                 <i class="fas fa-grip-lines me-2"></i>Řádky vína
                             </h5>
-                            <a href="{link addWineRow $vineyard->getId()}" class="btn btn-primary btn-sm">
-                                <i class="fas fa-plus me-2"></i>Přidat řádek
-                            </a>
+
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                {form searchWineRowsForm}
+                                    <div class="input-group" style="max-width:520px; min-width:400px;">
+                                        {input search}
+                                        {input send}
+                                    </div>
+                                {/form}
+                            </div>
+                            {if $userVintner}
+                                <a href="{link addWineRow $vineyard->getId()}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Přidat řádek
+                                </a>
+                            {/if}
                         </div>
                     </div>
                     <div class="card-body p-0">
@@ -221,9 +240,11 @@
                                             <th scope="col" class="fw-bold">
                                                 <i class="fas fa-calculator me-2"></i>Počet keřů
                                             </th>
-                                            <th scope="col" class="fw-bold text-center" style="width: 250px;">
-                                                <i class="fas fa-cogs me-2"></i>Akce
-                                            </th>
+                                            {if $userVintner}
+                                                <th scope="col" class="fw-bold text-center" style="width: 250px;">
+                                                    <i class="fas fa-cogs me-2"></i>Akce
+                                                </th>
+                                            {/if}
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -243,22 +264,24 @@
                                                 <td>
                                                     <span class="fw-semibold">{$row->getHeadCount()}</span>
                                                 </td>
-                                                <td>
-                                                    <div class="d-flex gap-2 justify-content-center">
-                                                        <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
-                                                           class="btn btn-outline-primary btn-sm" 
-                                                           title="Upravit řádek">
-                                                            <i class="fas fa-edit me-1"></i>Upravit
-                                                        </a>
-                                                        <button type="button" 
-                                                                class="btn btn-outline-danger btn-sm" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#deleteRowModal{$row->getId()}"
-                                                                title="Smazat řádek">
-                                                            <i class="fas fa-trash me-1"></i>Smazat
-                                                        </button>
-                                                    </div>
-                                                </td>
+                                                {if $userVintner}
+                                                    <td>
+                                                        <div class="d-flex gap-2 justify-content-center">
+                                                            <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
+                                                            class="btn btn-outline-primary btn-sm" 
+                                                            title="Upravit řádek">
+                                                                <i class="fas fa-edit me-1"></i>Upravit
+                                                            </a>
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deleteRowModal{$row->getId()}"
+                                                                    title="Smazat řádek">
+                                                                <i class="fas fa-trash me-1"></i>Smazat
+                                                            </button>
+                                                        </div>
+                                                    </td>
+                                                {/if}
                                             </tr>
                                         {/foreach}
                                     </tbody>

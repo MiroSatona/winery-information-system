@@ -74,9 +74,9 @@ final class ShopPresenter extends  BasePresenter
             return;
         }
         if (!$this->orderRep->addToCart($this->user->id, $wineId, $count)) {
-            $this->flashMessage("could not add fine to cart", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepovedlo se uložení do košíku", FlashMsgType::ERROR->value);
         } else {
-            $this->flashMessage("Wine #$wineId added to cart!", FlashMsgType::SUCCESS->value);
+            $this->flashMessage("Položka přidána do košíku", FlashMsgType::SUCCESS->value);
         }
         
         $this->redirect('this');

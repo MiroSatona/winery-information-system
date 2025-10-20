@@ -23,7 +23,7 @@ final class CartPresenter extends BasePresenter
         $user = $this->user;
 
         if (!$user->isLoggedIn()) {
-            $this->redirect('Sign:in');
+            $this->redirect(':Sign:in');
             return;
         }
 
@@ -32,7 +32,7 @@ final class CartPresenter extends BasePresenter
 
         if (!$order) {
             $this->template->order = null;
-            $this->template->message = 'Your cart is empty.';
+            $this->template->message = 'nákupní košík je prázdný';
             return;
         }
         
@@ -58,9 +58,9 @@ final class CartPresenter extends BasePresenter
         $success = $this->orderRepository->removeItemFromOrder($userId, $wineId);
 
         if ($success) {
-            $this->flashMessage('Item removed from your cart.', FlashMsgType::SUCCESS->value);
+            $this->flashMessage('Položka', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Could not remove item.', FlashMsgType::ERROR->value);
+            $this->flashMessage('Položku nelze odebrat!', FlashMsgType::ERROR->value);
         }
 
         $this->redirect('this');
@@ -72,9 +72,9 @@ final class CartPresenter extends BasePresenter
         $success = $this->orderRepository->editAmountOrItemInOrder($userId, $wineId, 1, $add);
 
         if ($success) {
-            $this->flashMessage('Item amount updated.', FlashMsgType::SUCCESS->value);
+            $this->flashMessage('Změna počtu položky uložena', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Could not update item amount.', FlashMsgType::ERROR->value); 
+            $this->flashMessage('Uložení se nepovedlo', FlashMsgType::ERROR->value); 
         }
 
         $this->redirect('this');

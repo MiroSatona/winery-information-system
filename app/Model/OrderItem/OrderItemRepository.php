@@ -119,7 +119,7 @@ final class OrderItemRepository
             "ID_ORDER" => $orderId,
             "ID_WINE" => $wineId,
             "BOTTLES_COUNT" => $amount,
-            "PRICE_PER_BOTTLE" => $wine->bottlePrice
+            "PRICE_PER_BOTTLE" => $wine->currentPrice
         ];
         $this->db->table("ORDER_ITEM")->insert($row);
         return $this->wineRepository->updateWineFreeBottles($wineId, $amount, false);

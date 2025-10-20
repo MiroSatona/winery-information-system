@@ -41,6 +41,16 @@ final class WineRepository
         if ($row->ID_PICTURE !== null) {
             $image = $this->imageRepository->fetchImageById((int) $row->ID_PICTURE);
         }
+        
+        $varieties = $this->db->table("HARVEST")
+            ->where("ID_WINE", $row->ID)
+            ->select("DISTINCT WINE_VARIETY.NAME")
+            ->joinWhere("WINE_VARIETY", "WINE_VARIETY.ID = HARVEST.ID_WINE_VARIETY")
+            ->fetchAll();
+
+        $varietyNames = array_map(fn($v) => $v->NAME, $varieties);
+        
+        Debugger::log("varieties: " . implode(", ", $varietyNames));
 
         return new Wine(
             id: (int) $row->ID,
@@ -61,7 +71,8 @@ final class WineRepository
             salesDescription: $row->SALES_DESCRIPTION !== null ? (string) $row->SALES_DESCRIPTION : null,
             productionNote: (string) $row->PRODUCTION_NOTE,
             name: (string) $row->WINE_NAME,
-            img: $image
+            img: $image,
+            variety: $varietyNames
         );
     }
     
