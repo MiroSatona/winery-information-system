@@ -5,7 +5,152 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    <h2>Přehled vín</h2>
-    <p>Zde budou funkce, možná ...</p>
+    <div class="container-fluid">
+        {* Main wine details section *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-wine-bottle me-2"></i>
+                                Přehled vín
+                            </h4>
+
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                {form searchWineForm}
+                                    <div class="input-group" style="max-width:520px; min-width:550px;">
+                                        {input search}
+                                        {input send}
+                                    </div>
+                                {/form}
+                            </div>
+                            
+                            <div class="d-flex gap-2">
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
+                                </a>
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-wine-bottle me-2"></i>Vyrobit víno
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <span class="text-muted">Celkem vín: <strong>{count($wines)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-wine-bottle me-2"></i>Název
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-calendar-alt me-2"></i>Ročník
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-seedling me-2"></i>Odrůdy
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-info-circle me-2"></i>Stav
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-percentage me-2"></i>Alkohol
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-flask me-2"></i>Objem (l)
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-coins me-2"></i>Cena (Kč)
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-boxes me-2"></i>Zbývá lahví
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-gears me-2"></i>Akce
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $wines as $wine}
+                                        <tr class="align-middle">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0 fw-semibold text-dark">{$wine->getName()}</h6>
+                                                        {if $wine->getType() !== "NONE"}
+                                                            <small class="text-muted">{$wine->getTypeText()}</small>
+                                                        {/if}
+                                                        {if $wine->getGrade() !== "NONE"}
+                                                            <small class="text-muted">{$wine->getGradeText()|lower}</small>
+                                                        {/if}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="mb-0 fw-semibold text-dark">{$wine->getYear()}</span>
+                                            </td>
+                                            <td>
+                                                <span class="mb-0 fw-semibold text-dark">{implode(", ", $wine->getVarietiesNames())}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="mb-0 fw-semibold text-dark">{$wine->getStateText()}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="mb-0 fw-semibold text-dark">{$wine->getAlcoholPercentage()}%</span>
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="mb-0 fw-semibold text-dark">{$wine->getVolume()}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                {if $wine->getCurrentPrice()}
+                                                    <span class="mb-0 fw-semibold text-dark">{$wine->getCurrentPrice()}</span>
+                                                {else}
+                                                    <span class="mb-0 fw-semibold text-dark">-</span>
+                                                {/if}
+                                            </td>
+                                            <td class="text-center">
+                                                {if $wine->getBottlesLeft() !== null}
+                                                        <span class="mb-0 fw-semibold text-dark">{$wine->getBottlesLeft()}</span>
+                                                {else}
+                                                    <span class="mb-0 fw-semibold text-dark">-</span>
+                                                {/if}
+                                            </td>
+                                            <td class="text-center">
+                                                <div class="d-flex flex-column">
+                                                    <div class="d-flex gap-2 justify-content-center">
+                                                        <a href="{link Wine:show $wine->getId()}" 
+                                                        class="btn btn-outline-primary btn-sm" 
+                                                        title="Detail vinohradu">
+                                                            <i class="fas fa-edit me-1"></i>Spravovat
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    {if count($wines) === 0}
+                                        <tr>
+                                            <td colspan="9" class="text-center py-5 text-muted">
+                                                <i class="fas fa-wine-bottle fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádná vína</h5>
+                                                <p>Zatím nejsou přidána žádná vína.</p>
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
 {/block isMainPanel}

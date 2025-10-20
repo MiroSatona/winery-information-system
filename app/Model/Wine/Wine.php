@@ -31,7 +31,9 @@ class Wine
         public string $productionNote,
         public string $name,
         public ?Image $img,
-        public array $variety
+        public array $variety,
+        /** @var WineVariety[] $varieties */
+        public array $varieties
     ) {
         // Populate Czech presentation values
         $this->typeCz  = $this->fetchType($this->type);
@@ -86,4 +88,136 @@ class Wine
             default => $state,
         };
     }
+
+    public function getName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Undocumented function
+     *
+     * @return WineVariety[]
+     */
+    public function getVarieties(): array
+    {
+        return $this->varieties;
+    }
+
+    public function getVarietiesNames(): array
+    {
+        return $this->variety;
+    }
+
+    public function getImage(): ?Image
+    {
+        return $this->img;
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    public function getYear(): int
+    {
+        return $this->year;
+    }
+
+    public function getAlcoholPercentage(): int
+    {
+        return $this->alcoholPercentage;
+    }
+
+    public function getType(): string
+    {
+        return $this->type;
+    }
+
+    public function getColor(): string
+    {
+        return $this->color;
+    }
+
+    public function getGrade(): string
+    {
+        return $this->grade;
+    }
+
+    public function getState(): string
+    {
+        return $this->state;
+    }
+
+    public function getVolume(): int
+    {
+        return $this->volume;
+    }
+
+    public function getProductionNote(): string
+    {
+        return $this->productionNote;
+    }
+
+    public function getSalesDescription(): ?string
+    {
+        return $this->salesDescription;
+    }
+
+    public function getBottlesLeft(): ?int
+    {
+        return $this->bottlesLeft;
+    }
+
+    public function getCurrentPrice(): ?int
+    {
+        return $this->currentPrice;
+    }
+
+    public function getBottlePrice(): ?int
+    {
+        return $this->bottlePrice;
+    }
+
+    public function getLeftSugar(): ?int
+    {
+        return $this->leftSugar;
+    }
+
+    public function getAcidContents(): ?int
+    {
+        return $this->acidContents;
+    }
+
+    public function getIdLiquidator(): ?int
+    {
+        return $this->idLiquidator;
+    }
+
+    public function getIdSellApprover(): ?int
+    {
+        return $this->idSellApprover;
+    }
+
+    public function getStateText(): string
+    {
+        return $this->fetchState($this->state);
+    }
+
+    public function getTypeText(): string
+    {
+        return $this->fetchType($this->type);
+    }
+
+    public function getColorText(): string
+    {
+        return $this->fetchColor($this->color);
+    }
+
+    public function getGradeText(): string
+    {
+        return $this->fetchGrade($this->grade);
+    }
+
+
 }

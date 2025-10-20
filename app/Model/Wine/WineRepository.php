@@ -4,7 +4,10 @@ namespace App\Model\Wine;
 
 use App\Model\Image\ImageRepository;
 use App\Model\Wine\Wine;
+use App\Model\WineVariety\WineVariety;
 use App\Model\Bottle\BottleRepository;
+use App\Model\Image\Image;
+use App\Model\WineVariety\WineVarietyType;
 use Nette\Database\Explorer;
 use Tracy\Debugger;
 
@@ -22,6 +25,11 @@ final class WineRepository
         return $wineRow ? $this->createWineFromRow($wineRow) : null;
     }
 
+    /**
+     * Fetch all wines from the database.
+     *
+     * @return Wine[] Array of Wine objects
+     */
     public function fetchAllWines(): array
     {
         $rows = $this->db->table('WINE');
@@ -44,9 +52,26 @@ final class WineRepository
         
         $varieties = $this->db->table("HARVEST")
             ->where("ID_WINE", $row->ID)
-            ->select("DISTINCT WINE_VARIETY.NAME")
+            ->select("DISTINCT WINE_VARIETY.NAME, WINE_VARIETY.ID_PICTURE, WINE_VARIETY.COLOR, WINE_VARIETY.DESCRIPTION, WINE_VARIETY.ID")
             ->joinWhere("WINE_VARIETY", "WINE_VARIETY.ID = HARVEST.ID_WINE_VARIETY")
             ->fetchAll();
+
+        /** @var WineVariety[] $varietiesData */
+        $varietiesData = [];
+        foreach ($varieties as $varietyRow) {
+            /** @var Image $image */
+            $image = null;
+            if ($varietyRow->ID_PICTURE !== null) {
+                $image = $this->imageRepository->fetchImageById((int) $varietyRow->ID_PICTURE);
+            }
+            $varietiesData[] = new WineVariety(
+                id: (int) $varietyRow->ID,
+                name: (string) $varietyRow->NAME,
+                color: WineVarietyType::from((string) $varietyRow->COLOR),
+                image: $image,
+                description: (string) $varietyRow->DESCRIPTION
+            );
+        }
 
         $varietyNames = array_map(fn($v) => $v->NAME, $varieties);
         
@@ -72,7 +97,8 @@ final class WineRepository
             productionNote: (string) $row->PRODUCTION_NOTE,
             name: (string) $row->WINE_NAME,
             img: $image,
-            variety: $varietyNames
+            variety: $varietyNames,
+            varieties: $varietiesData
         );
     }
     
