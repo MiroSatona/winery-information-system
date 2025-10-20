@@ -19,7 +19,7 @@
                     {form editWineRowForm}
                         <div class="mb-3">
                             <label for="rowNumber" class="form-label fw-semibold">
-                                <i class="fas fa-hashtag me-2 text-muted"></i>Číslo řádku
+                                <i class="fas fa-hashtag me-2 text-muted"></i>{label rowNumber /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input rowNumber}
@@ -27,7 +27,7 @@
 
                         <div class="mb-3">
                             <label for="variety" class="form-label fw-semibold">
-                                <i class="fas fa-seedling me-2 text-muted"></i>Odrůda
+                                <i class="fas fa-seedling me-2 text-muted"></i>{label variety /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input variety}
@@ -38,7 +38,7 @@
                         
                         <div class="mb-3">
                             <label for="year" class="form-label fw-semibold">
-                                <i class="fas fa-calendar-alt me-2 text-muted"></i>Rok vysazení
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input year}
@@ -49,7 +49,7 @@
                         
                         <div class="mb-3">
                             <label for="headCount" class="form-label fw-semibold">
-                                <i class="fas fa-calendar me-2 text-muted"></i>Počet keřů
+                                <i class="fas fa-calendar me-2 text-muted"></i>{label headCount /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input headCount}
@@ -66,7 +66,7 @@
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-6">
-                                    {input save class => 'btn btn-primary w-100 fw-bold text-white'}
+                                    {input save}
                                 </div>
                             </div>
                         </div>

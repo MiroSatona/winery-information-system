@@ -6,12 +6,10 @@ namespace App\Presentation\IS\WineVarieties;
 
 use App\Model\Image\Image;
 use App\Model\Image\ImageRepository;
-use Nette;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Validation\ValidationDefinitions;
-use App\Model\Wine;
 use App\Model\WineVariety\WineVarietyRepository;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\WineVariety\WineVariety;
@@ -191,9 +189,6 @@ final class WineVarietiesPresenter extends BasePresenter
         
         $form->addSubmit('send', 'Uložit změny')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold text-white');
-
-        // Pre-fill form with current data in renderEdit method
-        // Default values will be set in renderEdit method
 
         $form->onSuccess[] = [$this, 'processEditWineVarietyForm'];
 

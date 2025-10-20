@@ -20,7 +20,7 @@
                     {form addVineyardForm}
                         <div class="mb-3">
                             <label for="name" class="form-label fw-semibold">
-                                <i class="fas fa-tag me-2 text-muted"></i>Název vinohradu
+                                <i class="fas fa-tag me-2 text-muted"></i>{label name /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input name}
@@ -28,7 +28,7 @@
 
                         <div class="mb-3">
                             <label for="location" class="form-label fw-semibold">
-                                <i class="fas fa-map-marker-alt me-2 text-muted"></i>Lokalita
+                                <i class="fas fa-map-marker-alt me-2 text-muted"></i>{label location /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input location}
@@ -36,7 +36,7 @@
                         
                         <div class="mb-3">
                             <label for="year" class="form-label fw-semibold">
-                                <i class="fas fa-calendar-alt me-2 text-muted"></i>Rok založení
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input year}
@@ -44,7 +44,7 @@
                         
                         <div class="mb-3">
                             <label for="description" class="form-label fw-semibold">
-                                <i class="fas fa-file-alt me-2 text-muted"></i>Detailní popis
+                                <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
                                 <span class="text-danger">*</span>
                             </label>
                             {input description}
@@ -52,16 +52,18 @@
                         
                         <div class="mb-3">
                             <label for="image" class="form-label fw-semibold">
-                                <i class="fas fa-camera me-2 text-muted"></i>Přidat obrázek
+                                <i class="fas fa-camera me-2 text-muted"></i>{label image /}
                             </label>
                             {input image}
                         </div>
 
                         {* Information note *}
                         <div class="alert alert-info mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Informace
+                            </h6>
                             <small class="mb-0">
-                                <i class="fas fa-info-circle me-2"></i>
-                                <strong>Poznámka:</strong> Přidávání a úprava řad vín a dalších podrobností bude k dispozici po vytvoření vinohradu na jeho editační stránce.
+                                Přidávání a úprava řad vín a dalších podrobností bude k dispozici po vytvoření vinohradu na jeho editační stránce.
                             </small>
                         </div>
 
