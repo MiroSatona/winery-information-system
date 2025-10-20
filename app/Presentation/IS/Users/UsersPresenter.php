@@ -10,6 +10,7 @@ use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\User\UserRepository;
 use App\Model\Validation\ValidationDefinitions;
+use App\Model\FlashMsgType;
 
 final class UsersPresenter extends BasePresenter
 {   
@@ -33,6 +34,7 @@ final class UsersPresenter extends BasePresenter
     {   
         parent::startup();
         if (!$this->user->isInRole(Role::ADMIN->name)) {
+            $this->flashMessage('Nemáte oprávnění pro přístup k uživatelům.', FlashMsgType::ERROR->value);
             $this->redirect(':Home:default');
         }
     }
