@@ -43,9 +43,9 @@ final class WinePresenter extends BasePresenter
             return;
         }
         if (!$this->ordRep->addToCart($this->user->id, $wineId, $count)) {
-            $this->flashMessage("could not add fine to cart", FlashMsgType::ERROR->value);
+            $this->flashMessage("Položku se nepovedlo přidat do košíku", FlashMsgType::ERROR->value);
         } else {
-            $this->flashMessage("Wine #$wineId added to cart!", FlashMsgType::SUCCESS->value);
+            $this->flashMessage("Položka přidána do košíku", FlashMsgType::SUCCESS->value);
         }
         
         $this->redirect('this');
