@@ -281,8 +281,7 @@ final class UsersPresenter extends BasePresenter
                     'name' => $user->getName(),
                     'surname' => $user->getSurname(),
                     'email' => $user->getEmail(),
-                    // phone is not stored in User entity currently -> leave empty or extend User/Repo
-                    'phone' => '',
+                    'phone' => $user->getPhoneNumber(),
                     'city' => $user->getCity(),
                     'postalCode' => $user->getPostcode(),
                     'street' => $user->getStreet(),
