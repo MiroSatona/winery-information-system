@@ -491,7 +491,7 @@ final class VineyardsPresenter extends BasePresenter
         }
 
         // check with row id exists
-        $existingWineRow = $this->vineyardRepository->getWineRowById($vineyardId, $values->rowNumber);
+        $existingWineRow = $this->vineyardRepository->getWineRowById($vineyardId, $rowId);
         if ($existingWineRow === null) {
             $form->addError('Řádek s tímto číslem neexistuje.');
             $this->flashMessage('Řádek s tímto číslem neexistuje.', 'error');
