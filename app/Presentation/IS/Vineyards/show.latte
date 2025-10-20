@@ -198,6 +198,16 @@
                             <h5 class="mb-0 fw-bold">
                                 <i class="fas fa-grip-lines me-2"></i>Řádky vína
                             </h5>
+
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                {form searchWineRowsForm}
+                                    <div class="input-group" style="max-width:520px; min-width:400px;">
+                                        {input search}
+                                        {input send}
+                                    </div>
+                                {/form}
+                            </div>
+
                             <a href="{link addWineRow $vineyard->getId()}" class="btn btn-primary btn-sm">
                                 <i class="fas fa-plus me-2"></i>Přidat řádek
                             </a>

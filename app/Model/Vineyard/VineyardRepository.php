@@ -55,6 +55,42 @@ final class VineyardRepository
         return $vineyards;
     }
 
+    /**
+     * @return Vineyard[]
+     */
+    public function fetchAllWithPattern(string $pattern): array
+    {
+        /** @var Vineyard[] $vineyards */
+        $vineyards = [];
+        $rows = $this->database->table('VINEYARD')
+            ->where('NAME LIKE ? OR LOCATION LIKE ?', "%$pattern%", "%$pattern%")
+            ->fetchAll();
+
+        foreach ($rows as $row) {
+            // Access PICTURE data by left join
+            $picture = $row->ref('PICTURE', 'ID_PICTURE');
+            $image = null;
+            if ($picture) {
+                $image = new Image(
+                    $picture->ID,
+                    $picture->LINK,
+                    $picture->IMAGE_NAME,
+                    $picture->DESCRIPTION
+                );
+            }
+
+            $vineyards[] = new Vineyard(
+                $row->ID,
+                $row->NAME,
+                $row->LOCATION,
+                $image,
+                $row->DESCRIPTION,
+                $row->YEAR
+            );
+        }
+        return $vineyards;
+    }
+
     public function getVineyardById(int $id): ?Vineyard
     {
         $row = $this->database->table('VINEYARD')->get($id);
@@ -232,6 +268,29 @@ final class VineyardRepository
         $wineRows = [];
         $rows = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
+            ->fetchAll();
+
+        foreach ($rows as $row) {
+            $wineRows[] = new WineRow(
+                $row->CODE,
+                $row->ID_VINEYARD,
+                $row->ID_WINE_VARIETY,
+                $row->HEAD_COUNT,
+                $row->PLANTING_YEAR
+            );
+        }
+
+        return $wineRows;
+    }
+
+    public function getWineRowsOnVineyardWithPattern(int $vineyardId, string $pattern): array
+    {
+        /** @var WineRow[] $wineRows Array of wine rows on the given vineyard */
+        $wineRows = [];
+        // fetch wine rows matching the pattern in CODE, PLANTING_YEAR, or associated WINE_VARIETY name
+        $rows = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->where('CODE LIKE ? OR PLANTING_YEAR LIKE ? OR ID_WINE_VARIETY IN ?', "%$pattern%", "%$pattern%", $this->database->table('WINE_VARIETY')->where('NAME LIKE ?', "%$pattern%")->select('ID'))
             ->fetchAll();
 
         foreach ($rows as $row) {
