@@ -44,11 +44,19 @@ final class WineVarietiesPresenter extends BasePresenter
 
     public function renderAdd(): void
     {
-
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidávat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
     }
 
     public function renderEdit(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
+
         $wineVariety = $this->wineVarietyRepository->fetchById($id);
         if (!$wineVariety) {
             $this->flashMessage('Odrůda vína nebyla nalezena.', 'error');
@@ -109,6 +117,11 @@ final class WineVarietiesPresenter extends BasePresenter
 
     public function processAddWineVarietyForm(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidávat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
+
         /** @var FileUpload $image */
         $image = $values->image;
         $imagePath = null;
@@ -146,6 +159,11 @@ final class WineVarietiesPresenter extends BasePresenter
 
     public function handleDelete(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění odstraňovat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
+
         /** @var bool $result */
         $result = $this->wineVarietyRepository->deleteWineVariety($id);
         if ($result) {
@@ -197,6 +215,11 @@ final class WineVarietiesPresenter extends BasePresenter
 
     public function processEditWineVarietyForm(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
+
         $id = (int)$this->getParameter('id');
         if (!$id) {
             Debugger::log('Invalid ID for editing wine variety: ' . $id, ILogger::ERROR);
@@ -249,6 +272,11 @@ final class WineVarietiesPresenter extends BasePresenter
 
     public function handleRemoveImage(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat odrůdy vína.', 'error');
+            $this->redirect('WineVarieties:dashboard');
+        }
+
         $wineVariety = $this->wineVarietyRepository->fetchById($id);
         if (!$wineVariety) {
             Debugger::log('Wine variety not found: ' . $id, ILogger::ERROR);

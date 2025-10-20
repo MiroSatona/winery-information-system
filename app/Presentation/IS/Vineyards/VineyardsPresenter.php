@@ -86,12 +86,25 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleDelete(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění smazat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
+
         if ($this->vineyardRepository->deleteVineyard($vineyardId)) {
             $this->flashMessage('Vinohrad byl úspěšně smazán.', 'success');
         } else {
             $this->flashMessage('Vinohrad se nepodařilo smazat.', 'error');
         }
         
+    }
+
+    public function renderAdd(): void
+    {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
     }
 
     public function createComponentAddVineyardForm(): Form
@@ -139,6 +152,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function addVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění přidat vinohrad.', 'error');
+            $this->redirect('dashboard');
+        }
+
         /** @var FileUpload $image */
         $image = $values->image;
         $imagePath = null;
@@ -179,6 +197,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderEdit(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -241,6 +264,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function editVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
         
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
@@ -288,6 +316,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleRemoveImage(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění upravovat vinohrad.', 'error');
+            $this->redirect('show', $id);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($id);
         if ($vineyard === null) {
             $this->flashMessage('Vinohrad nebyl nalezen.', 'error');
@@ -408,6 +441,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function addWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show ', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
 
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
@@ -488,6 +526,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function editWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show ', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
         $rowId = (int)$this->getParameter('rowId');
 
@@ -528,6 +571,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderEditWineRow(int $vineyardId, int $rowId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -556,6 +604,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function renderAddWineRow(int $vineyardId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $vineyardId);
+        }
+
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
@@ -590,6 +643,11 @@ final class VineyardsPresenter extends BasePresenter
 
     public function handleDeleteWineRow(int $rowId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('Nemáte oprávnění pracovat s řádky vinohradu.', 'error');
+            $this->redirect('show', $this->getParameter('vineyardId'));
+        }
+
         $vineyardId = (int)$this->getParameter('vineyardId');
 
         if ($this->vineyardRepository->deleteWineRowFromVineyard($vineyardId, $rowId)) {
