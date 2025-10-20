@@ -315,26 +315,23 @@ class UserRepository
     private function sendAddUserMail(string $name, string $email, string $username, string $password): void
     {
 
-        $htmlBody = <<<HTML
-            <p>Dobrý den {$name},</p>
-            <p>byl jste úspěšně přidán do systému <strong>Andrej Vinářství</strong>.</p>
-            <p><strong>Přihlašovací údaje:</strong><br>
-            Uživatelské jméno: <code>{$username}</code><br>
-            Heslo: <code>{$password}</code></p>
-            <p>S pozdravem,<br>
-            <em>Andrejovo Vinářství</em></p>
-            HTML;
+        $textBody = "Dobrý den {$name},\n\n" .
+            "Byl\Byla jste úspěšně přidán do systému Andrej Vinářství.\n\n" .
+            "Přihlašovací údaje:\n" .
+            "Uživatelské jméno: {$username}\n" .
+            "Heslo: {$password}\n\n" .
+            "S pozdravem,\nAndrejovo Vinářství\n";
 
         $mail = (new Message())
             ->setFrom('no-reply@andrejvinarstvi.cz', 'Andrej Vinářství')
             ->addTo($email, $name)
             ->setSubject('Byli jste přidáni do systému Andrej Vinářství')
-            ->setHtmlBody($htmlBody);
+            ->setBody($textBody);
 
         try {
             $this->mailer->send($mail);
         } catch (SendException $emailException) {
-            throw $emailException;
+           throw $emailException;
         }
 
         return;
@@ -357,4 +354,110 @@ class UserRepository
 
         return ['password' => $password, 'salt' => $salt, 'hashedPassword' => $hashedPassword];
     }
+
+    /**
+     * editUserByAdmin
+     *
+     * @param integer $userId Id of the user to edit.
+     * @param array $data Array of data to edit the user.
+     * @return string Empty string on success or error message.
+     */
+    public function editUserByAdmin(int $userId, array $data): string{
+        /** @var string $error Error message */
+        $error = '';
+
+        $this->database->beginTransaction();
+        try{
+            $this->database->table('USER')->where('ID', $userId)->update($data);
+            $this->database->commit();
+        }
+        catch(\Exception $exception){
+            $this->database->rollBack();
+            $error = 'Chyba při úpravě uživatele: ' . $exception->getMessage();
+        }
+
+        return $error;
+    }
+
+
+    /**
+     * resetPasswordByAdmin
+     * Method for resetting user password, this reset is done by admin in the IS.
+     *
+     * @param integer $userId Id of the user for password reset.
+     * @return string Empty string on success or error message.
+     */
+    public function resetPasswordByAdmin(int $userId): string{
+
+        /** @var User|null $foundUser User found by ID */
+        $foundUser = $this->getUserById($userId);
+
+        if (!$foundUser) {
+            return 'Chyba při načítání uživatele, heslo nebylo resetováno.';
+        }
+
+        $this->database->beginTransaction();
+        try{
+            /** @var string[] $newLoginData New password, salt and hashed password.*/
+            $newLoginData = $this->createNewPassword();
+
+            // Update user hashed password and salt in the database
+            $this->database->table('USER')->where('ID', $userId)->update([
+                'PSWD_HASH' => $newLoginData['hashedPassword'],
+                'PSWD_SALT' => $newLoginData['salt']
+            ]);
+
+            $this->sendResetPasswordMail(
+                $foundUser->getName(),
+                $foundUser->getEmail(),
+                $foundUser->getUsername(),
+                $newLoginData['password']
+            );
+
+           
+            $this->database->commit();
+        }
+        catch(\Exception $exception){
+            $this->database->rollBack();
+            return 'Chyba při resetování hesla: ' . $exception->getMessage();
+        }
+        catch(SendException $emailException){
+            $this->database->rollBack();
+            return 'Chyba při odesílání e-mailu: ' . $emailException->getMessage();
+        }
+
+
+        return '';
+    }
+
+
+
+
+    /**
+     * sendResetPasswordMail
+     * Method for for send email to the user after password reset by admin.
+     *
+     * @param string $name Name of the user.
+     * @param string $email Email of the user.
+     * @param string $username Username of the user.
+     * @param string $password New password of the user.
+     * @return void
+     */
+    private function sendResetPasswordMail(string $name, string $email, string $username, string $password): void{
+        $textBody = "Dobrý den {$name},\n\n" .
+            "Vaše heslo bylo úspěšně resetováno administrátorem v Andrej Vinářství systému.\n\n" .
+            "Nové přihlašovací údaje:\n" .
+            "Uživatelské jméno: {$username}\n" .
+            "Heslo: {$password}\n\n" .
+            "S pozdravem,\nAndrejovo Vinářství\n";
+
+        $mail = (new Message())
+            ->setFrom('no-reply@andrejvinarstvi.cz', 'Andrej Vinářství')
+            ->addTo($email, $name)
+            ->setSubject('Vaše heslo bylo resetováno')
+            ->setBody($textBody);
+        $this->mailer->send($mail);
+        return;
+    }
+
 }
