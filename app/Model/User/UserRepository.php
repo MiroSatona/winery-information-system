@@ -314,7 +314,7 @@ class UserRepository
      */
     private function sendAddUserMail(string $name, string $email, string $username, string $password): void
     {
-        /*$htmlBody = <<<HTML
+        $htmlBody = <<<HTML
             <p>Dobrý den {$name},</p>
             <p>byl jste úspěšně přidán do systému <strong>Andrej Vinářství</strong>.</p>
             <p><strong>Přihlašovací údaje:</strong><br>
@@ -331,10 +331,12 @@ class UserRepository
             ->setHtmlBody($htmlBody);
 
         try {
-            $this->mailer->send($mail);
+            $mailer = new Nette\Mail\SendmailMailer;
+            $mailer->send($mail);
         } catch (SendException $emailException) {
             throw $emailException;
-        }*/
+        }
+
         return;
     }
 
