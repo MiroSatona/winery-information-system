@@ -102,7 +102,7 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Nahrajte obrázek odrůdy vína');
         
         $form->addSubmit('send', 'Přidat odrůdu vína')
-            ->setHtmlAttribute('class', 'btn btn-primary btn-lg w-100 fw-bold');
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
 
         $form->onSuccess[] = [$this, 'processAddWineVarietyForm'];
 
@@ -190,7 +190,7 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setHtmlAttribute('accept', 'image/*');
         
         $form->addSubmit('send', 'Uložit změny')
-            ->setHtmlAttribute('class', 'btn btn-primary btn-lg w-100 fw-bold text-white');
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold text-white');
 
         // Pre-fill form with current data in renderEdit method
         // Default values will be set in renderEdit method

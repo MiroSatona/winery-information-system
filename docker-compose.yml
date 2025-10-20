@@ -37,6 +37,13 @@ services:
       - lamp-docker
     depends_on:
       - db
+  mailhog:
+    image: mailhog/mailhog
+    ports:
+      - 8025:8025
+      - 1025:1025
+    networks:
+      - lamp-docker
 volumes:
   vendor_data:
   log_data:

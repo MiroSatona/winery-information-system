@@ -82,6 +82,11 @@ class User{
         return $this->email;
     }
 
+    public function getPhoneNumber(): string
+    {
+        return $this->phoneNumber;
+    }
+
     public function getCity(): ?string
     {
         return $this->city;
