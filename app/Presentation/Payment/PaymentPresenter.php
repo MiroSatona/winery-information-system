@@ -44,7 +44,7 @@ final class PaymentPresenter extends BasePresenter
         }
        
         $userId = $user->getId();
-        $result = $this->orderRep->clientPaydForOrder($userId);
+        $result = $this->orderRep->clientPayForOrder($userId);
         $this->redirect("Shop:default");
     }
 }

@@ -32,12 +32,22 @@
 
                 <ul class="list-unstyled text-secondary mb-4">
                     <li><strong>Rok:</strong> {$wine->year}</li>
-                    <li><strong>Typ:</strong> {$wine->type}</li>
-                    <li><strong>Barva:</strong> {$wine->color}</li>
-                    <li><strong>Odrůda:</strong> {$wine->grade}</li>
+                    <li><strong>Typ:</strong> {$wine->typeCz}</li>
+                    <li><strong>Barva:</strong> {$wine->colorCz}</li>
+                    <li><strong>Přívlastek:</strong> {$wine->gradeCz}</li>
                     <li><strong>Obsah alkoholu:</strong> {$wine->alcoholPercentage}%</li>
                     <li><strong>Objem:</strong> {$wine->volume} ml</li>
                 </ul>
+                
+                {if !empty($wine->variety)}
+                    <div class="d-flex flex-wrap align-items-center mb-3">
+                        {foreach $wine->variety as $v}
+                            <span class="badge bg-light text-dark border rounded-pill px-3 py-2 me-2 mb-2">
+                                {$v}
+                            </span>
+                        {/foreach}
+                    </div>
+                {/if}
 
                 <div class="mb-4">
                     {ifset $wine->currentPrice}

@@ -47,6 +47,19 @@ final class OrderRepository
 
         return $orders;
     }
+    
+    public function fetchCustomerOrders(int $userId) 
+    {
+        $rows = $this->db->table("CUSTOMER_ORDER")->where("ID_CUSTOMER", $userId);
+        
+        $returnItems = [];
+        foreach($rows as $row) {
+            $order = $this->createOrderFromRow($row);
+            $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
+            $returnItems[] = $order;
+        }
+        return $returnItems;
+    }
 
     private function createOrderFromRow($row): CustomerOrder
     {
@@ -64,7 +77,7 @@ final class OrderRepository
         );
     }
     
-    public function fetchCustomerOrder(int $userId) {
+    public function fetchCustomerOrder(int $userId, bool $createIfNotfound = false) {
         $row = $this->db->table("CUSTOMER_ORDER")
         ->where("ID_CUSTOMER", $userId)
         ->where("STATE", OrderState::reserved)
@@ -74,6 +87,9 @@ final class OrderRepository
             return $this->createOrderFromRow($row);
         }
         
+        if (!$createIfNotfound) {
+            return null;
+        }
        
         // No existing order found -> create one
         $insertData = [
@@ -103,6 +119,12 @@ final class OrderRepository
         $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
         if ($result) {
             $this->updateOrderPrice($order->id);
+            // if there is nothing in the order, delete the order 
+            $order = $this->fetchCustomerOrder($userId, false);
+            if ($order && $order->totalPrice == 0) {
+                $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
+                $row->delete();
+            }
         }
         return $result;
     }
@@ -117,12 +139,17 @@ final class OrderRepository
         $result = $this->orderItemRepository->changeItemAmount($wineId, $order->id, $diff, $add);
         if ($result) {
             $this->updateOrderPrice($order->id);
+            $order = $this->fetchCustomerOrder($userId, false);
+            if ($order && $order->totalPrice == 0) {
+                $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
+                $row->delete();
+            }
         }
         return $result;
     }
     
     public function addToCart(int $userId, int $wineId, int $amount): bool {
-        $order = $this->fetchCustomerOrder($userId);
+        $order = $this->fetchCustomerOrder($userId, true);
         if ($order == null) {
             return false;
         }
@@ -139,7 +166,7 @@ final class OrderRepository
         $totalPrice = 0;
         // calculate the full price of the order 
         foreach ($order->items as $item) {
-            $totalPrice += $item->wine->bottlePrice * $item->bottlesCount;
+            $totalPrice += $item->wine->currentPrice * $item->bottlesCount;
         }
         $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId);
         $row->update([
@@ -181,7 +208,7 @@ final class OrderRepository
         return true;
     }
     
-    public function clientPaydForOrder(int $userId): bool {
+    public function clientPayForOrder(int $userId): bool {
         $order = $this->fetchCustomerOrder($userId);
         if (!$order) {
             return false;
