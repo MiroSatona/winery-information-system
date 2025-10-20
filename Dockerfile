@@ -15,6 +15,10 @@ RUN apt-get update && apt-get install -y libjpeg-dev libpng-dev libwebp-dev libf
 RUN apt-get update && apt-get install -y libicu-dev \
     && docker-php-ext-install intl
 
+# Install mail functionality
+RUN apt-get update && apt-get install -y ssmtp mailutils \
+    && echo "sendmail_path = /usr/sbin/ssmtp -t" >> /usr/local/etc/php/php.ini
+
 RUN a2enmod rewrite
 
 # Allow .htaccess overrides in DocumentRoot
@@ -34,6 +38,15 @@ COPY composer.json composer.lock ./
 
 # Install PHP deps at build time
 RUN composer install
+
+# Configure ssmtp for mail functionality
+RUN echo "# ssmtp configuration" > /etc/ssmtp/ssmtp.conf \
+    && echo "root=postmaster" >> /etc/ssmtp/ssmtp.conf \
+    && echo "mailhub=mailhog:1025" >> /etc/ssmtp/ssmtp.conf \
+    && echo "hostname=localhost" >> /etc/ssmtp/ssmtp.conf \
+    && echo "FromLineOverride=YES" >> /etc/ssmtp/ssmtp.conf \
+    && echo "UseTLS=NO" >> /etc/ssmtp/ssmtp.conf \
+    && echo "UseSTARTTLS=NO" >> /etc/ssmtp/ssmtp.conf
 
 # Ensure writable dirs exist
 RUN mkdir -p /var/www/html/log /var/www/html/temp

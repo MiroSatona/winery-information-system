@@ -5,112 +5,125 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    <h2>Přehled odrůd vín</h2>
-
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <span class="text-muted">Celkem odrůd: <strong>{count($wineVarieties)}</strong></span>
-        </div>
-        <a href="{link WineVarieties:add}" class="btn btn-primary">
-            <i class="fas fa-plus me-2"></i>Přidat odrůdu
-        </a>
-    </div>
-    
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-primary">
-                        <tr>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-seedling me-2"></i>Název
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-palette me-2"></i>Barva
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-align-left me-2"></i>Popis
-                            </th>
-                            <th scope="col" class="fw-bold text-center">
-                                <i class="fas fa-image me-2"></i>Obrázek
-                            </th>
-                            <th scope="col" class="fw-bold text-center" style="width: 250px;">
-                                <i class="fas fa-cogs me-2"></i>Akce
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {foreach $wineVarieties as $variety}
-                            <tr class="align-middle">
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div>
-                                            <h6 class="mb-0 fw-semibold text-dark">{$variety->getName()}</h6>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    {switch $variety->getColor()}
-                                        {case $WineVarietyType::WHITE}
-                                            Bílé
-                                        {case $WineVarietyType::RED}
-                                            Červené
-                                        {case $WineVarietyType::PINK}
-                                            Růžové
-                                        {case $WineVarietyType::GREY}
-                                            Šedé
-                                        {case $WineVarietyType::BLUE}
-                                            Modré
-                                    {/switch}
-                                </td>
-                                <td>
-                                    <p class="mb-0 text-muted" >
-                                        {if strlen($variety->getDescription()) > 80}
-                                            {$variety->getDescription()|truncate:80}
-                                        {else}
-                                            {$variety->getDescription()}
-                                        {/if}
-                                    </p>
-                                </td>
-                                <td class="text-center">
-                                    {if $variety->getImage()}
-                                        <i class="fas fa-check me-1"></i>
-                                    {else}
-                                        <i class="fas fa-times me-1"></i>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-seedling me-2"></i>
+                                Přehled odrůd vín
+                            </h4>
+                            <div class="d-flex gap-2">
+                                <a href="{link WineVarieties:add}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Přidat odrůdu
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <span class="text-muted">Celkem odrůd: <strong>{count($wineVarieties)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-seedling me-2"></i>Název
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-palette me-2"></i>Barva
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-align-left me-2"></i>Popis
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-image me-2"></i>Obrázek
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center" style="width: 200px;">
+                                            <i class="fas fa-cogs me-2"></i>Akce
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $wineVarieties as $variety}
+                                        <tr class="align-middle">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0 fw-semibold text-dark">{$variety->getName()}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                {switch $variety->getColor()}
+                                                    {case $WineVarietyType::WHITE}
+                                                        Bílé
+                                                    {case $WineVarietyType::RED}
+                                                        Červené
+                                                    {case $WineVarietyType::PINK}
+                                                        Růžové
+                                                    {case $WineVarietyType::GREY}
+                                                        Šedé
+                                                    {case $WineVarietyType::BLUE}
+                                                        Modré
+                                                {/switch}
+                                            </td>
+                                            <td>
+                                                <p class="mb-0 text-muted" >
+                                                    {if strlen($variety->getDescription()) > 80}
+                                                        {$variety->getDescription()|truncate:80}
+                                                    {else}
+                                                        {$variety->getDescription()}
+                                                    {/if}
+                                                </p>
+                                            </td>
+                                            <td class="text-center">
+                                                {if $variety->getImage()}
+                                                    <i class="fas fa-check me-1"></i>
+                                                {else}
+                                                    <i class="fas fa-times me-1"></i>
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <a href="{link WineVarieties:edit, id => $variety->getId()}" 
+                                                       class="btn btn-outline-primary btn-sm" 
+                                                       title="Upravit odrůdu">
+                                                        <i class="fas fa-edit me-1"></i>Upravit
+                                                    </a>
+                                                    <button type="button" 
+                                                            class="btn btn-outline-danger btn-sm" 
+                                                            data-bs-toggle="modal" 
+                                                            data-bs-target="#deleteModal{$variety->getId()}"
+                                                            title="Smazat odrůdu">
+                                                        <i class="fas fa-trash me-1"></i>Smazat
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    {if count($wineVarieties) === 0}
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="fas fa-wine-glass fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné odrůdy vín</h5>
+                                                <p>Zatím nejsou přidány žádné odrůdy vín.</p>
+                                                <a href="{link WineVarieties:add}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-plus me-2"></i>Přidat první odrůdu
+                                                </a>
+                                            </td>
+                                        </tr>
                                     {/if}
-                                </td>
-                                <td>
-                                    <div class="d-flex gap-2 justify-content-center">
-                                        <a href="{link WineVarieties:edit, id => $variety->getId()}" 
-                                           class="btn btn-outline-primary btn-sm" 
-                                           title="Upravit odrůdu">
-                                            <i class="fas fa-edit me-1"></i>Upravit
-                                        </a>
-                                        <button type="button" 
-                                                class="btn btn-outline-danger btn-sm" 
-                                                data-bs-toggle="modal" 
-                                                data-bs-target="#deleteModal{$variety->getId()}"
-                                                title="Smazat odrůdu">
-                                            <i class="fas fa-trash me-1"></i>Smazat
-                                        </button>
-                                    </div>
-                                </td>
-                            </tr>
-                        {/foreach}
-                        {if count($wineVarieties) === 0}
-                            <tr>
-                                <td colspan="5" class="text-center py-5 text-muted">
-                                    <i class="fas fa-wine-glass fa-3x mb-3 opacity-50"></i>
-                                    <h5>Žádné odrůdy vín</h5>
-                                    <p>Zatím nejsou přidány žádné odrůdy vín.</p>
-                                    <a href="{link WineVarieties:add}" class="btn btn-primary">
-                                        <i class="fas fa-plus me-2"></i>Přidat první odrůdu
-                                    </a>
-                                </td>
-                            </tr>
-                        {/if}
-                    </tbody>
-                </table>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -149,5 +162,4 @@
             </div>
         </div>
     {/foreach}
-
 {/block isMainPanel}

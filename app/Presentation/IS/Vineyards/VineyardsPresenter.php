@@ -64,7 +64,7 @@ final class VineyardsPresenter extends BasePresenter
         if ($this->vineyardRepository->deleteVineyard($vineyardId)) {
             $this->flashMessage('Vinohrad byl úspěšně smazán.', 'success');
         } else {
-            $this->flashMessage('Vinohrad se nepodařilo smazat.', 'danger');
+            $this->flashMessage('Vinohrad se nepodařilo smazat.', 'error');
         }
         
     }
@@ -265,7 +265,7 @@ final class VineyardsPresenter extends BasePresenter
     {
         $vineyard = $this->vineyardRepository->getVineyardById($id);
         if ($vineyard === null) {
-            $this->flashMessage('Vinohrad nebyl nalezen.', 'danger');
+            $this->flashMessage('Vinohrad nebyl nalezen.', 'error');
             $this->redirect('dashboard');
         }
 
@@ -310,6 +310,8 @@ final class VineyardsPresenter extends BasePresenter
         $wineVarieties = $this->vineyardRepository->getUniqueWineVarietiesOnVineyard($vineyardId);
         $vineyard->setWineRowsCount(count($wineRows));
         $vineyard->setWineVarietiesCount(count($wineVarieties));
+
+        // Get total head count for each wine variety
 
         $totalHeadCount = 0;
         
