@@ -336,9 +336,16 @@ final class VineyardsPresenter extends BasePresenter
         $vineyard->setWineRowsCount(count($wineRows));
         $vineyard->setWineVarietiesCount(count($wineVarieties));
 
-        // Get total head count for each wine variety
+        // Get total head count for each wine variety on this vineyard
+        $wineVarietiesHeadCount = [];
+        foreach ($wineVarieties as $variety) {
+            /** @var WineVariety $variety */
+            $totalHeadCount = $this->vineyardRepository->getWineVarietyTotalHeadCountOnVineyard($vineyardId, $variety->getId());
+            $wineVarietiesHeadCount[$variety->getId()] = $totalHeadCount;
+        }
+
+        // Get total head count on vineyard and setup wine variety for each row
         $totalHeadCount = 0;
-        
         foreach ($wineRows as $row) {
             /** @var WineRow $row */
             $totalHeadCount += $row->getHeadCount();
@@ -350,6 +357,7 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->vineyard = $vineyard;
         $this->template->wineVarieties = $wineVarieties;
         $this->template->wineRows = $wineRows;
+        $this->template->wineVarietiesHeadCount = $wineVarietiesHeadCount;
         $this->template->imageRepository = $this->imageRepository;
     }
 

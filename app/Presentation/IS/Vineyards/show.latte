@@ -139,6 +139,9 @@
                                             <th scope="col" class="fw-bold">
                                                 <i class="fas fa-align-left me-2"></i>Popis
                                             </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-calculator me-2"></i>Počet keřů
+                                            </th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -170,6 +173,11 @@
                                                         {else}
                                                             {$variety->getDescription()}
                                                         {/if}
+                                                    </p>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 fw-semibold text-dark">
+                                                        {$wineVarietiesHeadCount[$variety->getId()]}
                                                     </p>
                                                 </td>
                                             </tr>

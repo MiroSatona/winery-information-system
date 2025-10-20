@@ -427,4 +427,14 @@ final class VineyardRepository
             return false;
         }
     }
+
+    public function getWineVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
+    {
+        $totalHeadCount = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->where('ID_WINE_VARIETY', $wineVarietyId)
+            ->sum('HEAD_COUNT');
+
+        return (int)$totalHeadCount;
+    }
 }
