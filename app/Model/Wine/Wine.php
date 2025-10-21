@@ -12,7 +12,7 @@ class Wine
     public string $stateCz;
 
     private int $bottlesTotal;
-    private int $bottleVolume;
+    private float $bottleVolume;
 
     public function __construct(
         public int $id,
@@ -225,7 +225,7 @@ class Wine
     }
 
 
-    public function getBottleVolume(): int
+    public function getBottleVolume(): float
     {
         return $this->bottleVolume;
     }
@@ -240,7 +240,7 @@ class Wine
         $this->bottlesTotal = $bottlesTotal;
     }
 
-    public function setBottleVolume(int $bottleVolume): void
+    public function setBottleVolume(float $bottleVolume): void
     {
         $this->bottleVolume = $bottleVolume;
     }

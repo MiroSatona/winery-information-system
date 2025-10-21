@@ -52,7 +52,7 @@ final class WineRepository
         }
 
         $wine->setBottlesTotal((int) $bottles->BOTTLES_COUNT);
-        $wine->setBottleVolume((int) $bottles->BOTTLE_VOLUME);
+        $wine->setBottleVolume($bottles->BOTTLE_VOLUME);
         return true;
     }
     

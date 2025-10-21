@@ -72,6 +72,7 @@ final class WinePresenter extends BasePresenter
         }
 
         $this->wineRepository->fetchBottlingInfoForWine($wine);
+        bdump($wine);
 
         $this->template->wine = $wine;
         $this->template->imageRepository = $this->imageRepository;
@@ -85,6 +86,11 @@ final class WinePresenter extends BasePresenter
     }
 
     public function handleSelling(int $wineId): void
+    {
+        // todo
+    }
+
+    public function handleChangePrice(int $wineId): void
     {
         // todo
     }
