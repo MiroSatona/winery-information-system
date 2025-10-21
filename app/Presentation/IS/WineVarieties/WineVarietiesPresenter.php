@@ -42,6 +42,7 @@ final class WineVarietiesPresenter extends BasePresenter
     public function renderDashboard(): void
     {
         $this->template->wineVarieties = $this->wineVarietyRepository->fetchAll();
+        $this->template->wineVarietyRepository = $this->wineVarietyRepository;
     }
 
     public function renderAdd(): void
@@ -163,6 +164,11 @@ final class WineVarietiesPresenter extends BasePresenter
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage('Nemáte oprávnění odstraňovat odrůdy vína.', FlashMsgType::ERROR->value);
+            $this->redirect('WineVarieties:dashboard');
+        }
+
+        if ($this->wineVarietyRepository->checkWineVarietyUsed($id)) {
+            $this->flashMessage('Odrůdu vína nelze odstranit, protože je používána v systému.', FlashMsgType::ERROR->value);
             $this->redirect('WineVarieties:dashboard');
         }
 

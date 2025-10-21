@@ -14,6 +14,7 @@ final class Vineyard
 
     public function __construct(
         private ?int $id,
+        private bool $active,
         private string $name,
         private string $location,
         private ?Image $image,
@@ -25,6 +26,11 @@ final class Vineyard
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
     }
 
     public function getName(): string

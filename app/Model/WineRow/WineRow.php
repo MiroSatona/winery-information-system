@@ -15,6 +15,7 @@ final class WineRow
 
     public function __construct(
         private int $id,
+        private bool $active,
         private int $vineyardId,
         private int $wineVarietyId,
         private int $headCount,
@@ -31,6 +32,11 @@ final class WineRow
     public function getVineyardId(): int
     {
         return $this->vineyardId;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->active;
     }
 
     public function getWineVarietyId(): int

@@ -45,6 +45,7 @@ final class VineyardRepository
 
             $vineyards[] = new Vineyard(
                 $row->ID,
+                (bool)$row->ACTIVE,
                 $row->NAME,
                 $row->LOCATION,
                 $image,
@@ -58,13 +59,20 @@ final class VineyardRepository
     /**
      * @return Vineyard[]
      */
-    public function fetchAllWithPattern(string $pattern): array
+    public function fetchAllWithPattern(string $pattern, string $type): array
     {
         /** @var Vineyard[] $vineyards */
         $vineyards = [];
-        $rows = $this->database->table('VINEYARD')
-            ->where('NAME LIKE ? OR LOCATION LIKE ?', "%$pattern%", "%$pattern%")
-            ->fetchAll();
+        $rowsSelection = $this->database->table('VINEYARD')
+            ->where('NAME LIKE ? OR LOCATION LIKE ?', "%$pattern%", "%$pattern%");
+
+        if ($type === 'active') {
+            $rowsSelection = $rowsSelection->where('ACTIVE', true);
+        } elseif ($type === 'inactive') {
+            $rowsSelection = $rowsSelection->where('ACTIVE', false);
+        }
+
+        $rows = $rowsSelection->fetchAll();
 
         foreach ($rows as $row) {
             // Access PICTURE data by left join
@@ -81,6 +89,7 @@ final class VineyardRepository
 
             $vineyards[] = new Vineyard(
                 $row->ID,
+                (bool)$row->ACTIVE,
                 $row->NAME,
                 $row->LOCATION,
                 $image,
@@ -112,6 +121,7 @@ final class VineyardRepository
 
         return new Vineyard(
             $row->ID,
+            (bool)$row->ACTIVE,
             $row->NAME,
             $row->LOCATION,
             $image,
@@ -205,7 +215,7 @@ final class VineyardRepository
         }
     }
 
-    public function deleteVineyard(int $id): bool
+    public function deactivateVineyard(int $id): bool
     {
         try {
             return $this->database->transaction(function () use ($id) {
@@ -214,15 +224,41 @@ final class VineyardRepository
                     return false;
                 }
                 $pictureId = $row->ID_PICTURE;
-                $row->delete();
-                // Delete picture as well
-                if ($pictureId !== null) {
-                    $this->database->table('PICTURE')->where('ID', $pictureId)->delete();
-                }
+                $row->update(['ACTIVE' => false]);
+
+                // also set all associated wine rows to inactive
+                $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $id)
+                    ->update(['ACTIVE' => false]);
+
                 return true;
             });
         } catch (\Exception $e) {
-            Debugger::log('Failed to delete vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
+            Debugger::log('Failed to deactivate vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
+            return false;
+        }
+    }
+
+    public function reactivateVineyard(int $id): bool
+    {
+        try {
+            return $this->database->transaction(function () use ($id) {
+                $row = $this->database->table('VINEYARD')->get($id);
+                if ($row === null) {
+                    return false;
+                }
+                $pictureId = $row->ID_PICTURE;
+                $row->update(['ACTIVE' => true]);
+
+                // also set all associated wine rows to active
+                $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $id)
+                    ->update(['ACTIVE' => true]);
+                
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to activate vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
             return false;
         }
     }
@@ -273,6 +309,7 @@ final class VineyardRepository
         foreach ($rows as $row) {
             $wineRows[] = new WineRow(
                 $row->CODE,
+                (bool)$row->ACTIVE,
                 $row->ID_VINEYARD,
                 $row->ID_WINE_VARIETY,
                 $row->HEAD_COUNT,
@@ -283,19 +320,27 @@ final class VineyardRepository
         return $wineRows;
     }
 
-    public function getWineRowsOnVineyardWithPattern(int $vineyardId, string $pattern): array
+    public function getWineRowsOnVineyardWithPattern(int $vineyardId, string $pattern, string $type): array
     {
         /** @var WineRow[] $wineRows Array of wine rows on the given vineyard */
         $wineRows = [];
         // fetch wine rows matching the pattern in CODE, PLANTING_YEAR, or associated WINE_VARIETY name
-        $rows = $this->database->table('WINE_ROW')
+        $rowsSelection = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
-            ->where('CODE LIKE ? OR PLANTING_YEAR LIKE ? OR ID_WINE_VARIETY IN ?', "%$pattern%", "%$pattern%", $this->database->table('WINE_VARIETY')->where('NAME LIKE ?', "%$pattern%")->select('ID'))
-            ->fetchAll();
+            ->where('CODE LIKE ? OR PLANTING_YEAR LIKE ? OR ID_WINE_VARIETY IN ?', "%$pattern%", "%$pattern%", $this->database->table('WINE_VARIETY')->where('NAME LIKE ?', "%$pattern%")->select('ID'));
+        
+        if ($type === 'active') {
+            $rowsSelection = $rowsSelection->where('ACTIVE', true);
+        } elseif ($type === 'inactive') {
+            $rowsSelection = $rowsSelection->where('ACTIVE', false);
+        }
+
+        $rows = $rowsSelection->fetchAll();
 
         foreach ($rows as $row) {
             $wineRows[] = new WineRow(
                 $row->CODE,
+                (bool)$row->ACTIVE,
                 $row->ID_VINEYARD,
                 $row->ID_WINE_VARIETY,
                 $row->HEAD_COUNT,
@@ -319,6 +364,7 @@ final class VineyardRepository
 
         return new WineRow(
             $row->CODE,
+            (bool)$row->ACTIVE,
             $row->ID_VINEYARD,
             $row->ID_WINE_VARIETY,
             $row->HEAD_COUNT,
@@ -354,7 +400,7 @@ final class VineyardRepository
             ->count();
     }
 
-    public function deleteWineRowFromVineyard(int $vineyardId, int $wineRowCode): bool
+    public function deactivateWineRow(int $vineyardId, int $wineRowCode): bool
     {
         try {
             $row = $this->database->table('WINE_ROW')
@@ -364,10 +410,30 @@ final class VineyardRepository
             if ($row === null) {
                 return false;
             }
-            $row->delete();
+            $row->update(['ACTIVE' => false]);
+
             return true;
         } catch (\Exception $e) {
-            Debugger::log('Failed to delete wine row from vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
+            Debugger::log('Failed to deactivate wine row from vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
+            return false;
+        }
+    }
+
+    public function reactivateWineRow(int $vineyardId, int $wineRowCode): bool
+    {
+        try {
+            $row = $this->database->table('WINE_ROW')
+                ->where('ID_VINEYARD', $vineyardId)
+                ->where('CODE', $wineRowCode)
+                ->fetch();
+            if ($row === null) {
+                return false;
+            }
+            $row->update(['ACTIVE' => true]);
+
+            return true;
+        } catch (\Exception $e) {
+            Debugger::log('Failed to reactivate wine row on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
             return false;
         }
     }

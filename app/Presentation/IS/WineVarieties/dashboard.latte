@@ -101,13 +101,15 @@
                                                         title="Upravit odrůdu">
                                                             <i class="fas fa-edit me-1"></i>Upravit
                                                         </a>
-                                                        <button type="button" 
-                                                                class="btn btn-outline-danger btn-sm" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#deleteModal{$variety->getId()}"
-                                                                title="Smazat odrůdu">
-                                                            <i class="fas fa-trash me-1"></i>Smazat
-                                                        </button>
+                                                        {if !$wineVarietyRepository->checkWineVarietyUsed($variety->getId())}
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deleteModal{$variety->getId()}"
+                                                                    title="Smazat odrůdu">
+                                                                <i class="fas fa-trash me-1"></i>Smazat
+                                                            </button>
+                                                        {/if}
                                                     </div>
                                                 </td>
                                             {/if}
@@ -151,8 +153,7 @@
                             <h5>Opravdu chcete smazat odrůdu?</h5>
                             <p class="text-muted">
                                 <strong>{$variety->getName()}</strong><br>
-                                Tato akce je nevratná. Společně s odrůdou budou odstraněny i všechny položky, které je využívají.
-                                Toto zahrnuje řádky, vína, atd.
+                                Tato akce je nevratná. Smazat lze pouze odrůdy, které nejsou používány v systému.
                             </p>
                         </div>
                     </div>

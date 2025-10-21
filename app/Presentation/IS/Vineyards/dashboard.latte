@@ -19,12 +19,14 @@
 
                             <div class="flex-fill d-flex justify-content-center px-3">
                                 {form searchVineyardsForm}
-                                    <div class="input-group" style="max-width:520px; min-width:400px;">
+                                    <div class="d-flex gap-2 align-items-center" style="max-width:550px; min-width:550px;">
                                         {input search}
+                                        {input type}
                                         {input send}
                                     </div>
                                 {/form}
                             </div>
+
                             
                             <div class="d-flex gap-2">
                                 <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
@@ -75,7 +77,7 @@
                                 </thead>
                                 <tbody>
                                     {foreach $vineyards as $vineyard}
-                                        <tr class="align-middle">
+                                        <tr class="align-middle {if !$vineyard->isActive()}table-secondary{/if}">
                                             <td>
                                                 <div class="d-flex align-items-center">
                                                     <div>
@@ -106,19 +108,31 @@
                                             </td>
                                             <td>
                                                 <div class="d-flex gap-2 justify-content-center">
-                                                    <a href="{link Vineyards:show $vineyard->getId()}" 
-                                                    class="btn btn-outline-primary btn-sm" 
-                                                    title="Detail vinohradu">
-                                                        <i class="fas fa-bars me-1"></i>Detail
-                                                    </a>
+                                                    {if $vineyard->isActive()}
+                                                        <a href="{link Vineyards:show $vineyard->getId()}" 
+                                                        class="btn btn-outline-primary btn-sm" 
+                                                        title="Detail vinohradu">
+                                                            <i class="fas fa-bars me-1"></i>Detail
+                                                        </a>
+                                                    {/if}
                                                     {if $userVintner}
-                                                        <button type="button" 
-                                                                class="btn btn-outline-danger btn-sm" 
-                                                                data-bs-toggle="modal" 
-                                                                data-bs-target="#deleteModal{$vineyard->getId()}"
-                                                                title="Smazat vinohrad">
-                                                            <i class="fas fa-trash me-1"></i>Smazat
-                                                        </button>
+                                                        {if $vineyard->isActive()}
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deleteModal{$vineyard->getId()}"
+                                                                    title="Smazat vinohrad">
+                                                                <i class="fas fa-trash me-1"></i>Smazat
+                                                            </button>
+                                                        {else}
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-success btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#reactivateModal{$vineyard->getId()}"
+                                                                    title="Obnovit vinohrad">
+                                                                <i class="fas fa-eye me-1"></i>Obnovit
+                                                            </button>
+                                                        {/if}
                                                     {/if}
                                                 </div>
                                             </td>
@@ -165,8 +179,8 @@
                             <p class="text-muted">
                                 <strong>{$vineyard->getName()}</strong><br>
                                 Lokalita: {$vineyard->getLocation()}<br>
-                                Tato akce je nevratná. Společně s vinohradem budou odstraněny i všechny položky, které jej využívají.
-                                Toto zahrnuje řádky, vína, ošetření, sklizně, atd.
+                                Smazáním nedojde k úplnému odstranění, ale pouze poznačení, které znemožní vinohrad dále využívat a zobrazovat na domovské stránce.
+                                Takto deaktivované vinohrady lze později zpětně
                             </p>
                         </div>
                     </div>
@@ -181,6 +195,43 @@
                 </div>
             </div>
         </div>
+    {/foreach}
+
+    {* Reactivation confirmation modal *}
+    {foreach $vineyards as $vineyard}
+        {if !$vineyard->isActive()}
+            <div class="modal fade" id="reactivateModal{$vineyard->getId()}" tabindex="-1" aria-labelledby="reactivateModalLabel{$vineyard->getId()}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="reactivateModalLabel{$vineyard->getId()}">
+                                <i class="fas fa-eye me-2"></i>Potvrdit obnovení
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <i class="fas fa-mountain fa-3x text-success mb-3"></i>
+                                <h5>Opravdu chcete obnovit vinohrad?</h5>
+                                <p class="text-muted">
+                                    <strong>{$vineyard->getName()}</strong><br>
+                                    Lokalita: {$vineyard->getLocation()}<br>
+                                    Obnovením se vinohrad znovu aktivuje a bude dostupný pro využívání a zobrazování na domovské stránce.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Zrušit
+                            </button>
+                            <a href="{link reactivate!, $vineyard->getId()}" class="btn btn-success">
+                                <i class="fas fa-eye me-1"></i>Obnovit vinohrad
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
     {/foreach}
     
 

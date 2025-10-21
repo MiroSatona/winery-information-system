@@ -209,8 +209,9 @@
 
                             <div class="flex-fill d-flex justify-content-center px-3">
                                 {form searchWineRowsForm}
-                                    <div class="input-group" style="max-width:520px; min-width:400px;">
+                                    <div class="d-flex gap-2 align-items-center" style="max-width:550px; min-width:550px;">
                                         {input search}
+                                        {input type}
                                         {input send}
                                     </div>
                                 {/form}
@@ -249,7 +250,7 @@
                                     </thead>
                                     <tbody>
                                         {foreach $wineRows as $row}
-                                            <tr class="align-middle">
+                                            <tr class="align-middle {if !$row->isActive()}table-secondary{/if}">
                                                 <td>
                                                     <span class="fw-semibold">{$row->getId()}</span>
                                                 </td>
@@ -267,18 +268,32 @@
                                                 {if $userVintner}
                                                     <td>
                                                         <div class="d-flex gap-2 justify-content-center">
-                                                            <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
-                                                            class="btn btn-outline-primary btn-sm" 
-                                                            title="Upravit řádek">
-                                                                <i class="fas fa-edit me-1"></i>Upravit
-                                                            </a>
-                                                            <button type="button" 
-                                                                    class="btn btn-outline-danger btn-sm" 
-                                                                    data-bs-toggle="modal" 
-                                                                    data-bs-target="#deleteRowModal{$row->getId()}"
-                                                                    title="Smazat řádek">
-                                                                <i class="fas fa-trash me-1"></i>Smazat
-                                                            </button>
+                                                            {if $row->isActive()}
+                                                                <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
+                                                                class="btn btn-outline-primary btn-sm" 
+                                                                title="Upravit řádek">
+                                                                    <i class="fas fa-edit me-1"></i>Upravit
+                                                                </a>
+                                                            {/if}
+                                                            {if $row->isActive()}
+                                                                <button type="button" 
+                                                                        class="btn btn-outline-danger btn-sm" 
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#deleteRowModal{$row->getId()}"
+                                                                        title="Smazat řádek">
+                                                                    <i class="fas fa-trash me-1"></i>Smazat
+                                                                </button>
+                                                            {else}
+                                                                <button type="button" 
+                                                                        class="btn btn-outline-success btn-sm" 
+                                                                        data-bs-toggle="modal" 
+                                                                        data-bs-target="#reactivateRowModal{$row->getId()}"
+                                                                        title="Obnovit řádek">
+                                                                    <i class="fas fa-eye me-1"></i>Obnovit
+                                                                </button>
+                                                            {/if}
+                                                            
+
                                                         </div>
                                                     </td>
                                                 {/if}
@@ -320,7 +335,8 @@
                                 Odrůda: <strong>{$row->getWineVariety()->getName()}</strong><br>
                                 Rok výsadby: <strong>{$row->getYearPlanted()}</strong><br>
                                 Počet keřů: <strong>{$row->getHeadCount()}</strong><br>
-                                Tato akce je nevratná. Společně s řádkem budou odstraněny i všechny související záznamy (např. ošetření, sklizně).
+                                Smazáním řádku dojde k jeho deaktivaci a nebude možné jej nadále využívat.
+                                Řádky je možné později obnovit.
                             </p>
                         </div>
                     </div>
@@ -335,6 +351,45 @@
                 </div>
             </div>
         </div>
+    {/foreach}
+
+    {* Reactivation Confirmation Modals for Wine Rows *}
+    {foreach $wineRows as $row}
+        {if !$row->isActive()}
+            <div class="modal fade" id="reactivateRowModal{$row->getId()}" tabindex="-1" aria-labelledby="reactivateRowModalLabel{$row->getId()}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="reactivateRowModalLabel{$row->getId()}">
+                                <i class="fas fa-eye me-2"></i>Potvrdit obnovení
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <i class="fas fa-grip-lines fa-3x text-success mb-3"></i>
+                                <h5>Opravdu chcete obnovit řádek vína?</h5>
+                                <p class="text-muted">
+                                    <strong>Řádek {$row->getId()}</strong><br>
+                                    Odrůda: <strong>{$row->getWineVariety()->getName()}</strong><br>
+                                    Rok výsadby: <strong>{$row->getYearPlanted()}</strong><br>
+                                    Počet keřů: <strong>{$row->getHeadCount()}</strong><br>
+                                    Obnovením se řádek znovu aktivuje a bude možné jej využívat.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Zrušit
+                            </button>
+                            <a href="{link reactivateWineRow! $row->getId()}" class="btn btn-success">
+                                <i class="fas fa-eye me-1"></i>Obnovit řádek
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
     {/foreach}
 
 {/block isMainPanel}

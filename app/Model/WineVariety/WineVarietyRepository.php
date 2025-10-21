@@ -80,6 +80,19 @@ final class WineVarietyRepository
         );
     }
 
+    public function checkWineVarietyUsed(int $id): bool
+    {
+        $count = $this->database->table('WINE_ROW')
+            ->where('ID_WINE_VARIETY', $id)
+            ->count();
+       
+        $count += $this->database->table("HARVEST")
+            ->where('ID_WINE_VARIETY', $id)
+            ->count();
+        
+        return $count > 0;
+    }
+
     public function addWineVariety(WineVariety $wineVariety): bool
     {
         try {
