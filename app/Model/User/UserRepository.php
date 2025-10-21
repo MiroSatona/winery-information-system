@@ -50,7 +50,7 @@ class UserRepository
             $users[] = new User(
                 $row->ID,
                 $row->NAME,
-                (bool)$row->STATE,
+                (bool)$row->ACTIVE,
                 $row->SURNAME,
                 $row->USERNAME,
                 $row->EMAIL,
@@ -87,7 +87,7 @@ class UserRepository
         return new User(
             $user->ID,
             $user->NAME,
-            (bool)$user->STATE,
+            (bool)$user->ACTIVE,
             $user->SURNAME,
             $user->USERNAME,
             $user->EMAIL,
