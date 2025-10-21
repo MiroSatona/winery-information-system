@@ -41,6 +41,20 @@ final class WineRepository
 
         return $wines;
     }
+
+    public function fetchBottlingInfoForWine(Wine $wine): bool
+    {
+        $bottles = $this->db->table("BOTTLING")
+            ->where("ID_WINE", $wine->id)->fetch();
+
+        if ($bottles == null) {
+            return false;
+        }
+
+        $wine->setBottlesTotal((int) $bottles->BOTTLES_COUNT);
+        $wine->setBottleVolume((int) $bottles->BOTTLE_VOLUME);
+        return true;
+    }
     
     public function createWineFromRow($row): Wine
     {

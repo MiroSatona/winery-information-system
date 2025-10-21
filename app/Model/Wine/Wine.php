@@ -11,6 +11,9 @@ class Wine
     public string $gradeCz;
     public string $stateCz;
 
+    private int $bottlesTotal;
+    private int $bottleVolume;
+
     public function __construct(
         public int $id,
         public ?int $idLiquidator,
@@ -35,6 +38,8 @@ class Wine
         /** @var WineVariety[] $varieties */
         public array $varieties
     ) {
+        $this->bottlesTotal = 0;
+        $this->bottleVolume = 0;
         // Populate Czech presentation values
         $this->typeCz  = $this->fetchType($this->type);
         $this->colorCz = $this->fetchColor($this->color);
@@ -217,6 +222,27 @@ class Wine
     public function getGradeText(): string
     {
         return $this->fetchGrade($this->grade);
+    }
+
+
+    public function getBottleVolume(): int
+    {
+        return $this->bottleVolume;
+    }
+
+    public function getBottlesTotal(): int
+    {
+        return $this->bottlesTotal;
+    }
+
+    public function setBottlesTotal(int $bottlesTotal): void
+    {
+        $this->bottlesTotal = $bottlesTotal;
+    }
+
+    public function setBottleVolume(int $bottleVolume): void
+    {
+        $this->bottleVolume = $bottleVolume;
     }
 
 

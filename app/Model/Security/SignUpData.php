@@ -11,7 +11,7 @@ class SignUpData
         private string $surname,
         private string $username,
         private string $email,
-        private string $phone,
+        private ?string $phone,
         private ?string $city,
         private ?string $street,
         private ?string $houseNumber,
@@ -40,7 +40,7 @@ class SignUpData
         return $this->email;
     }
 
-    public function getPhone(): string
+    public function getPhone(): ?string
     {
         return $this->phone;
     }

@@ -71,6 +71,8 @@ final class WinePresenter extends BasePresenter
             $this->redirect('dashboard');
         }
 
+        $this->wineRepository->fetchBottlingInfoForWine($wine);
+
         $this->template->wine = $wine;
         $this->template->imageRepository = $this->imageRepository;
         $this->template->WineVarietyType = WineVarietyType::class;
