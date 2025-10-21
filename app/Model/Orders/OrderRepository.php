@@ -5,6 +5,7 @@ namespace App\Model\Orders;
 use App\Model\OrderItem\OrderItemRepository;
 use App\Model\Orders\CustomerOrder;
 use App\Model\Orders\OrderState;
+use App\Model\User\UserRepository;
 use Nette\Database\Explorer;
 
 final class OrderRepository
@@ -12,6 +13,7 @@ final class OrderRepository
     public function __construct(
         private Explorer $db,
         private OrderItemRepository $orderItemRepository,
+        private UserRepository $usrRep
     ) {}
     
     public function fetchOrderById(int $orderId, bool $includeItems = false): ?CustomerOrder
@@ -25,6 +27,7 @@ final class OrderRepository
 
         if ($includeItems) {
             $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
+            $order->setUser($this->usrRep->getUserById($order->idCustomer));
         }
 
         return $order;
@@ -44,8 +47,11 @@ final class OrderRepository
             if ($includeItems) {
                 $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
             }
-
+            
+            $order->setUser($this->usrRep->getUserById($order->id));
+            
             $result[] = $order;
+            
         }
         return $result;
     }
