@@ -31,6 +31,10 @@ class MainAuthenticator implements Authenticator, IdentityHandler
 			throw new AuthenticationException('User not found.');
 		}
 
+        if (!$row->ACTIVE) {
+            throw new AuthenticationException('User account is inactive.');
+        }
+
         $saltedPassword = $password . $row->PSWD_SALT;
 
 		if (!$this->passwords->verify($saltedPassword, $row->PSWD_HASH)) {
@@ -97,6 +101,10 @@ class MainAuthenticator implements Authenticator, IdentityHandler
         // if user not found, return null
         if (!$userRow)
             return null;
+
+        if (!$userRow->ACTIVE) {
+            return null;
+        }
 
         $userData = [
             'name' => $userRow->NAME,

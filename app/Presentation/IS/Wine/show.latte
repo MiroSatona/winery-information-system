@@ -75,9 +75,9 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
-                                                <i class="fas fa-percentage me-2"></i>Obsah alkoholu
+                                                <i class="fas fa-flask me-2"></i>Objem
                                             </label>
-                                            <p class="fs-6 text-dark mb-2">{$wine->getAlcoholPercentage()}%</p>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getVolume()} l</p>
                                         </div>
                                     </div>
 
@@ -103,34 +103,17 @@
                                             </label>
                                             <p class="fs-6 text-dark mb-2">{$wine->getGradeText()}</p>
                                         </div>
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold text-muted">
-                                                <i class="fas fa-info-circle me-2"></i>Stav
-                                            </label>
-                                            <p class="fs-6 text-dark mb-2">
-                                                {$wine->getStateText()}
-                                            </p>
-                                        </div>
-                                    </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold text-muted">
-                                                <i class="fas fa-flask me-2"></i>Objem
-                                            </label>
-                                            <p class="fs-6 text-dark mb-2">{$wine->getVolume()} ml</p>
-                                        </div>
-                                        {if $wine->getBottlesLeft() !== null}
+                                        {if $wine->getState() === $WineState::bottled->value || $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold text-muted">
-                                                    <i class="fas fa-wine-bottle me-2"></i>Zbývající láhve
+                                                    <i class="fas fa-wine-bottle me-2"></i>Zbývá lahví
                                                 </label>
                                                 <p class="fs-6 text-dark mb-2">{$wine->getBottlesLeft()}</p>
                                             </div>
                                         {/if}
                                     </div>
 
-                                    {if $wine->getCurrentPrice() !== null || $wine->getBottlePrice() !== null}
+                                    {if $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
                                         <div class="row mb-3">
                                             {if $wine->getCurrentPrice() !== null}
                                                 <div class="col-md-6">
@@ -150,6 +133,26 @@
                                             {/if}
                                         </div>
                                     {/if}
+
+                                    {if $wine->getState() === $WineState::bottled->value || $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-muted">
+                                                    <i class="fas fa-wine-bottle me-2"></i>Lahví vyrobeno
+                                                </label>
+                                                <p class="fs-6 text-dark mb-2">{$wine->getBottlesTotal()}</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-muted">
+                                                    <i class="fas fa-flask me-2"></i>Objem láhve
+                                                </label>
+                                                <p class="fs-6 text-dark mb-2">{$wine->getBottleVolume()}</p>
+                                            </div>
+                                        </div>
+                                    {/if}
+
+                                    
+                                    
                                     {if $wine->getLeftSugar() !== null || $wine->getAcidContents() !== null}
                                         <div class="row mb-3">
                                             {if $wine->getLeftSugar() !== null}
@@ -170,6 +173,14 @@
                                             {/if}
                                         </div>
                                     {/if}
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-percentage me-2"></i>Obsah alkoholu
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getAlcoholPercentage()}%</p>
+                                        </div>
+                                    </div>
 
                                     <hr>
 

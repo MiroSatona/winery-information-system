@@ -7,10 +7,11 @@ use DateTimeInterface;
 class User{
     private int $id;
     private string $name;
+    private bool $state;
     private string $surname;
     private string $username;
     private string $email;
-    private string $phoneNumber;
+    private ?string $phoneNumber;
     private ?string $city;
     private ?string $postcode;
     private ?string $street;
@@ -26,10 +27,11 @@ class User{
     public function __construct(
         int $id,
         string $name,
+        bool $state,
         string $surname,
         string $username,
         string $email,
-        string $phoneNumber,
+        ?string $phoneNumber,
         ?string $city,
         ?string $postcode,
         ?string $street,
@@ -42,6 +44,7 @@ class User{
     ) {
         $this->id = $id;
         $this->name = $name;
+        $this->state = $state;
         $this->surname = $surname;
         $this->username = $username;
         $this->email = $email;
@@ -77,12 +80,16 @@ class User{
         return $this->name;
     }
 
+    public function getState(): bool {
+        return $this->state;
+    }
+
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    public function getPhoneNumber(): string
+    public function getPhoneNumber(): ?string
     {
         return $this->phoneNumber;
     }

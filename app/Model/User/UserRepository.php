@@ -50,6 +50,7 @@ class UserRepository
             $users[] = new User(
                 $row->ID,
                 $row->NAME,
+                (bool)$row->STATE,
                 $row->SURNAME,
                 $row->USERNAME,
                 $row->EMAIL,
@@ -86,6 +87,7 @@ class UserRepository
         return new User(
             $user->ID,
             $user->NAME,
+            (bool)$user->STATE,
             $user->SURNAME,
             $user->USERNAME,
             $user->EMAIL,
@@ -163,6 +165,7 @@ class UserRepository
             $users[] = new User(
                 $userRow->ID,
                 $userRow->NAME,
+                (bool)$userRow->STATE,
                 $userRow->SURNAME,
                 $userRow->USERNAME,
                 $userRow->EMAIL,
@@ -188,7 +191,9 @@ class UserRepository
      * @param string $name Name of the new user.
      * @param string $surname Surname of the new user.
      * @param string $username Username of the new user in the system.
+     * @param bool $state State of the user. New user is always active.
      * @param string $email Email of the new user.
+     * @param string|null $phoneNumber Phone number of the new user.
      * @param string|null $city City of the new user.
      * @param string|null $postcode Postcode of the new user.
      * @param string|null $street Street of the new user.
@@ -203,8 +208,9 @@ class UserRepository
         string $name,
         string $surname,
         string $username,
+        bool $state,
         string $email,
-        string $phoneNumber,
+        ?string $phoneNumber,
         ?string $city,
         ?string $postcode,
         ?string $street,
@@ -234,6 +240,7 @@ class UserRepository
         $this->database->table('USER')->insert([
             'NAME' => $name,
             'SURNAME' => $surname,
+            'STATE' => $state,
             'USERNAME' => $username,
             'EMAIL' => $email,
             'PHONE_NUMBER' => $phoneNumber,
@@ -429,9 +436,6 @@ class UserRepository
 
         return '';
     }
-
-
-
 
     /**
      * sendResetPasswordMail

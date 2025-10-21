@@ -83,7 +83,7 @@ final class SignPresenter extends BasePresenter
             $this->flashMessage('Byli jste úspěšně přihlášeni.', 'success');
             $this->redirect('Home:default');
         } catch (AuthenticationException $e) {
-            $this->flashMessage('Přihlášení se nezdařilo. Zkontrolujte své uživatelské jméno a heslo.', FlashMsgType::ERROR->value);
+            $this->flashMessage('Přihlášení se nezdařilo. Zkontrolujte své uživatelské jméno a heslo, případně Váš účet může být deaktivován.', FlashMsgType::ERROR->value);
         }
     }
 
@@ -114,7 +114,6 @@ final class SignPresenter extends BasePresenter
             ->setHtmlAttribute('type', 'email');
         
         $form->addText('phone', 'Telefon')
-            ->setRequired('Zadejte prosím své telefonní číslo.')
             ->addRule($form::MinLength, 'Telefonní číslo musí mít alespoň %d znaků.', $this->validationDefinitions::PHONE_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Telefonní číslo může mít maximálně %d znaků.', $this->validationDefinitions::PHONE_LENGTH_MAX)
             ->addRule($form::Pattern, 'Zadejte prosím platné telefonní číslo.', $this->validationDefinitions::PHONE_NUMBER_PATTERN)
@@ -187,10 +186,15 @@ final class SignPresenter extends BasePresenter
 
     public function processSignUpForm(Form $form, \stdClass $values): void
     {
+        $phone = null;
         $city = null;
         $street = null;
         $houseNumber = null;
         $postalCode = null;
+
+        if (!empty($values->phone)) {
+            $phone = $values->phone;
+        }
 
         if (!empty($values->city)) {
             $city = $values->city;
@@ -213,7 +217,7 @@ final class SignPresenter extends BasePresenter
             $values->surname,
             $values->username,
             $values->email,
-            $values->phone,
+            $phone,
             $city,
             $street,
             $houseNumber,
