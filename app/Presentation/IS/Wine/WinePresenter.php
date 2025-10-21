@@ -204,7 +204,7 @@ final class WinePresenter extends BasePresenter
         $form ->addTextArea("popis", "Prodejní popis")
             ->setRequired("Zadejte prodejní popis");
 
-        $form->addSubmit('send', 'Potvrdit a zařadit do prodeje')
+        $form->addSubmit('send', 'Potvrdit')
             ->setHtmlAttribute('class', 'btn btn-success');
 
         $form->onSuccess[] = [$this, 'setWinePriceFormSucceeded'];
