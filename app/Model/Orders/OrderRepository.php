@@ -13,7 +13,7 @@ final class OrderRepository
         private Explorer $db,
         private OrderItemRepository $orderItemRepository,
     ) {}
-
+    
     public function fetchOrderById(int $orderId, bool $includeItems = false): ?CustomerOrder
     {
         $row = $this->db->table('CUSTOMER_ORDER')->where('ID', $orderId)->fetch();
@@ -30,22 +30,32 @@ final class OrderRepository
         return $order;
     }
 
-    public function fetchAllOrders(bool $includeItems = false): array
+    public function fetchAllOrders(bool $includeItems = false, string $searchTerm = ""): array
     {
-        $rows = $this->db->table('CUSTOMER_ORDER');
-        $orders = [];
+        bdump($this->db->getStructure()->getBelongsToReference('customer_order', 'user'));
 
-        foreach ($rows as $row) {
+        if (!empty($searchTerm)) {
+            $like = '%' . $searchTerm . '%';
+
+            $orders = $this->db->table('customer_order')
+                ->select('customer_order.*, user.name, user.surname, user.email')
+                ->where('user.name LIKE ? OR user.surname LIKE ?', $like, $like);
+        } else {
+            $orders = $this->db->table('customer_order')
+                ->select('customer_order.*, user.name, user.surname, user.email');
+        }
+
+        $result = [];
+        foreach ($orders as $row) {
             $order = $this->createOrderFromRow($row);
 
             if ($includeItems) {
                 $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
             }
 
-            $orders[] = $order;
+            $result[] = $order;
         }
-
-        return $orders;
+        return $result;
     }
     
     public function fetchCustomerOrders(int $userId) 
@@ -223,6 +233,17 @@ final class OrderRepository
                 "STATE" => "PAID"
             ]
             );
+        return true;
+    }
+
+    public function changeClientOrderStatus(int $orderId, string $newState): bool {
+        $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId)->fetch();
+        if (!$row) {
+            return false;
+        }
+        $row->update([
+            "STATE" => $newState
+        ]);
         return true;
     }
 }

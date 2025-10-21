@@ -5,7 +5,76 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    <h2>Přehled objednávek</h2>
-    <p>Zde budou funkce, možná ...</p>
+<div class="container mt-4">
+
+    <h2>Orders Dashboard</h2>
+
+    {* Search and Filter Form *}
+    <form method="get" class="mb-3 d-flex align-items-center gap-2">
+        <input type="text" name="search" value="{$search|escape}" placeholder="Search orders..." class="form-control" />
+        
+        <select name="state" class="form-select" onchange="this.form.submit()">
+            <option value="">All States</option>
+            <option value="RESERVED" {if $state === 'RESERVED'}selected{/if}>Reserved</option>
+            <option value="PAID" {if $state === 'PAID'}selected{/if}>Paid</option>
+            <option value="CANCELLED" {if $state === 'CANCELLED'}selected{/if}>Cancelled</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+
+    {* Orders Table *}
+    <table class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>ID</th>
+                <th>Customer ID</th>
+                <th>Total Price</th>
+                <th>State</th>
+                <th>Delivery Type</th>
+                <th>Order Time</th>
+                <th>Items</th>
+            </tr>
+        </thead>
+        <tbody>
+            {foreach $orders as $order}
+                <tr>
+                    <td>{$order->id}</td>
+                    <td>{$order->idCustomer}</td>
+                    <td>${$order->totalPrice}</td>
+                    <td>
+                        {switch $order->state}
+                            {case 'RESERVED'}Reserved
+                            {case 'PAID'}Paid
+                            {case 'CANCELLED'}Cancelled
+                        {/switch}
+                    </td>
+                    <td>{$order->deliveryType}</td>
+                    <td>{$order->orderTimestamp}</td>
+                    <td>
+                        {if count($order->items) > 0}
+                            <ul class="mb-0">
+                                {foreach $order->items as $item}
+                                    <li>
+                                        {$item->wine->name} x {$item->bottlesCount} @ ${$item->pricePerBottle|number:2}
+                                    </li>
+                                {/foreach}
+                            </ul>
+                        {else}
+                            No items
+                        {/if}
+                    </td>
+                </tr>
+            {/foreach}
+        </tbody>
+    </table>
+
+    {if count($orders) === 0}
+        <div class="alert alert-warning">No orders found.</div>
+    {/if}
+
+</div>
+
+
 
 {/block isMainPanel}
