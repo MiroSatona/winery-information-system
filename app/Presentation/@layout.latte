@@ -110,13 +110,13 @@
 						{block topMenuRight}
 							{if $user->isLoggedIn()}
 								<div class="nav-separator me-3"></div>
-								<span class="nav-link d-flex align-items-center fw-semibold text-dark me-2">
-									<i class="fas fa-user-circle me-2"></i>
-									<span>{$user->getIdentity()->name} {$user->getIdentity()->surname}</span>
-								</span>
-								<a class="nav-link nav-button auth-button px-3 py-2 fw-bold" href="{link :Sign:out}">
+								<a class="nav-link nav-button auth-button px-3 py-2 fw-bold" href="{link :Profile:default}">
+									<i class="fas fa-user-circle me-2"></i> {$user->getIdentity()->name} {$user->getIdentity()->surname}
+								</a>
+								<a class="nav-link nav-button auth-button px-3 py-2 fw-bold ms-2" href="{link :Sign:out}">
 									<i class="fas fa-right-from-bracket me-2"></i>Odhlásit se
 								</a>
+
 							{else}
 								<div class="nav-separator me-3"></div>
 								<a href="{link :Sign:in}" class="nav-link nav-button auth-button mx-1 px-3 py-2 fw-bold">

@@ -91,18 +91,21 @@ final class UsersPresenter extends BasePresenter
 
         // Information fields about the new user
         $form->addText('name', 'Jméno')
+            ->setRequired()
             ->addRule($form::MinLength, 'Jméno musí mít alespoň %d znaky.', $this->validationDefinitions::NAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Jméno nesmí mít více než %d znaků.', $this->validationDefinitions::NAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Jméno uživatele');
 
         $form->addText('surname', 'Příjmení')
+            ->setRequired()
             ->addRule($form::MinLength, 'Příjmení musí mít alespoň %d znaky.', $this->validationDefinitions::SURNAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Příjmení nesmí mít více než %d znaků.', $this->validationDefinitions::SURNAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Příjmení uživatele');
 
         $form->addText('email', 'E-mail')
+            ->setRequired()
             ->addRule($form::Email, 'Zadejte platnou e-mailovou adresu.', $this->validationDefinitions::EMAIL_PATTERN)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'E-mail uživatele');
@@ -113,7 +116,6 @@ final class UsersPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Telefonní číslo uživatele');
 
-        // Contact details fields -> not required
         $form->addText('city', 'Město')
             ->addRule($form::MinLength, 'Město musí mít alespoň %d znaky.', $this->validationDefinitions::CITY_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Město nesmí mít více než %d znaků.', $this->validationDefinitions::CITY_LENGTH_MAX)
@@ -139,8 +141,8 @@ final class UsersPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', '12345');
 
-        // Details of user for using the system
         $form->addText('username', 'Uživatelské jméno')
+            ->setRequired()
             ->addRule($form::MinLength, 'Uživatelské jméno musí mít alespoň %d znaky.', $this->validationDefinitions::USERNAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Uživatelské jméno nesmí mít více než %d znaků.', $this->validationDefinitions::USERNAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
@@ -200,21 +202,20 @@ final class UsersPresenter extends BasePresenter
      */
     public function addFormSucceeded(Form $form, \stdClass $values): void
     {   
-        if(!$values->name || !$values->surname || !$values->email || !$values->phone || !$values->username) {
-            $form->addError('Nejsou vyplněny všechny povinné údaje.');
-            $this->flashMessage('Je potřeba vyplnit všechny povinné údaje(označené *).', 'error');
-            return;
-        }
-
         if(!$values->isUser && !$values->isWorker && !$values->isVintner && !$values->isAdmin) {
             $form->addError('Je potřeba vybrat alespoň jednu roli.');
             $this->flashMessage('Je potřeba vybrat alespoň jednu roli.', 'error');
             return;
         }
+
+        /** @var bool $active New user is always active */
+        $active = true;
+
         $this->userRepository->addUser(
             $values->name,
             $values->surname,
             $values->username,
+            $active,
             $values->email,
             $values->phone,
             $values->city ?: null,
@@ -431,7 +432,6 @@ final class UsersPresenter extends BasePresenter
 
 
         $realChanges = array_diff_assoc($newUserData, $oldUserData);
-        bdump($realChanges);
 
         if(empty($realChanges)) {
             $this->flashMessage('Nebyly provedeny žádné změny.', 'info');

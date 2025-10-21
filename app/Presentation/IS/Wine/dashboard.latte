@@ -19,8 +19,11 @@
 
                             <div class="flex-fill d-flex justify-content-center px-3">
                                 {form searchWineForm}
-                                    <div class="input-group" style="max-width:520px; min-width:550px;">
+                                    <div class="d-flex gap-2 align-items-center" style="max-width:800px; min-width:800px;">
                                         {input search}
+                                        {input type}
+                                        {input state}
+                                        {input grade}
                                         {input send}
                                     </div>
                                 {/form}
@@ -30,7 +33,7 @@
                                 <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
-                                <a href="{link :IS:Dashboard:view}" class="btn btn-primary btn-sm">
+                                <a href="{link produce}" class="btn btn-primary btn-sm">
                                     <i class="fas fa-wine-bottle me-2"></i>Vyrobit víno
                                 </a>
                             </div>

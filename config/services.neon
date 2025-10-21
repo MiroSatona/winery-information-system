@@ -7,6 +7,7 @@ services:
 	- App\Model\Vineyard\VineyardRepository
 	- App\Model\WineVariety\WineVarietyRepository
 	- App\Model\User\UserRepository
+	- App\Model\Profile\ProfileModel
 	- App\Model\Image\ImageRepository(%uploadsDir%, %uploadsDirWeb%)
 
 

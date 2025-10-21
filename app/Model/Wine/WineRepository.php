@@ -42,6 +42,53 @@ final class WineRepository
         return $wines;
     }
 
+    public function fetchAllWinesWithPattern(string $patternWines, string $patternType, string $patternGrade, string $patternState): array
+    {
+        $query = $this->db->table('WINE');
+
+        // Search through wine names, years, and wine varieties (through HARVEST table)
+        if ($patternWines !== '') {
+            $like = '%' . $patternWines . '%';
+
+            $varietyIds = $this->db->table('WINE_VARIETY')
+                ->where('NAME LIKE ?', $like)
+                ->select('ID');
+            
+            $wineIdsFromVarieties = $this->db->table('HARVEST')
+                ->where('ID_WINE_VARIETY IN ?', $varietyIds)
+                ->select('DISTINCT ID_WINE');
+            
+            $query = $query->where(
+                'WINE_NAME LIKE ? OR YEAR LIKE ? OR ID IN ?', 
+                $like, 
+                $like, 
+                $wineIdsFromVarieties
+            );
+        }
+
+        // Rest of filters (type, grade, state)
+        if ($patternType !== 'all') {
+            $query = $query->where('TYPE', $patternType);
+        }
+
+        if ($patternGrade !== 'all') {
+            $query = $query->where('GRADE', $patternGrade);
+        }
+
+        if ($patternState !== 'all') {
+            $query = $query->where('STATE', $patternState);
+        }
+
+        $rows = $query->fetchAll();
+        $wines = [];
+
+        foreach ($rows as $row) {
+            $wines[] = $this->createWineFromRow($row);
+        }
+
+        return $wines;
+    }
+
     public function fetchBottlingInfoForWine(Wine $wine): bool
     {
         $bottles = $this->db->table("BOTTLING")
