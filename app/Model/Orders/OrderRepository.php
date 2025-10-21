@@ -32,18 +32,10 @@ final class OrderRepository
 
     public function fetchAllOrders(bool $includeItems = false, string $searchTerm = ""): array
     {
-        bdump($this->db->getStructure()->getBelongsToReference('customer_order', 'user'));
-
-        if (!empty($searchTerm)) {
-            $like = '%' . $searchTerm . '%';
-
-            $orders = $this->db->table('customer_order')
-                ->select('customer_order.*, user.name, user.surname, user.email')
-                ->where('user.name LIKE ? OR user.surname LIKE ?', $like, $like);
-        } else {
-            $orders = $this->db->table('customer_order')
-                ->select('customer_order.*, user.name, user.surname, user.email');
-        }
+        $like = '%' . $searchTerm . '%';
+        $orders = $this->db->table('CUSTOMER_ORDER')
+            ->where('CUSTOMER_ORDER.ID LIKE ? OR NAME LIKE ? OR ID_CUSTOMER.SURNAME LIKE ?', $like, $like, $like)
+            ->fetchAll();
 
         $result = [];
         foreach ($orders as $row) {
