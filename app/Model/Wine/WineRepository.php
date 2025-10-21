@@ -160,4 +160,69 @@ final class WineRepository
         ]);
         return true;
     }
+    
+    public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
+        
+        $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
+        $this->db->beginTransaction();
+        if (!$this->fetchWineById($idWine)) {
+            return false;
+        }
+        try {
+            $this->db->table("WINE")
+            ->where("ID", $idWine)
+            ->update([
+                $param => $newValue
+            ]);
+            $this->db->commit();
+        } catch(\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+        return true;
+    }
+    
+    public function setWineState(int $idWine, string $newState): bool {
+
+        $wine = $this->fetchWineById($idWine);
+        if (!$wine) {
+            return false;
+        }
+        
+        $this->db->beginTransaction();
+        try {
+            $this->db->table("WINE")
+            ->where("ID", $idWine)
+            ->update([
+                "STATE" => $newState
+            ]);
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
+    
+    public function setWineDescription(int $idWine, string $newDescription): bool {
+
+        $wine = $this->fetchWineById($idWine);
+        if (!$wine) {
+            return false;
+        }
+        
+        $this->db->beginTransaction();
+        try {
+            $this->db->table("WINE")
+            ->where("ID", $idWine)
+            ->update([
+               "SALES_DESCRIPTION" => $newDescription
+            ]);
+            $this->db->commit();
+            return true; 
+        } catch(\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
+    }
 }

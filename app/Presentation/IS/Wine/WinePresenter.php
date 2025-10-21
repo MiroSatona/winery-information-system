@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Wine;
 
+use App\Model\FlashMsgType;
 use Nette;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
@@ -13,6 +14,7 @@ use App\Model\Image\ImageRepository;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
 use Nette\Application\UI\Form;
+use App\Model\Validation\ValidationDefinitions;
 
 final class WinePresenter extends BasePresenter
 {
@@ -82,12 +84,114 @@ final class WinePresenter extends BasePresenter
 
     public function handleBottling(int $wineId): void
     {
-        // todo
+        // doto 
     }
 
-    public function handleSelling(int $wineId): void
+    public function renderSelling(int $wineId): void
     {
-        // todo
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if (!$wine) {
+           $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+           $this->redirect(":IS:Wine:dashboard");
+           return;
+        }
+
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může přidávat víno do prodeje!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
+        if ($wine->state !== WINeState::bottled->value) {
+            $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+        
+        $this->template->imageRepository = $this->imageRepository;
+        $this->template->wine = $wine;
+    }
+    
+ 
+    public function renderChangePrice(int $wineId): void
+    {
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if (!$wine) {
+           $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+           $this->redirect(":IS:Wine:dashboard");
+           return;
+        }
+
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může přidávat víno do prodeje!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
+        if ($wine->state !== WINeState::sale->value) {
+            $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+        
+        $form = $this->getComponent("setWinePriceForm");
+        $form["price"]->setValue($wine->getCurrentPrice());
+        $form["popis"]->setValue($wine->getSalesDescription());
+        
+        $this->template->imageRepository = $this->imageRepository;
+        $this->template->wine = $wine;
+    }
+    
+    public function createComponentSetWinePriceForm(): Form
+    {
+        $form = new Form();
+
+        $form->addFloat('price', 'Cena za láhev (Kč)')
+            ->addRule(Form::Min, "jsi bot", ValidationDefinitions::PRICE_MIN)
+            ->addRule(Form::Max, "jis bot v2", ValidationDefinitions::PRICE_MAX)
+            ->setRequired('Zadejte cenu.')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte cenu např. 249.90');
+
+        $form ->addTextArea("popis", "Prodejní popis")
+            ->setRequired("Zadejte prodejní popis");
+
+        $form->addSubmit('send', 'Potvrdit a zařadit do prodeje')
+            ->setHtmlAttribute('class', 'btn btn-success');
+
+        $form->onSuccess[] = [$this, 'setWinePriceFormSucceeded'];
+        return $form;
+    }
+
+    public function setWinePriceFormSucceeded(Form $form, \stdClass $values): void
+    {
+        $wineId = (int) $this->getParameter('wineId');
+        $price = (float) $values->price;
+        $description = (string) $values->popis;
+        
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        
+        if (!$wine) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);            
+            $this->redirect('Wine:dashboard');
+            return; 
+        }
+        
+        $result = true;
+        if ($wine->state == WineState::bottled->value) {
+            $result = $this->wineRepository->updateWinePrice($wineId, $price, false);
+            $this->wineRepository->setWineState($wineId, WineState::sale->value);
+        }
+        $result2 = $this->wineRepository->updateWinePrice($wineId, $price, true);
+        $result3 = $this->wineRepository->setWineDescription($wineId, $description);
+        
+        if (!$result || !$result2 || !$result3) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage("Cena uložena", FlashMsgType::SUCCESS->value);
+        }
+
+        $this->redirect('Wine:dashboard');
     }
 
     public function handleChangePrice(int $wineId): void
@@ -97,6 +201,7 @@ final class WinePresenter extends BasePresenter
 
     public function renderEdit(int $wineId): void
     {
-        // todo
+        // doto 
     }
+    
 }

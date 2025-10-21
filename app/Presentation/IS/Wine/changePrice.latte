@@ -1,0 +1,85 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Vína
+    <i class="fas fa-arrow-right me-2 ms-2"></i>Změna ceny
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+<div class="d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-wine-bottle me-2"></i>
+                    Změna ceny 
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                {* === WINE INFO === *}
+                <div class="d-flex align-items-center mb-4">
+                    <img src="{asset $imageRepository->getPathForImage($wine->img)}"
+                         alt="{$wine->name}" class="img-thumbnail me-3 shadow-sm"
+                         style="width: 100px; height: auto; object-fit: cover;">
+                    <div>
+                        <h5 class="fw-bold mb-1 text-primary">{$wine->name}</h5>
+                        <small class="text-muted">Upravte Aktuální cenu</small>
+                    </div>
+                </div>
+
+                <hr class="mb-4">
+
+                {* === PRICE FORM === *}
+                {form setWinePriceForm}
+                    <div class="mb-3">
+                        <label for="price" class="form-label fw-semibold">
+                            <i class="fas fa-coins me-2 text-muted"></i>{label price /}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {input price}
+                    </div>
+
+                    <hr class="my-4">
+
+                    {* === PRODUCT DESCRIPTION BELOW === *}
+                    <div class="mb-4">
+                        <label for="popis" class="form-label fw-semibold">
+                            <i class="fas fa-file-alt me-2 text-muted"></i>{label popis /}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {input popis, rows => 8, class => 'form-control', style => 'resize: vertical;'}
+                        <small class="form-text text-muted">
+                            Tento popis se zobrazí zákazníkům v detailu produktu.
+                        </small>
+                    </div>
+
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Informace
+                        </h6>
+                        <small class="mb-0">
+                            Po potvrzení bude víno zařazeno do e-shopu s uvedenou cenou a popisem. Tyto údaje můžete později upravit v detailu vína.
+                        </small>
+                    </div>
+
+                    <div class="border-top pt-4">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <a href="{link Wine:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                    <i class="fas fa-times me-2"></i>Zrušit
+                                </a>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                {input send}
+                            </div>
+                        </div>
+                    </div>
+                {/form}
+               
+                
+            </div>
+        </div>
+    </div>
+</div>
+{/block isMainPanel}

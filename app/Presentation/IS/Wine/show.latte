@@ -32,12 +32,12 @@
                                     </a>
                                 {/if}
                                 {if $wine->getState() === $WineState::bottled->value && $userVintner}
-                                    <a href="{link selling! $wine->getId()}" class="btn btn-primary btn-sm">
+                                    <a href="{link selling $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-coins me-2"></i>Zařadit do prodeje
                                     </a>
                                 {/if}
                                 {if $wine->getState() === $WineState::sale->value && $userVintner}
-                                    <a href="{link changePrice! $wine->getId()}" class="btn btn-primary btn-sm">
+                                    <a href="{link changePrice $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-coins me-2"></i>Změnit cenu
                                     </a>
                                 {/if}
