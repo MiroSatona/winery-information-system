@@ -35,8 +35,7 @@ final class CartPresenter extends BasePresenter
             $this->template->message = 'nákupní košík je prázdný';
             return;
         }
-        
-        $this->orderRepository->updateOrderPrice($order->id);
+        $this->orderRepository->updateOrderPrice($order->id, true);
 
         // Optionally fetch all items for that order
         $order->items = $this->orderRepository

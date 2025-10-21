@@ -48,7 +48,7 @@ final class OrderRepository
                 $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
             }
             
-            $order->setUser($this->usrRep->getUserById($order->id));
+            $order->setUser($this->usrRep->getUserById($order->idCustomer));
             
             $result[] = $order;
             
@@ -107,8 +107,14 @@ final class OrderRepository
             "DELIVERY_TYPE" => "PICKUP",      // Required (no default)
             "DELIVERY_DATA" => "",
         ];
-
-        $newRow = $this->db->table("CUSTOMER_ORDER")->insert($insertData);
+        $this->db->beginTransaction();
+        try {
+            $newRow = $this->db->table("CUSTOMER_ORDER")->insert($insertData);
+            $this->db->commit();
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
 
         if (!$newRow) {
             return null; // insert failed for some reason
@@ -123,18 +129,25 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        
-        $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
-        if ($result) {
-            $this->updateOrderPrice($order->id);
-            // if there is nothing in the order, delete the order 
-            $order = $this->fetchCustomerOrder($userId, false);
-            if ($order && $order->totalPrice == 0) {
-                $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
-                $row->delete();
+        $this->db->beginTransaction();
+        try {
+            $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
+            if ($result) {
+                $this->updateOrderPrice($order->id);
+                // if there is nothing in the order, delete the order 
+                $order = $this->fetchCustomerOrder($userId, false);
+                if ($order && $order->totalPrice == 0) {
+                    $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
+                    $row->delete();
+                }
             }
+            $this->db->commit();
+            return $result;
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
         }
-        return $result;
     }
 
     public function editAmountOrItemInOrder(int $userId, int $wineId, int $diff, bool $add): bool 
@@ -143,17 +156,24 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        
-        $result = $this->orderItemRepository->changeItemAmount($wineId, $order->id, $diff, $add);
-        if ($result) {
-            $this->updateOrderPrice($order->id);
-            $order = $this->fetchCustomerOrder($userId, false);
-            if ($order && $order->totalPrice == 0) {
-                $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
-                $row->delete();
+        $this->db->beginTransaction();
+        try {
+            $result = $this->orderItemRepository->changeItemAmount($wineId, $order->id, $diff, $add);
+            if ($result) {
+                $this->updateOrderPrice($order->id);
+                $order = $this->fetchCustomerOrder($userId, false);
+                if ($order && $order->totalPrice == 0) {
+                    $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
+                    $row->delete();
+                }
             }
+            $this->db->commit();
+            return $result;
+
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
         }
-        return $result;
     }
     
     public function addToCart(int $userId, int $wineId, int $amount): bool {
@@ -161,14 +181,21 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        $result = $this->orderItemRepository->addItem($order->id, $wineId, $amount);
-        if ($result) {
-            $this->updateOrderPrice($order->id);
+        $this->db->beginTransaction();
+        try {
+            $result = $this->orderItemRepository->addItem($order->id, $wineId, $amount);
+            if ($result) {
+                $this->updateOrderPrice($order->id);
+            }
+            $this->db->commit();
+            return $result;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
         }
-        return $result;
     }
     
-    public function updateOrderPrice(int $orderId) {
+    public function updateOrderPrice(int $orderId, bool $doTransaction = false) {
         $order = $this->fetchOrderById($orderId, true);
         
         $totalPrice = 0;
@@ -177,6 +204,19 @@ final class OrderRepository
             $totalPrice += $item->wine->currentPrice * $item->bottlesCount;
         }
         $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId);
+        if ($doTransaction) {
+            $this->db->beginTransaction();
+            try {
+                $row->update([
+                    "TOTAL_PRICE" => $totalPrice,
+                ]);
+                $this->db->commit();
+            } catch (\Exception $e) {
+                $this->db->rollBack();
+                throw $e;
+            }
+            return;
+        }
         $row->update([
             "TOTAL_PRICE" => $totalPrice,
         ]);
@@ -184,54 +224,70 @@ final class OrderRepository
 
     public function updateDeliveryAdress(int $userId, string $type, ?string $addres): bool 
     {
-        $order = $this->fetchCustomerOrder($userId);
-        if (!$order) {
-            return false;
-        }
+        $this->db->beginTransaction();
+        try {
+            $order = $this->fetchCustomerOrder($userId);
+            if (!$order) {
+                $this->db->commit();
+                return false;
+            }
 
-        // update the delivery type 
-        $row = $this->db->table("CUSTOMER_ORDER")
-        ->where("ID_CUSTOMER", $userId)
-        ->where("ID", $order->id)
-        ->fetch();
-    
-        if (!$row) {
-            return false;
-        }
-
-        $row->update(
-            ["DELIVERY_TYPE" => $type]
-        );
+            // update the delivery type 
+            $row = $this->db->table("CUSTOMER_ORDER")
+            ->where("ID_CUSTOMER", $userId)
+            ->where("ID", $order->id)
+            ->fetch();
         
-        if (!$addres) {
+            if (!$row) {
+                $this->db->commit();
+                return false;
+            }
+
+            $row->update(
+                ["DELIVERY_TYPE" => $type]
+            );
+            
+            if (!$addres) {
+                $row->update([
+                    "DELIVERY_DATA" => ""
+                ]);
+                $this->db->commit();
+                return true;
+            }
+            
             $row->update([
-                "DELIVERY_DATA" => ""
+                "DELIVERY_DATA" => $addres
             ]);
+            $this->db->commit();
             return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
         }
-        
-        $row->update([
-            "DELIVERY_DATA" => $addres
-        ]);
-        return true;
     }
-    
-    public function clientPayForOrder(int $userId): bool {
-        $order = $this->fetchCustomerOrder($userId);
+                
+    public function clientpayfororder(int $userid): bool {
+        $order = $this->fetchcustomerorder($userid);
         if (!$order) {
             return false;
         }
         $row = $this->db->table("CUSTOMER_ORDER")
-        ->where("ID_CUSTOMER", $userId)
+        ->where("ID_CUSTOMER", $userid)
         ->where("ID", $order->id)
         ->fetch(); 
         
-        $row->update(
+        $this->db->beginTransaction();
+        try {
+            $row->update(
             [
                 "STATE" => "PAID"
-            ]
-            );
-        return true;
+            ]);
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 
     public function changeClientOrderStatus(int $orderId, string $newState): bool {
@@ -239,9 +295,16 @@ final class OrderRepository
         if (!$row) {
             return false;
         }
-        $row->update([
-            "STATE" => $newState
-        ]);
-        return true;
+        $this->db->beginTransaction();
+        try {
+            $row->update([
+                "STATE" => $newState
+            ]);
+            $this->db->commit();
+            return true;
+        } catch (\Exception $e) {
+            $this->db->rollBack();
+            throw $e;
+        }
     }
 }
