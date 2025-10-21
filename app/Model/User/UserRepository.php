@@ -350,7 +350,7 @@ class UserRepository
      *
      * @return string[] Array containing 'password', 'salt' and 'hashedPassword'
      */
-    private function createNewPassword() : array{
+    public function createNewPassword() : array{
         // Generate random password
         $password = bin2hex(random_bytes(4));
         // Generate random salt for password hashing

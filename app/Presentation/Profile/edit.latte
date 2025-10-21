@@ -1,0 +1,135 @@
+{layout ../@layout.latte}
+
+{block title}Editace profilu{/block}
+
+{block content}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        Úprava uživatele
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form editProfileByUserForm}
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="name" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2 text-muted"></i>Jméno
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input name}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="surname" class="form-label fw-semibold">
+                                    <i class="fas fa-user me-2 text-muted"></i>Příjmení
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input surname}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="email" class="form-label fw-semibold">
+                                    <i class="fas fa-envelope me-2 text-muted"></i>E-mail
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input email}
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <label for="username" class="form-label fw-semibold">
+                                    <i class="fas fa-user-check me-2 text-muted"></i>Login
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input username}
+                            </div>
+
+                        
+
+                            <div class="col-12 col-md-6">
+                                <label for="city" class="form-label fw-semibold">
+                                    <i class="fas fa-city me-2 text-muted"></i>Město
+                                </label>
+                                {input city}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="street" class="form-label fw-semibold">
+                                    <i class="fas fa-road me-2 text-muted"></i>Ulice
+                                </label>
+                                {input street}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="houseNumber" class="form-label fw-semibold">
+                                    <i class="fas fa-home me-2 text-muted"></i>Číslo popisné
+                                </label>
+                                {input houseNumber}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="postalCode" class="form-label fw-semibold">
+                                    <i class="fas fa-mail-bulk me-2 text-muted"></i>PSČ
+                                </label>
+                                {input postalCode}
+                            </div>
+                            <div class="col-12">
+                                <label for="phone" class="form-label fw-semibold">
+                                    <i class="fas fa-phone me-2 text-muted"></i>Telefon
+                                </label>
+                                {input phone}
+                            </div>
+                            
+                            <div class="col-12 col">
+                                <div class="d-grid">
+                                    {input send}
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+
+                    <div class="d-flex justify-content-start align-items-center flex-row mt-5 mb-2">
+                        <h4 class="fw-bold text-danger border-bottom border-2 pb-2 w-100">
+                            <i class="fas fa-lock me-2"></i> Restartování hesla
+                        </h4>
+                    </div>
+                    {form resetPasswordForm}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="newPassword" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-danger"></i>Staré heslo
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input oldPassword class}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="newPasswordAgain" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-danger"></i>Potvrzení hesla
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input newPassword}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="newPasswordAgain" class="form-label fw-semibold">
+                                    <i class="fas fa-lock me-2 text-danger"></i>Potvrzení hesla
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input newPasswordAgain }
+                            </div>
+
+                            <div class="col-12">
+                                <div class="d-grid">
+                                    {input changePassword }
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block}
