@@ -52,7 +52,7 @@ final class WineRepository
         
         $varieties = $this->db->table("HARVEST")
             ->where("ID_WINE", $row->ID)
-            ->select("DISTINCT WINE_VARIETY.NAME, WINE_VARIETY.ID_PICTURE, WINE_VARIETY.COLOR, WINE_VARIETY.DESCRIPTION, WINE_VARIETY.ID")
+            ->select("DISTINCT WINE_VARIETY.NAME, WINE_VARIETY.ID_PICTURE AS VARIETY_ID_PICTURE, WINE_VARIETY.COLOR, WINE_VARIETY.DESCRIPTION, WINE_VARIETY.ID")
             ->joinWhere("WINE_VARIETY", "WINE_VARIETY.ID = HARVEST.ID_WINE_VARIETY")
             ->fetchAll();
 
@@ -60,15 +60,15 @@ final class WineRepository
         $varietiesData = [];
         foreach ($varieties as $varietyRow) {
             /** @var Image $image */
-            $image = null;
-            if ($varietyRow->ID_PICTURE !== null) {
-                $image = $this->imageRepository->fetchImageById((int) $varietyRow->ID_PICTURE);
+            $imageVariety = null;
+            if ($varietyRow->VARIETY_ID_PICTURE !== null) {
+                $imageVariety = $this->imageRepository->fetchImageById((int) $varietyRow->VARIETY_ID_PICTURE);
             }
             $varietiesData[] = new WineVariety(
                 id: (int) $varietyRow->ID,
                 name: (string) $varietyRow->NAME,
                 color: WineVarietyType::from((string) $varietyRow->COLOR),
-                image: $image,
+                image: $imageVariety,
                 description: (string) $varietyRow->DESCRIPTION
             );
         }
