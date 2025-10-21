@@ -9,11 +9,12 @@ use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Orders\OrderRepository;
 use App\Model\FlashMsgType;
+use App\Model\Image\ImageRepository;
 
 final class OrdersPresenter extends BasePresenter
 {
 
-    public function __construct(private OrderRepository $ordRepository)
+    public function __construct(private OrderRepository $ordRepository, private ImageRepository $imgRep)
     {
         parent::__construct();
     }
@@ -24,6 +25,7 @@ final class OrdersPresenter extends BasePresenter
         if (!($this->user->isInRole(Role::WORKER->name) || $this->user->isInRole(Role::VINTNER->name))) {
             $this->redirect(':Home:default');
         }
+        $this->template->imgRep = $this->imgRep;
     }
 
     public function renderDashboard(): void
@@ -43,7 +45,7 @@ final class OrdersPresenter extends BasePresenter
         $this->template->orders = $orders;
     }
     
-    public function handleChangeState(int $orderId, string $newState) {
+    public function handleChangeOrderState(int $orderId, string $newState) {
         
         $result = $this->ordRepository->changeClientOrderStatus($orderId, $newState);
         
@@ -52,6 +54,10 @@ final class OrdersPresenter extends BasePresenter
         } else {
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
         }
+    }
+    
+    public function renderOrderDetail(int $orderId) {
+       $this->template->order = $this->ordRepository->fetchOrderById($orderId, true);
     }
     
 
