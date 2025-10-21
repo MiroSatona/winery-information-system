@@ -8,14 +8,20 @@ use Nette;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Wine\WineRepository;
+use App\Model\Wine\Wine;
+use App\Model\Image\ImageRepository;
+use App\Model\WineVariety\WineVarietyType;
+use App\Model\Wine\WineState;
 use Nette\Application\UI\Form;
 
 final class WinePresenter extends BasePresenter
 {
     private string $patternWines = '';
 
-    public function __construct(private WineRepository $wineRepository)
-    {
+    public function __construct(
+        private WineRepository $wineRepository,
+        private ImageRepository $imageRepository
+    ) {
         parent::__construct();
     }
 
@@ -54,10 +60,35 @@ final class WinePresenter extends BasePresenter
         $wines = $this->wineRepository->fetchAllWines();
 
         $this->template->wines = $wines;
+        $this->template->imageRepository = $this->imageRepository;
     }
 
     public function renderShow(int $wineId): void
     {
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage('Víno nebylo nalezeno', 'error');
+            $this->redirect('dashboard');
+        }
 
+        $this->template->wine = $wine;
+        $this->template->imageRepository = $this->imageRepository;
+        $this->template->WineVarietyType = WineVarietyType::class;
+        $this->template->WineState = WineState::class;
+    }
+
+    public function handleBottling(int $wineId): void
+    {
+        // todo
+    }
+
+    public function handleSelling(int $wineId): void
+    {
+        // todo
+    }
+
+    public function renderEdit(int $wineId): void
+    {
+        // todo
     }
 }

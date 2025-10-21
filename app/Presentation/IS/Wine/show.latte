@@ -2,10 +2,299 @@
 
 {block topMenuISAdditional}
     <i class="fas fa-arrow-right me-2"></i>Vína
-    <i class="fas fa-arrow-right me-2"></i>Spravovat víno
+    <i class="fas fa-arrow-right me-2"></i>Detail vína
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <div class="container-fluid">
+        {* Main wine details section *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-wine-bottle me-2"></i>
+                                Detail vína
+                            </h4>
+                            <div class="d-flex gap-2">
+                                <a href="{link Wine:dashboard}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
+                                </a>
+                                {if $wine->getState() === $WineState::production->value && $userVintner}
+                                    <a href="{link bottling! $wine->getId()}" class="btn btn-danger btn-sm">
+                                        <i class="fas fa-trash me-2"></i>Zlikvidovat víno
+                                    </a>
+                                {/if}
+                                {if $wine->getState() === $WineState::production->value && $userVintner}
+                                    <a href="{link bottling! $wine->getId()}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-wine-bottle me-2"></i>Zalahvovat víno
+                                    </a>
+                                {/if}
+                                {if $wine->getState() === $WineState::bottled->value && $userVintner}
+                                    <a href="{link selling! $wine->getId()}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-coins me-2"></i>Zařadit do prodeje
+                                    </a>
+                                {/if}
+                                {if $userVintner}
+                                    <a href="{link edit $wine->getId()}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-edit me-2"></i>Upravit víno
+                                    </a>
+                                {/if}
+                                
+                            </div>
+                        </div>
+                    </div>
 
+                    <div class="card-body p-4">
+                        <div class="row">
+                            {* Wine information *}
+                            <div class="col-12 col-md-8">
+                                <div class="mb-4">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-wine-bottle me-2"></i>Název vína
+                                            </label>
+                                            <p class="fs-4 fw-bold text-dark mb-2">{$wine->getName()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-info-circle me-2"></i>Stav
+                                            </label>
+                                            <p class="fs-4 fw-bold text-dark mb-2">{$wine->getStateText()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-calendar-alt me-2"></i>Ročník
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getYear()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-percentage me-2"></i>Obsah alkoholu
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getAlcoholPercentage()}%</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-tint me-2"></i>Typ
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getTypeText()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-palette me-2"></i>Barva
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getColorText()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-award me-2"></i>Přívlastek
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getGradeText()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-info-circle me-2"></i>Stav
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">
+                                                {$wine->getStateText()}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-flask me-2"></i>Objem
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$wine->getVolume()} ml</p>
+                                        </div>
+                                        {if $wine->getBottlesLeft() !== null}
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-muted">
+                                                    <i class="fas fa-wine-bottle me-2"></i>Zbývající láhve
+                                                </label>
+                                                <p class="fs-6 text-dark mb-2">{$wine->getBottlesLeft()}</p>
+                                            </div>
+                                        {/if}
+                                    </div>
+
+                                    {if $wine->getCurrentPrice() !== null || $wine->getBottlePrice() !== null}
+                                        <div class="row mb-3">
+                                            {if $wine->getCurrentPrice() !== null}
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold text-muted">
+                                                        <i class="fas fa-tag me-2"></i>Aktuální cena
+                                                    </label>
+                                                    <p class="fs-6 text-dark mb-2 fw-bold">{$wine->getCurrentPrice()} Kč</p>
+                                                </div>
+                                            {/if}
+                                            {if $wine->getBottlePrice() !== null}
+                                                <div class="col-md-6">
+                                                    <label class="form-label fw-semibold text-muted">
+                                                        <i class="fas fa-money-bill me-2"></i>Původní cena láhve
+                                                    </label>
+                                                    <p class="fs-6 text-dark mb-2">{$wine->getBottlePrice()} Kč</p>
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/if}
+                                    {if $wine->getLeftSugar() !== null || $wine->getAcidContents() !== null}
+                                        <div class="row mb-3">
+                                            {if $wine->getLeftSugar() !== null}
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-semibold text-muted">
+                                                        <i class="fas fa-cube me-2"></i>Zbytkový cukr
+                                                    </label>
+                                                    <p class="fs-6 text-dark mb-0">{$wine->getLeftSugar()} g/l</p>
+                                                </div>
+                                            {/if}
+                                            {if $wine->getAcidContents() !== null}
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label fw-semibold text-muted">
+                                                        <i class="fas fa-vial me-2"></i>Obsah kyselin
+                                                    </label>
+                                                    <p class="fs-6 text-dark mb-0">{$wine->getAcidContents()} g/l</p>
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/if}
+
+                                    <hr>
+
+                                    {if $wine->getSalesDescription()}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-file-alt me-2"></i>Popis pro prodej
+                                            </label>
+                                            <p class="text-dark mb-2">{$wine->getSalesDescription()}</p>
+                                        </div>
+                                    {/if}
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-clipboard me-2"></i>Poznámka z výroby
+                                        </label>
+                                        <p class="text-dark mb-2">{$wine->getProductionNote()}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {* Wine image *}
+                            <div class="col-12 col-md-4">
+                                <div class="wine-image-container border rounded p-3 bg-light d-flex justify-content-center">
+                                    {if $wine->getImage()}
+                                        <img src="{asset $imageRepository->getPathForImage($wine->getImage())}" 
+                                             alt="{$wine->getImage()->description}" 
+                                             class="rounded shadow-sm"
+                                             style="max-width: 100%; object-fit: contain;">
+                                    {else}
+                                        <div class="no-image-placeholder text-center py-5">
+                                            <i class="fas fa-wine-bottle fa-4x text-muted mb-3"></i>
+                                            <p class="text-muted mb-0">Bez obrázku</p>
+                                        </div>
+                                    {/if}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {* Wine varieties section *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-seedling me-2"></i>Odrůdy vína
+                            </h5>
+                            <a href="{link :IS:WineVarieties:dashboard}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-seedling me-2"></i>Přehled odrůd
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {if count($wine->getVarieties()) > 0}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-tag me-2"></i>Název
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-palette me-2"></i>Barva
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-align-left me-2"></i>Popis
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $wine->getVarieties() as $variety}
+                                            <tr class="align-middle">
+                                                <td>
+                                                    <h6 class="mb-0 fw-semibold text-dark">{$variety->getName()}</h6>
+                                                </td>
+                                                <td>
+                                                    <span class="fw-semibold">
+                                                        {switch $variety->getColor()}
+                                                            {case $WineVarietyType::WHITE}
+                                                                Bílé
+                                                            {case $WineVarietyType::RED}
+                                                                Červené
+                                                            {case $WineVarietyType::PINK}
+                                                                Růžové
+                                                            {case $WineVarietyType::GREY}
+                                                                Šedé
+                                                            {case $WineVarietyType::BLUE}
+                                                                Modré
+                                                        {/switch}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 text-muted">
+                                                        {if strlen($variety->getDescription()) > 120}
+                                                            {$variety->getDescription()|truncate:120}
+                                                        {else}
+                                                            {$variety->getDescription()}
+                                                        {/if}
+                                                    </p>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {else}
+                            <div class="text-center py-5">
+                                <i class="fas fa-seedling fa-3x text-muted mb-3 opacity-50"></i>
+                                <h5 class="text-muted">Žádné odrůdy vína</h5>
+                                <p class="text-muted">K tomuto vínu nejsou přiřazeny žádné odrůdy.</p>
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <h2> Možná něco jako úkony nad vínem????????</h2>
+        </div>
+    </div>
 
 {/block isMainPanel}
