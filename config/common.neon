@@ -37,6 +37,8 @@ di:
 		parameters: no
 		tags: no
 
+session:
+	expiration: 30 minutes
 
 security:
 	authentication:

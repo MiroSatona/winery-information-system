@@ -217,12 +217,12 @@ COLLATE utf8mb4_czech_ci;
 
 CREATE TABLE HARVEST(
     ID_TASK INT PRIMARY KEY,
-    ID_VINEYARD INTEGER,
-    ID_WINE_VARIETY INTEGER,
-    ID_WINEGROWER INTEGER,
+    ID_VINEYARD INTEGER NOT NULL,
+    ID_WINE_VARIETY INTEGER NOT NULL,
+    ID_HARVEST_CONFIRMER INTEGER,
     ID_WINE INTEGER,
-    WEIGHT DECIMAL(10,2) NOT NULL,
-    SUGAR_CONTENT DECIMAL(5,2) NOT NULL,
+    WEIGHT DECIMAL(10,2),
+    SUGAR_CONTENT DECIMAL(5,2),
     CONSTRAINT FK_HARVEST_TASK
         FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
         ON DELETE CASCADE,
@@ -232,8 +232,8 @@ CREATE TABLE HARVEST(
     CONSTRAINT FK_HARVEST_WINE_VARIETY
         FOREIGN KEY (ID_WINE_VARIETY) REFERENCES WINE_VARIETY(ID) 
         ON DELETE CASCADE,
-    CONSTRAINT FK_HARVEST_WINE_GROWER
-        FOREIGN KEY (ID_WINEGROWER) REFERENCES USER(ID) 
+    CONSTRAINT FK_HARVEST_WINE_CONFIRMER
+        FOREIGN KEY (ID_HARVEST_CONFIRMER) REFERENCES USER(ID) 
         ON DELETE SET NULL,
     CONSTRAINT FK_HARVEST_WINE
         FOREIGN KEY (ID_WINE) REFERENCES WINE(ID) 
@@ -262,20 +262,20 @@ CHARACTER SET utf8mb4
 COLLATE utf8mb4_czech_ci;
 
 
-CREATE TABLE TASK_ROAD (
+CREATE TABLE TASK_ROW (
     ID_VINEYARD INTEGER NOT NULL,
     CODE_ROW    INTEGER NOT NULL,  
     ID_TASK      INTEGER NOT NULL,
 
-    CONSTRAINT PK_TASK_ROAD
+    CONSTRAINT PK_TASK_ROW
         PRIMARY KEY (ID_VINEYARD, CODE_ROW, ID_TASK),
 
-    CONSTRAINT FK_TASK_ROAD_TASK
+    CONSTRAINT FK_TASK_ROW_TASK
         FOREIGN KEY (ID_TASK)
         REFERENCES TASK (ID)
         ON DELETE CASCADE,
 
-    CONSTRAINT FK_TASK_ROAD_ROAD
+    CONSTRAINT FK_TASK_ROW_WINE_ROW
         FOREIGN KEY (ID_VINEYARD, CODE_ROW)
         REFERENCES WINE_ROW (ID_VINEYARD, CODE)
         ON DELETE CASCADE
@@ -345,48 +345,72 @@ INSERT INTO TASK (ID, NAME, STATE, CREATION_TIMESTAMP, LAST_CHANGE_TIMESTAMP, PL
 VALUES
 (1, 'Harvest Grapes', 'PLANNED', '2023-10-01 10:00:00', '2023-10-01 10:00:00', '2023-10-05 08:00:00', NULL, 'Harvest the grapes in the vineyard', 1, NULL),
 (2, 'Bottle Wine', 'FINISHED', '2023-10-02 11:00:00', '2023-10-02 12:00:00', '2023-10-07 10:00:00', '2023-10-07 09:00:00', 'Bottling the wine from last harvest', 2, 3),
-(3, 'Wine Quality Check', 'CANCELED', '2023-10-03 15:00:00', '2023-10-03 16:00:00', '2023-10-10 10:00:00', NULL, 'Quality check canceled due to logistics issues', NULL, NULL);
-
+(3, 'Wine Quality Check', 'CANCELED', '2023-10-03 15:00:00', '2023-10-03 16:00:00', '2023-10-10 10:00:00', NULL, 'Quality check canceled due to logistics issues', NULL, NULL),
+(4, 'Harvest 2', 'PLANNED', '2023-11-01 10:00:00', '2023-11-01 10:00:00', '2023-11-05 08:00:00', NULL, 'Harvest the grapes in the vineyard - second task', 1, NULL),
+(5, 'Harvest 3', 'FINISHED', '2023-11-02 11:00:00', '2023-11-02 12:00:00', '2023-11-07 10:00:00', '2023-11-07 09:00:00', 'Harvest the grapes in the vineyard - third task', 2, 3);
 -- picture table
 INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
 (1, 'Irsai Oliver', 'irsaiOliver.webp', 'Obrázek odrůdy Irsai Oliver'),
 (2, 'Modrý Portugal', 'modryPortugal.jpg', 'Obrázek odrůdy Modrý Portugal'),
 (3, 'Tramín Červený', 'traminCerveny.jpg', 'Obrázek odrůdy Tramín Červený'),
-(4, 'Zlaté vinohrady', 'vinohrad1.jpg', 'Obrázek vinohradu Zlaté vinohrady'),
-(5, 'Slunečné vinohrady', 'vinohrad2.jpg', 'Obrázek vinohradu Slunečné vinohrady'),
-(6, 'Říční vinohrady', 'vinohrad3.jpg', 'Obrázek vinohradu Říční vinohrady'),
+(4, 'Vinohrad U Zlaté studny', 'vinohrad1.jpg', 'Obrázek vinohradu U Zlaté studny'),
+(5, 'Vinohrad Pod Hůrkou', 'vinohrad2.jpg', 'Obrázek vinohradu Pod Hůrkou'),
+(6, 'Vinohrad Na Stráni', 'vinohrad3.jpg', 'Obrázek vinohradu Na Stráni'),
 (7, 'Irsai Oliver', 'irsaiOliverVino.png', 'Obrázek láhve Irsai Oliver'),
 (8, 'Modrý Portugal', 'modryPortugalVino.jpeg', 'Obrázek láhve Modrý Portugal'),
-(9, 'Tramín Červený', 'traminCervenyVino.png', 'Obrázek láhve Tramín Červený');
+(9, 'Tramín Červený', 'traminCervenyVino.png', 'Obrázek láhve Tramín Červený'),
+(10, 'Ryzlink Vlašský', 'ryzlinkVlassky.jpg', 'Obrázek odrůdy Ryzlink Vlašský'),
+(11, 'Pálava', 'palava.png', 'Obrázek odrůdy Pálava'),
+(12, 'Müller Thurgau', 'mueller_thurgau.jpg', 'Obrázek odrůdy Müller Thurgau'),
+(13, 'Sauvignon', 'Sauvignon.webp', 'Obrázek odrůdy Sauvignon'),
+(14, 'Ryzlink Rýnský', 'Ryzlink-rynsky.jpg', 'Obrázek odrůdy Ryzlink Rýnský');
 
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'DRY', 'RED', 'CABINET', 'PRODUCTION', 1000, 15, 20, 100, 5, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
-(2, 'Modrý Portugal', 2, 3, 8, 2020, 13, 'HALF_DRY', 'WHITE', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
+(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'HALF_DRY', 'WHITE', 'LATE', 'PRODUCTION', 1000, 120, 90, 100, 10, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
+(2, 'Modrý Portugal', 2, 3, 8, 2020, 13, 'DRY', 'RED', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
 (3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'PINK', 'NONE', 'SALE', 500, 10, 15, 150, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION, YEAR)
 VALUES
-(1, 4, 'Zlaté vinohrady', 'Znojmo, Česká republika', 'Krásný vinohrad známý svými bohatými červenými víny', 2015),
-(2, 5, 'Slunečné vinohrady', 'Moravské Slovácko, ČR', 'Slunný vinohrad proslulý svými bílými víny', 2016),
-(3, 6, 'Říční vinohrady', 'Velké Bílovice, ČR', 'Malý vinohrad umístěný u řeky', 2017);
+(1, 4, 'Vinohrad U Zlaté studny', 'Pavlov, Česká republika', 'Tento vinohrad leží na jihovýchodních svazích Pálavy s výhledem na Novomlýnské nádrže. Díky vápenité půdě a teplému mikroklimatu zde vznikají vína s výjimečnou minerální stopou a plnou aromatikou. Réva je pěstována šetrně, s důrazem na ruční práci a nízké výnosy, což zaručuje vysokou kvalitu hroznů. Typickými odrůdami jsou Ryzlink vlašský, Pálava a Tramín červený, které zde získávají elegantní vůni květů a medu. Vinaři se zaměřují na harmonická, vyvážená vína s dlouhou dochutí, ideální k archivaci i k okamžitému vychutnání.', 2005),
+(2, 5, 'Vinohrad Pod Hůrkou', 'Mikulčice, Česká republika', 'Menší rodinný vinohrad se rozkládá na svazích nad obcí Mikulčice v Dolnomoravském úvalu. Písčitohlinitá půda a teplé proudění od jihu dávají vznik vínům jemným, ovocným a svěžím, s výraznou kyselinkou. Pěstují se zde především Irsai Oliver, Müller Thurgau a Sauvignon, které vynikají svou lehkostí a aromatičností. Vinohrad je veden s respektem k přírodě – bez chemických postřiků a s důrazem na biodiverzitu. Výsledná vína odrážejí jedinečný charakter jižní Moravy a každý ročník přináší jemné nuance vůní i chutí.', 2010),
+(3, 6, 'Vinohrad Na Stráni', 'Velké Žernoseky, Česká republika', 'Vinohrad Na Stráni se nachází na úbočí Českého středohoří, kde sopečné podloží a chladnější klima dávají vínům zcela odlišný charakter než na Moravě. Hrozny dozrávají pomaleji, díky čemuž si zachovávají intenzivní aroma a svěží kyselinu. Dominantními odrůdami jsou Ryzlink rýnský a Modrý Portugal, které se vyznačují čistotou, elegancí a minerálním závěrem. Vinohrad hospodaří s respektem k tradici i moderním postupům, s důrazem na ruční sklizeň a precizní zpracování. Výsledkem jsou vína s charakterem, která dokonale vystihují severní terroir Čech.', 1998);
+
 
 -- WINE_VARIETY table 
 INSERT INTO WINE_VARIETY (ID, ID_PICTURE, COLOR, NAME, DESCRIPTION)
 VALUES
-(1, 1, 'WHITE', 'Irsai Oliver', 'Aromatic white grape variety known for its floral and fruity notes.'),
-(2, 2, 'BLUE', 'Modrý Portugal', 'A red grape variety producing light and fruity wines with a hint of spice.'),
-(3, 3, 'GREY', 'Tramín Červený', 'A pink-skinned grape variety used to make aromatic wines with a spicy character.');
+(1, 1, 'WHITE', 'Irsai Oliver', 'Irsai Oliver je aromatická bílá odrůda vína původem z Maďarska, vzniklá křížením odrůd Pozsonyi Fehér (Bratislavské bílé) a Pearl of Csaba v roce 1930. Vyznačuje se intenzivní květinovo-muškátovou vůní, často připomínající bezový květ, muškátový hrozen či citrusové plody. Chuť je lehčí, svěží a harmonická, s příjemnou kyselinkou, která podtrhuje její ovocný charakter. Tato odrůda se nejčastěji používá pro výrobu suchých nebo polosuchých vín, která jsou oblíbená pro svou pitelnost a aromatickou přitažlivost už jako mladá vína. Irsai Oliver se dobře pije za tepla letního dne nebo jako aperitiv, často bývá i základem pro letní cuvée.'),
+(2, 2, 'BLUE', 'Modrý Portugal', 'Modrý Portugal je tradiční červená odrůda původu střední Evropy, rozšířená především v Rakousku, České republice a na Slovensku. Je známá svou jemností, lehkostí a ovocným charakterem, díky čemuž si získala oblibu jako víno pro každodenní pití. Víno z Modrého Portugalu má světle rubínovou až granátovou barvu a vůni po červeném ovoci, zejména třešních, malinách či ostružinách. Chuť bývá měkká, vyvážená a sametová, s nižším obsahem tříslovin i kyselin, což z něj činí příjemně hladké a snadno pitelné víno'),
+(3, 3, 'GREY', 'Tramín Červený', 'Tramín červený je stará aromatická odrůda révy vinné, jejíž původ sahá až do středověku a bývá spojován s oblastí okolo jihotyrolského města Tramin (Termeno). Patří mezi nejvýraznější bílé odrůdy, i když její hrozny mají nažloutle růžové až červené slupky. Víno z Tramínu červeného je typické svou intenzivní vůní růží, koření, medu a exotického ovoce. Chuť bývá plná, bohatá a výrazně aromatická, často s nižší kyselinkou, což mu dodává hebkost a sametový dojem. Nejčastěji se vyrábí jako suché nebo polosladké víno, které vyniká svou výraznou osobitostí.'),
+(4, 10, 'WHITE', 'Ryzlink Vlašský', 'Ryzlink vlašský je tradiční bílá odrůda rozšířená především na jižní Moravě, zejména v oblasti Pálavy. Vyznačuje se výraznou minerální chutí a svěží kyselinkou, která odráží vápenité podloží místních vinic. Víno má jemné aroma květin, jablek a lískových oříšků, s lehkým nádechem medu při delším zrání. Díky své vyváženosti a eleganci je oblíbené jak k okamžité konzumaci, tak pro archivaci. Ryzlink vlašský je ideální společník k rybám, lehkým sýrům a pokrmům z bílého masa.'),
+(5, 11, 'WHITE', 'Pálava', 'Pálava je ušlechtilá aromatická odrůda vzniklá na Moravě křížením Tramínu červeného a Mülleru Thurgau. Je typická svou bohatou vůní muškátu, růží a tropického ovoce. Chuť bývá plná, kulatá a jemně nasládlá, s harmonickou kyselinkou. Pálava je často vyráběna jako polosuché nebo polosladké víno, které vyniká svou svůdnou vůní a dlouhou dochutí. Je to víno vhodné k dezertům, aromatickým sýrům nebo k samostatnému vychutnání při zvláštních příležitostech.'),
+(6, 12, 'WHITE', 'Müller Thurgau', 'Müller Thurgau je lehká a svěží bílá odrůda, vyšlechtěná ve Švýcarsku křížením Ryzlinku rýnského a Madeleine Royale. Na Moravě je velmi rozšířená díky své ranosti a spolehlivému výnosu. Vína z této odrůdy mají jemné aroma květin a muškátu s tóny broskví či citrusů. Chuť je měkká, harmonická a příjemně ovocná, často s nižším obsahem kyselin. Je ideálním vínem pro každodenní pití, obzvláště v mladém stavu, kdy vyniká svou svěžestí a lehkostí.'),
+(7, 13, 'WHITE', 'Sauvignon', 'Sauvignon je celosvětově uznávaná aromatická bílá odrůda, která se na Moravě těší velké oblibě. Je charakteristická výraznou vůní po černém rybízu, angreštu, broskví či kopřivách. Chuť bývá svěží, plná života a doprovázená výraznou kyselinkou, která vínu dodává energii a eleganci. Podle polohy vinohradu může být Sauvignon jemný a květinový, nebo naopak zemitější a minerální. Výborně se hodí k rybám, kozím sýrům i lehkým zeleninovým pokrmům.'),
+(8, 14, 'WHITE', 'Ryzlink Rýnský', 'Ryzlink rýnský patří mezi nejvšestrannější a nejuznávanější bílé odrůdy světa. Na severu Čech i na Moravě poskytuje vína s výraznou kyselinkou, dlouhověkostí a komplexní aromatikou. Typické jsou tóny limetky, meruněk, lipového květu a minerality. S věkem víno získává na hloubce a rozvíjí medové a petrolejové tóny. Ryzlink rýnský je ideálním vínem k archivaci i gurmánským pokrmům – od ryb po kořeněná jídla. Každý ročník dokáže překvapit svou jedinečnou harmonií a elegancí.');
 
 -- WINE_ROW
 INSERT INTO WINE_ROW (CODE, ID_VINEYARD, ID_WINE_VARIETY, HEAD_COUNT, PLANTING_YEAR)
 VALUES
-(1, 1, 1, 200, 2015),
-(1, 2, 2, 150, 2018),
-(1, 3, 3, 100, 2017);
+(1, 1, 4, 185, 2006),
+(2, 1, 5, 172, 2010),
+(3, 1, 3, 156, 2012),
+(4, 1, 4, 198, 2016),
+(5, 1, 5, 145, 2018),
+(1, 2, 1, 210, 2009),
+(2, 2, 6, 198, 2011),
+(3, 2, 7, 165, 2014),
+(4, 2, 1, 230, 2018),
+(5, 2, 6, 187, 2020),
+(1, 3, 8, 175, 2000),
+(2, 3, 2, 162, 2002),
+(3, 3, 8, 189, 2008),
+(4, 3, 2, 143, 2013),
+(5, 3, 8, 168, 2019);
 
 -- Treatment table 
 INSERT INTO TREATMENT (ID_TASK, CATEGORY, NAME, QUANTITY, UNIT)
@@ -396,11 +420,13 @@ VALUES
 (3, 'Herbicide', 'Weed Control', 5.0, 'liters');
 
 -- Harvest Table
-INSERT INTO HARVEST (ID_TASK, ID_VINEYARD, ID_WINE_VARIETY, ID_WINEGROWER, ID_WINE, WEIGHT, SUGAR_CONTENT)
+INSERT INTO HARVEST (ID_TASK, ID_VINEYARD, ID_WINE_VARIETY, ID_HARVEST_CONFIRMER, ID_WINE, WEIGHT, SUGAR_CONTENT)
 VALUES
 (1, 1, 1, 3, 1, 1200.5, 24.3),
 (2, 2, 2, 2, 2, 850.0, 22.1),
-(3, 3, 3, 1, 3, 1100.3, 20.5);
+(3, 3, 3, 1, 3, 1100.3, 20.5),
+(4, 1, 1, NULL, NULL, NULL, NULL),
+(5, 2, 2, 2, NULL, 900.0, 23.0);
 
 -- BOTTLING table 
 INSERT INTO BOTTLING (ID_TASK, ID_WINE, BOTTLES_COUNT, BOTTLE_VOLUME)

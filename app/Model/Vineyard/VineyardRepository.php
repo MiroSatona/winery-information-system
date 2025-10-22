@@ -56,6 +56,36 @@ final class VineyardRepository
         return $vineyards;
     }
 
+    public function fetchById(int $id): ?Vineyard
+    {
+        $row = $this->database->table('VINEYARD')->get($id);
+        if ($row === null) {
+            return null;
+        }
+
+        // Access PICTURE data by left join
+        $picture = $row->ref('PICTURE', 'ID_PICTURE');
+        $image = null;
+        if ($picture) {
+            $image = new Image(
+                $picture->ID,
+                $picture->LINK,
+                $picture->IMAGE_NAME,
+                $picture->DESCRIPTION
+            );
+        }
+
+        return new Vineyard(
+            $row->ID,
+            (bool)$row->ACTIVE,
+            $row->NAME,
+            $row->LOCATION,
+            $image,
+            $row->DESCRIPTION,
+            $row->YEAR
+        );
+    }
+
     /**
      * @return Vineyard[]
      */

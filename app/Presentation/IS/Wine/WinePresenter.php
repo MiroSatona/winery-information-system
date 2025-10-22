@@ -11,10 +11,10 @@ use App\Model\Security\Role;
 use App\Model\Wine\WineRepository;
 use App\Model\Wine\Wine;
 use App\Model\Image\ImageRepository;
+use App\Model\Validation\ValidationDefinitions;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
 use Nette\Application\UI\Form;
-use App\Model\Validation\ValidationDefinitions;
 
 final class WinePresenter extends BasePresenter
 {
@@ -252,4 +252,128 @@ final class WinePresenter extends BasePresenter
         // doto 
     }
     
+
+    public function renderProduce(): void
+    {
+        // todo
+    }
+
+    public function createComponentHarvestSelectionForm(): Form
+    {
+        $form = new Form();
+
+        /** @var Harvest[] $harvests */
+        $harvests = $this->wineRepository->fetchAllHarvestsReadyForProduction();
+        $harvestOptions = [];
+        
+        foreach ($harvests as $harvest) {
+            /** @var Harvest $harvest */
+            $harvestOptions[$harvest->getId()] = 
+            "Sklizeň " . $harvest->getWineVariety()->getName() . 
+            " | " . $harvest->getVineyard()->getName() .
+            " | " . $harvest->getExecutionTimestamp()->format('d.m.Y') .
+            " | " . ($harvest->getWeight()) . " kg" .
+            " | " . ($harvest->getSugarContent()) . " °KMW";
+        }
+
+        $form->addSelect('harvest', 'Sklizeň', $harvestOptions)
+            ->setHtmlAttribute('placeholder', 'Vyberte sklizeň ...')
+            ->setHtmlAttribute('class', 'form-select');
+        
+        $form->addSubmit('addHarvest', 'Přidat')
+            ->setHtmlAttribute('class', 'btn btn-primary mt-2');
+
+        $form->onSuccess[] = [$this, 'harvestSelectionFormSucceeded'];
+
+        return $form;
+    }
+
+    public function harvestSelectionFormSucceeded(Form $form, \stdClass $values): void
+    {
+        // todo
+    }
+
+
+    public function handleDeleteHarvestFromProduction(int $harvestId): void
+    {
+        // todo
+    }
+
+    public function createComponentProduceWineForm(): Form
+    {
+        $form = new Form();
+
+        // improve this form to use some default values
+
+        $form->addText('name', 'Název vína')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte název vína.');
+
+        $form->addInteger('year', 'Ročník')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte ročník vína.')
+            ->setValue(date('Y'))
+            ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
+            ->addRule(Form::Max, 'Ročník nemůže být větší než aktuální rok', date('Y'));
+        
+        $form->addInteger('alcoholPercentage', 'Obsah alkoholu (%)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte obsah alkoholu ve víně.')
+            ->addRule(Form::Min, 'Obsah alkoholu nemůže být menší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MIN)
+            ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
+
+
+        $form->addSelect('type', 'Typ vína', [
+            'DRY' => 'Suché',
+            'HALF_DRY' => 'Polosuché',
+            'HALF_SWEET' => 'Polosladké',
+            'SWEET' => 'Sladké',
+        ])
+            ->setValue('DRY')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte typ vína.');
+        
+        $form->addSelect('grade', 'Přívlastek vína', [
+            'NONE' => 'Bez přívlastku',
+            'CABINET' => 'Kabinetní víno',
+            'LATE' => 'Pozdní sběr',
+            'GRAPE_SELECTION' => 'Výběr z hroznů',
+            'BERRY_SELECTION' => 'Výběr z bobulí',
+            'ICE' => 'Ledové víno',
+            'STRAW' => 'Slámové víno',
+        ])
+            ->setValue('NONE')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte přívlastek vína.');
+        
+        $form->addInteger('volume', 'Objem výroby (v litrech)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte objem výroby vína v litrech.')
+            ->addRule(Form::Min, 'Objem výroby nemůže být menší než %d litrů.', ValidationDefinitions::VOLUME_MIN)
+            ->addRule(Form::Max, 'Objem výroby nemůže být větší než %d litrů.', ValidationDefinitions::VOLUME_MAX);
+        
+        $form->addFloat('leftSugar', 'Zbytkový cukr (g/l)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte hodnotu zbytkového cukru ve víně.')
+            ->addRule(Form::Min, 'Zbytkový cukr nemůže být menší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MIN)
+            ->addRule(Form::Max, 'Zbytkový cukr nemůže být větší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MAX);
+
+        $form->addFloat('acidContents', 'Kyseliny (g/l)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte hodnotu kyselin ve víně.')
+            ->addRule(Form::Min, 'Kyseliny nemohou být menší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MIN)
+            ->addRule(Form::Max, 'Kyseliny nemohou být větší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MAX);
+
+        $form->addSubmit('produce', 'Vyrobit víno')
+            ->setHtmlAttribute('class', 'btn btn-primary mt-3');
+
+        $form->onSuccess[] = [$this, 'produceWineFormSucceeded'];
+
+        return $form;
+    }
+
+    public function produceWineFormSucceeded(Form $form, \stdClass $values): void
+    {
+        // todo
+    }
 }

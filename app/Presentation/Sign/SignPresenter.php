@@ -169,6 +169,10 @@ final class SignPresenter extends BasePresenter
         $form->addSubmit('send', 'Registrovat se')
             ->setHtmlAttribute('class', 'btn btn-primary btn-lg w-100 fw-bold');
 
+        $form->onError[] = function (Form $form) {
+            $this->flashMessage('Formulář není správně vyplněn.', FlashMsgType::ERROR->value);
+        };
+
         // Add Bootstrap classes to labels
         $form->onRender[] = function ($form) {
             foreach ($form->getControls() as $control) {

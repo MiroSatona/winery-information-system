@@ -3,6 +3,11 @@
 https://www.cestazavinem.cz/wp-content/uploads/2019/04/tramin-cerveny.jpg
 https://www.cestazavinem.cz/wp-content/uploads/2019/11/Modry-Portugal.jpg
 https://www.cestazavinem.cz/wp-content/uploads/2021/08/Irsai-oliver.jpg
+https://www.cestazavinem.cz/wp-content/uploads/2019/11/Ryzlink-vlassky.jpg
+https://www.cestazavinem.cz/wp-content/uploads/2019/03/palava.png
+https://www.cestazavinem.cz/wp-content/uploads/2019/11/mueller_thurgau.jpg
+https://www.cestazavinem.cz/wp-content/uploads/2019/04/Sauvignon.jpg
+https://www.cestazavinem.cz/wp-content/uploads/2019/05/Ryzlink-rynsky.jpg
 
 https://www.levne-oploceni.cz/files/ckeditor//poradna/vinohrad_sloupky.jpg
 https://vinarstvipaulus.cz/wp-content/uploads/2024/01/vinohrad_podzim_2020-9102-scaled.jpg
