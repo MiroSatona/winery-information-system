@@ -273,7 +273,7 @@ final class WinePresenter extends BasePresenter
             " | " . $harvest->getVineyard()->getName() .
             " | " . $harvest->getExecutionTimestamp()->format('d.m.Y') .
             " | " . ($harvest->getWeight()) . " kg" .
-            " | " . ($harvest->getSugarContent()) . " °KMW";
+            " | " . ($harvest->getSugarContent()) . " °NM";
         }
 
         $form->addSelect('harvest', 'Sklizeň', $harvestOptions)
