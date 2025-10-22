@@ -294,6 +294,13 @@ class ProfilePresenter extends BasePresenter
         $form->addError($resultMessage);
     }
 
+    /**
+    * formError
+    * Method for handling form errors.
+    *
+    * @param Form $form Form where the error was detected.
+    * @return void
+    */
     public function formError(Form $form): void
     {
         $errors = $form->getErrors();

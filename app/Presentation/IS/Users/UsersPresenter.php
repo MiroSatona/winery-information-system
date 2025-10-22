@@ -22,6 +22,8 @@ final class UsersPresenter extends BasePresenter
     private string $pattern = '';
     /** @var string $role Role for filtering users on the dashboard */
     private string $role = '';
+    /** @var string $state State for filtering users on the dashboard */
+    private string $state = '';
 
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions)
     {
@@ -67,6 +69,15 @@ final class UsersPresenter extends BasePresenter
         ->setHtmlAttribute('class', 'form-select')
         ->setHtmlAttribute('style', 'width: 180px;');
 
+        // Set selection bar for filtering by state -> active/deactivated
+        $form->addSelect('state', '', [
+            '' => 'Všichni uživatelé',
+            'active' => 'Aktivní uživatelé',
+            'inactive' => 'Neaktivní uživatelé',
+        ])
+        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('style', 'width: 180px;');
+
         // Button for submitting the form
         $form->addSubmit('send', 'Hledat')
             ->setHtmlAttribute('class', 'btn btn-primary');
@@ -80,6 +91,7 @@ final class UsersPresenter extends BasePresenter
 
         // Call the method filterFormSucceeded on form success
         $form->onSuccess[] = [$this, 'filterFormSucceeded'];
+        $form->onError[] = [$this, 'formError'];
 
         return $form;
     }
@@ -164,6 +176,7 @@ final class UsersPresenter extends BasePresenter
     
         // Call the method addFormSucceeded on form success
         $form->onSuccess[] = [$this, 'addFormSucceeded'];
+        $form->onError[] = [$this, 'formError'];
 
         return $form;
     }
@@ -175,7 +188,7 @@ final class UsersPresenter extends BasePresenter
      */
     public function renderDashboard(): void
     {   
-        $this->template->users = $this->userRepository->fetchByAdmin($this->role, $this->pattern);
+        $this->template->users = $this->userRepository->fetchByAdmin($this->role, $this->pattern, $this->state);
     }
 
     /**
@@ -189,6 +202,7 @@ final class UsersPresenter extends BasePresenter
     {   
         $this->pattern = $values->pattern;
         $this->role = $values->role;
+        $this->state = $values->state;
     }
 
     
@@ -234,20 +248,38 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * handleDeleteUser
-     * Method for handling delete user.
+     * handleDeactivateUser
+     * Method for handling deactivate user.
      *
-     * @param integer $userId Id of the user to delete.
+     * @param integer $userId Id of the user to deactivate.
      * @return void
      */
-    public function handleDeleteUser(int $userId): void{
-        /** @var string $deleteResult Result of the delete operation */
-        $error = $this->userRepository->deleteUser($userId);
+    public function handleDeactivateUser(int $userId): void{
+        /** @var string $deactivateResult Result of the deactivate operation */
+        $deactivateResult = $this->userRepository->deactivateUser($userId);
 
-        if(!$error) {
-            $this->flashMessage('Uživatel byl úspěšně odstraněn.', 'success');
+        if(!$deactivateResult) {
+            $this->flashMessage('Uživatel byl úspěšně deaktivován.', 'success');
         } else {
-            $this->flashMessage($error, 'error');
+            $this->flashMessage($deactivateResult, 'error');
+        }
+
+    }
+    /**
+     * handleActivateUser
+     * Method for handling activate user.
+     *
+     * @param integer $userId Id of the user to activate.
+     * @return void
+     */
+    public function handleActivateUser(int $userId): void{
+        /** @var string $activateResult Result of the activate operation */
+        $activateResult = $this->userRepository->activateUser($userId);
+
+        if(!$activateResult) {
+            $this->flashMessage('Uživatel byl úspěšně aktivován.', 'success');
+        } else {
+            $this->flashMessage($activateResult, 'error');
         }
 
     }
@@ -373,6 +405,7 @@ final class UsersPresenter extends BasePresenter
             ->onClick[] = [$this, 'resetPassword'];
 
         $form->onSuccess[] = [$this, 'editFormSucceeded'];
+        $form->onError[] = [$this, 'formError'];
 
         return $form;
     }
@@ -473,7 +506,24 @@ final class UsersPresenter extends BasePresenter
         }
 
         $this->redirect('Users:dashboard');
-        
+   }
+
+   /**
+    * formError
+    * Method for handling form errors.
+    *
+    * @param Form $form Form where the error was detected.
+    * @return void
+    */
+   public function formError(Form $form): void
+   {
+      $errors = $form->getErrors();
+
+        if (!empty($errors)) {
+            $this->flashMessage($errors[0], 'error');
+        } else {
+            $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
+        }
    }
 
 }

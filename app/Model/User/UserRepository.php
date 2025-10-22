@@ -106,13 +106,14 @@ class UserRepository
 
     /**
      * fetchByAdmin
-     * Method for fetching users based on role and search pattern from form in the admin space in the system
+     * Method for fetching users based on role, state and search pattern from form in the admin space in the system
      * 
      * @param string $role Filtering role.
      * @param string $pattern Search pattern for full name or login.
+     * @param string $state Filtering by state -> active/inactive users.
      * @return User[] Array of instances of user.
      */
-    public function fetchByAdmin(string $role, string $pattern): array{
+    public function fetchByAdmin(string $role, string $pattern, string $state): array{
         
         /** @var string|null $roleColumn Role column name for where in SQL query */
         $roleColumn = null;
@@ -139,24 +140,31 @@ class UserRepository
         $queryResult = [];
 
         if(!$pattern && !$roleColumn){ // Any filtering is not provided -> fetch all users
-            return $this->fetchAll();
+            $queryResult = $this->database->table('USER');
         }
         else if(!$pattern && $roleColumn){ // Fetch independently by role
-            $queryResult = $this->database->table('USER')->where($roleColumn, true)->fetchAll();
+            $queryResult = $this->database->table('USER')->where($roleColumn, true);
         }
         else if($pattern && !$roleColumn){ // Fetch independently by pattern from searchbar
             $regex = '%' . $pattern . '%';
-            $queryResult = $this->database->table('USER')
-                ->where('NAME LIKE ? OR SURNAME LIKE ? OR USERNAME LIKE ?', $regex, $regex, $regex)
-                ->fetchAll();
+            $queryResult = $this->database->table('USER')->where('NAME LIKE ? OR SURNAME LIKE ? OR USERNAME LIKE ?', $regex, $regex, $regex);
         }
         else{ // Fetch independently on the pattern and role
             $regex = '%' . $pattern . '%';
             $queryResult = $this->database->table('USER')
                 ->where($roleColumn, true)
-                ->where('NAME LIKE ? OR SURNAME LIKE ? OR USERNAME LIKE ?', $regex, $regex, $regex)
-                ->fetchAll();
+                ->where('NAME LIKE ? OR SURNAME LIKE ? OR USERNAME LIKE ?', $regex, $regex, $regex);
         }
+
+        // Further filter by state if provided
+        if($state === 'active'){
+            $queryResult = $queryResult->where('ACTIVE', true);
+        }
+        else if($state === 'inactive'){
+            $queryResult = $queryResult->where('ACTIVE', false);
+        }
+
+        $result = $queryResult->fetchAll();
 
         /** @var User[] $users Array of user instances which is get by fetching by filters */
         $users = [];
@@ -165,7 +173,7 @@ class UserRepository
             $users[] = new User(
                 $userRow->ID,
                 $userRow->NAME,
-                (bool)$userRow->STATE,
+                (bool)$userRow->ACTIVE,
                 $userRow->SURNAME,
                 $userRow->USERNAME,
                 $userRow->EMAIL,
@@ -270,13 +278,13 @@ class UserRepository
     }
 
     /**
-     * deleteUser
-     * Method for deleting user from the database.
+     * deactivateUser
+     * Method for deactivating user in the database.
      *
-     * @param integer $userId Id of the user to delete.
+     * @param integer $userId Id of the user to deactivate.
      * @return string Error message or empty string on success.
      */
-    public function deleteUser(int $userId): string
+    public function deactivateUser(int $userId): string
     {   
         /** @var string $error Error message */
         $error='';
@@ -290,21 +298,48 @@ class UserRepository
         $deletedUser = $this->database->table('USER')->where('ID', $userId)->where('ROLE_ADMIN', true)->fetch();
 
         if (count($adminUsers) === 1 && $deletedUser) {
-            $error = 'Nelze smazat posledního administrátora.';
+            $error = 'Nelze deaktivovat jediného administrátora.';
             $this->database->rollBack();
             return $error;
         }
 
-        /** Delete user  */
-
-        $this->database->table('USER')->where('ID', $userId)->delete();
+        /** Deactivate user  */
+        $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => false]);
         $this->database->commit();
         return $error;
 
         }
         catch (\Exception $exception) {
             $this->database->rollBack();
-            $error = 'Chyba při mazání uživatele: ' . $exception->getMessage();
+            $error = 'Chyba při deaktivaci uživatele: ' . $exception->getMessage();
+            return $error;
+        }
+    }
+
+    /**
+     * activateUser
+     * Method for activating user in the database.
+     *
+     * @param integer $userId Id of the user to activate.
+     * @return string Error message or empty string on success.
+     */
+    public function activateUser(int $userId): string
+    {   
+        /** @var string $error Error message */
+        $error='';
+        $this->database->beginTransaction();
+
+        try 
+        {
+        /** Activate user  */
+        $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
+        $this->database->commit();
+        return $error;
+
+        }
+        catch (\Exception $exception) {
+            $this->database->rollBack();
+            $error = 'Chyba při aktivaci uživatele: ' . $exception->getMessage();
             return $error;
         }
     }
