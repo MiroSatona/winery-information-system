@@ -15,6 +15,7 @@ use App\Model\Vineyard\VineyardRepository;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Database\Explorer;
 use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class WineRepository
 {
@@ -47,62 +48,6 @@ final class WineRepository
         }
 
         return $wines;
-    }
-
-    /**
-     * Undocumented function
-     *
-     * @return Harvest[]
-     */
-    public function fetchAllHarvestsReadyForProduction(): array
-    {
-        // harvest needs to have state FINISHED, cannot be yet used and it must have WINEGROWER id set (not null)
-        $result = $this->db->table('HARVEST')
-            ->joinWhere('TASK', 'TASK.ID = ID')
-            ->where('STATE', 'FINISHED')
-            ->where('ID_WINE IS NULL')
-            ->where('ID_HARVEST_CONFIRMER IS NOT NULL')
-            ->select('HARVEST.*, TASK.*')
-            ->fetchAll();
-
-        /**$result = $this->db->table('TASK')
-            ->where('STATE', 'FINISHED')
-            ->joinWhere('HARVEST', 'HARVEST.ID = TASK.ID')
-            ->where('HARVEST.ID_WINE IS NULL')
-            ->where('HARVEST.ID_WINEGROWER IS NOT NULL')
-            ->fetchAll();**/
-        
-        /** @var Harvest[] $harvests */
-        $harvests = [];
-        foreach ($result as $row) {
-            $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
-            $wineVariety = $this->wineVarietyRepository->fetchById((int)$row->ID_WINE_VARIETY);
-            if ($vineyard === null || $wineVariety === null) {
-                Debugger::log("Failed to fetch associated Vineyard or WineVariety for Harvest ID " . $row->ID);
-                continue;
-            }
-
-            $harvests[] = new Harvest(
-                $row->ID,
-                $row->NAME,
-                TaskState::from((string)$row->STATE),
-                $row->CREATION_TIMESTAMP,
-                $row->LAST_CHANGE_TIMESTAMP,
-                $row->PLANNED_EXECUTION_TIMESTAMP,
-                $row->EXECUTION_TIMESTAMP,
-                $row->NOTE,
-                ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
-                ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
-                $vineyard,
-                $wineVariety,
-                ($row->ID_HARVEST_CONFIRMER !== null) ? (int)$row->ID_HARVEST_CONFIRMER : null,
-                ($row->ID_WINE !== null) ? (int)$row->ID_WINE : null,
-                ($row->WEIGHT !== null) ? (float)$row->WEIGHT : null,
-                ($row->SUGAR_CONTENT !== null) ? (float)$row->SUGAR_CONTENT : null
-            );
-        }
-    
-        return $harvests;
     }
 
     public function fetchAllWinesWithPattern(string $patternWines, string $patternType, string $patternGrade, string $patternState): array
@@ -206,7 +151,7 @@ final class WineRepository
             idLiquidator: $row->ID_LIQUIDATOR !== null ? (int) $row->ID_LIQUIDATOR : null,
             idSellApprover: $row->ID_SELL_APPROVER !== null ? (int) $row->ID_SELL_APPROVER : null,
             year: (int) $row->YEAR,
-            alcoholPercentage: (int) $row->ALCOHOL_PERCENTAGE,
+            alcoholPercentage: $row->ALCOHOL_PERCENTAGE,
             type: (string) $row->TYPE,
             color: (string) $row->COLOR,
             grade: (string) $row->GRADE,
@@ -334,5 +279,66 @@ final class WineRepository
             $this->db->rollBack();
             throw $e;
         }
+    }
+
+    /**
+     * Produce wine from given harvests.
+     *
+     * @param Wine $wine
+     * @param Harvest[] $harvests
+     * @return boolean
+     */
+    public function produceWine(Wine $wine, array $harvests): bool
+    {
+        try {
+            $this->db->transaction(function () use ($wine, $harvests) {
+                // check that all harvests are correct and ready for production
+                foreach ($harvests as $harvest) {
+                    $harvestNew = $this->db->table('HARVEST')
+                        ->where('ID_TASK', $harvest->getId())
+                        ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+                        ->select('TASK.STATE, HARVEST.ID_HARVEST_CONFIRMER, HARVEST.ID_WINE')
+                        ->fetch();
+                    if ($harvestNew === null || $harvestNew->STATE !== TaskState::FINISHED->value || $harvestNew->ID_HARVEST_CONFIRMER === null || $harvestNew->ID_WINE !== null) {
+                        throw new \Exception('One of the harvests is not ready for wine production.');
+                    }
+                }
+                // insert new wine
+                $result = $this->db->table('WINE')->insert([
+                    'WINE_NAME' => $wine->getName(),
+                    'YEAR' => $wine->getYear(),
+                    'ALCOHOL_PERCENTAGE' => $wine->getAlcoholPercentage(),
+                    'TYPE' => $wine->getType(),
+                    'COLOR' => $wine->getColor(),
+                    'GRADE' => $wine->getGrade(),
+                    'STATE' => 'PRODUCTION',
+                    'VOLUME' => $wine->getVolume(),
+                    'LEFT_SUGAR' => $wine->getLeftSugar(),
+                    'ACID_CONTENTS' => $wine->getAcidContents(),
+                    'PRODUCTION_NOTE' => $wine->getProductionNote(),
+                ]);
+
+                if ($result === null) {
+                    throw new \Exception('Failed to insert new wine into the database.');
+                }
+                // link harvests
+                foreach ($harvests as $harvest) {
+                    $this->db->table('HARVEST')
+                        ->where('ID_TASK', $harvest->getId())
+                        ->update([
+                            'ID_WINE' => $result->ID,
+                        ]);
+                }
+
+                return true;
+                
+
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to produce wine: ' . $e->getMessage() . ' | Wine: ' . $wine->getName(), ILogger::ERROR);
+            return false;
+        }
+
+        return true;
     }
 }

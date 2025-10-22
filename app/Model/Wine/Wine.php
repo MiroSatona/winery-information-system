@@ -15,11 +15,11 @@ class Wine
     private float $bottleVolume;
       
     public function __construct(
-        public int $id,
+        public ?int $id,
         public ?int $idLiquidator,
         public ?int $idSellApprover,
         public int $year,
-        public int $alcoholPercentage,
+        public float $alcoholPercentage,
         public string $type,
         public string $color,
         public string $grade,
@@ -63,7 +63,7 @@ class Wine
         return match ($color) {
             'WHITE' => 'Bílé',
             'RED' => 'Červené',
-            'PINK' => 'Růžové',
+            'ROSE' => 'Růžové',
             default => $color,
         };
     }
@@ -119,7 +119,7 @@ class Wine
         return $this->img;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -129,7 +129,7 @@ class Wine
         return $this->year;
     }
 
-    public function getAlcoholPercentage(): int
+    public function getAlcoholPercentage(): float
     {
         return $this->alcoholPercentage;
     }

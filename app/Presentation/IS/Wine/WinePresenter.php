@@ -11,6 +11,7 @@ use App\Model\Security\Role;
 use App\Model\Wine\WineRepository;
 use App\Model\Wine\Wine;
 use App\Model\Image\ImageRepository;
+use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
@@ -25,7 +26,8 @@ final class WinePresenter extends BasePresenter
 
     public function __construct(
         private WineRepository $wineRepository,
-        private ImageRepository $imageRepository
+        private ImageRepository $imageRepository,
+        private HarvestRepository $harvestRepository
     ) {
         parent::__construct();
     }
@@ -248,14 +250,15 @@ final class WinePresenter extends BasePresenter
     }
 
     public function renderEdit(int $wineId): void
-    {
-        // doto 
+    {   
+        // todo
     }
     
 
     public function renderProduce(): void
     {
-        // todo
+        $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
+        $this->template->harvestsInProduction = $harvests ?? [];
     }
 
     public function createComponentHarvestSelectionForm(): Form
@@ -263,11 +266,22 @@ final class WinePresenter extends BasePresenter
         $form = new Form();
 
         /** @var Harvest[] $harvests */
-        $harvests = $this->wineRepository->fetchAllHarvestsReadyForProduction();
+        $harvests = $this->harvestRepository->fetchAllHarvestsReadyForProduction();
         $harvestOptions = [];
+
+        $harvestsSelected = $this->getSession('wineIS')->get('harvestsInProduction');
+        if ($harvestsSelected === null) {
+            $harvestsSelected = [];
+        }
         
         foreach ($harvests as $harvest) {
             /** @var Harvest $harvest */
+            foreach ($harvestsSelected as $selectedHarvest) {
+                if ($selectedHarvest->getId() === $harvest->getId()) {
+                    continue 2; // Skip already selected harvests
+                }
+            }
+
             $harvestOptions[$harvest->getId()] = 
             "Sklizeň " . $harvest->getWineVariety()->getName() . 
             " | " . $harvest->getVineyard()->getName() .
@@ -279,7 +293,7 @@ final class WinePresenter extends BasePresenter
         $form->addSelect('harvest', 'Sklizeň', $harvestOptions)
             ->setHtmlAttribute('placeholder', 'Vyberte sklizeň ...')
             ->setHtmlAttribute('class', 'form-select');
-        
+
         $form->addSubmit('addHarvest', 'Přidat')
             ->setHtmlAttribute('class', 'btn btn-primary mt-2');
 
@@ -290,13 +304,61 @@ final class WinePresenter extends BasePresenter
 
     public function harvestSelectionFormSucceeded(Form $form, \stdClass $values): void
     {
-        // todo
+        $harvestId = (int) $values->harvest;
+        $harvest = $this->harvestRepository->fetchById($harvestId);
+        if ($harvest === null) {
+            $this->flashMessage('Sklizeň nebyla nalezena', 'error');
+            $this->redirect('this');
+        }
+
+        $session = $this->getSession('wineIS');
+        $harvestsInProduction = $session->get('harvestsInProduction');
+        if ($harvestsInProduction === null) {
+            $harvestsInProduction = [];
+        }
+
+        // Check if harvest is already in the list
+        foreach ($harvestsInProduction as $existingHarvest) {
+            if ($existingHarvest->getId() === $harvest->getId()) {
+                $this->flashMessage('Tato sklizeň je již přidána pro výrobu vína.', 'warning');
+                $this->redirect('this');
+            }
+        }
+
+        $harvestsInProduction[] = $harvest;
+        $session->set('harvestsInProduction', $harvestsInProduction);
+
+        $this->flashMessage('Sklizeň byla úspěšně přidána pro výrobu vína.', 'success');
+        $this->redirect('this');
     }
 
 
-    public function handleDeleteHarvestFromProduction(int $harvestId): void
+    public function handleRemoveHarvestFromProduction(int $harvestId): void
     {
-        // todo
+        $session = $this->getSession('wineIS');
+        $harvestsInProduction = $session->get('harvestsInProduction');
+        if ($harvestsInProduction === null) {
+            $harvestsInProduction = [];
+        }
+
+        $updatedHarvests = [];
+        $found = false;
+        foreach ($harvestsInProduction as $harvest) {
+            if ($harvest->getId() === $harvestId) {
+                $found = true;
+                continue; // Skip the harvest to be deleted
+            }
+            $updatedHarvests[] = $harvest;
+        }
+
+        if ($found) {
+            $session->set('harvestsInProduction', $updatedHarvests);
+            $this->flashMessage('Sklizeň byla úspěšně odebrána z výroby vína.', 'success');
+        } else {
+            $this->flashMessage('Sklizeň nebyla nalezena ve výrobě vína.', 'error');
+        }
+
+        $this->redirect('this');
     }
 
     public function createComponentProduceWineForm(): Form
@@ -316,8 +378,9 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, 'Ročník nemůže být větší než aktuální rok', date('Y'));
         
-        $form->addInteger('alcoholPercentage', 'Obsah alkoholu (%)')
+        $form->addFloat('alcoholPercentage', 'Obsah alkoholu (%)')
             ->setHtmlAttribute('class', 'form-control')
+            ->setValue(13.5)
             ->setRequired('Zadejte obsah alkoholu ve víně.')
             ->addRule(Form::Min, 'Obsah alkoholu nemůže být menší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MIN)
             ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
@@ -332,6 +395,15 @@ final class WinePresenter extends BasePresenter
             ->setValue('DRY')
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte typ vína.');
+
+        $form->addSelect('color', 'Barva vína', [
+            'WHITE' => 'Bílé',
+            'ROSE' => 'Růžové',
+            'RED' => 'Červené',
+        ])
+            ->setValue('WHITE')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte barvu vína.');
         
         $form->addSelect('grade', 'Přívlastek vína', [
             'NONE' => 'Bez přívlastku',
@@ -364,6 +436,10 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Min, 'Kyseliny nemohou být menší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MIN)
             ->addRule(Form::Max, 'Kyseliny nemohou být větší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MAX);
 
+        $form->addTextArea('productionNote', 'Poznámka k výrobě vína')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setRequired('Zadejte poznámku k výrobě vína.');
+
         $form->addSubmit('produce', 'Vyrobit víno')
             ->setHtmlAttribute('class', 'btn btn-primary mt-3');
 
@@ -374,6 +450,51 @@ final class WinePresenter extends BasePresenter
 
     public function produceWineFormSucceeded(Form $form, \stdClass $values): void
     {
-        // todo
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K výrobě vína nemáte dostatečná oprávnění.', 'error');
+            $this->redirect(':IS:Wine:dashboard');
+        }
+
+        $harvestsInProduction = $this->getSession('wineIS')->get('harvestsInProduction');
+        if ($harvestsInProduction === null || count($harvestsInProduction) === 0) {
+            $this->flashMessage('Pro výrobu vína musíte vybrat alespoň jednu sklizeň.', 'error');
+            $this->redirect('this');
+        }
+
+        /** @var Wine $wine */
+        $wine = new Wine(
+            id: null,
+            idLiquidator: null,
+            idSellApprover: null,
+            year: (int) $values->year,
+            alcoholPercentage: (float) $values->alcoholPercentage,
+            type: (string) $values->type,
+            color: (string) $values->color,
+            grade: (string) $values->grade,
+            state: WineState::production->value,
+            volume: (int) $values->volume,
+            bottlePrice: null,
+            currentPrice: null,
+            bottlesLeft: null,
+            leftSugar: (int) $values->leftSugar,
+            acidContents: (int) $values->acidContents,
+            salesDescription: null,
+            productionNote: (string) $values->productionNote,
+            name: (string) $values->name,
+            img: null,
+            variety: [],
+            varieties: []
+        );
+
+        $result = $this->wineRepository->produceWine($wine, $harvestsInProduction);
+        if ($result) {
+            // Clear session harvests
+            $this->getSession('wineIS')->set('harvestsInProduction', []);
+            $this->flashMessage('Víno bylo úspěšně vyrobeno.', 'success');
+            $this->redirect(':IS:Wine:dashboard');
+        } else {
+            $this->flashMessage('Při výrobě vína došlo k chybě.', 'error');
+            $this->redirect('this');
+        }
     }
 }
