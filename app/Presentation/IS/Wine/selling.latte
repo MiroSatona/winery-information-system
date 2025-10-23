@@ -19,9 +19,16 @@
             <div class="card-body p-4">
                 {* === WINE INFO === *}
                 <div class="d-flex align-items-center mb-4">
-                    <img src="{asset $imageRepository->getPathForImage($wine->img)}"
-                         alt="{$wine->name}" class="img-thumbnail me-3 shadow-sm"
-                         style="width: 100px; height: auto; object-fit: cover;">
+                    {if $wine->img !== null}
+                        <img src="{asset $imageRepository->getPathForImage($wine->img)}"
+                            alt="{$wine->name}" class="img-thumbnail me-3 shadow-sm"
+                            style="width: 100px; height: auto; object-fit: cover;">
+                    {else}
+                        <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded me-3"
+                            style="width: 100px; height: 100px;">
+                            <i class="fas fa-wine-bottle fa-2x text-muted"></i>
+                        </div>
+                    {/if}
                     <div>
                         <h5 class="fw-bold mb-1 text-primary">{$wine->name}</h5>
                         <small class="text-muted">Nastavte prodejní cenu a potvrďte zařazení vína do nabídky.</small>

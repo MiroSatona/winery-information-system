@@ -1,6 +1,9 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Model\Image;
+
 use Nette\Database\Explorer;
 use Nette\Http\FileUpload;
 

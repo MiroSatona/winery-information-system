@@ -7,5 +7,10 @@
 
 {block isMainPanel}
 
+    {control editWineForm}
+
+    <a href="{link 'Wine:show', $wine->getId()}" class="btn btn-outline-secondary mt-3">
+        <i class="fas fa-arrow-left me-2"></i>Zrušit
+    </a>
 
 {/block isMainPanel}

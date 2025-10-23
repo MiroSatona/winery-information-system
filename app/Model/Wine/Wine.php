@@ -28,8 +28,8 @@ class Wine
         public ?float $bottlePrice,
         public ?float $currentPrice,
         public ?int $bottlesLeft,
-        public ?int $leftSugar,
-        public ?int $acidContents,
+        public ?float $leftSugar,
+        public ?float $acidContents,
         public ?string $salesDescription,
         public string $productionNote,
         public string $name,
@@ -184,12 +184,12 @@ class Wine
         return $this->bottlePrice;
     }
 
-    public function getLeftSugar(): ?int
+    public function getLeftSugar(): ?float
     {
         return $this->leftSugar;
     }
 
-    public function getAcidContents(): ?int
+    public function getAcidContents(): ?float
     {
         return $this->acidContents;
     }
@@ -245,5 +245,8 @@ class Wine
         $this->bottleVolume = $bottleVolume;
     }
 
-
+    public function setImage(?Image $img): void
+    {
+        $this->img = $img;
+    }
 }

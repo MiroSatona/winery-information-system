@@ -10,7 +10,6 @@ use App\Model\Image\Image;
 use App\Model\Task\Harvest\Harvest;
 use App\Model\Task\TaskState;
 use App\Model\WineVariety\WineVarietyType;
-use App\Model\Vineyard\Vineyard;
 use App\Model\Vineyard\VineyardRepository;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Database\Explorer;
@@ -169,6 +168,32 @@ final class WineRepository
             variety: $varietyNames,
             varieties: $varietiesData
         );
+    }
+
+    public function updateWine(Wine $wine): bool
+    {
+        try {
+            return $this->db->transaction(function () use ($wine) {
+                $this->db->table('WINE')
+                    ->where('ID', $wine->id)
+                    ->update([
+                        'WINE_NAME' => $wine->getName(),
+                        'YEAR' => $wine->getYear(),
+                        'ALCOHOL_PERCENTAGE' => $wine->getAlcoholPercentage(),
+                        'TYPE' => $wine->getType(),
+                        'COLOR' => $wine->getColor(),
+                        'GRADE' => $wine->getGrade(),
+                        'VOLUME' => $wine->getVolume(),
+                        'LEFT_SUGAR' => $wine->getLeftSugar(),
+                        'ACID_CONTENTS' => $wine->getAcidContents(),
+                        'PRODUCTION_NOTE' => $wine->getProductionNote(),
+                    ]);
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to update wine: ' . $e->getMessage() . ' | Wine ID: ' . $wine->getId(), ILogger::ERROR);
+            return false;
+        }
     }
     
     public function getWineAllBottleCount(int $idWine) {
@@ -340,5 +365,86 @@ final class WineRepository
         }
 
         return true;
+    }
+
+    public function liquidateWine(int $wineId, int $userId): bool
+    {
+        try {
+            $this->db->transaction(function () use ($wineId, $userId) {
+                // check wine exists and is in production state
+                $wine = $this->db->table('WINE')
+                    ->where('ID', $wineId)
+                    ->fetch();
+                
+                if ($wine === null || $wine->STATE !== 'PRODUCTION') {
+                    throw new \Exception('Wine not found or not in production state.');
+                }
+
+                // update wine state to liquidated
+                $result = $this->db->table('WINE')
+                    ->where('ID', $wineId)
+                    ->update([
+                        'STATE' => 'LIQUIDATED',
+                        'ID_LIQUIDATOR' => $userId,
+                    ]);
+                if ($result === null) {
+                    throw new \Exception('Failed to update wine state to liquidated.');
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to liquidate wine ID ' . $wineId . ': ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
+
+        return true;
+    }
+
+    public function updateWineImage(int $wineId, ?Image $image): bool
+    {
+        try {
+            return $this->db->transaction(function () use ($wineId, $image) {
+                $row = $this->db->table('WINE')->get($wineId);
+                if ($row === null) {
+                    return false;
+                }
+               // Handle picture update or insertion
+                $pictureId = $row->ID_PICTURE;
+                if ($image !== null) {
+                    if ($pictureId !== null) {
+                        // Update existing picture
+                        $this->db->table('PICTURE')->where('ID', $pictureId)->update([
+                            'LINK' => $image->src,
+                            'IMAGE_NAME' => $image->name,
+                            'DESCRIPTION' => $image->description
+                        ]);
+                    } else {
+                        // Insert new picture
+                        $pictureData = [
+                            'LINK' => $image->src,
+                            'IMAGE_NAME' => $image->name,
+                            'DESCRIPTION' => $image->description
+                        ];
+                        $picture = $this->db->table('PICTURE')->insert($pictureData);
+                        $pictureId = $picture->ID;
+                    }
+                } else {
+                    // If no image provided, remove existing picture reference
+                    if ($pictureId !== null) {
+                        $this->db->table('PICTURE')->where('ID', $pictureId)->delete();
+                        $pictureId = null;
+                    }
+                }
+                // Update wine record
+                $row->update([
+                    'ID_PICTURE' => $pictureId
+                ]);
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to update wine image for ID ' . $wineId . ': ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
     }
 }

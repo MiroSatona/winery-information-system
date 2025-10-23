@@ -16,8 +16,12 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineProduceData;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
+use App\Model\Image\Image;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Button;
+use Nette\Http\FileUpload;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class WinePresenter extends BasePresenter
 {
@@ -121,12 +125,11 @@ final class WinePresenter extends BasePresenter
     {
         $wine = $this->wineRepository->fetchWineById($wineId);
         if ($wine === null) {
-            $this->flashMessage('Víno nebylo nalezeno', 'error');
+            $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
         }
 
         $this->wineRepository->fetchBottlingInfoForWine($wine);
-        bdump($wine);
 
         $this->template->wine = $wine;
         $this->template->imageRepository = $this->imageRepository;
@@ -134,9 +137,34 @@ final class WinePresenter extends BasePresenter
         $this->template->WineState = WineState::class;
     }
 
+    public function handleLiquidate(int $wineId): void
+    {
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
+            $this->redirect('this');
+        }
+
+        if ($wine->state !== WineState::production->value) {
+            $this->flashMessage('Lze likvidovat pouze víno ve výrobě', FlashMsgType::ERROR->value);
+            $this->redirect('this');
+            return;
+        }
+
+        $result = $this->wineRepository->liquidateWine($wineId, $this->user->getId());
+        if ($result) {
+            $this->flashMessage('Víno bylo úspěšně zlikvidováno', FlashMsgType::SUCCESS->value);
+        } else {
+            $this->flashMessage('Při likvidaci vína došlo k chybě', FlashMsgType::ERROR->value);
+        }
+
+
+    }
+
     public function handleBottling(int $wineId): void
     {
-        // doto 
+        // todo
     }
 
     public function renderSelling(int $wineId): void
@@ -246,9 +274,291 @@ final class WinePresenter extends BasePresenter
         $this->redirect('Wine:dashboard');
     }
 
+    public function createComponentEditWineForm(): Form
+    {
+        $form = new Form();
+
+        $form->addText('name', 'Název vína')
+            ->addRule(Form::MinLength, 'Název vína musí mít alespoň %d znaky.', ValidationDefinitions::NAME_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Název vína může mít maximálně %d znaků.', ValidationDefinitions::NAME_LENGTH_MAX)
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte název vína...')
+            ->setRequired('Zadejte název vína.');
+        
+        $form->addInteger('year', 'Ročník')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. ' . date('Y'))
+            ->setRequired('Zadejte ročník vína.')
+            ->setValue(date('Y'))
+            ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
+            ->addRule(Form::Max, 'Ročník nemůže být větší než aktuální rok', date('Y'));
+        
+        $form->addFloat('alcoholPercentage', 'Obsah alkoholu (%)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 13.5')
+            ->setValue(13.5)
+            ->setRequired('Zadejte obsah alkoholu ve víně.')
+            ->addRule(Form::Min, 'Obsah alkoholu nemůže být menší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MIN)
+            ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
+
+        $form->addSelect('type', 'Typ vína', [
+            'DRY' => 'Suché',
+            'HALF_DRY' => 'Polosuché',
+            'HALF_SWEET' => 'Polosladké',
+            'SWEET' => 'Sladké',
+        ])
+            ->setValue('DRY')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte typ vína.');
+
+        $form->addSelect('color', 'Barva vína', [
+            'WHITE' => 'Bílé',
+            'PINK' => 'Růžové',
+            'RED' => 'Červené',
+        ])
+            ->setValue('WHITE')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte barvu vína.');
+        
+        $form->addSelect('grade', 'Přívlastek vína', [
+            'NONE' => 'Bez přívlastku',
+            'CABINET' => 'Kabinetní víno',
+            'LATE' => 'Pozdní sběr',
+            'GRAPE_SELECTION' => 'Výběr z hroznů',
+            'BERRY_SELECTION' => 'Výběr z bobulí',
+            'ICE' => 'Ledové víno',
+            'STRAW' => 'Slámové víno',
+        ])
+            ->setValue('NONE')
+            ->setHtmlAttribute('class', 'form-select')
+            ->setRequired('Vyberte přívlastek vína.');
+        
+        $form->addInteger('volume', 'Objem výroby (litry)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 500')
+            ->setRequired('Zadejte objem výroby vína v litrech.')
+            ->addRule(Form::Min, 'Objem výroby nemůže být menší než %d litrů.', ValidationDefinitions::VOLUME_MIN)
+            ->addRule(Form::Max, 'Objem výroby nemůže být větší než %d litrů.', ValidationDefinitions::VOLUME_MAX);
+        
+        $form->addFloat('leftSugar', 'Zbytkový cukr (g/l)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 4.5')
+            ->setRequired('Zadejte hodnotu zbytkového cukru ve víně.')
+            ->addRule(Form::Min, 'Zbytkový cukr nemůže být menší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MIN)
+            ->addRule(Form::Max, 'Zbytkový cukr nemůže být větší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MAX);
+
+        $form->addFloat('acidContents', 'Kyseliny (g/l)')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 6.2')
+            ->setRequired('Zadejte hodnotu kyselin ve víně.')
+            ->addRule(Form::Min, 'Kyseliny nemohou být menší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MIN)
+            ->addRule(Form::Max, 'Kyseliny nemohou být větší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MAX);
+
+        $form->addTextArea('productionNote', 'Poznámka k výrobě')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('rows', '3')
+            ->setHtmlAttribute('placeholder', 'Volitelná poznámka k výrobnímu procesu...');
+        
+        $form->addSubmit('send', 'Uložit změny')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+
+        $form->onSuccess[] = [$this, 'wineEditFormSucceeded'];
+
+        return $form;
+    }
+
+    public function wineEditFormSucceeded(Form $form, \stdClass $values): void
+    {
+        $wineId = (int) $this->getParameter('wineId');
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:dashboard');
+            return;
+        }
+
+        /** @var Wine $newWine */
+        $newWine = new Wine(
+            $wine->getId(),
+            $wine->getIdLiquidator(),
+            $wine->getIdSellApprover(),
+            $values->year,
+            $values->alcoholPercentage,
+            $values->type,
+            $values->color,
+            $values->grade,
+            $wine->getState(),
+            $values->volume,
+            $wine->getBottlePrice(),
+            $wine->getCurrentPrice(),
+            $wine->getBottlesLeft(),
+            $values->leftSugar,
+            $values->acidContents,
+            $wine->getSalesDescription(),
+            $values->productionNote,
+            $values->name,
+            $wine->getImage(),
+            [],
+            []
+        );
+
+        $result = $this->wineRepository->updateWine($newWine);
+        if ($result) {
+            $this->flashMessage("Víno bylo úspěšně upraveno", FlashMsgType::SUCCESS->value);
+            $this->redirect('Wine:show', $wineId);
+        } else {
+            $this->flashMessage("Víno se nepodařilo upravit", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:edit', $wineId);
+        }
+    }
+
     public function renderEdit(int $wineId): void
     {   
-        // todo
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
+            $this->redirect('dashboard');
+        }
+
+        // Populate form with current values
+        $form = $this->getComponent('editWineForm');
+        $form['name']->setValue($wine->getName());
+        $form['year']->setValue($wine->getYear());
+        $form['alcoholPercentage']->setValue($wine->getAlcoholPercentage());
+        $form['type']->setValue($wine->getType());
+        $form['color']->setValue($wine->getColor());
+        $form['grade']->setValue($wine->getGrade());
+        $form['volume']->setValue($wine->getVolume());
+        $form['leftSugar']->setValue($wine->getLeftSugar());
+        $form['acidContents']->setValue($wine->getAcidContents());
+        $form['productionNote']->setValue($wine->getProductionNote());
+
+        $this->template->wine = $wine;
+    }
+
+    public function createComponentChangeImageForm(): Form
+    {
+        $form = new Form();
+
+        $form->addUpload('image', 'Obrázek vína')
+            ->setRequired('Vyberte obrázek k nahrání.')
+            ->addRule(Form::Image, 'Vložte platný obrázek.')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('accept', 'image/*');
+        
+        $form->addSubmit('send', 'Uložit obrázek')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, 'changeWineImage'];
+        
+        $form->addSubmit('cancel', 'Zrušit')
+            ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
+            ->setValidationScope([])
+            ->onClick[] = [$this, 'backToDashboardImage'];
+        
+        return $form;
+    }
+
+    public function changeWineImage(Button $button, \stdClass $values): void
+    {
+        $wineId = (int) $this->getParameter('wineId');
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:dashboard');
+            return;
+        }
+
+        /** @var FileUpload $image */
+        $image = $values->image;
+        /** @var Image $imageEntity */
+        $imageEntity = null;
+        // Handle new image upload
+        if ($image->hasFile()) {
+            $imagePath = $this->imageRepository->uploadImage($image);
+            if ($imagePath === '') {
+                Debugger::log('Image upload failed', ILogger::ERROR);
+                $this->flashMessage("Obrázek se nepodařilo nahrát", FlashMsgType::ERROR->value);
+                return;
+            }
+            $imageEntity = new Image(null, $imagePath, $wine->getName(), 'Obrázek vinohradu ' . $wine->getName());
+        }
+
+        $result = $this->wineRepository->updateWineImage($wineId, $imageEntity);
+        if ($result) {
+            $this->flashMessage("Obrázek vína byl úspěšně změněn", FlashMsgType::SUCCESS->value);
+            $this->redirect('Wine:show', $wineId);
+        } else {
+            $this->flashMessage("Obrázek vína se nepodařilo změnit", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:changeImage', $wineId);
+        }
+    }
+
+    public function removeWineImage(Button $button, \stdClass $values): void
+    {
+        $wineId = (int) $this->getParameter('wineId');
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:dashboard');
+            return;
+        }
+
+        if ($wine->getImage() === null) {
+            $this->flashMessage("Víno nemá přiřazený obrázek", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:show', $wineId);
+            return;
+        }
+
+        $this->imageRepository->removeImage($wine->getImage()->id);
+
+        $result = $this->wineRepository->updateWineImage($wineId, null);
+        if ($result) {
+            $this->flashMessage("Obrázek vína byl úspěšně odstraněn", FlashMsgType::SUCCESS->value);
+            $this->redirect('Wine:show', $wineId);
+        } else {
+            $this->flashMessage("Obrázek vína se nepodařilo odstranit", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:changeImage', $wineId);
+        }
+    }
+
+    public function handleRemoveWineImage(int $wineId): void
+    {
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById($wineId);
+        if ($wine === null) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->redirect('Wine:dashboard');
+            return;
+        }
+
+        if ($wine->getImage() === null) {
+            $this->flashMessage("Víno nemá přiřazený obrázek", FlashMsgType::WARNING->value);
+            $this->redirect('changeImage', $wineId);
+            return;
+        }
+
+        // Remove the physical file
+        $this->imageRepository->removeImage($wine->getImage()->id);
+
+        // Update the wine record to remove image reference
+        $result = $this->wineRepository->updateWineImage($wineId, null);
+        if ($result) {
+            $this->flashMessage("Obrázek vína byl úspěšně odstraněn", FlashMsgType::SUCCESS->value);
+            $this->redirect('show', $wineId);
+        } else {
+            $this->flashMessage("Obrázek vína se nepodařilo odstranit", FlashMsgType::ERROR->value);
+            $this->redirect('changeImage', $wineId);
+        }
+    }
+
+    public function renderChangeImage(int $wineId): void
+    {
+        $this->template->imageRepository = $this->imageRepository;
+        $this->template->wine = $this->wineRepository->fetchWineById($wineId);
     }
 
     public function renderProduceP1(): void
@@ -287,19 +597,20 @@ final class WinePresenter extends BasePresenter
         }
 
         $form->addSelect('harvest', 'Sklizeň', $harvestOptions)
-            ->setHtmlAttribute('placeholder', 'Vyberte sklizeň ...')
+            ->setPrompt('Vyberte sklizeň ...')
             ->setHtmlAttribute('class', 'form-select');
 
         $form->addSubmit('backToDashboard', 'Zrušit')
-            ->setHtmlAttribute('class', 'btn btn-secondary')
+            ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
+            ->setValidationScope([])
             ->onClick[] = [$this, 'backToDashboardProduce'];
 
-        $form->addSubmit('addHarvest', 'Přidat')
-            ->setHtmlAttribute('class', 'btn btn-primary mt-2')
+        $form->addSubmit('addHarvest', 'Přidat sklizeň')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'harvestSelectionFormSucceeded'];
         
-        $form->addSubmit('toStep2', 'Pokračovat na krok 2')
-            ->setHtmlAttribute('class', 'btn btn-primary mt-2')
+        $form->addSubmit('toStep2', 'Pokračovat k výrobě')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'redirectToProduceP2'];
 
         return $form;
@@ -406,14 +717,16 @@ final class WinePresenter extends BasePresenter
     {
         $form = new Form();
 
-        // improve this form to use some default values
-
         $form->addText('name', 'Název vína')
+            ->addRule(Form::MinLength, 'Název vína musí mít alespoň %d znaky.', ValidationDefinitions::NAME_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Název vína může mít maximálně %d znaků.', ValidationDefinitions::NAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte název vína...')
             ->setRequired('Zadejte název vína.');
 
         $form->addInteger('year', 'Ročník')
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. ' . date('Y'))
             ->setRequired('Zadejte ročník vína.')
             ->setValue(date('Y'))
             ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
@@ -421,11 +734,11 @@ final class WinePresenter extends BasePresenter
         
         $form->addFloat('alcoholPercentage', 'Obsah alkoholu (%)')
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 13.5')
             ->setValue(13.5)
             ->setRequired('Zadejte obsah alkoholu ve víně.')
             ->addRule(Form::Min, 'Obsah alkoholu nemůže být menší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MIN)
             ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
-
 
         $form->addSelect('type', 'Typ vína', [
             'DRY' => 'Suché',
@@ -439,7 +752,7 @@ final class WinePresenter extends BasePresenter
 
         $form->addSelect('color', 'Barva vína', [
             'WHITE' => 'Bílé',
-            'ROSE' => 'Růžové',
+            'PINK' => 'Růžové',
             'RED' => 'Červené',
         ])
             ->setValue('WHITE')
@@ -459,38 +772,43 @@ final class WinePresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte přívlastek vína.');
         
-        $form->addInteger('volume', 'Objem výroby (v litrech)')
+        $form->addInteger('volume', 'Objem výroby (litry)')
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 500')
             ->setRequired('Zadejte objem výroby vína v litrech.')
             ->addRule(Form::Min, 'Objem výroby nemůže být menší než %d litrů.', ValidationDefinitions::VOLUME_MIN)
             ->addRule(Form::Max, 'Objem výroby nemůže být větší než %d litrů.', ValidationDefinitions::VOLUME_MAX);
         
         $form->addFloat('leftSugar', 'Zbytkový cukr (g/l)')
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 4.5')
             ->setRequired('Zadejte hodnotu zbytkového cukru ve víně.')
             ->addRule(Form::Min, 'Zbytkový cukr nemůže být menší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MIN)
             ->addRule(Form::Max, 'Zbytkový cukr nemůže být větší než %d g/l.', ValidationDefinitions::SUGAR_CONTENT_MAX);
 
         $form->addFloat('acidContents', 'Kyseliny (g/l)')
             ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'např. 6.2')
             ->setRequired('Zadejte hodnotu kyselin ve víně.')
             ->addRule(Form::Min, 'Kyseliny nemohou být menší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MIN)
             ->addRule(Form::Max, 'Kyseliny nemohou být větší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MAX);
 
-        $form->addTextArea('productionNote', 'Poznámka k výrobě vína')
-            ->setHtmlAttribute('class', 'form-control');
+        $form->addTextArea('productionNote', 'Poznámka k výrobě')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('rows', '3')
+            ->setHtmlAttribute('placeholder', 'Volitelná poznámka k výrobnímu procesu...');
 
         $form->addSubmit('backToDashboard', 'Zrušit')
-            ->setHtmlAttribute('class', 'btn btn-secondary')
+            ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
             ->setValidationScope([])
             ->onClick[] = [$this, 'backToDashboardProduce'];
 
         $form->addSubmit('back', 'Zpět na krok 1')
-            ->setHtmlAttribute('class', 'btn btn-primary')
+            ->setHtmlAttribute('class', 'btn btn-outline-primary w-100 fw-bold')
             ->onClick[] = [$this, 'backToProduceP1'];
 
         $form->addSubmit('produce', 'Vyrobit víno')
-            ->setHtmlAttribute('class', 'btn btn-primary mt-3')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'produceWineFormSucceeded'];
 
         return $form;

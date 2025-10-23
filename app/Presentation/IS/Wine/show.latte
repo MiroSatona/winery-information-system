@@ -22,9 +22,13 @@
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
                                 {if $wine->getState() === $WineState::production->value && $userVintner}
-                                    <a href="{link bottling! $wine->getId()}" class="btn btn-danger btn-sm">
+                                    <button type="button" 
+                                            class="btn btn-danger btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#liquidateModal{$wine->getId()}"
+                                            title="Zlikvidovat víno">
                                         <i class="fas fa-trash me-2"></i>Zlikvidovat víno
-                                    </a>
+                                    </button>
                                 {/if}
                                 {if $wine->getState() === $WineState::production->value && $userVintner}
                                     <a href="{link bottling! $wine->getId()}" class="btn btn-primary btn-sm">
@@ -41,9 +45,14 @@
                                         <i class="fas fa-coins me-2"></i>Změnit cenu
                                     </a>
                                 {/if}
-                                {if $userVintner}
+                                {if $wine->getState() === $WineState::production->value && $userVintner}
                                     <a href="{link edit $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-edit me-2"></i>Upravit víno
+                                    </a>
+                                {/if}
+                                {if ($wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::bottled->value) && $userVintner}
+                                    <a href="{link changeImage $wine->getId()}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-image me-2"></i>Změna obrázku
                                     </a>
                                 {/if}
                                 
@@ -308,5 +317,52 @@
             </div>
         </div>
     </div>
+
+    {* Liquidation confirmation modal *}
+    {if $wine->getState() === $WineState::production->value && $userVintner}
+        <div class="modal fade" id="liquidateModal{$wine->getId()}" tabindex="-1" aria-labelledby="liquidateModalLabel{$wine->getId()}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="liquidateModalLabel{$wine->getId()}">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potvrdit likvidaci vína
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="fas fa-wine-bottle fa-3x text-danger mb-3"></i>
+                            <h5>Opravdu chcete zlikvidovat toto víno?</h5>
+                            <div class="mt-3 p-3 bg-light rounded">
+                                <p class="mb-1 fw-semibold">{$wine->getName()}</p>
+                                <p class="mb-1"><strong>Ročník:</strong> {$wine->getYear()}</p>
+                                <p class="mb-1"><strong>Typ:</strong> 
+                                    {if $wine->getType() === 'DRY'}Suché
+                                    {elseif $wine->getType() === 'HALF_DRY'}Polosuché 
+                                    {elseif $wine->getType() === 'HALF_SWEET'}Polosladké
+                                    {else}Sladké{/if}
+                                </p>
+                                <p class="mb-0"><strong>Objem:</strong> {$wine->getVolume()} l</p>
+                            </div>
+                            <div class="alert alert-info mt-3 mb-0 text-start">
+                                <i class="fas fa-info-circle me-2"></i>Informace
+                                <p>
+                                Likvidace vína je nevratná operace. Víno bude označeno jako zlikvidované a nebude možné ho dále používat v produkci.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link liquidate!, $wine->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Zlikvidovat víno
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
 
 {/block isMainPanel}
