@@ -13,9 +13,11 @@ use App\Model\Wine\Wine;
 use App\Model\Image\ImageRepository;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Validation\ValidationDefinitions;
+use App\Model\Wine\WineProduceData;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
 use Nette\Application\UI\Form;
+use Nette\Forms\Controls\Button;
 
 final class WinePresenter extends BasePresenter
 {
@@ -248,8 +250,8 @@ final class WinePresenter extends BasePresenter
     {   
         // todo
     }
-    
-    public function renderProduce(): void
+
+    public function renderProduceP1(): void
     {
         $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
         $this->template->harvestsInProduction = $harvests ?? [];
@@ -288,12 +290,26 @@ final class WinePresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Vyberte sklizeň ...')
             ->setHtmlAttribute('class', 'form-select');
 
-        $form->addSubmit('addHarvest', 'Přidat')
-            ->setHtmlAttribute('class', 'btn btn-primary mt-2');
+        $form->addSubmit('backToDashboard', 'Zrušit')
+            ->setHtmlAttribute('class', 'btn btn-secondary')
+            ->onClick[] = [$this, 'backToDashboardProduce'];
 
-        $form->onSuccess[] = [$this, 'harvestSelectionFormSucceeded'];
+        $form->addSubmit('addHarvest', 'Přidat')
+            ->setHtmlAttribute('class', 'btn btn-primary mt-2')
+            ->onClick[] = [$this, 'harvestSelectionFormSucceeded'];
+        
+        $form->addSubmit('toStep2', 'Pokračovat na krok 2')
+            ->setHtmlAttribute('class', 'btn btn-primary mt-2')
+            ->onClick[] = [$this, 'redirectToProduceP2'];
 
         return $form;
+    }
+
+    public function backToDashboardProduce(Button $button, \stdClass $values): void
+    {
+        $this->getSession('wineIS')->set('harvestsInProduction', []);
+        $this->getSession('wineIS')->set('wineProduceData', null);
+        $this->redirect('dashboard');
     }
 
     public function harvestSelectionFormSucceeded(Form $form, \stdClass $values): void
@@ -326,6 +342,17 @@ final class WinePresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    public function redirectToProduceP2(Button $button, \stdClass $values): void
+    {
+        if ($this->getSession('wineIS')->get('harvestsInProduction') === null ||
+            count($this->getSession('wineIS')->get('harvestsInProduction')) === 0) {
+            $this->flashMessage('Pro pokračování do kroku 2 musíte vybrat alespoň jednu sklizeň.', 'error');
+            $this->redirect('this');
+        }
+
+        $this->redirect('produceP2');
+    }
+
 
     public function handleRemoveHarvestFromProduction(int $harvestId): void
     {
@@ -353,6 +380,26 @@ final class WinePresenter extends BasePresenter
         }
 
         $this->redirect('this');
+    }
+
+    public function renderProduceP2(): void
+    {
+        $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
+        $this->template->harvestsInProduction = $harvests ?? [];
+        $wineData = $this->getSession('wineIS')->get('wineProduceData');
+        $form = $this->getComponent('produceWineForm');
+        if ($wineData !== null) {
+            $form['name']->setValue($wineData->getName());
+            $form['year']->setValue($wineData->getYear());
+            $form['type']->setValue($wineData->getType());
+            $form['color']->setValue($wineData->getColor());
+            $form['grade']->setValue($wineData->getGrade());
+            $form['volume']->setValue($wineData->getVolume());
+            $form['alcoholPercentage']->setValue($wineData->getAlcoholPercentage());
+            $form['leftSugar']->setValue($wineData->getLeftSugar());
+            $form['acidContents']->setValue($wineData->getAcidContents());
+            $form['productionNote']->setValue($wineData->getProductionNote());
+        }
     }
 
     public function createComponentProduceWineForm(): Form
@@ -431,15 +478,41 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Max, 'Kyseliny nemohou být větší než %d g/l.', ValidationDefinitions::ACID_CONTENTS_MAX);
 
         $form->addTextArea('productionNote', 'Poznámka k výrobě vína')
-            ->setHtmlAttribute('class', 'form-control')
-            ->setRequired('Zadejte poznámku k výrobě vína.');
+            ->setHtmlAttribute('class', 'form-control');
+
+        $form->addSubmit('backToDashboard', 'Zrušit')
+            ->setHtmlAttribute('class', 'btn btn-secondary')
+            ->setValidationScope([])
+            ->onClick[] = [$this, 'backToDashboardProduce'];
+
+        $form->addSubmit('back', 'Zpět na krok 1')
+            ->setHtmlAttribute('class', 'btn btn-primary')
+            ->onClick[] = [$this, 'backToProduceP1'];
 
         $form->addSubmit('produce', 'Vyrobit víno')
-            ->setHtmlAttribute('class', 'btn btn-primary mt-3');
-
-        $form->onSuccess[] = [$this, 'produceWineFormSucceeded'];
+            ->setHtmlAttribute('class', 'btn btn-primary mt-3')
+            ->onClick[] = [$this, 'produceWineFormSucceeded'];
 
         return $form;
+    }
+
+    public function backToProduceP1(Button $button, $data): void
+    {
+        /** @var WineProduceData $wineProduceData */
+        $wineProduceData = new WineProduceData(
+            name: isset($data->name) ? $data->name : null,
+            year: isset($data->year) ? $data->year : null,
+            type: $data->type,
+            color: $data->color,
+            grade: $data->grade,
+            volume: isset($data->volume) ? $data->volume : null,
+            alcoholPercentage: isset($data->alcoholPercentage) ? $data->alcoholPercentage : null,
+            leftSugar: isset($data->leftSugar) ? $data->leftSugar : null,
+            acidContents: isset($data->acidContents) ? $data->acidContents : null,
+            productionNote: isset($data->productionNote) ? $data->productionNote : null
+        );
+        $this->getSession('wineIS')->set('wineProduceData', $wineProduceData);
+        $this->redirect('produceP1');
     }
 
     public function produceWineFormSucceeded(Form $form, \stdClass $values): void

@@ -6,8 +6,8 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-
-    {control harvestSelectionForm}
+    
+    <h5>Krok 2: Výroba vína z vybraných sklizní</h5>
 
     <h5>Vybrané sklizně pro výrobu vína:</h5>
     {foreach $harvestsInProduction as $harvest}
@@ -22,7 +22,8 @@
             </a>
         </p>
     {/foreach}
-    
+
     {control produceWineForm}
+    
 
 {/block isMainPanel}

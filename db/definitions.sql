@@ -116,10 +116,10 @@ CREATE TABLE WINE (
     BOTTLE_PRICE DECIMAL(10,2),
     CURRENT_PRICE DECIMAL(10,2),
     BOTTLES_LEFT SMALLINT,
-    LEFT_SUGAR DECIMAL(5,2) NOT NULL,
-    ACID_CONTENTS DECIMAL(5,2) NOT NULL,
+    LEFT_SUGAR DECIMAL(5,2),
+    ACID_CONTENTS DECIMAL(5,2),
     SALES_DESCRIPTION TEXT,
-    PRODUCTION_NOTE TEXT NOT NULL DEFAULT(''),
+    PRODUCTION_NOTE TEXT,
     CONSTRAINT PK_WINE PRIMARY KEY (ID),
     CONSTRAINT
         FK_ID_LIQUIDATOR
@@ -206,8 +206,8 @@ CREATE TABLE TREATMENT(
     ID_TASK INT PRIMARY KEY,
     CATEGORY VARCHAR(20) NOT NULL,
     NAME VARCHAR(20) NOT NULL,
-    QUANTITY DECIMAL(10,2) NOT NULL,
-    UNIT VARCHAR(10) NOT NULL,
+    QUANTITY DECIMAL(10,2),
+    UNIT VARCHAR(10),
     CONSTRAINT FK_TREATMENT_TASK
         FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
         ON DELETE CASCADE
@@ -369,9 +369,9 @@ VALUES
 -- wine table 
 INSERT INTO WINE (ID, WINE_NAME, ID_LIQUIDATOR, ID_SELL_APPROVER, ID_PICTURE, YEAR, ALCOHOL_PERCENTAGE, TYPE, COLOR, GRADE, STATE, VOLUME, BOTTLE_PRICE, CURRENT_PRICE, BOTTLES_LEFT, LEFT_SUGAR, ACID_CONTENTS, SALES_DESCRIPTION, PRODUCTION_NOTE)
 VALUES
-(1, 'Irsai Oliver', 1, 3, 7, 2021, 14.2, 'HALF_DRY', 'WHITE', 'LATE', 'PRODUCTION', 1000, 120, 90, 100, 10, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
-(2, 'Modrý Portugal', 2, 3, 8, 2020, 13.5, 'DRY', 'RED', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
-(3, 'Tramín Červený', 3, 1, 9, 2019, 12.8, 'SWEET', 'ROSE', 'NONE', 'SALE', 500, 10, 15, 150, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
+(1, 'Irsai Oliver', 1, 3, 7, 2021, 14, 'HALF_DRY', 'WHITE', 'LATE', 'PRODUCTION', 1000, 120, 90, 100, 10, 6, 'Robustní červené víno perfektní k večeři', 'Pěstované v srdci vinohradu'),
+(2, 'Modrý Portugal', 2, 3, 8, 2020, 13, 'DRY', 'RED', 'LATE', 'BOTTLED', 750, 12, 18, 200, 3, 5, 'Jemné bílé víno s nádechem sladkosti', 'Vyrobené z pozdně sklízených hroznů'),
+(3, 'Tramín Červený', 3, 1, 9, 2019, 12, 'SWEET', 'ROSE', 'NONE', 'SALE', 500, 10, 15, 150, 8, 7, 'Sladké rosé víno, ideální k lehkým jídlům', 'Vyrobené z vybraných odrůd');
 
 -- vineYard table 
 INSERT INTO VINEYARD (ID, ID_PICTURE, NAME, LOCATION, DESCRIPTION, YEAR)
