@@ -244,17 +244,11 @@ final class WinePresenter extends BasePresenter
         $this->redirect('Wine:dashboard');
     }
 
-    public function handleChangePrice(int $wineId): void
-    {
-        // todo
-    }
-
     public function renderEdit(int $wineId): void
     {   
         // todo
     }
     
-
     public function renderProduce(): void
     {
         $harvests = $this->getSession('wineIS')->get('harvestsInProduction');

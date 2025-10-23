@@ -31,7 +31,7 @@
                 <hr class="mb-4">
 
                 {* === PRICE FORM === *}
-                {form setWinePriceForm}
+                 {form setWinePriceForm}
                     <div class="mb-3">
                         <label for="price" class="form-label fw-semibold">
                             <i class="fas fa-coins me-2 text-muted"></i>{label price /}
@@ -40,12 +40,26 @@
                         {input price}
                     </div>
 
+                    <hr class="my-4">
+
+                    {* === PRODUCT DESCRIPTION BELOW === *}
+                    <div class="mb-4">
+                        <label for="popis" class="form-label fw-semibold">
+                            <i class="fas fa-file-alt me-2 text-muted"></i>{label popis /}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {input popis, rows => 8, class => 'form-control', style => 'resize: vertical;'}
+                        <small class="form-text text-muted">
+                            Tento popis se zobrazí zákazníkům v detailu produktu.
+                        </small>
+                    </div>
+
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Informace
                         </h6>
                         <small class="mb-0">
-                            Po potvrzení bude víno zařazeno do e-shopu s uvedenou prodejní cenou. Cenu můžete kdykoli později upravit.
+                            Po potvrzení bude víno zařazeno do e-shopu s uvedenou cenou a popisem. Tyto údaje můžete později upravit v detailu vína.
                         </small>
                     </div>
 
@@ -57,7 +71,7 @@
                                 </a>
                             </div>
                             <div class="col-12 col-md-6">
-                                {input send}
+                                {input send, class => 'btn btn-success w-100 fw-bold'}
                             </div>
                         </div>
                     </div>
