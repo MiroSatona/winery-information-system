@@ -1,0 +1,37 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Úkony
+    <i class="fas fa-arrow-right me-2"></i>Výběr pracovníků
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+
+<h5>Krok 1: Výběr pracovníků pro úkon</h5>
+    {form taskWorkersForm}
+
+
+        {label worker /}
+        {input worker}
+
+        <h5>Vybraní pracovníci:</h5>
+        {if $selectedWorkers && count($selectedWorkers) > 0}
+            {foreach $selectedWorkers as $worker}
+                <p>
+                    {$worker->getFullName()} - {$worker->getUsername()}
+                    <a href="{link removeWorkerFromSelection! $worker->getId()}" class="btn btn-sm btn-outline-danger ms-3">
+                        <i class="fas fa-trash-alt me-1"></i>Odebrat
+                    </a>
+                </p>
+            {/foreach}
+        {else}
+            <p class="text-muted">Zatím nebyl vybrán žádný pracovník.</p>
+        {/if}
+
+        {input backToDashboard}
+        {input addWorker}
+        {input clearWorkers}
+
+    {/form}
+    
+    <a n:href="tmpTaskPart3"> pokracovat</a>
