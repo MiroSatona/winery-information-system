@@ -79,4 +79,14 @@ class TaskRepository{
             $idTaskConfirmer
         );
     }
+
+    public function fetchTasks(string $pattern, string $type, string $state): array{
+        $query = $this->database->table('TASK');
+        
+        
+
+        return [];
+    }
+
+    
 }

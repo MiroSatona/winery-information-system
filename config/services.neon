@@ -11,6 +11,7 @@ services:
 	- App\Model\Task\Harvest\HarvestRepository
 	- App\Model\Task\Bottling\BottlingRepository
 	- App\Model\Task\Treatment\TreatmentRepository
+	- App\Model\Task\TaskRepository
 	- App\Model\Image\ImageRepository(%uploadsDir%, %uploadsDirWeb%)
 
 

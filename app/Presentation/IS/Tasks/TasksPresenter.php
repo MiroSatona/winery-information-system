@@ -5,21 +5,20 @@ declare(strict_types=1);
 namespace App\Presentation\IS\Tasks;
 
 use Nette;
+use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Task\TaskType;
-use App\Model\Task\Task;
-use App\Model\Task\TaskState;
 use App\Model\Task\TaskData;
+use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
-use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 
 final class TasksPresenter extends BasePresenter
 {
 
-    public function __construct(private UserRepository $userRepository)
+    public function __construct(private UserRepository $userRepository, private TaskRepository $taskRepository)
     {
         parent::__construct();
     }
@@ -66,7 +65,7 @@ final class TasksPresenter extends BasePresenter
         ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
     
         $form->addText('planned_date', 'Datum provedení')
-        ->setHtmlType('date') // 👈 makes it an <input type="date">
+        ->setHtmlType('date') 
         ->setRequired('Zadejte plánované datum provedení.')
         ->setHtmlAttribute('class', 'form-control form-control-sm')
         ->setHtmlAttribute('style', 'width: 200px;')
@@ -257,4 +256,106 @@ final class TasksPresenter extends BasePresenter
        bdump($this->fetchCurrentNewTask());
     }
     
+
+    /**
+     * createComponentFilterForm
+     * Method for creating the filter form in the dashboard of tasks.
+     * 
+     * @return Form
+     */
+    protected function createComponentFilterForm(): Form
+    {
+        /** @var Form  $form Form for filtering users */
+        $form = new Form;
+        
+        // Set method get for getting parameters for filtering
+        $form->getElementPrototype()->method = 'get';
+        // Set class for form layout
+        $form->getElementPrototype()->class = 'd-flex flex-row gap-3 justify-content-center align-items-center flex-grow-1 mx-4';
+
+        // Set input for searching users by typing
+        $form->addText('pattern', '')
+            ->setHtmlAttribute('type', 'search')
+            ->setHtmlAttribute('placeholder', 'Hledat úkony')
+            ->setHtmlAttribute('class', 'form-control flex-grow-1')
+            ->setHtmlAttribute('style', 'width: 400px;');
+
+        // Set selection bar for filtering by state
+        $form->addSelect('state', '', [
+            '' => 'Všechny stavy',
+            'PLANNED' => 'Plánované',
+            'FINISHED' => 'Zrušené',
+            'FINISHED' => 'Dokončené',
+        ])
+        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('style', 'width: 180px;');
+
+        // Set selection bar for filtering by type
+        $form->addSelect('type', '', [
+            '' => 'Všichni typy',
+            'BOTTLING' => 'Lahvování',
+            'HARVEST' => 'Sklizeň',
+            'TREATMENT' => 'Ošetření'
+        ])
+
+        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('style', 'width: 180px;');
+
+        // Button for submitting the form
+        $form->addSubmit('send', 'Hledat')
+            ->setHtmlAttribute('class', 'btn btn-primary');
+        
+        // Config form rendering
+        $formRender = $form->getRenderer();
+        $formRender->wrappers['controls']['container'] = null;
+        $formRender->wrappers['pair']['container'] = null;
+        $formRender->wrappers['label']['container'] = null;
+        $formRender->wrappers['control']['container'] = null;
+
+        // Call the method filterForm on form success
+        $form->onSuccess[] = [$this, 'filterForm'];
+        $form->onError[] = [$this, 'formError'];
+
+        return $form;
+        
+    }
+
+    /**
+     * filterForm
+     * Method for handling the filter form submission.
+     * @param Form $form Form where the filter was submitted
+     * @param \stdClass $values Filter values.
+     * @return void
+     */
+    public function filterForm(Form $form,  \stdClass $values): void
+    {   
+        /** @var string $pattern Pattern for filtering tasks */
+        $pattern = $values->pattern ;
+        /** @var string $state State for filtering tasks */
+        $state = $values->state;
+        /** @var string $type Type for filtering tasks */
+        $type = $values->type;
+        $this->taskRepository->fetchTasks($pattern, $type, $state);
+
+    }
+
+
+   /**
+    * formError
+    * Method for handling form errors.
+    *
+    * @param Form $form Form where the error was detected.
+    * @return void
+    */
+   public function formError(Form $form): void
+   {
+      $errors = $form->getErrors();
+
+        if (!empty($errors)) {
+            $this->flashMessage($errors[0], 'error');
+        } else {
+            $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
+        }
+   }
 }
+
