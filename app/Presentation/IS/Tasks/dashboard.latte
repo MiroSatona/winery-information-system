@@ -33,14 +33,17 @@
                                 <a href="" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
-                                <a n:href="addTask1" class="btn btn-primary btn-sm">
+                                <a href="" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-clipboard me-2"></i>Zaznamenat úkon
+                                </a>
+                                <a href="" class="btn btn-primary btn-sm">
                                     <i class="fas fa-clipboard me-2"></i>Vytvořit úkon
                                 </a>
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">
                             <div>
-                                <span class="text-muted"><strong>Celkový počet úkonů:</strong></span>
+                                <span class="text-muted"><strong>Celkový počet úkonů: {count($tasks)}</strong></span>
                             </div>
                         </div>
                     </div>
@@ -70,6 +73,59 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {foreach $tasks as $task}
+                                        <tr>
+                                            <td>{$task->getName()}</td>
+                                            <td>
+                                                {if $task instanceof App\Model\Task\Harvest\Harvest}
+                                                    Sklizeň
+                                                {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                                                    Ošetření
+                                                {else}
+                                                    Láhvování
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {if $task->getPlannedTimestamp()}
+                                                    {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                {else}
+                                                    —
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {if $task->getExecutionTimestamp()}
+                                                    {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                {else}
+                                                    —
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                    <span class="badge bg-warning">Plánovaný</span>
+                                                {elseif $task->getState() === App\Model\Task\TaskState::FINISHED}
+                                                    <span class="badge bg-success">Dokončený</span>
+                                                {elseif $task->getState() === App\Model\Task\TaskState::CANCELED}
+                                                    <span class="badge bg-secondary">Zrušený</span>
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <a href="" class="btn btn-sm btn-outline-secondary">
+                                                    <i class="fas fa-edit"></i> Upravit
+                                                </a>
+                                                <a href="" class="btn btn-sm btn-secondary">
+                                                    <i class="fas fa-edit"></i> Upravit
+                                                </a>
+                                                <a href="" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-trash"></i> Zaznamenat
+                                                </a>
+                                                {if  $task->getState() === App\Model\Task\TaskState::FINISHED && $task instanceof App\Model\Task\Harvest\Harvest}
+                                                    <a href="" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-trash"></i> Potvrdit
+                                                    </a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/foreach}
                                 </tbody>
                             </table>
                         </div>

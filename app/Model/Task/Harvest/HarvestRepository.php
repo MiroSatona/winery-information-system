@@ -119,4 +119,64 @@ final class HarvestRepository
     
         return $harvests;
     }
-}
+
+    /**
+     * fetchHarvests
+     * Method to fetch harvests based on pattern and state.
+     *
+     * @param string $pattern Pattern to search for.
+     * @param string $state State to filter by.
+     * @return Harvest[] Array of Harvest objects.
+     */
+    public function fetchHarvests(string $pattern, string $state): array
+    {
+        // Fetch joined teble of tasks and harvests
+        $mainQuery = $this->database->table('HARVEST')
+                        ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+                        ->select('TASK.*, HARVEST.*');
+
+        // Filter by pattern and state
+        if ($pattern !== '') {
+            $mainQuery->where('name LIKE ?', "%$pattern%");
+        }
+
+        if ($state !== '') {
+            $mainQuery->where('state = ?', $state);
+        }
+        
+        // Fetch all filtered data
+        $mainQuery->fetchAll();
+
+        /** @var Harvest[] */
+        $harvests = [];
+        
+        foreach ($mainQuery as $row) {
+            $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
+            $wineVariety = $this->wineVarietyRepository->fetchById((int)$row->ID_WINE_VARIETY);
+            if ($vineyard === null || $wineVariety === null) {
+                continue;
+            }
+
+            $harvests[] = new Harvest(
+                $row->ID,
+                $row->NAME,
+                TaskState::from((string)$row->STATE),
+                $row->CREATION_TIMESTAMP,
+                $row->LAST_CHANGE_TIMESTAMP,
+                $row->PLANNED_EXECUTION_TIMESTAMP,
+                $row->EXECUTION_TIMESTAMP,
+                $row->NOTE,
+                ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
+                ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
+                $vineyard,
+                $wineVariety,
+                ($row->ID_HARVEST_CONFIRMER !== null) ? (int)$row->ID_HARVEST_CONFIRMER : null,
+                ($row->ID_WINE !== null) ? (int)$row->ID_WINE : null,
+                ($row->WEIGHT !== null) ? (float)$row->WEIGHT : null,
+                ($row->SUGAR_CONTENT !== null) ? (float)$row->SUGAR_CONTENT : null
+            );
+        }
+
+        return $harvests;
+    }
+}   

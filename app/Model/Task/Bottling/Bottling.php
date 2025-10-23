@@ -6,20 +6,12 @@ namespace App\Model\Task\Bottling;
 
 use App\Model\Task\Task;
 use App\Model\Task\TaskState;
-use App\Model\User\User;
-use App\Model\Vineyard\Vineyard;
-use App\Model\WineVariety\WineVariety;
-use App\Model\Wine\Wine;
 use Nette\Utils\DateTime;
 
 
 class Bottling extends Task
 {
-    private int $key;
-    private Vineyard $vineyard;
-    private WineVariety $wineVariety;
-    private ?User $bottlingConfirmer;
-    private ?Wine $wine;
+    private ?int $idWine;
     private ?float $bottledVolume;
     private ?float $sugarContent;
 
@@ -34,12 +26,9 @@ class Bottling extends Task
         string $note,
         ?int $idTaskIssuer,
         ?int $idTaskConfirmer,
-        Vineyard $vineyard,
-        WineVariety $wineVariety,
-        ?int $idHarvestConfirmer,
         ?int $idWine,
-        ?float $weight,
-        ?float $sugarContent
+        int $bottlesCount,
+        float $bottleVolume
     )
     {
         parent::__construct(
@@ -55,31 +44,14 @@ class Bottling extends Task
             $idTaskConfirmer
         );
 
-        $this->vineyard = $vineyard;
-        $this->wineVariety = $wineVariety;
-        $this->bottlingConfirmer = $idHarvestConfirmer;
-        $this->wine = $idWine;
-        $this->bottledVolume = $weight;
-        $this->sugarContent = $sugarContent;
+        $this->idWine = $idWine;
+        $this->bottledVolume = $bottlesCount * $bottleVolume;
+        $this->sugarContent = null;
     }
 
-    public function getVineyard(): Vineyard
+    public function getIdWine(): ?int
     {
-        return $this->vineyard;
-    }
-
-    public function getWineVariety(): WineVariety
-    {
-        return $this->wineVariety;
-    }
-    public function getBottlingConfirmer(): ?User
-    {
-        return $this->bottlingConfirmer;
-    }
-
-    public function getWine(): ?Wine
-    {
-        return $this->wine;
+        return $this->idWine;
     }
 
     public function getBottledVolume(): ?float

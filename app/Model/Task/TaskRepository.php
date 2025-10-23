@@ -80,12 +80,41 @@ class TaskRepository{
         );
     }
 
-    public function fetchTasks(string $pattern, string $type, string $state): array{
-        $query = $this->database->table('TASK');
-        
-        
+    /**
+     * fetchTasks
+     * Method to fetch tasks.
+     *
+     * @param string $pattern Pattern to match task names.
+     * @param string $type Task type to filter by.
+     * @param string $state Task state to filter by.
+     * @return array
+     */
+     public function fetchTasks(string $pattern, string $type, string $state): array
+    {
+        /** @var Task[] $tasks Array of all Tasks. */
+        $tasks = [];
 
-        return [];
+        // Filter by type
+        if ($type !== '') {
+            switch ($type) {
+                case TaskType::HARVEST->value:
+                    $tasks = $this->harvestRepository->fetchHarvests($pattern, $state);
+                    break;
+                case TaskType::TREATMENT->value:
+                    $tasks = $this->treatmentRepository->fetchTreatments($pattern, $state);
+                    break;
+                case TaskType::BOTTLING->value:
+                    $tasks = $this->bottlingRepository->fetchBottling($pattern, $state);
+                    break;
+            }
+        } else { //No type is provided
+            $harvests = $this->harvestRepository->fetchHarvests($pattern, $state);
+            $treatments = $this->treatmentRepository->fetchTreatments($pattern, $state);
+            $bottlings = $this->bottlingRepository->fetchBottling($pattern, $state);
+            $tasks = array_merge($harvests, $treatments, $bottlings);
+        }
+
+        return $tasks;
     }
 
     

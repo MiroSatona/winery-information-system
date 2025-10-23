@@ -12,6 +12,7 @@ use App\Model\Task\TaskType;
 use App\Model\Task\TaskData;
 use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
+use App\Model\Task\TaskState;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 
@@ -33,7 +34,12 @@ final class TasksPresenter extends BasePresenter
 
     public function renderDashboard(): void
     {
-
+        $pattern = $this->getParameter('pattern') ?? '';
+        $type = $this->getParameter('type') ?? '';
+        $state = $this->getParameter('state') ?? '';
+        
+        $this->template->tasks = $this->taskRepository->fetchTasks($pattern, $type, $state);
+        $this->template->roleType = TaskState::class;
     }
     
     public function renderAddTask1(): void 
@@ -284,22 +290,22 @@ final class TasksPresenter extends BasePresenter
         $form->addSelect('state', '', [
             '' => 'Všechny stavy',
             'PLANNED' => 'Plánované',
-            'FINISHED' => 'Zrušené',
+            'CANCELED' => 'Zrušené',
             'FINISHED' => 'Dokončené',
         ])
         ->setHtmlAttribute('class', 'form-select')
-        ->setHtmlAttribute('style', 'width: 180px;');
+        ->setHtmlAttribute('style', 'width: 150px;');
 
         // Set selection bar for filtering by type
         $form->addSelect('type', '', [
-            '' => 'Všichni typy',
+            '' => 'Všechny typy',
             'BOTTLING' => 'Lahvování',
             'HARVEST' => 'Sklizeň',
             'TREATMENT' => 'Ošetření'
         ])
 
         ->setHtmlAttribute('class', 'form-select')
-        ->setHtmlAttribute('style', 'width: 180px;');
+        ->setHtmlAttribute('style', 'width: 150px;');
 
         // Button for submitting the form
         $form->addSubmit('send', 'Hledat')
@@ -323,11 +329,10 @@ final class TasksPresenter extends BasePresenter
     /**
      * filterForm
      * Method for handling the filter form submission.
-     * @param Form $form Form where the filter was submitted
      * @param \stdClass $values Filter values.
      * @return void
      */
-    public function filterForm(Form $form,  \stdClass $values): void
+    public function filterForm(\stdClass $values): void
     {   
         /** @var string $pattern Pattern for filtering tasks */
         $pattern = $values->pattern ;
@@ -335,7 +340,11 @@ final class TasksPresenter extends BasePresenter
         $state = $values->state;
         /** @var string $type Type for filtering tasks */
         $type = $values->type;
-        $this->taskRepository->fetchTasks($pattern, $type, $state);
+        /** @var Task[] $tasks Filtered tasks */
+        $tasks = $this->taskRepository->fetchTasks($pattern, $type, $state);
+
+        // Set filtered tasks to template
+        $this->template->tasks = $tasks;
 
     }
 
