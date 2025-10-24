@@ -24,7 +24,7 @@ class TaskData
 
     // Bottling
     private ?int $idWine = null;
-    private ?int $bottleVolume = null;
+    private ?float $bottleVolume = null;
     private ?Image $img = null;
 
     // Treatment
@@ -124,12 +124,12 @@ class TaskData
         $this->idWine = $idWine;
     }
 
-    public function getBottleVolume(): ?int
+    public function getBottleVolume(): ?float
     {
         return $this->bottleVolume;
     }
 
-    public function setBottleVolume(?int $bottleVolume): void
+    public function setBottleVolume(?float $bottleVolume): void
     {
         $this->bottleVolume = $bottleVolume;
     }

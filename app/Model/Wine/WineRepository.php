@@ -48,6 +48,18 @@ final class WineRepository
 
         return $wines;
     }
+    
+    public function fetchAllProductionWines(): array
+    {
+        $rows = $this->db->table("WINE")     
+        ->where("STATE", WineState::production->value);
+        
+        $wines = [];
+        foreach ($rows as $row) {
+           $wines[] = $this->createWineFromRow($row);
+        }
+        return $wines;
+    }
 
     public function fetchAllWinesWithPattern(string $patternWines, string $patternType, string $patternGrade, string $patternState): array
     {

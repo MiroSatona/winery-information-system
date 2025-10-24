@@ -11,6 +11,11 @@ use App\Model\Task\TaskState;
 use App\Model\Task\Treatment\TreatmentRepository;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Task\Harvest\HarvestRepository;
+use App\Model\Task\TaskData;
+use App\Model\Image\Image as ImageEntity;
+use App\Model\Validation\ValidationDefinitions;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class TaskRepository{
     private Explorer $database;
@@ -143,4 +148,133 @@ class TaskRepository{
         return null;
 
     }
+    
+
+    public function createBottlingTask(TaskData $data): bool {
+
+        // Basic validation
+        try {
+            // name
+            $name = trim($data->getName());
+            if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
+                throw new \Exception('Invalid task name');
+            }
+
+            // wine id
+            $idWine = $data->getIdWine();
+            if ($idWine === null) {
+                throw new \Exception('No wine selected for bottling');
+            }
+
+            // bottle volume
+            $bottleVolume = $data->getBottleVolume();
+            if ($bottleVolume === null || !is_numeric($bottleVolume) || $bottleVolume <= 0.0) {
+                throw new \Exception('Invalid bottle volume');
+            }
+            if ($bottleVolume < ValidationDefinitions::BOTTLE_VOLUME_MIN || $bottleVolume > ValidationDefinitions::BOTTLE_VOLUME_MAX) {
+                throw new \Exception('Bottle volume out of allowed range');
+            }
+
+            // check wine exists and is in correct state (production)
+            $wineRow = $this->database->table('WINE')->where('ID', $idWine)->fetch();
+            if ($wineRow === null) {
+                throw new \Exception('Specified wine does not exist');
+            }
+
+            // compute bottles count based on wine volume if possible
+            $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
+            $bottlesCount = 0;
+            if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
+                // assume VOLUME is in same units as bottleVolume (best-effort)
+                $bottlesCount = (int) floor($wineVolume / ($bottleVolume*1000));
+            }
+
+            if ($bottlesCount <= 0) {
+                throw new \Exception('Computed bottles count is zero or invalid');
+            }
+
+            // begin transaction
+            $this->database->beginTransaction();
+
+            // insert task row
+            $now = new DateTime();
+            $taskRow = $this->database->table('TASK')->insert([
+                'NAME' => $name,
+                'STATE' => TaskState::PLANNED->value,
+                'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
+                'EXECUTION_TIMESTAMP' => null,
+                'NOTE' => $data->getNote(),
+                'ID_TASK_ISSUER' => null,
+                'ID_TASK_CONFIRMER' => null,
+            ]);
+
+            if ($taskRow === null || !isset($taskRow->ID)) {
+                throw new \Exception('Failed to insert task');
+            }
+
+            $taskId = (int) $taskRow->ID;
+
+            // handle optional image: insert into PICTURE and update wine picture
+            $pictureId = null;
+            $img = $data->getImg();
+            if ($img instanceof ImageEntity) {
+                $picture = $this->database->table('PICTURE')->insert([
+                    'IMAGE_NAME' => $img->name,
+                    'LINK' => $img->src,
+                    'DESCRIPTION' => $img->description,
+                ]);
+                if ($picture === null || !isset($picture->ID)) {
+                    throw new \Exception('Failed to insert picture');
+                }
+                $pictureId = (int) $picture->ID;
+
+                // update wine picture reference
+                $this->database->table('WINE')->where('ID', $idWine)->update([
+                    'ID_PICTURE' => $pictureId,
+                ]);
+            }
+
+            // insert bottling row
+            $bottlingRow = $this->database->table('BOTTLING')->insert([
+                'ID_TASK' => $taskId,
+                'ID_WINE' => $idWine,
+                'BOTTLES_COUNT' => $bottlesCount,
+                'BOTTLE_VOLUME' => $bottleVolume,
+            ]);
+
+            if ($bottlingRow === null) {
+                throw new \Exception('Failed to insert bottling');
+            }
+
+            // update wine state and bottles_left if appropriate
+            $this->database->table('WINE')->where('ID', $idWine)->update([
+                'BOTTLES_LEFT' => $bottlesCount,
+            ]);
+
+            // assign workers if provided
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $this->database->table('WORKER')->insert([
+                    'ID_USER' => $workerId,
+                    'ID_TASK' => $taskId,
+                ]);
+            }
+
+            $this->database->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                // ignore
+            }
+            bdump('Failed to create bottling task: ' . $e->getMessage());
+            return false;
+        }
+
+    }
+
 }
