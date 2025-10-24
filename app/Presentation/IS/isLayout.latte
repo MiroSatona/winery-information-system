@@ -11,12 +11,12 @@
 {/block topMenuLeft}
 
 {block topMenuCenter}
-	<a href="#" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
-		<i class="fas fa-cogs me-2"></i>Informační systém
+		<a href="{link :IS:Dashboard:view}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
+			<i class="fas fa-cogs me-2"></i>Informační systém
+		</a>
 		{block topMenuISAdditional}
 
 		{/block topMenuISAdditional}
-	</a>
 {/block topMenuCenter}
 
 {block content}
@@ -33,11 +33,6 @@
 						<a href="{link Dashboard:view}" class="is-nav-btn">
 							<i class="fas fa-tachometer-alt me-2"></i>Přehled
 						</a>
-					{/if}
-					{if $userWorker || $userVintner}
-					<a href="{link Calendar:view}" class="is-nav-btn">
-						<i class="fas fa-calendar-alt me-2"></i>Kalendář
-					</a>
 					{/if}
 					{if $userWorker || $userVintner}
 					<a href="{link Tasks:dashboard}" class="is-nav-btn">

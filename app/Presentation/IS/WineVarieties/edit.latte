@@ -1,8 +1,12 @@
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
-    <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
-    <i class="fas fa-arrow-right me-2 ms-2"></i>Upravit odrůdu
+    <a href="{link :IS:WineVarieties:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Upravit odrůdu
+    </a>
 {/block topMenuISAdditional}
 
 {block isMainPanel}

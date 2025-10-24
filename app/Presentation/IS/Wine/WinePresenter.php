@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Presentation\IS\Wine;
 
 use App\Model\FlashMsgType;
-use Nette;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Wine\WineRepository;
@@ -139,6 +138,11 @@ final class WinePresenter extends BasePresenter
 
     public function handleLiquidate(int $wineId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K likvidaci vína nemáte oprávnění', FlashMsgType::ERROR->value);
+            $this->redirect('this');
+        }
+
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
         if ($wine === null) {
@@ -169,17 +173,17 @@ final class WinePresenter extends BasePresenter
 
     public function renderSelling(int $wineId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může přidávat víno do prodeje!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $wine = $this->wineRepository->fetchWineById($wineId);
         if (!$wine) {
            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
            $this->redirect(":IS:Wine:dashboard");
            return;
-        }
-
-        if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage("Jen Vinař může přidávat víno do prodeje!", FlashMsgType::ERROR->value);
-            $this->redirect(":IS:Wine:dashboard");
-            return;
         }
 
         if ($wine->state !== WINeState::bottled->value) {
@@ -195,6 +199,12 @@ final class WinePresenter extends BasePresenter
  
     public function renderChangePrice(int $wineId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může přidávat víno do prodeje a měnit cenu!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+        
         $wine = $this->wineRepository->fetchWineById($wineId);
         if (!$wine) {
            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
@@ -202,13 +212,7 @@ final class WinePresenter extends BasePresenter
            return;
         }
 
-        if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage("Jen Vinař může přidávat víno do prodeje!", FlashMsgType::ERROR->value);
-            $this->redirect(":IS:Wine:dashboard");
-            return;
-        }
-
-        if ($wine->state !== WINeState::sale->value) {
+        if ($wine->state !== WineState::sale->value) {
             $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
             $this->redirect(":IS:Wine:dashboard");
             return;
@@ -245,6 +249,12 @@ final class WinePresenter extends BasePresenter
 
     public function setWinePriceFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může přidávat víno do prodeje a měnit cenu!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $wineId = (int) $this->getParameter('wineId');
         $price = (float) $values->price;
         $description = (string) $values->popis;
@@ -369,6 +379,12 @@ final class WinePresenter extends BasePresenter
 
     public function wineEditFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může upravovat víno!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
@@ -414,7 +430,13 @@ final class WinePresenter extends BasePresenter
     }
 
     public function renderEdit(int $wineId): void
-    {   
+    {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může upravovat víno!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
         if ($wine === null) {
@@ -462,6 +484,12 @@ final class WinePresenter extends BasePresenter
 
     public function changeWineImage(Button $button, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může měnit obrázek vína!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
@@ -498,6 +526,12 @@ final class WinePresenter extends BasePresenter
 
     public function removeWineImage(Button $button, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může měnit obrázek vína!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
@@ -527,6 +561,12 @@ final class WinePresenter extends BasePresenter
 
     public function handleRemoveWineImage(int $wineId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může měnit obrázek vína!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchWineById($wineId);
         if ($wine === null) {
@@ -557,12 +597,24 @@ final class WinePresenter extends BasePresenter
 
     public function renderChangeImage(int $wineId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Jen Vinař může měnit obrázek vína!", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $this->template->imageRepository = $this->imageRepository;
         $this->template->wine = $this->wineRepository->fetchWineById($wineId);
     }
 
     public function renderProduceP1(): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
         $this->template->harvestsInProduction = $harvests ?? [];
     }
@@ -625,10 +677,16 @@ final class WinePresenter extends BasePresenter
 
     public function harvestSelectionFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $harvestId = (int) $values->harvest;
         $harvest = $this->harvestRepository->fetchById($harvestId);
         if ($harvest === null) {
-            $this->flashMessage('Sklizeň nebyla nalezena', 'error');
+            $this->flashMessage('Sklizeň nebyla nalezena', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
 
@@ -641,7 +699,7 @@ final class WinePresenter extends BasePresenter
         // Check if harvest is already in the list
         foreach ($harvestsInProduction as $existingHarvest) {
             if ($existingHarvest->getId() === $harvest->getId()) {
-                $this->flashMessage('Tato sklizeň je již přidána pro výrobu vína.', 'warning');
+                $this->flashMessage('Tato sklizeň je již přidána pro výrobu vína.', FlashMsgType::ERROR->value);
                 $this->redirect('this');
             }
         }
@@ -649,15 +707,21 @@ final class WinePresenter extends BasePresenter
         $harvestsInProduction[] = $harvest;
         $session->set('harvestsInProduction', $harvestsInProduction);
 
-        $this->flashMessage('Sklizeň byla úspěšně přidána pro výrobu vína.', 'success');
+        $this->flashMessage('Sklizeň byla úspěšně přidána pro výrobu vína.', FlashMsgType::SUCCESS->value);
         $this->redirect('this');
     }
 
     public function redirectToProduceP2(Button $button, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         if ($this->getSession('wineIS')->get('harvestsInProduction') === null ||
             count($this->getSession('wineIS')->get('harvestsInProduction')) === 0) {
-            $this->flashMessage('Pro pokračování do kroku 2 musíte vybrat alespoň jednu sklizeň.', 'error');
+            $this->flashMessage('Pro pokračování do kroku 2 musíte vybrat alespoň jednu sklizeň.', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
 
@@ -667,6 +731,12 @@ final class WinePresenter extends BasePresenter
 
     public function handleRemoveHarvestFromProduction(int $harvestId): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $session = $this->getSession('wineIS');
         $harvestsInProduction = $session->get('harvestsInProduction');
         if ($harvestsInProduction === null) {
@@ -685,9 +755,9 @@ final class WinePresenter extends BasePresenter
 
         if ($found) {
             $session->set('harvestsInProduction', $updatedHarvests);
-            $this->flashMessage('Sklizeň byla úspěšně odebrána z výroby vína.', 'success');
+            $this->flashMessage('Sklizeň byla úspěšně odebrána z výroby vína.', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Sklizeň nebyla nalezena ve výrobě vína.', 'error');
+            $this->flashMessage('Sklizeň nebyla nalezena ve výrobě vína.', FlashMsgType::ERROR->value);
         }
 
         $this->redirect('this');
@@ -695,6 +765,12 @@ final class WinePresenter extends BasePresenter
 
     public function renderProduceP2(): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
         $this->template->harvestsInProduction = $harvests ?? [];
         $wineData = $this->getSession('wineIS')->get('wineProduceData');
@@ -816,6 +892,12 @@ final class WinePresenter extends BasePresenter
 
     public function backToProduceP1(Button $button, $data): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("K výrobě vína nemáte dostatečná oprávnění.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
+        }
+
         /** @var WineProduceData $wineProduceData */
         $wineProduceData = new WineProduceData(
             name: isset($data->name) ? $data->name : null,
@@ -836,13 +918,13 @@ final class WinePresenter extends BasePresenter
     public function produceWineFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage('K výrobě vína nemáte dostatečná oprávnění.', 'error');
+            $this->flashMessage('K výrobě vína nemáte dostatečná oprávnění.', FlashMsgType::ERROR->value);
             $this->redirect(':IS:Wine:dashboard');
         }
 
         $harvestsInProduction = $this->getSession('wineIS')->get('harvestsInProduction');
         if ($harvestsInProduction === null || count($harvestsInProduction) === 0) {
-            $this->flashMessage('Pro výrobu vína musíte vybrat alespoň jednu sklizeň.', 'error');
+            $this->flashMessage('Pro výrobu vína musíte vybrat alespoň jednu sklizeň.', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
 
@@ -875,10 +957,10 @@ final class WinePresenter extends BasePresenter
         if ($result) {
             // Clear session harvests
             $this->getSession('wineIS')->set('harvestsInProduction', []);
-            $this->flashMessage('Víno bylo úspěšně vyrobeno.', 'success');
+            $this->flashMessage('Víno bylo úspěšně vyrobeno.', FlashMsgType::SUCCESS->value);
             $this->redirect(':IS:Wine:dashboard');
         } else {
-            $this->flashMessage('Při výrobě vína došlo k chybě.', 'error');
+            $this->flashMessage('Při výrobě vína došlo k chybě.', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
     }

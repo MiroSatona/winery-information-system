@@ -199,7 +199,7 @@ final class VineyardRepository
             return $this->database->transaction(function () use ($vineyard) {
                 $row = $this->database->table('VINEYARD')->get($vineyard->getId());
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Vineyard not found with ID ' . $vineyard->getId());
                 }
                 // Handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;
@@ -251,9 +251,8 @@ final class VineyardRepository
             return $this->database->transaction(function () use ($id) {
                 $row = $this->database->table('VINEYARD')->get($id);
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Vineyard not found with ID ' . $id);
                 }
-                $pictureId = $row->ID_PICTURE;
                 $row->update(['ACTIVE' => false]);
 
                 // also set all associated wine rows to inactive
@@ -275,9 +274,8 @@ final class VineyardRepository
             return $this->database->transaction(function () use ($id) {
                 $row = $this->database->table('VINEYARD')->get($id);
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Vineyard not found with ID ' . $id);
                 }
-                $pictureId = $row->ID_PICTURE;
                 $row->update(['ACTIVE' => true]);
 
                 // also set all associated wine rows to active
@@ -433,16 +431,17 @@ final class VineyardRepository
     public function deactivateWineRow(int $vineyardId, int $wineRowCode): bool
     {
         try {
-            $row = $this->database->table('WINE_ROW')
-                ->where('ID_VINEYARD', $vineyardId)
-                ->where('CODE', $wineRowCode)
-                ->fetch();
-            if ($row === null) {
-                return false;
-            }
-            $row->update(['ACTIVE' => false]);
-
-            return true;
+            return $this->database->transaction(function () use ($vineyardId, $wineRowCode) {
+                $row = $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->where('CODE', $wineRowCode)
+                    ->fetch();
+                if ($row === null) {
+                    throw new \Exception('Wine row not found on vineyard: ' . $vineyardId . ' with code: ' . $wineRowCode);
+                }
+                $row->update(['ACTIVE' => false]);
+                return true;
+            });
         } catch (\Exception $e) {
             Debugger::log('Failed to deactivate wine row from vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
             return false;
@@ -452,16 +451,18 @@ final class VineyardRepository
     public function reactivateWineRow(int $vineyardId, int $wineRowCode): bool
     {
         try {
-            $row = $this->database->table('WINE_ROW')
-                ->where('ID_VINEYARD', $vineyardId)
-                ->where('CODE', $wineRowCode)
-                ->fetch();
-            if ($row === null) {
-                return false;
-            }
-            $row->update(['ACTIVE' => true]);
+            return $this->database->transaction(function () use ($vineyardId, $wineRowCode) {
+                $row = $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->where('CODE', $wineRowCode)
+                    ->fetch();
+                if ($row === null) {
+                    throw new \Exception('Wine row not found on vineyard: ' . $vineyardId . ' with code: ' . $wineRowCode);
+                }
+                $row->update(['ACTIVE' => true]);
 
-            return true;
+                return true;
+            });
         } catch (\Exception $e) {
             Debugger::log('Failed to reactivate wine row on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
             return false;
@@ -486,15 +487,17 @@ final class VineyardRepository
     public function addWineRowToVineyard(WineRow $wineRow): bool
     {
         try {
-            $data = [
-                'CODE' => $wineRow->getId(),
-                'ID_VINEYARD' => $wineRow->getVineyardId(),
-                'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
-                'HEAD_COUNT' => $wineRow->getHeadCount(),
-                'PLANTING_YEAR' => $wineRow->getYearPlanted()
-            ];
-            $this->database->table('WINE_ROW')->insert($data);
-            return true;
+            return $this->database->transaction(function () use ($wineRow) {
+                $data = [
+                    'CODE' => $wineRow->getId(),
+                    'ID_VINEYARD' => $wineRow->getVineyardId(),
+                    'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
+                    'HEAD_COUNT' => $wineRow->getHeadCount(),
+                    'PLANTING_YEAR' => $wineRow->getYearPlanted()
+                ];
+                $this->database->table('WINE_ROW')->insert($data);
+                return true;
+            });
         } catch (\Exception $e) {
             Debugger::log('Failed to add wine row to vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $wineRow->getVineyardId(), ILogger::ERROR);
             return false;
@@ -504,20 +507,22 @@ final class VineyardRepository
     public function updateWineRowOnVineyard(WineRow $wineRow): bool
     {
         try {
-            $row = $this->database->table('WINE_ROW')
-                ->where('ID_VINEYARD', $wineRow->getVineyardId())
-                ->where('CODE', $wineRow->getId())
-                ->fetch();
-            if ($row === null) {
-                return false;
-            }
-            $row->update([
-                'CODE' => $wineRow->getId(),
-                'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
-                'HEAD_COUNT' => $wineRow->getHeadCount(),
-                'PLANTING_YEAR' => $wineRow->getYearPlanted()
-            ]);
-            return true;
+            return $this->database->transaction(function () use ($wineRow) {
+                $row = $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $wineRow->getVineyardId())
+                    ->where('CODE', $wineRow->getId())
+                    ->fetch();
+                if ($row === null) {
+                    throw new \Exception('Wine row not found on vineyard: ' . $wineRow->getVineyardId() . ' with code: ' . $wineRow->getId());
+                }
+                $row->update([
+                    'CODE' => $wineRow->getId(),
+                    'ID_WINE_VARIETY' => $wineRow->getWineVarietyId(),
+                    'HEAD_COUNT' => $wineRow->getHeadCount(),
+                    'PLANTING_YEAR' => $wineRow->getYearPlanted()
+                ]);
+                return true;
+            });
         } catch (\Exception $e) {
             Debugger::log('Failed to edit wine row on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $wineRow->getVineyardId() . ' | Wine Row Code: ' . $wineRow->getId(), ILogger::ERROR);
             return false;

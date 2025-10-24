@@ -256,10 +256,11 @@ final class WineRepository
     public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
         
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
-        $this->db->beginTransaction();
+        
         if (!$this->fetchWineById($idWine)) {
             return false;
         }
+        $this->db->beginTransaction();
         try {
             $this->db->table("WINE")
             ->where("ID", $idWine)
@@ -419,7 +420,7 @@ final class WineRepository
             return $this->db->transaction(function () use ($wineId, $image) {
                 $row = $this->db->table('WINE')->get($wineId);
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Wine not found with ID ' . $wineId);
                 }
                // Handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;

@@ -1,7 +1,12 @@
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
-    <i class="fas fa-arrow-right me-2"></i>Detail objednávky
+    <a href="{link :IS:Orders:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Objednávky
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Detail objednávky
+    </a>
 {/block topMenuISAdditional}
 
 {block isMainPanel}

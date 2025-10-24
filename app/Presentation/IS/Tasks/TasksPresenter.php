@@ -660,6 +660,12 @@ final class TasksPresenter extends BasePresenter
 
     public function onSuccessMarkHarvestDoneForm(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
         $id = (int)$this->getParameter('id');
 
         /** @var Harvest $harvest */
@@ -687,6 +693,12 @@ final class TasksPresenter extends BasePresenter
 
     public function renderMarkHarvestDone(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
         /** @var Harvest $harvest */
         $harvest = $this->harvestRepository->fetchById($id);
         if ($harvest === null) {
