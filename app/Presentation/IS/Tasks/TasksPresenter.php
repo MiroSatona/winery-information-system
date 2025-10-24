@@ -409,7 +409,7 @@ final class TasksPresenter extends BasePresenter
             return;
         }
 
-        $this->template->harvest = $harvest;
+        $this->template->task = $harvest;
     }
 
 
@@ -430,7 +430,7 @@ final class TasksPresenter extends BasePresenter
             return;
         }
 
-        $this->template->bottling = $bottling;
+        $this->template->task = $bottling;
     }
 
 
@@ -451,7 +451,7 @@ final class TasksPresenter extends BasePresenter
             return;
         }
 
-        $this->template->treatment = $treatment;
+        $this->template->task = $treatment;
     }
 
 
