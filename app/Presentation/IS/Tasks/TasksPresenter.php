@@ -15,7 +15,6 @@ use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
-use Nette\Utils\DateTimeImmutable;
 
 final class TasksPresenter extends BasePresenter
 {
@@ -45,7 +44,13 @@ final class TasksPresenter extends BasePresenter
     
     public function renderAddTask1(): void 
     {
-
+        $form = $this->getComponent("addTaskForm");
+        $newTask = $this->fetchCurrentNewTask();
+        
+        $form['name']->setValue($newTask->getName());
+        $form["note"]->setValue($newTask->getNote());
+        $form["type"]->setValue($newTask->getType());
+        $form["planned_date"]->setValue($newTask->getPlannedTimestamp());
     }
 
     public function createComponentAddTaskForm(): Form
@@ -68,7 +73,6 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute("style", "width: 150px;");
        
         $form->addTextArea("note", "Poznámka")
-            ->setRequired('Zadejte popis vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
@@ -79,12 +83,21 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control form-control-sm')
             ->setHtmlAttribute('style', 'width: 200px;');
 
-        $form->addSubmit('send', 'Pokračovat')
-            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
-        
+        $send = $form->addSubmit('send', 'Pokračovat');
+        $send->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+        $send->getControlPrototype();
+
+        // handle form success
         $form->onSuccess[] = [$this, 'addTaskFromSucceeded'];
-        
+
         return $form;
+    }
+    
+    public function handleClearForm(): void
+    {
+        $section = $this->session->getSection("TaskCreation");
+        $section->set("newTask", null);
+        $this->redirect('dashboard');
     }
     
     public function createComponentTaskWorkersForm(): Form
@@ -111,20 +124,52 @@ final class TasksPresenter extends BasePresenter
             ->setDefaultValue('');
 
         $form->addSubmit('backToDashboard', 'Zrušit')
-            ->setHtmlAttribute('class', 'btn btn-secondary')
-            ->onClick[] = [$this, 'backToDashboardTaskCreation'];
+            ->setHtmlAttribute('class', 'btn btn-danger w-100 fw-bold')
+            ->onClick[] = [$this, 'handleClearForm'];
 
         $form->addSubmit('addWorker', 'Přidat')
             ->setHtmlAttribute('class', 'btn btn-primary mt-2')
             ->onClick[] = [$this, 'workerSelectionFormSucceeded'];
+        
+        $form->addSubmit('goBack', "Zpět")
+            ->setHtmlAttribute('class', 'btn btn-secondary w-100 fw-bold')
+            ->onClick[] = [$this, 'goBackTo1'];
 
         $form->addSubmit('clearWorkers', 'Vymazat výběr')
             ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
             ->onClick[] = [$this, 'clearWorkers'];
+        
+        $form->addSubmit("next", "Pokračovat")
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, "goToNextForm"];
 
         return $form;
     }
     
+    public function goBackTo1() {
+        $this->redirect("addTask1");
+    }
+    
+    public function goToNextForm() 
+    {
+        $newTask = $this->fetchCurrentNewTask();
+
+        switch($newTask->getType()) {
+        case TaskType::TREATMENT->value: 
+            $this->redirect("treatment");
+            break;
+        case TaskType::HARVEST->value:
+            $this->redirect("harvest");
+            break;
+        case TaskType::BOTTLING->value: 
+            $this->redirect("bottling");
+            break;
+        default:
+            bdump($newTask->getType());
+            break;
+        }
+    }
+
     private function fetchCurrentNewTask() {
         $section = $this->session->getSection("TaskCreation");
 
@@ -137,51 +182,45 @@ final class TasksPresenter extends BasePresenter
         return $newTask;
     }
     
-    private function finalizeCurrentTask() {
-        
-    }
-
     public function addTaskFromSucceeded(Form $form, \stdClass $values): void 
     {
         $newTask = $this->fetchCurrentNewTask();
 
-            // set basic fields from form values using TaskData setters
-            if (isset($values->name)) {
-                $newTask->setName((string) $values->name);
-            }
+        // set basic fields from form values using TaskData setters
+        if (isset($values->name)) {
+            $newTask->setName((string) $values->name);
+        }
 
-            if (isset($values->note)) {
-                $newTask->setNote((string) $values->note);
-            }
+        if (isset($values->note)) {
+            $newTask->setNote((string) $values->note);
+        }
 
-            $planned = null;
-            if (isset($values->planned_date) && $values->planned_date !== '') {
-                try {
-                    $planned = new DateTime((string) $values->planned_date->format('Y-m-d') . ' 00:00:00');
-                } catch (\Exception $e) {
-                    // keep null on parse failure
-                    $planned = null;
-                }
+        $planned = null;
+        if (isset($values->planned_date) && $values->planned_date !== '') {
+            try {
+                $planned = new DateTime((string) $values->planned_date->format('Y-m-d') . ' 00:00:00');
+            } catch (\Exception $e) {
+                // keep null on parse failure
+                $planned = null;
             }
-            $newTask->setPlannedTimestamp($planned);
-            
-            if (isset($values->type)) {
-                $newTask->setType($values->type);
-            }
+        }
+        $newTask->setPlannedTimestamp($planned);
+        
+        if (isset($values->type)) {
+            $newTask->setType($values->type);
+        }
 
-            // persist updated TaskData back into session
-            $section = $this->session->getSection("TaskCreation");
-            $section->set("newTask", $newTask);
+        // persist updated TaskData back into session
+        $section = $this->session->getSection("TaskCreation");
+        $section->set("newTask", $newTask);
 
-            // proceed to next step or reload add task page
-            $this->redirect('selectWorkers');
+        // proceed to next step or reload add task page
+        $this->redirect('selectWorkers');
     }
     
     public function backToDashboardTaskCreation(Button $button, \stdClass $values): void
     {
-        // clear task creation session and go back to dashboard
-        $this->session->getSection('TaskCreation')->set('newTask', null);
-        $this->redirect('dashboard');
+        $this->redirect('addTask1');
     }
 
     public function taskWorkersFormSucceeded(Button $button, \stdClass $values): void
@@ -258,12 +297,6 @@ final class TasksPresenter extends BasePresenter
         $this->template->availableWorkers = $available;
     }
     
-    public function rendertmpTaskPart3()
-    {
-       bdump($this->fetchCurrentNewTask());
-    }
-    
-
     /**
      * createComponentFilterForm
      * Method for creating the filter form in the dashboard of tasks.
@@ -274,7 +307,7 @@ final class TasksPresenter extends BasePresenter
     {
         /** @var Form  $form Form for filtering users */
         $form = new Form;
-        
+
         // Set method get for getting parameters for filtering
         $form->getElementPrototype()->method = 'get';
         // Set class for form layout
@@ -367,5 +400,18 @@ final class TasksPresenter extends BasePresenter
             $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
         }
    }
+
+    // 3 sub tasks here 
+    public function renderBottling() {
+
+    }
+
+    public function renderHarvest() {
+
+    }
+
+    public function renderTreatment() {
+
+    }
 }
 

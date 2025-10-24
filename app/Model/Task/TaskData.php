@@ -5,7 +5,7 @@ declare(strict_types=1);
 
 namespace App\Model\Task;
 
-use App\Model\Task\TaskState;
+use App\Model\Task\TaskType;
 use Nette\Utils\DateTime;
 use App\Model\Image\Image;
 
@@ -16,11 +16,10 @@ class TaskData
     private string $note = '';
     private ?DateTime $plannedTimestamp = null;
     private array $idsOfWorkers = [];
-    private string $taskType = "";
+    private string $taskType = TaskType::TREATMENT->value; 
 
     // Harvest task
     private ?int $idWineYard = null;
-    private ?int $idOdruda = null;
     private ?int $idWineVariety = null;
 
     // Bottling
@@ -29,11 +28,13 @@ class TaskData
     private ?Image $img = null;
 
     // Treatment
-    private array $idRows = [];
     private string $category = '';
     private string $treatmentName = '';
     private string $mnozstvi = '';
     private string $unit = '';
+
+    // common 
+    private array $idRows = [];
 
     public function __construct()
     {
@@ -100,16 +101,6 @@ class TaskData
     public function setIdWineYard(?int $idWineYard): void
     {
         $this->idWineYard = $idWineYard;
-    }
-
-    public function getIdOdruda(): ?int
-    {
-        return $this->idOdruda;
-    }
-
-    public function setIdOdruda(?int $idOdruda): void
-    {
-        $this->idOdruda = $idOdruda;
     }
 
     public function getIdWineVariety(): ?int
