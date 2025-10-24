@@ -3,7 +3,7 @@
 parameters:
 	uploadsDir: 'assets/uploads'
 	uploadsDirWeb: '/uploads'
-
+	tmpImage: '/images'	
 
 application:
 	errorPresenter:

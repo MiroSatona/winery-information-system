@@ -46,8 +46,9 @@
                                     </a>
                                 </td>
                                 <td class="text-center">
-                                    <img src="{if $item->wine->img} {asset $imageRepository->getPathForImage($item->wine->img)}{else}{/if}"
-                                         alt="{$item->wine->img->description}" class="rounded shadow-sm" width="80">
+                                    <img src="{asset $item->wine->img ? $imageRepository->getPathForImage($item->wine->img) : $imageRepository->getTmpWineImage()}"
+                                        alt="{if $item->wine->img}{$item->wine->img->description}{else}Obrázek vína{/if}"
+                                        class="rounded shadow-sm" width="80">
                                 </td>
                                 <td class="text-center">
                                     <div class="d-inline-flex align-items-center border rounded px-2 py-1 bg-light">

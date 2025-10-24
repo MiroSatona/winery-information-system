@@ -20,8 +20,8 @@
 
             <!-- Obrázek vína -->
             <div class="col-12 col-md-5">
-                <img src="{asset $imageRepository->getPathForImage($wine->img)}"
-                     alt="{$wine->img->description}"
+                <img src="{asset $wine->img ? $imageRepository->getPathForImage($wine->img) : $imageRepository->getTmpWineImage()}"
+                     alt="{if $wine->img}{$wine->img->description}{else}Obrázek vína{/if}"
                      class="img-fluid rounded-4 shadow-sm w-100"
                      style="aspect-ratio: 3/4; object-fit: cover; background: #f7f9fc;">
             </div>

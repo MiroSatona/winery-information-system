@@ -18,7 +18,7 @@ use App\Model\Task\Bottling\Bottling;
 use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
-use App\Model\Task\Harvest\HarvestRepository;
+use App\Model\Task\Harvest\HarvestRepository;  
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineRepository;
 use App\Model\Image\ImageRepository;
@@ -568,7 +568,18 @@ final class TasksPresenter extends BasePresenter
 
     public function renderBottling() {
         $task = $this->fetchCurrentNewTask();
-
+        $form = $this->getComponent("wineSelectForm");
+        
+        $form["wine"]->setValue($task->getIDWine());
+        $form["volume"]->setValue($task->getBottleVolume());
+        
+        $img = $task->getImg();
+        
+        if ($task->getImg()) {
+            $this->template->image = $this->imgRep->getPathForImage($task->getImg());
+        } else {
+            $this->template->image = null;
+        }
     }
     
     public function processBottlingForm(Form $form, \stdClass $values) {
