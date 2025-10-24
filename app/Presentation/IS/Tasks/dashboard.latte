@@ -30,13 +30,13 @@
                             
                             <div class="d-flex gap-2">
                                 <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
-                                    <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
+                                    <i class="fas fa-arrow-left me-2"></i>Přehled
                                 </a>
                                 <a href="" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-clipboard me-2"></i>Zaznamenat
+                                    <i class="fas fa-clipboard me-2"></i>Zaznamenat neexistující
                                 </a>
                                 <a href="{link addTask1}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-clipboard me-2"></i>Vytvořit
+                                    <i class="fas fa-clipboard me-2"></i>Naplánovat
                                 </a>
                             </div>
                         </div>
@@ -58,15 +58,15 @@
                                             <i class="fas fa-tags me-2"></i>Typ
                                         </th>
                                         <th scope="col" class="fw-bold">
-                                            <i class="fas fa-calendar-alt me-2"></i>Plán. dokončení
+                                            <i class="fas fa-calendar-alt me-2"></i>Plánováno
                                         </th>
                                         <th scope="col" class="fw-bold">
-                                            <i class="fas fa-check-circle me-2"></i>Datum dokončení
+                                            <i class="fas fa-calendar-alt me-2"></i>Dokončeno
                                         </th>
                                         <th scope="col" class="fw-bold">
                                             <i class="fas fa-toggle-on me-2"></i>Stav
                                         </th>
-                                        <th scope="col" class="fw-bold">
+                                        <th scope="col" class="fw-bold text-center" style="width: 400px;">
                                             <i class="fas fa-cogs me-2"></i>Akce
                                         </th>
                                     </tr>
@@ -76,12 +76,12 @@
                                         <tr>
                                             <td>{$task->getName()}</td>
                                             <td>
-                                                {if $task instanceof App\Model\Task\Harvest\Harvest}
+                                                {if $task instanceof $HarvestType}
                                                     Sklizeň
-                                                {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                                                {elseif $task instanceof $TreatmentType}
                                                     Ošetření
                                                 {else}
-                                                    Láhvování
+                                                    Lahvování
                                                 {/if}
                                             </td>
                                             <td>
@@ -99,11 +99,11 @@
                                                 {/if}
                                             </td>
                                             <td>
-                                                {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                {if $task->getState() === $TaskStateType::PLANNED}
                                                     <span class="badge bg-warning">Plánovaný</span>
-                                                {elseif $task->getState() === App\Model\Task\TaskState::FINISHED}
+                                                {elseif $task->getState() === $TaskStateType::FINISHED}
                                                     <span class="badge bg-success">Dokončený</span>
-                                                {elseif $task->getState() === App\Model\Task\TaskState::CANCELED}
+                                                {elseif $task->getState() === $TaskStateType::CANCELED}
                                                     <span class="badge bg-secondary">Zrušený</span>
                                                 {/if}
                                             </td>
@@ -111,15 +111,17 @@
                                                 <a n:href="details! taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
                                                     Detail
                                                 </a>
-                                                <a href="" class="btn btn-sm btn-secondary">
+                                                <a href="" class="btn btn-sm btn-outline-secondary">
                                                     <i class="fas fa-edit me-1"></i> Upravit
                                                 </a>
-                                                <a href="" class="btn btn-sm btn-outline-primary">
-                                                    <i class="fas fa-clipboard-check me-1"></i> Zaznamenat
-                                                </a>
-                                                {if  $task->getState() === App\Model\Task\TaskState::FINISHED && $task instanceof App\Model\Task\Harvest\Harvest}
-                                                    <a href="" class="btn btn-sm btn-primary">
-                                                        <i class="fas fa-check-circle me-1"></i> Potvrdit
+                                                {if $task->getState() === $TaskStateType::PLANNED}
+                                                    <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
+                                                    </a>
+                                                {/if}
+                                                {if $userVintner && $task->getState() === $TaskStateType::FINISHED && $task instanceof $HarvestType && $task->getIdHarvestConfirmer() === null}
+                                                    <a href="{link Tasks:markHarvestDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-check-circle me-1"></i> Potvrdit sklizeň
                                                     </a>
                                                 {/if}
                                             </td>
@@ -133,4 +135,6 @@
             </div>
         </div>
     </div>
+
+    
 {/block isMainPanel}

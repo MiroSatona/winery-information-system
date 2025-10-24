@@ -6,32 +6,95 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 col-lg-9 col-xl-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-users me-2"></i>
+                        Výběr pracovníků
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form taskWorkersForm}
 
-<h5>Krok 1: Výběr pracovníků pro úkon</h5>
-    {form taskWorkersForm}
+                        <div class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-9">
+                                    <label for="worker" class="form-label fw-semibold">
+                                        <i class="fas fa-user-tie me-2 text-muted"></i>{label worker /}
+                                    </label>
+                                    {input worker}
+                                </div>
+                                <div class="col-3">
+                                    {input addWorker}
+                                </div>
+                            </div>
+                        </div>
 
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold m-0">
+                                    <i class="fas fa-check-circle me-2 text-success"></i>
+                                    Vybraní pracovníci
+                                </h5>
 
-        {label worker /}
-        {input worker}
+                                <div>
+                                    {input clearWorkers}
+                                </div>
+                            </div>
 
-        <h5>Vybraní pracovníci:</h5>
-        {if $selectedWorkers && count($selectedWorkers) > 0}
-            {foreach $selectedWorkers as $worker}
-                <p>
-                    {$worker->getFullName()} - {$worker->getUsername()}
-                    <a href="{link removeWorkerFromSelection! $worker->getId()}" class="btn btn-sm btn-outline-danger ms-3">
-                        <i class="fas fa-trash-alt me-1"></i>Odebrat
-                    </a>
-                </p>
-            {/foreach}
-        {else}
-            <p class="text-muted">Zatím nebyl vybrán žádný pracovník.</p>
-        {/if}
+                            {if $selectedWorkers && count($selectedWorkers) > 0}
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="fw-bold">Jméno</th>
+                                                <th scope="col" class="fw-bold">Login</th>
+                                                <th scope="col" class="fw-bold text-center" style="width: 120px;">Akce</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {foreach $selectedWorkers as $worker}
+                                                <tr class="align-middle">
+                                                    <td class="fw-semibold">{$worker->getFullName()}</td>
+                                                    <td>{$worker->getUsername()}</td>
+                                                    <td class="text-center">
+                                                        <a href="{link removeWorkerFromSelection! $worker->getId()}" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash-alt me-1"></i>Odebrat
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {else}
+                                <div class="alert alert-info">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace
+                                    </h6>
+                                    <small class="mb-0">Zatím nejsou vybráni žádní pracovníci. Vyberte pracovníka z dropdownu a přidejte ho.</small>
+                                </div>
+                            {/if}
+                        </div>
+                        <div class="border-top pt-4">
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    {input backToDashboard}
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input goBack}
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input next}
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
 
-        {input backToDashboard}
-        {input addWorker}
-        {input clearWorkers}
-
-    {/form}
-    
-    <a n:href="tmpTaskPart3"> pokracovat</a>
+{/block isMainPanel}

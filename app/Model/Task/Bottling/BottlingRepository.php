@@ -6,20 +6,69 @@ namespace App\Model\Task\Bottling;
 
 use Nette\Database\Explorer;
 use App\Model\Task\TaskState;
-
+use App\Model\Wine\Wine;
+use App\Model\Task\Bottling\Bottling;
+use App\Model\Wine\WineRepository;
 
 class BottlingRepository
 {
     private Explorer $database;
+    private WineRepository $wineRepository;
 
     /**
      * Constructor of the BottlingRepository.
      *
      * @param Explorer $database Database explorer.
      */
-    public function __construct(Explorer $database)
+    public function __construct(Explorer $database, WineRepository $wineRepository)
     {
         $this->database = $database;
+        $this->wineRepository = $wineRepository;
+    }
+
+    /**
+     * fetchById
+     * Method for fetch the joined bottling with task by id.
+     * @param int id of task/bottling wich will be fetch.
+     * @return Bottling|null Object of bottling if this data exists, else return null.
+     */
+    public function fetchById(int $id): ?Bottling
+    {
+        $row = $this->database->table('BOTTLING')
+            ->where('ID', $id)
+            ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+            ->select('BOTTLING.*, TASK.*')
+            ->fetch();
+
+        if ($row === null) {
+            return null;
+        }
+
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+        if ($wine === null) {
+            return null;
+        }
+
+        /** @var Bottling $bottling */
+        $bottling = new Bottling(
+            $row->ID,
+            $row->NAME,
+            TaskState::from((string)$row->STATE),
+            $row->CREATION_TIMESTAMP,
+            $row->LAST_CHANGE_TIMESTAMP,
+            $row->PLANNED_EXECUTION_TIMESTAMP,
+            $row->EXECUTION_TIMESTAMP,
+            $wine,
+            $row->NOTE,
+            ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
+            ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
+            ($row->ID_WINE !== null) ? (int)$row->ID_WINE : null,
+            (int)$row->BOTTLES_COUNT,
+            (float)$row->BOTTLE_VOLUME
+        );
+
+        return $bottling;
     }
 
     /**
@@ -52,6 +101,11 @@ class BottlingRepository
         // Create bottling objects and return them
         $bottlings = [];
         foreach ($mainQuery as $row) {
+            /** @var Wine $wine */
+            $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+            if ($wine === null) {
+                continue;
+            }
             $bottlings[] = new Bottling(
                 (int)$row->ID,
                 (string)$row->NAME,
@@ -60,6 +114,7 @@ class BottlingRepository
                 $row->LAST_CHANGE_TIMESTAMP,
                 $row->PLANNED_EXECUTION_TIMESTAMP ?? null,
                 $row->EXECUTION_TIMESTAMP ?? null,
+                $wine,
                 (string)$row->NOTE,
                 $row->ID_TASK_ISSUER !== null ? (int)$row->ID_TASK_ISSUER : null,
                 $row->ID_TASK_CONFIRMER !== null ? (int)$row->ID_TASK_CONFIRMER : null,
@@ -70,43 +125,6 @@ class BottlingRepository
         }
 
         return $bottlings;
-    }
-
-    /**
-     * fetchById
-     * Method for fetch the joined bottling with task by id.
-     * @param int Id of task/bottling wich will be fetch.
-     * @return Bottling|null Object of bottling if this data exists, else return null.
-     */
-    public function fetchById(int $id): ?Bottling
-    {
-        /** @var Row|null $queryResult Result of the query for joined table task and bottling */
-        $queryResult = $this->database->table('BOTTLING')
-            ->joinWhere('TASK', 'TASK.ID = ID_TASK')
-            ->select('TASK.*, BOTTLING.*')
-            ->where('BOTTLING.ID_TASK', $id)
-            ->fetch();
-
-        // If this task does not exist
-        if (!$queryResult) {
-            return null;
-        }
-
-        return new Bottling(
-            (int)$queryResult->ID,
-            (string)$queryResult->NAME,
-            TaskState::from((string)$queryResult->STATE),
-            $queryResult->CREATION_TIMESTAMP,
-            $queryResult->LAST_CHANGE_TIMESTAMP,
-            $queryResult->PLANNED_EXECUTION_TIMESTAMP ?? null,
-            $queryResult->EXECUTION_TIMESTAMP ?? null,
-            (string)$queryResult->NOTE,
-            $queryResult->ID_TASK_ISSUER !== null ? (int)$queryResult->ID_TASK_ISSUER : null,
-            $queryResult->ID_TASK_CONFIRMER !== null ? (int)$queryResult->ID_TASK_CONFIRMER : null,
-            $queryResult->ID_WINE !== null ? (int)$queryResult->ID_WINE : null,
-            (int)$queryResult->BOTTLES_COUNT,
-            (float)$queryResult->BOTTLE_VOLUME
-        );
     }
 
 }

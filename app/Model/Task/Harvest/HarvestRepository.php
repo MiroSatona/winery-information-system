@@ -179,4 +179,30 @@ final class HarvestRepository
 
         return $harvests;
     }
+
+    public function markHarvestDone(int $idHarvest, float $weight, float $sugarContent, int $idUser): bool
+    {
+        try {
+            return $this->database->transaction(function () use ($idHarvest, $weight, $sugarContent, $idUser): bool {
+                $this->database->table('HARVEST')
+                    ->where('ID_TASK', $idHarvest)
+                    ->update([
+                        'WEIGHT' => $weight,
+                        'SUGAR_CONTENT' => $sugarContent,
+                        'ID_HARVEST_CONFIRMER' => $idUser
+                    ]);
+
+                $this->database->table('TASK')
+                    ->where('ID', $idHarvest)
+                    ->update([
+                        'LAST_CHANGE_TIMESTAMP' => new \DateTime()
+                    ]);
+                
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Error marking harvest done: ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
+    }
 }   

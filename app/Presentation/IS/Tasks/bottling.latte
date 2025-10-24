@@ -1,0 +1,96 @@
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <i class="fas fa-arrow-right me-2"></i>Úkony
+    <i class="fas fa-arrow-right me-2"></i>Lahvování
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 col-lg-9 col-xl-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-wine-bottle me-2"></i>
+                        Výroba / Výběr vína a láhve
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form wineSelectForm}
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="wine" class="form-label fw-semibold">
+                                    <i class="fas fa-wine-glass-alt me-2 text-muted"></i>{label wine /}
+                                </label>
+                                {input wine}
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="wine-image-input" class="form-label fw-semibold">
+                                    <i class="far fa-image me-2 text-muted"></i>{label image /}
+                                </label>
+                                {input image}
+                                <div class="form-text">Nahrajte obrázek láhve nebo odrůdy. Náhled je níže.</div>
+                            </div>
+
+                            <div class="col-12 col-md-6 d-flex align-items-start flex-column">
+                                <label class="form-label fw-semibold">
+                                    <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
+                                </label>
+                                {input volume}
+                                <div class="form-text">Zadejte objem v litrech nebo jednotkách, které projekt používá.</div>
+                            </div>
+
+                            <div class="col-12">
+                                <h6 class="fw-semibold mb-2">Náhled obrázku</h6>
+                                <div class="border rounded p-3 d-flex justify-content-center align-items-center" style="min-height:160px;">
+                                    <img id="wine-preview" src="" alt="Obrázek - náhled" class="img-fluid" style="max-height:200px; object-fit:contain;" />
+                                </div>
+                            </div>
+
+                            <div class="col-12 border-top pt-4 mt-2">
+                                <div class="row g-2">
+                                    <div class="col-6">
+                                        <a href="{link dashboard}" class="btn btn-outline-secondary w-100">
+                                            <i class="fas fa-arrow-left me-1"></i> Zpět
+                                        </a>
+                                    </div>
+                                    <div class="col-6">
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="fas fa-check me-1"></i> Pokračovat
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){
+            // Find file input (we set id above), and preview image element
+            const fileInput = document.getElementById('wine-image-input');
+            const preview = document.getElementById('wine-preview');
+
+            if (!fileInput || !preview) return;
+
+            fileInput.addEventListener('change', function(e){
+                const file = this.files && this.files[0];
+                if (!file) {
+                    // restore empty transparent placeholder
+                    preview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
+                    return;
+                }
+                const reader = new FileReader();
+                reader.onload = function(ev){
+                    preview.src = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+        })();
+    </script>
+
+{/block isMainPanel}

@@ -752,7 +752,7 @@ final class WinePresenter extends BasePresenter
 
         $form->addSelect('color', 'Barva vína', [
             'WHITE' => 'Bílé',
-            'PINK' => 'Růžové',
+            'ROSE' => 'Růžové',
             'RED' => 'Červené',
         ])
             ->setValue('WHITE')

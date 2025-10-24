@@ -46,7 +46,7 @@
                                     </a>
                                 </td>
                                 <td class="text-center">
-                                    <img src="{asset $imageRepository->getPathForImage($item->wine->img)}"
+                                    <img src="{if $item->wine->img} {asset $imageRepository->getPathForImage($item->wine->img)}{else}{/if}"
                                          alt="{$item->wine->img->description}" class="rounded shadow-sm" width="80">
                                 </td>
                                 <td class="text-center">
