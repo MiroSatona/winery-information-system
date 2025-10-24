@@ -401,7 +401,7 @@ final class TasksPresenter extends BasePresenter
      */
     public function renderDetailHarvest(int $id): void
     {
-        $harvest = $this->harvestRepository->fetchById($id);
+        $harvest = $this->taskRepository->fetchById($id);
 
         if ($harvest === null) {
             $this->flashMessage('Chyba při načítání sklizně z databáze, zkuste to prosím znovu.', 'error');
@@ -422,7 +422,7 @@ final class TasksPresenter extends BasePresenter
      */
     public function renderDetailBottling(int $id): void
     {
-        $bottling = $this->bottlingRepository->fetchById($id);
+        $bottling = $this->taskRepository->fetchById($id);
 
         if ($bottling === null) {
             $this->flashMessage('Chyba při načítání lahvování z databáze, zkuste to prosím znovu.', 'error');
@@ -443,7 +443,7 @@ final class TasksPresenter extends BasePresenter
      */
     public function renderDetailTreatment(int $id): void
     {
-        $treatment = $this->treatmentRepository->fetchById($id);
+        $treatment = $this->taskRepository->fetchById($id);
 
         if ($treatment === null) {
             $this->flashMessage('Chyba při načítání ošetření z databáze, zkuste to prosím znovu.', 'error');

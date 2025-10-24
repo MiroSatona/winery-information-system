@@ -84,7 +84,7 @@ class BottlingRepository
         $queryResult = $this->database->table('BOTTLING')
             ->joinWhere('TASK', 'TASK.ID = ID_TASK')
             ->select('TASK.*, BOTTLING.*')
-            ->where('BOTTLING.ID', $id)
+            ->where('BOTTLING.ID_TASK', $id)
             ->fetch();
 
         // If this task does not exist

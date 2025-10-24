@@ -87,7 +87,7 @@ class TreatmentRepository
     $queryResult = $this->database->table('TREATMENT')
         ->joinWhere('TASK', 'TASK.ID = ID_TASK')
         ->select('TASK.*, TREATMENT.*')
-        ->where('TREATMENT.ID', $id)
+        ->where('TREATMENT.ID_TASK', $id)
         ->fetch();
 
     // If this task does not exist
