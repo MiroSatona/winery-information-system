@@ -214,11 +214,14 @@ class TaskRepository{
 
             // compute bottles count based on wine volume if possible
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
+            bdump($wineVolume);
+            bdump($bottleVolume);
             $bottlesCount = 0;
             if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
                 // assume VOLUME is in same units as bottleVolume (best-effort)
-                $bottlesCount = (int) floor($wineVolume / ($bottleVolume*1000));
+                $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
             }
+            bdump($bottlesCount);
 
             if ($bottlesCount <= 0) {
                 throw new \Exception('Computed bottles count is zero or invalid');
@@ -278,11 +281,6 @@ class TaskRepository{
             if ($bottlingRow === null) {
                 throw new \Exception('Failed to insert bottling');
             }
-
-            // update wine state and bottles_left if appropriate
-            $this->database->table('WINE')->where('ID', $idWine)->update([
-                'BOTTLES_LEFT' => $bottlesCount,
-            ]);
 
             // assign workers if provided
             $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
