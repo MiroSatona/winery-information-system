@@ -17,14 +17,19 @@ use App\Model\Task\Bottling\Bottling;
 use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
+use App\Model\Task\Harvest\HarvestRepository;
+use App\Model\Validation\ValidationDefinitions;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 
 final class TasksPresenter extends BasePresenter
 {
 
-    public function __construct(private UserRepository $userRepository, private TaskRepository $taskRepository)
-    {
+    public function __construct(
+        private UserRepository $userRepository,
+        private TaskRepository $taskRepository,
+        private HarvestRepository $harvestRepository
+    ) {
         parent::__construct();
     }
 
@@ -34,6 +39,11 @@ final class TasksPresenter extends BasePresenter
         if (!($this->user->isInRole(Role::WORKER->name) || $this->user->isInRole(Role::VINTNER->name))) {
             $this->redirect(':Home:default');
         }
+
+        $this->template->TaskStateType = TaskState::class;
+        $this->template->HarvestType = Harvest::class;
+        $this->template->TreatmentType = Treatment::class;
+        $this->template->BottlingType = Bottling::class;
     }
 
     public function renderDashboard(): void
@@ -63,7 +73,7 @@ final class TasksPresenter extends BasePresenter
 
         $form->addText("name", "Název úkonu")
             ->setRequired('Zadejte název úkolu.')
-            ->setHtmlAttribute("class", "form-control form-control-sm")
+            ->setHtmlAttribute("class", "form-control")
             ->setHtmlAttribute("placeholder", "Zadejte název úkolu ...");
    
         $form->addSelect('type', 'Typ úkonu', [
@@ -72,7 +82,7 @@ final class TasksPresenter extends BasePresenter
            TaskType::TREATMENT->value => "Ošetření"
         ])
             ->setRequired('Zvolte typ úkonu.')
-            ->setHtmlAttribute("class", "form-select from-select-sm")
+            ->setHtmlAttribute("class", "form-select")
             ->setDefaultValue(TaskType::BOTTLING->value)
             ->setHtmlAttribute("style", "width: 150px;");
        
@@ -84,7 +94,7 @@ final class TasksPresenter extends BasePresenter
         $form->addDate('planned_date', 'Datum plánovaného provedení')
             ->setValue(new DateTime('now'))
             ->setRequired('Zadejte plánované datum provedení.')
-            ->setHtmlAttribute('class', 'form-control form-control-sm')
+            ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('style', 'width: 200px;');
 
         $send = $form->addSubmit('send', 'Pokračovat');
@@ -495,16 +505,16 @@ final class TasksPresenter extends BasePresenter
     * @param Form $form Form where the error was detected.
     * @return void
     */
-   public function formError(Form $form): void
-   {
-      $errors = $form->getErrors();
+    public function formError(Form $form): void
+    {
+        $errors = $form->getErrors();
 
-        if (!empty($errors)) {
-            $this->flashMessage($errors[0], 'error');
-        } else {
-            $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
-        }
-   }
+            if (!empty($errors)) {
+                $this->flashMessage($errors[0], 'error');
+            } else {
+                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
+            }
+    }
 
     // 3 sub tasks here 
     public function renderBottling() {
@@ -517,6 +527,132 @@ final class TasksPresenter extends BasePresenter
 
     public function renderTreatment() {
 
+    }
+
+    // HARVEST MARKING
+    public function createComponentMarkHarvestDoneForm(): Form
+    {
+        $form = new Form();
+        
+        $form->addFloat('quantity', 'Množství sklizených hroznů (kg)')
+            ->setRequired('Zadejte množství sklizených hroznů.')
+            ->addRule(Form::Min, 'Množství musí být minimálně %d kg.', ValidationDefinitions::HARVEST_WEIGHT_MIN)
+            ->addRule(Form::Max, 'Množství nesmí přesáhnout %d kg.', ValidationDefinitions::HARVEST_WEIGHT_MAX)
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte množství sklizených hroznů v kg');
+        
+        $form->addFloat('sugar_content', 'Cukernatost (°NM)')
+            ->setRequired('Zadejte cukernatost.')
+            ->addRule(Form::Min, 'Cukernatost musí být minimálně %d °NM.', ValidationDefinitions::SUGAR_CONTENT_MIN)
+            ->addRule(Form::Max, 'Cukernatost nesmí přesáhnout %d °NM.', ValidationDefinitions::SUGAR_CONTENT_MAX)
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte cukernatost hroznů v °NM');
+    
+        $form->addSubmit('send', 'Uložit')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+    
+        $form->onSuccess[] = [$this, 'onSuccessMarkHarvestDoneForm'];
+    
+        return $form;
+    }
+
+    public function onSuccessMarkHarvestDoneForm(Form $form, \stdClass $values): void
+    {
+        $id = (int)$this->getParameter('id');
+
+        /** @var Harvest $harvest */
+        $harvest = $this->harvestRepository->fetchById($id);
+        if ($harvest === null) {
+            $this->flashMessage('Sklizeň nebyla nalezena.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
+        $result = $this->harvestRepository->markHarvestDone(
+            $id,
+            (float)$values->quantity,
+            (float)$values->sugar_content,
+            $this->user->getId()
+        );
+        if ($result) {
+            $this->flashMessage('Sklizeň byla úspěšně označena jako dokončená.', 'success');
+            $this->redirect('Tasks:dashboard');
+        } else {
+            $this->flashMessage('Při označování sklizně došlo k chybě.', 'error');
+            $this->redirect('Tasks:dashboard');
+        }
+    }
+
+    public function renderMarkHarvestDone(int $id): void
+    {
+        /** @var Harvest $harvest */
+        $harvest = $this->harvestRepository->fetchById($id);
+        if ($harvest === null) {
+            $this->flashMessage('Sklizeň nebyla nalezena.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
+        $this->template->harvest = $harvest;
+    }
+
+    public function createComponentMarkTaskDoneForm(): Form
+    {
+        $form = new Form();
+
+        $form->addDate('execution_date', 'Datum provedení')
+            ->setValue(new DateTime('now'))
+            ->setRequired('Zadejte datum provedení.')
+            ->setHtmlAttribute('class', 'form-control');
+
+        $form->addSubmit('send', 'Zaznamenat splnění')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+        
+        $form->onSuccess[] = [$this, 'onSuccessMarkTaskDoneForm'];
+
+        return $form;
+    }
+
+    public function onSuccessMarkTaskDoneForm(Form $form, \stdClass $values): void
+    {
+        $id = (int)$this->getParameter('id');
+
+        /** @var Task $task */
+        $task = $this->taskRepository->fetchById($id);
+        if ($task === null) {
+            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
+        // todo checks
+
+        $result = $this->taskRepository->markTaskDone(
+            $task,
+            $this->user->getId(),
+            new DateTime((string)$values->execution_date->format('Y-m-d') . ' 00:00:00')
+        );
+
+        if ($result) {
+            $this->flashMessage('Úkon byl úspěšně označen jako dokončený.', 'success');
+            $this->redirect('Tasks:dashboard');
+        } else {
+            $this->flashMessage('Při označování úkonu došlo k chybě.', 'error');
+            $this->redirect('Tasks:dashboard');
+        }
+    }
+
+    public function renderMarkTaskDone(int $id): void
+    {
+        /** @var Task $task */
+        $task = $this->taskRepository->fetchById($id);
+        if ($task === null) {
+            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
+        $this->template->task = $task;
     }
 }
 

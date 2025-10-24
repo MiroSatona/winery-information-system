@@ -343,11 +343,20 @@ INSERT INTO `USER` (`ID`, `NAME`, `SURNAME`, `USERNAME`, `EMAIL`, `PSWD_HASH`, `
 -- task table
 INSERT INTO TASK (ID, NAME, STATE, CREATION_TIMESTAMP, LAST_CHANGE_TIMESTAMP, PLANNED_EXECUTION_TIMESTAMP, EXECUTION_TIMESTAMP, NOTE, ID_TASK_ISSUER, ID_TASK_CONFIRMER)
 VALUES
-(1, 'Harvest Grapes', 'PLANNED', '2023-10-01 10:00:00', '2023-10-01 10:00:00', '2023-10-05 08:00:00', NULL, 'Harvest the grapes in the vineyard', 1, NULL),
-(2, 'Bottle Wine', 'FINISHED', '2023-10-02 11:00:00', '2023-10-02 12:00:00', '2023-10-07 10:00:00', '2023-10-07 09:00:00', 'Bottling the wine from last harvest', 2, 3),
-(3, 'Wine Quality Check', 'CANCELED', '2023-10-03 15:00:00', '2023-10-03 16:00:00', '2023-10-10 10:00:00', NULL, 'Quality check canceled due to logistics issues', NULL, NULL),
-(4, 'Harvest 2', 'PLANNED', '2023-11-01 10:00:00', '2023-11-01 10:00:00', '2023-11-05 08:00:00', NULL, 'Harvest the grapes in the vineyard - second task', 1, NULL),
-(5, 'Harvest 3', 'FINISHED', '2023-11-02 11:00:00', '2023-11-02 12:00:00', '2023-11-07 10:00:00', '2023-11-07 09:00:00', 'Harvest the grapes in the vineyard - third task', 2, 3);
+(1, 'Sklizeň hroznů', 'PLANNED', '2023-10-01 10:00:00', '2023-10-01 10:00:00', '2023-10-05 08:00:00', NULL, 'Sklidit hrozny na vinohradu', 1, NULL),
+(2, 'Sklizeň hroznů', 'FINISHED', '2023-10-02 11:00:00', '2023-10-02 12:00:00', '2023-10-07 10:00:00', '2023-10-07 09:00:00', 'Sklizeň hroznů z poslední sklizně', 2, 3),
+(3, 'Sklizeň hroznů', 'CANCELED', '2023-10-03 15:00:00', '2023-10-03 16:00:00', '2023-10-10 10:00:00', NULL, 'Sklizeň hroznů zrušena kvůli logistickým problémům', NULL, NULL),
+(4, 'Sklizeň hroznů', 'PLANNED', '2023-11-01 10:00:00', '2023-11-01 10:00:00', '2023-11-05 08:00:00', NULL, 'Sklizeň hroznů na vinohradu - druhý úkol', 1, NULL),
+(5, 'Sklizeň hroznů', 'FINISHED', '2023-11-02 11:00:00', '2023-11-02 12:00:00', '2023-11-07 10:00:00', '2023-11-07 09:00:00', 'Sklizeň hroznů na vinohradu - třetí úkol', 2, 3),
+(6, 'Sklizeň hroznů', 'FINISHED', '2024-05-01 09:00:00', '2024-05-10 07:00:00', '2024-05-06 07:00:00', '2024-05-10 07:00:00', 'Sklizeň hroznů na vinohradu - fáze 4', 3, NULL),
+(7, 'Lahvování vína', 'FINISHED', '2024-05-11 10:00:00', '2024-05-15 12:00:00', '2024-05-20 09:00:00', '2024-05-15 12:00:00', 'Lahvování vína z poslední sklizně', 1, 2),
+(8, 'Lahvování vína', 'FINISHED', '2024-06-01 10:00:00', '2024-06-05 12:00:00', '2024-06-10 09:00:00', '2024-06-05 12:00:00', 'Lahvování vína z poslední sklizně - druhé kolo', 2, 3),
+(9, 'Lahvování vína', 'PLANNED', '2024-06-10 10:00:00', '2024-06-10 10:00:00', '2024-06-15 09:00:00', NULL, 'Lahvování vína z poslední sklizně - plánované', 3, NULL),
+(10, 'Ošetření vinice', 'PLANNED', '2024-06-15 10:00:00', '2024-06-15 10:00:00', '2024-06-20 09:00:00', NULL, 'Ošetření vínice před sezónou', 1, NULL),
+(11, 'Ošetření vinice', 'FINISHED', '2024-06-16 11:00:00', '2024-06-16 12:00:00', '2024-06-21 10:00:00', '2024-06-21 09:00:00', 'Ošetření vínice - dokončeno', 2, 3),
+(12, 'Ošetření vinice', 'CANCELED', '2024-06-17 15:00:00', '2024-06-17 16:00:00', '2024-06-22 10:00:00', NULL, 'Ošetření vínice zrušeno kvůli nepříznivému počasí', NULL, NULL),
+(13, 'Sklizeň hroznů', 'FINISHED', '2024-06-18 09:00:00', '2024-06-20 07:00:00', '2024-06-19 07:00:00', '2024-06-20 07:00:00', 'Sklizeň hroznů na vinohradu - fáze 5', 1, 2),
+(14, 'Sklizeň hroznů', 'FINISHED', '2024-06-21 09:00:00', '2024-06-23 07:00:00', '2024-06-22 07:00:00', '2024-06-23 07:00:00', 'Sklizeň hroznů na vinohradu - fáze 6', 2, 3);
 -- picture table
 INSERT INTO PICTURE (ID, IMAGE_NAME, LINK, DESCRIPTION)
 VALUES
@@ -412,28 +421,48 @@ VALUES
 (4, 3, 2, 143, 2013),
 (5, 3, 8, 168, 2019);
 
+
+
 -- Treatment table 
 INSERT INTO TREATMENT (ID_TASK, CATEGORY, TREAT_NAME, QUANTITY, UNIT)
 VALUES
-(1, 'Pesticide', 'Insecticide Spray', 10.5, 'liters'),
-(2, 'Fertilizer', 'Organic Fertilizer', 15.2, 'kg'),
-(3, 'Herbicide', 'Weed Control', 5.0, 'liters');
+(10, 'Fungicid', 'Mancozeb', 2.5, 'ml/litr'),
+(11, 'Turbo Hnojivo', 'Hnojivo XL Super', 3.0, 'kg/m²'),
+(12, 'Insekticid', 'Spinosad', 1.5, 'ml/litr');
 
 -- Harvest Table
 INSERT INTO HARVEST (ID_TASK, ID_VINEYARD, ID_WINE_VARIETY, ID_HARVEST_CONFIRMER, ID_WINE, WEIGHT, SUGAR_CONTENT)
 VALUES
-(1, 1, 1, 3, 1, 1200.5, 24.3),
+(1, 1, 1, NULL, NULL, NULL, NULL),
 (2, 2, 2, 2, 2, 850.0, 22.1),
-(3, 3, 3, 1, 3, 1100.3, 20.5),
+(3, 3, 3, NULL, NULL, NULL, NULL),
 (4, 1, 1, NULL, NULL, NULL, NULL),
-(5, 2, 2, 2, NULL, 900.0, 23.0);
+(5, 2, 2, 2, NULL, 900.0, 23.0),
+(6, 3, 3, NULL, NULL, NULL, NULL),
+(13, 1, 1, 1, 1, 950.0, 21.5),
+(14, 3, 3, 2, 3, 800.0, 22.8);
+
+-- TASK_ROW table
+INSERT INTO TASK_ROW (ID_VINEYARD, CODE_ROW, ID_TASK)
+VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 2, 3),
+(1, 3, 4),
+(2, 4, 5),
+(3, 5, 6),
+(1, 1, 10),
+(2, 2, 11),
+(3, 3, 12),
+(1, 2, 13),
+(3, 4, 14);
 
 -- BOTTLING table 
 INSERT INTO BOTTLING (ID_TASK, ID_WINE, BOTTLES_COUNT, BOTTLE_VOLUME)
 VALUES
-(2, 1, 100, 0.75),
-(3, 2, 200, 0.75),
-(1, 3, 150, 0.75);
+(7, 3, 100, 750),
+(8, 2, 200, 750),
+(9, 1, 150, 750);
 
 
 -- CUSTOMER_ORDER table 

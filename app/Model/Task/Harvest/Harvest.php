@@ -55,12 +55,12 @@ final class Harvest extends Task
         return $this->wineVariety;
     }
 
-    public function getIdHarvestConfirmer(): int
+    public function getIdHarvestConfirmer(): ?int
     {
         return $this->idHarvestConfirmer;
     }
 
-    public function getIdWine(): int
+    public function getIdWine(): ?int
     {
         return $this->idWine;
     }

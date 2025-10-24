@@ -5,12 +5,15 @@ declare(strict_types=1);
 
 namespace App\Model\Task;
 
+use App\Model\Task\Bottling\Bottling;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use App\Model\Task\TaskState;
 use App\Model\Task\Treatment\TreatmentRepository;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Task\Harvest\HarvestRepository;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 class TaskRepository{
     private Explorer $database;
@@ -142,5 +145,36 @@ class TaskRepository{
 
         return null;
 
+    }
+
+    public function markTaskDone(Task $task, int $confirmerId, DateTime $executionDate): bool
+    {
+        try {
+            return $this->database->transaction(function () use ($task, $confirmerId, $executionDate) {
+
+                $this->database->table('TASK')
+                    ->where('ID', $task->getId())
+                    ->update([
+                        'STATE' => TaskState::FINISHED->value,
+                        'LAST_CHANGE_TIMESTAMP' => new DateTime(),
+                        'EXECUTION_TIMESTAMP' => $executionDate,
+                        'ID_TASK_CONFIRMER' => $confirmerId,
+                    ]);
+
+                // also update wine to bottled state if it was bottling
+                if ($task instanceof Bottling) {
+                    $this->database->table('WINE')
+                        ->where('ID', $task->getWine()->getId())
+                        ->update([
+                            'STATE' => 'BOTTLED',
+                        ]);
+                }
+
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log("Failed to mark Task ID " . $task->getId() . " as done. Error: " . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
     }
 }

@@ -7,20 +7,73 @@ namespace App\Model\Task\Treatment;
 use Nette\Database\Explorer;
 use App\Model\Task\Treatment\Treatment;
 use App\Model\Task\TaskState;
-
+use App\Model\Vineyard\Vineyard;
+use App\Model\Vineyard\VineyardRepository;
 
 class TreatmentRepository
 {   /** @var Explorer $database Database explorer. */
     private Explorer $database;
+    private VineyardRepository $vineyardRepository;
 
     /**
      * Constructor of the TreatmentRepository.
      *
      * @param Explorer $database Database explorer.
+     * @param VineyardRepository $vineyardRepository
      */
-    public function __construct(Explorer $database)
+    public function __construct(Explorer $database, VineyardRepository $vineyardRepository)
     {
         $this->database = $database;
+        $this->vineyardRepository = $vineyardRepository;
+    }
+
+    /**
+     * fetchById
+     * Method for fetch the joined treatment with task by id.
+     * @param int Id of task/bottling wich will be fetch.
+     * @return Treatment|null Object of treatment if this data exists, else return null.
+     */
+    public function fetchById(int $id): ?Treatment
+    {
+        $row = $this->database->table('TREATMENT')
+            ->where('ID', $id)
+            ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+            ->select('TREATMENT.*, TASK.*')
+            ->fetch();
+
+        if ($row === null) {
+            return null;
+        }
+
+        /** @var Vineyard[] $vineyards */
+        $vineyards = [];
+        $vineyardRows = $this->database->table('TASK_ROW')
+            ->where('ID_TASK', $id)
+            ->select('DISTINCT ID_VINEYARD');
+        foreach ($vineyardRows as $vineyardRow) {
+            $vineyards[] = $this->vineyardRepository->fetchById((int)$vineyardRow->ID_VINEYARD);
+        }
+
+        /** @var Treatment $treatment */
+        $treatment = new Treatment(
+            $row->ID,
+            $row->NAME,
+            TaskState::from((string)$row->STATE),
+            $row->CREATION_TIMESTAMP,
+            $row->LAST_CHANGE_TIMESTAMP,
+            $row->PLANNED_EXECUTION_TIMESTAMP,
+            $row->EXECUTION_TIMESTAMP,
+            $vineyards,
+            $row->NOTE,
+            ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
+            ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
+            $row->CATEGORY,
+            $row->NAME,
+            $row->QUANTITY,
+            $row->UNIT
+        );
+
+        return $treatment;
     }
     
 
@@ -51,9 +104,21 @@ class TreatmentRepository
         // Fetch all filtered data
         $mainQuery->fetchAll();
 
+        
+
         // Create treatment objects and return them
         $treatments = [];
         foreach ($mainQuery as $row) {
+
+            /** @var Vineyard[] $vineyards */
+            $vineyards = [];
+            $vineyardRows = $this->database->table('TASK_ROW')
+                ->where('ID_TASK', $row->ID)
+                ->select('DISTINCT ID_VINEYARD')
+                ->fetchAll();
+            foreach ($vineyardRows as $vineyardRow) {
+                $vineyards[] = $this->vineyardRepository->fetchById((int)$vineyardRow->ID_VINEYARD);
+            }
             $treatments[] = new Treatment(
                 (int) $row->ID,
                 (string) $row->NAME,
@@ -62,6 +127,7 @@ class TreatmentRepository
                 $row->LAST_CHANGE_TIMESTAMP,
                 $row->PLANNED_EXECUTION_TIMESTAMP ?? null,
                 $row->EXECUTION_TIMESTAMP ?? null,
+                $vineyards,
                 (string) $row->NOTE,
                 $row->ID_TASK_ISSUER !== null ? (int) $row->ID_TASK_ISSUER : null,
                 $row->ID_TASK_CONFIRMER !== null ? (int) $row->ID_TASK_CONFIRMER : null,
@@ -74,44 +140,4 @@ class TreatmentRepository
 
         return $treatments;
     }
-
-    /**
-     * fetchById
-     * Method for fetch the joined treatment with task by id.
-     * @param int Id of task/bottling wich will be fetch.
-     * @return Treatment|null Object of treatment if this data exists, else return null.
-     */
-    public function fetchById(int $id): ?Treatment
-    {
-    /** @var Row|null $queryResult Result of the query for joined table task and treatment */
-    $queryResult = $this->database->table('TREATMENT')
-        ->joinWhere('TASK', 'TASK.ID = ID_TASK')
-        ->select('TASK.*, TREATMENT.*')
-        ->where('TREATMENT.ID_TASK', $id)
-        ->fetch();
-
-    // If this task does not exist
-    if (!$queryResult) {
-        return null;
-    }
-
-    return new Treatment(
-        (int) $queryResult->ID,
-        (string) $queryResult->NAME,
-        TaskState::from((string) $queryResult->STATE),
-        $queryResult->CREATION_TIMESTAMP,
-        $queryResult->LAST_CHANGE_TIMESTAMP,
-        $queryResult->PLANNED_EXECUTION_TIMESTAMP ?? null,
-        $queryResult->EXECUTION_TIMESTAMP ?? null,
-        (string) $queryResult->NOTE,
-        $queryResult->ID_TASK_ISSUER !== null ? (int) $queryResult->ID_TASK_ISSUER : null,
-        $queryResult->ID_TASK_CONFIRMER !== null ? (int) $queryResult->ID_TASK_CONFIRMER : null,
-        (string) $queryResult->CATEGORY,
-        (string) $queryResult->NAME,
-        (float) $queryResult->QUANTITY,
-        (string) $queryResult->UNIT
-    );
-    }
-
-
 }

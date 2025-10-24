@@ -25,6 +25,7 @@ final class Treatment extends Task
         private DateTime $lastChangeTimestamp,
         private ?DateTime $plannedTimestamp,
         private ?DateTime $executionTimestamp,
+        private array $vineyards,
         private string $note,
         private ?int $idTaskIssuer,
         private ?int $idTaskConfirmer,
@@ -71,5 +72,15 @@ final class Treatment extends Task
     public function getUnit(): string
     {
         return $this->unit;
+    }
+
+    /**
+     * getVineyards
+     *
+     * @return Vineyard[]
+     */
+    public function getVineyards(): array
+    {
+        return $this->vineyards;
     }
 }
