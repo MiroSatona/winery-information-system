@@ -89,7 +89,7 @@ class TaskRepository{
      * @param string $state Task state to filter by.
      * @return array
      */
-     public function fetchTasks(string $pattern, string $type, string $state): array
+    public function fetchTasks(string $pattern, string $type, string $state): array
     {
         /** @var Task[] $tasks Array of all Tasks. */
         $tasks = [];
@@ -117,5 +117,30 @@ class TaskRepository{
         return $tasks;
     }
 
-    
+    /**
+     * fetchById
+     * Method for fetch a task joined with its specific table (bottling, harvest, or treatment).
+     *
+     * @param int $id ID of the task.
+     * @return Task|null Returns the corresponding Task object, or null if not found.
+     */
+    public function fetchById(int $id): ?Task
+    {
+       
+        $bottling = $this->bottlingRepository->fetchById($id);
+        if ($bottling !== null) {
+            return $bottling;
+        }
+        $harvest = $this->harvestRepository->fetchById($id);
+        if ($harvest !== null) {
+            return $harvest;
+        }
+        $treatment = $this->treatmentRepository->fetchById($id);
+        if ($treatment !== null) {
+            return $treatment;
+        }
+
+        return null;
+
+    }
 }

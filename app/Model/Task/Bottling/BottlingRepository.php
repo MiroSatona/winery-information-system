@@ -71,4 +71,43 @@ class BottlingRepository
 
         return $bottlings;
     }
+
+    /**
+     * fetchById
+     * Method for fetch the joined bottling with task by id.
+     * @param int Id of task/bottling wich will be fetch.
+     * @return Bottling|null Object of bottling if this data exists, else return null.
+     */
+    public function fetchById(int $id): ?Bottling
+    {
+        /** @var Row|null $queryResult Result of the query for joined table task and bottling */
+        $queryResult = $this->database->table('BOTTLING')
+            ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+            ->select('TASK.*, BOTTLING.*')
+            ->where('BOTTLING.ID_TASK', $id)
+            ->fetch();
+
+        // If this task does not exist
+        if (!$queryResult) {
+            return null;
+        }
+
+        return new Bottling(
+            (int)$queryResult->ID,
+            (string)$queryResult->NAME,
+            TaskState::from((string)$queryResult->STATE),
+            $queryResult->CREATION_TIMESTAMP,
+            $queryResult->LAST_CHANGE_TIMESTAMP,
+            $queryResult->PLANNED_EXECUTION_TIMESTAMP ?? null,
+            $queryResult->EXECUTION_TIMESTAMP ?? null,
+            (string)$queryResult->NOTE,
+            $queryResult->ID_TASK_ISSUER !== null ? (int)$queryResult->ID_TASK_ISSUER : null,
+            $queryResult->ID_TASK_CONFIRMER !== null ? (int)$queryResult->ID_TASK_CONFIRMER : null,
+            $queryResult->ID_WINE !== null ? (int)$queryResult->ID_WINE : null,
+            (int)$queryResult->BOTTLES_COUNT,
+            (float)$queryResult->BOTTLE_VOLUME
+        );
+    }
+
 }
+

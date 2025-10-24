@@ -10,6 +10,10 @@ use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Task\TaskType;
 use App\Model\Task\TaskData;
+use App\Model\Task\Task;
+use App\Model\Task\Treatment\Treatment;
+use App\Model\Task\Harvest\Harvest;
+use App\Model\Task\Bottling\Bottling;
 use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
@@ -380,6 +384,107 @@ final class TasksPresenter extends BasePresenter
         // Set filtered tasks to template
         $this->template->tasks = $tasks;
 
+    }
+
+    /**
+     * handleDetails
+     * Method for handling program flow after task details button is pressed.
+     * 
+     * @param int $taskId ID of the task to show details for.
+     * @return void
+     */
+    public function handleDetails(int $taskId): void
+    {
+        /** @var Task $task Task to show details for. */
+        $task = $this->taskRepository->fetchById($taskId);
+
+        if ($task === null) {
+            $this->flashMessage('Chyby při načítání úkonu z databáze, zkuste to prosím znovu.', 'error');
+            $this->redirect('dashboard');
+            return;
+        }
+
+        if ($task instanceof Harvest) {
+            $this->redirect('detailHarvest', ['id' => $taskId]);
+            return;
+        }
+
+        if ($task instanceof Bottling) {
+            $this->redirect('detailBottling', ['id' => $taskId]);
+            return;
+        }
+
+        if ($task instanceof Treatment) {
+            $this->redirect('detailTreatment', ['id' => $taskId]);
+            return;
+        }
+
+        $this->flashMessage('Chyba při načítání úkonu z databáze, zkuste to prosím znovu.', 'error');
+        $this->redirect('dashboard');
+
+
+    }
+
+    /**
+     * renderDetailHarvest
+     * Method for render page with details about harvest.
+     *
+     * @param int $id ID of the harvest to show details for.
+     * @return void
+     */
+    public function renderDetailHarvest(int $id): void
+    {
+        $harvest = $this->taskRepository->fetchById($id);
+
+        if ($harvest === null) {
+            $this->flashMessage('Chyba při načítání sklizně z databáze, zkuste to prosím znovu.', 'error');
+            $this->redirect('dashboard');
+            return;
+        }
+
+        $this->template->harvest = $harvest;
+    }
+
+
+    /**
+     * renderDetailBottling
+     * Method for render page with details about bottling.
+     *
+     * @param int $id ID of the bottling to show details for.
+     * @return void
+     */
+    public function renderDetailBottling(int $id): void
+    {
+        $bottling = $this->taskRepository->fetchById($id);
+
+        if ($bottling === null) {
+            $this->flashMessage('Chyba při načítání lahvování z databáze, zkuste to prosím znovu.', 'error');
+            $this->redirect('dashboard');
+            return;
+        }
+
+        $this->template->bottling = $bottling;
+    }
+
+
+    /**
+     * renderDetailTreatment
+     * Method for render page with details about treatment.
+     *
+     * @param int $taskId ID of the treatment to show details for.
+     * @return void
+     */
+    public function renderDetailTreatment(int $id): void
+    {
+        $treatment = $this->taskRepository->fetchById($id);
+
+        if ($treatment === null) {
+            $this->flashMessage('Chyba při načítání ošetření z databáze, zkuste to prosím znovu.', 'error');
+            $this->redirect('dashboard');
+            return;
+        }
+
+        $this->template->treatment = $treatment;
     }
 
 
