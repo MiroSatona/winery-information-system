@@ -19,7 +19,7 @@ class Task
         private DateTime $lastChangeTimestamp,
         private ?DateTime $plannedTimestamp,
         private ?DateTime $executionTimestamp,
-        private string $note,
+        private ?string $note,
         private ?int $idTaskIssuer,
         private ?int $idTaskConfirmer
     ) {
@@ -61,7 +61,7 @@ class Task
         return $this->executionTimestamp;
     }
 
-    public function getNote(): string
+    public function getNote(): ?string
     {
         return $this->note;
     }
@@ -106,7 +106,7 @@ class Task
         $this->executionTimestamp = $timestamp;
     }
 
-    public function setNote(string $note): void
+    public function setNote(?string $note): void
     {
         $this->note = $note;
     }

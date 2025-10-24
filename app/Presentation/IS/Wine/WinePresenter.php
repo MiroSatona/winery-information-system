@@ -58,13 +58,13 @@ final class WinePresenter extends BasePresenter
             'all' => 'Všechny',
             'PRODUCTION' => 'Ve výrobě',
             'LIQUIDATED' => 'Zlikvidované',
-            'BOTTLED' => 'Zalahvované',
+            'BOTTLED' => 'Zalahvované', 
             'SALE' => 'Na prodej',
             'SOLD' => 'Prodáno',
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
-            ->setHtmlAttribute('style', 'max-width: 110px;');
+            ->setHtmlAttribute('style', 'max-width: 100px;');
 
         $form->addSelect('grade', 'Přívlastek', [
             'all' => 'Všechny',
@@ -78,7 +78,7 @@ final class WinePresenter extends BasePresenter
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
-            ->setHtmlAttribute('style', 'width: 150px;');
+            ->setHtmlAttribute('style', 'max-width: 100px;');
 
         $form->addSelect('type', 'Typ', [
             'all' => 'Všechny',
@@ -89,7 +89,7 @@ final class WinePresenter extends BasePresenter
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
-            ->setHtmlAttribute('style', 'width: 110px;');
+            ->setHtmlAttribute('style', 'max-width: 100px;');
 
         $form->addSubmit('send', 'Hledat')
             ->setHtmlAttribute('class', 'btn btn-sm btn-primary');

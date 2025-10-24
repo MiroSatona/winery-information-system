@@ -15,6 +15,7 @@ use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
+use Nette\Utils\DateTimeImmutable;
 
 final class TasksPresenter extends BasePresenter
 {
@@ -49,36 +50,37 @@ final class TasksPresenter extends BasePresenter
 
     public function createComponentAddTaskForm(): Form
     {
-       $form = new Form() ;
-       
-       $form->addText("name", "Název úkonu")
-       ->setHtmlAttribute("class", "form-control form-control-sm")
-       ->setHtmlAttribute("placeholder", "zadejte název úkolu ...");
+        $form = new Form();
+
+        $form->addText("name", "Název úkonu")
+            ->setRequired('Zadejte název úkolu.')
+            ->setHtmlAttribute("class", "form-control form-control-sm")
+            ->setHtmlAttribute("placeholder", "Zadejte název úkolu ...");
    
-        $form->addSelect('type', 'typ', [
+        $form->addSelect('type', 'Typ úkonu', [
            TaskType::BOTTLING->value => "Lahvování",
            TaskType::HARVEST->value => "Sklizeň",
            TaskType::TREATMENT->value => "Ošetření"
         ])
-        ->setHtmlAttribute("class", "form-select from-select-sm")
-        ->setDefaultValue(TaskType::BOTTLING->value)
-        ->setHtmlAttribute("style", "width: 150px;");
+            ->setRequired('Zvolte typ úkonu.')
+            ->setHtmlAttribute("class", "form-select from-select-sm")
+            ->setDefaultValue(TaskType::BOTTLING->value)
+            ->setHtmlAttribute("style", "width: 150px;");
        
         $form->addTextArea("note", "Poznámka")
-         ->setRequired('Zadejte popis vinohradu.')
-        ->setHtmlAttribute('class', 'form-control')
-        ->setHtmlAttribute('rows', 4)
-        ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
+            ->setRequired('Zadejte popis vinohradu.')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('rows', 4)
+            ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
     
-        $form->addText('planned_date', 'Datum provedení')
-        ->setHtmlType('date') 
-        ->setRequired('Zadejte plánované datum provedení.')
-        ->setHtmlAttribute('class', 'form-control form-control-sm')
-        ->setHtmlAttribute('style', 'width: 200px;')
-        ->addRule(Form::Pattern, 'Datum musí být ve formátu RRRR-MM-DD', '\d{4}-\d{2}-\d{2}');
+        $form->addDate('planned_date', 'Datum plánovaného provedení')
+            ->setValue(new DateTime('now'))
+            ->setRequired('Zadejte plánované datum provedení.')
+            ->setHtmlAttribute('class', 'form-control form-control-sm')
+            ->setHtmlAttribute('style', 'width: 200px;');
 
-        $form->addSubmit('send', 'Uložit a pokračovat')
-            ->setHtmlAttribute('class', 'btn btn-primary btn-sm');
+        $form->addSubmit('send', 'Pokračovat')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
         
         $form->onSuccess[] = [$this, 'addTaskFromSucceeded'];
         
@@ -152,11 +154,10 @@ final class TasksPresenter extends BasePresenter
                 $newTask->setNote((string) $values->note);
             }
 
-            // planned_date is provided as YYYY-MM-DD (or empty)
             $planned = null;
             if (isset($values->planned_date) && $values->planned_date !== '') {
                 try {
-                    $planned = new DateTime((string) $values->planned_date);
+                    $planned = new DateTime((string) $values->planned_date->format('Y-m-d') . ' 00:00:00');
                 } catch (\Exception $e) {
                     // keep null on parse failure
                     $planned = null;
@@ -283,8 +284,8 @@ final class TasksPresenter extends BasePresenter
         $form->addText('pattern', '')
             ->setHtmlAttribute('type', 'search')
             ->setHtmlAttribute('placeholder', 'Hledat úkony')
-            ->setHtmlAttribute('class', 'form-control flex-grow-1')
-            ->setHtmlAttribute('style', 'width: 400px;');
+            ->setHtmlAttribute('class', 'form-control flex-grow-1 form-control-sm')
+            ->setHtmlAttribute('style', 'max-width: 300px;');
 
         // Set selection bar for filtering by state
         $form->addSelect('state', '', [
@@ -293,8 +294,8 @@ final class TasksPresenter extends BasePresenter
             'CANCELED' => 'Zrušené',
             'FINISHED' => 'Dokončené',
         ])
-        ->setHtmlAttribute('class', 'form-select')
-        ->setHtmlAttribute('style', 'width: 150px;');
+        ->setHtmlAttribute('class', 'form-select form-select-sm')
+        ->setHtmlAttribute('style', 'width: 100px;');
 
         // Set selection bar for filtering by type
         $form->addSelect('type', '', [
@@ -304,12 +305,12 @@ final class TasksPresenter extends BasePresenter
             'TREATMENT' => 'Ošetření'
         ])
 
-        ->setHtmlAttribute('class', 'form-select')
-        ->setHtmlAttribute('style', 'width: 150px;');
+        ->setHtmlAttribute('class', 'form-select form-select-sm')
+        ->setHtmlAttribute('style', 'width: 100px;');
 
         // Button for submitting the form
         $form->addSubmit('send', 'Hledat')
-            ->setHtmlAttribute('class', 'btn btn-primary');
+            ->setHtmlAttribute('class', 'btn btn-primary btn-sm');
         
         // Config form rendering
         $formRender = $form->getRenderer();
