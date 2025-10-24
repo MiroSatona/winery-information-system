@@ -74,4 +74,44 @@ class TreatmentRepository
 
         return $treatments;
     }
+
+    /**
+     * fetchById
+     * Method for fetch the joined treatment with task by id.
+     * @param int Id of task/bottling wich will be fetch.
+     * @return Treatment|null Object of treatment if this data exists, else return null.
+     */
+    public function fetchById(int $id): ?Treatment
+    {
+    /** @var Row|null $queryResult Result of the query for joined table task and treatment */
+    $queryResult = $this->database->table('TREATMENT')
+        ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+        ->select('TASK.*, TREATMENT.*')
+        ->where('TREATMENT.ID', $id)
+        ->fetch();
+
+    // If this task does not exist
+    if (!$queryResult) {
+        return null;
+    }
+
+    return new Treatment(
+        (int) $queryResult->ID,
+        (string) $queryResult->NAME,
+        TaskState::from((string) $queryResult->STATE),
+        $queryResult->CREATION_TIMESTAMP,
+        $queryResult->LAST_CHANGE_TIMESTAMP,
+        $queryResult->PLANNED_EXECUTION_TIMESTAMP ?? null,
+        $queryResult->EXECUTION_TIMESTAMP ?? null,
+        (string) $queryResult->NOTE,
+        $queryResult->ID_TASK_ISSUER !== null ? (int) $queryResult->ID_TASK_ISSUER : null,
+        $queryResult->ID_TASK_CONFIRMER !== null ? (int) $queryResult->ID_TASK_CONFIRMER : null,
+        (string) $queryResult->CATEGORY,
+        (string) $queryResult->NAME,
+        (float) $queryResult->QUANTITY,
+        (string) $queryResult->UNIT
+    );
+    }
+
+
 }
