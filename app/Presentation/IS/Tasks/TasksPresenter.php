@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Tasks;
 
+use App\Model\FlashMsgType;
 use Nette;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
@@ -19,16 +20,22 @@ use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Validation\ValidationDefinitions;
+use App\Model\Wine\WineRepository;
+use App\Model\Image\ImageRepository;
+use App\Model\Image\Image;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 final class TasksPresenter extends BasePresenter
 {
-
     public function __construct(
         private UserRepository $userRepository,
         private TaskRepository $taskRepository,
-        private HarvestRepository $harvestRepository
+        private HarvestRepository $harvestRepository,
+        private WineRepository $wineRep,
+        private ImageRepository $imgRep
     ) {
         parent::__construct();
     }
@@ -89,7 +96,7 @@ final class TasksPresenter extends BasePresenter
         $form->addTextArea("note", "Poznámka")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
-            ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
+            ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
     
         $form->addDate('planned_date', 'Datum plánovaného provedení')
             ->setValue(new DateTime('now'))
@@ -516,14 +523,98 @@ final class TasksPresenter extends BasePresenter
             }
     }
 
-    // 3 sub tasks here 
+    
+// ----------------------------------------------------------
+//                       Bottling Task 
+// ----------------------------------------------------------
+
+    public function createComponentWineSelectForm() 
+    {
+        $availableWines = $this->wineRep->fetchAllProductionWines();
+        bdump($availableWines);
+        $form = new Form();
+        
+        $selectArray = [];
+
+        foreach ($availableWines as $wine) {
+            $selectArray[$wine->getId()] = $wine->getName();
+        }
+        
+        $form->addSelect("wine", "Víno", $selectArray)
+        ->setRequired("Prosím zadejte víno")
+        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('placeholder', 'Vyberte víno');
+    
+        $form->addUpload("image", "Obrázek vína")
+        ->addRule($form::Image, "Nahrajte obrázek vína")
+        ->setHtmlAttribute('class', 'form-control')
+        ->setHtmlAttribute('placeholder', 'Nahrajte obrázek odrůdy vína');
+    
+        $form->addFloat('volume', 'Obsah láhve')
+        ->addRule(Form::Min, "minimum", ValidationDefinitions::VOLUME_MIN)
+        ->addRule(Form::Max, "maximum", ValidationDefinitions::VOLUME_MAX)
+        ->setRequired('zadejte objem jedné láhve')
+        ->setHtmlAttribute('class', 'form-control')
+        ->setHtmlAttribute('placeholder', 'zadejte objem jedné láhve');
+    
+        $form->addSubmit("finish", "Pokračovat")
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, "goToNextForm"];
+    
+        $form->onSuccess[] = [$this, "processBottlingForm"];
+        return $form;
+    }
+
+
     public function renderBottling() {
+        $task = $this->fetchCurrentNewTask();
 
     }
+    
+    public function processBottlingForm(Form $form, \stdClass $values) {
+        
+        $task = $this->fetchCurrentNewTask();
+        
+        if (isset($values->wine)) {
+            $task->setIdWine($values->wine);
+        }
+
+        $image = $values->image;
+        $imagePath = null;
+        if ($image->hasFile()) {
+            $imagePath = $this->imgRep->uploadImage($values->image);
+            if ($imagePath === '') {
+                Debugger::log('Image upload failed', ILogger::ERROR);
+                $form->addError('Obrázek se nepodařilo nahrát.');
+                return;
+            }
+            $wine = $this->wineRep->fetchWineById($task->getIdWine());
+            $imageEntity = new Image(null, $imagePath, $wine->name, 'Obrázek vína ' . $wine->name);
+            $task->setImg($imageEntity);
+        }
+        
+        if (isset($values->volume)) {
+            $task->setBottleVolume($values->volume);
+        }
+        
+        if (isset($values->wine)) {
+            $task->setIdWine($values->wine);
+        }
+        
+        $this->finalizeTask();
+    }
+
+// ----------------------------------------------------------
+//                       Bottling Task 
+// ----------------------------------------------------------
 
     public function renderHarvest() {
 
     }
+
+// ----------------------------------------------------------
+//                       Bottling Task 
+// ----------------------------------------------------------
 
     public function renderTreatment() {
 
@@ -654,5 +745,36 @@ final class TasksPresenter extends BasePresenter
 
         $this->template->task = $task;
     }
+
+// ----------------------------------------------------------
+//                      Finalization 
+// ----------------------------------------------------------
+    
+    public function finalizeTask() {
+        $task = $this->fetchCurrentNewTask();
+        $result = false;
+        
+        switch($task->getType()) {
+            case TaskType::BOTTLING->value: 
+                $result = $this->taskRepository->createBottlingTask($task);
+                break; 
+            case TaskType::HARVEST->value: 
+                break; 
+            case TaskType::TREATMENT->value: 
+                break;
+            default: 
+                break;
+        }
+        
+        if (!$result) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage("Úkon uložen", FlashMsgType::SUCCESS->value);
+        }
+
+        $this->handleClearForm();
+        $this->redirect("dashboard");
+    }
 }
+
 
