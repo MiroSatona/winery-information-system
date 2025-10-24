@@ -170,6 +170,7 @@ class TaskRepository{
                         ->where('ID', $task->getWine()->getId())
                         ->update([
                             'STATE' => 'BOTTLED',
+                            'BOTTLES_LEFT' => $task->getBottlesCount(),
                         ]);
                 }
 
