@@ -93,7 +93,6 @@ final class OrderItemRepository
         }
 
         if ($newAmount > $this->wineRepository->getWineAllBottleCount($wineId)) {
-            bdump($this->wineRepository->getWineAllBottleCount($wineId));
             return false;
         }
 

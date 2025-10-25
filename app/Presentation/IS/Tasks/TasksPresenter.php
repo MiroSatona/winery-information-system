@@ -261,7 +261,7 @@ final class TasksPresenter extends BasePresenter
         $newTask->setIdsOfWorkers([]);
         $this->session->getSection('TaskCreation')->set('newTask', $newTask);
 
-        $this->flashMessage('Výběr pracovníků byl vymazán.', 'success');
+        $this->flashMessage('Výběr pracovníků byl vymazán.', FlashMsgType::SUCCESS->value);
         $this->redirect('this');
     }
 
@@ -269,7 +269,7 @@ final class TasksPresenter extends BasePresenter
     {
         // add single selected worker to session TaskData
         if (!isset($values->worker) || $values->worker === '') {
-            $this->flashMessage('Nevybrali jste pracovníka.', 'warning');
+            $this->flashMessage('Nevybrali jste pracovníka.', FlashMsgType::ERROR->value);
             $this->redirect('this');
             return;
         }
@@ -281,9 +281,9 @@ final class TasksPresenter extends BasePresenter
             $ids[] = $id;
             $newTask->setIdsOfWorkers($ids);
             $this->session->getSection('TaskCreation')->set('newTask', $newTask);
-            $this->flashMessage('Pracovník přidán.', 'success');
+            $this->flashMessage('Pracovník přidán.', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Tento pracovník je již přidán.', 'warning');
+            $this->flashMessage('Tento pracovník je již přidán.', FlashMsgType::ERROR->value);
         }
         $this->redirect('this');
     }
@@ -295,7 +295,7 @@ final class TasksPresenter extends BasePresenter
         $updated = array_values(array_filter($ids, fn($i) => $i !== $workerId));
         $newTask->setIdsOfWorkers($updated);
         $this->session->getSection('TaskCreation')->set('newTask', $newTask);
-        $this->flashMessage('Pracovník odebrán.', 'success');
+        $this->flashMessage('Pracovník odebrán.', FlashMsgType::SUCCESS->value);
         $this->redirect('this');
     }
     
@@ -420,7 +420,7 @@ final class TasksPresenter extends BasePresenter
         $task = $this->taskRepository->fetchById($taskId);
 
         if ($task === null) {
-            $this->flashMessage('Chyby při načítání úkonu z databáze, zkuste to prosím znovu.', 'error');
+            $this->flashMessage('Chyby při načítání úkonu z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
             return;
         }
@@ -440,7 +440,7 @@ final class TasksPresenter extends BasePresenter
             return;
         }
 
-        $this->flashMessage('Chyba při načítání úkonu z databáze, zkuste to prosím znovu.', 'error');
+        $this->flashMessage('Chyba při načítání úkonu z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
         $this->redirect('dashboard');
 
 
@@ -458,7 +458,7 @@ final class TasksPresenter extends BasePresenter
         $harvest = $this->taskRepository->fetchById($id);
 
         if ($harvest === null || !($harvest instanceof Harvest)) {
-            $this->flashMessage('Chyba při načítání sklizně z databáze, zkuste to prosím znovu.', 'error');
+            $this->flashMessage('Chyba při načítání sklizně z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
             return;
         }
@@ -502,7 +502,7 @@ final class TasksPresenter extends BasePresenter
         $bottling = $this->taskRepository->fetchById($id);
 
         if ($bottling === null) {
-            $this->flashMessage('Chyba při načítání lahvování z databáze, zkuste to prosím znovu.', 'error');
+            $this->flashMessage('Chyba při načítání lahvování z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
             return;
         }
@@ -533,7 +533,7 @@ final class TasksPresenter extends BasePresenter
         $treatment = $this->taskRepository->fetchById($id);
 
         if ($treatment === null) {
-            $this->flashMessage('Chyba při načítání ošetření z databáze, zkuste to prosím znovu.', 'error');
+            $this->flashMessage('Chyba při načítání ošetření z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
             return;
         }
@@ -567,9 +567,9 @@ final class TasksPresenter extends BasePresenter
         $errors = $form->getErrors();
 
             if (!empty($errors)) {
-                $this->flashMessage($errors[0], 'error');
+                $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
             } else {
-                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
+                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
             }
     }
 
@@ -577,6 +577,13 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 //                       Bottling Task 
 // ----------------------------------------------------------
+
+    public function actionStartBottling(int $wineId) {
+        $task = $this->fetchCurrentNewTask();
+        $task->setIdWine($wineId);
+        $task->setType(TaskType::BOTTLING->value);
+        $this->redirect("addTask1");
+    }
 
     public function createComponentWineSelectForm() 
     {
@@ -678,32 +685,30 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 
     public function renderHarvest() {
-        
         $task = $this->fetchCurrentNewTask();
 
         $vineYardFrom = $this->getComponent("selectVineyard");
         $wineVarietyFrom = $this->getComponent("selectWineVariety");
         $wineRowsForm = $this->getComponent("selectRowsForm");
-        
-        if (!$task->getIdWineYard()) {
-            return;
+
+        if ($task->getIdWineYard()) {
+            $vineYardFrom['vineyard']->setValue($task->getIdWineYard());
         }
 
-        $vineYardFrom['vineyard']->setValue($task->getIdWineYard());
-        
-        if (!$task->getIdWineVariety()) {
-            return;
+        if ($task->getIdWineVariety()) {
+            $wineVarietyFrom['wineVariety']->setValue($task->getIdWineVariety());
         }
-        
-        $wineVarietyFrom['wineVariety']->setValue($task->getIdWineVariety());
-        
-        if (!$task->getIdRows()) {
-           return; 
+
+        // prepare selected rows for template display
+        $selectedRows = [];
+        $idRows = $task->getIdRows() ?? [];
+        foreach ($idRows as $code) {
+            $rowObj = $this->vineyardRep->getWineRowById($task->getIdWineYard(), $code);
+            if ($rowObj !== null) {
+                $selectedRows[] = $rowObj;
+            }
         }
-        
-        foreach($task->getIdRows() as $idRow) {
-            // do stuff here to add the things ... 
-        }
+        $this->template->selectedRows = $selectedRows;
        
     }
     
@@ -740,11 +745,17 @@ final class TasksPresenter extends BasePresenter
     
     public function createComponentSelectWineVariety() {
         
+        $task = $this->fetchCurrentNewTask();
         $form = new Form();
         
         $options = [];
+        if ($task->getIdWineYard()) {
+            foreach($this->vineyardRep->getUniqueWineVarietiesOnVineyard($task->getIdWineYard()) as $variety) {
+                $options[$variety->getId()] = $variety->getName();
+            }
+        }
         
-        $form->addSelect("wineVariety", "Odrůda", $options)
+        $form->addSelect("wineVariety", "Odrůda", ['' => "Vyberte odrůdu ... "] + $options)
         ->setRequired("Prosím zadejte víno")
         ->setHtmlAttribute('class', 'form-select')
         ->setHtmlAttribute('placeholder', 'Vyberte odrůdu');
@@ -772,7 +783,15 @@ final class TasksPresenter extends BasePresenter
        
         $options = [];
         if ($wineVarietyId && $wineYardId) {
-            // set the available things
+            $rows = $this->vineyardRep->getRowsAtVineyardWithWineVariety($wineYardId, $wineVarietyId);
+            $already = $task->getIdRows() ?? [];
+            foreach ($rows as $r) {
+                $code = $r->getId();
+                if (in_array($code, $already, true)) {
+                    continue; // exclude already-selected rows
+                }
+                $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
+            }
         }
 
         $form = new Form();
@@ -788,7 +807,7 @@ final class TasksPresenter extends BasePresenter
 
         $form->addSubmit('addRow', 'Přidat')
             ->setHtmlAttribute('class', 'btn btn-primary mt-2')
-            ->onClick[] = [$this, 'windRowSelection'];
+            ->onClick[] = [$this, 'wineRowSelection'];
 
         $form->addSubmit('clearRows', 'Vymazat výběr')
             ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
@@ -806,8 +825,39 @@ final class TasksPresenter extends BasePresenter
        $task->setIdRows([]);
     }
     
-    public function windRowSelection() {
+    public function wineRowSelection(Button $button, \stdClass $values): void {
 
+        // add the row to the array 
+        if (!isset($values->rows) || $values->rows === "") {
+            $this->flashMessage("Nevybrali jste žádný řádek", FlashMsgType::ERROR->value);
+            $this->redirect("this");
+            return;
+        }
+        
+        $id = (int) $values->rows;
+        /** @var TaskData */
+        $newTask = $this->fetchCurrentNewTask();
+        $ids = $newTask->getIdRows() ?? [];
+        if (!in_array($id, $ids, true)) {
+            $ids[] = $id;
+            $newTask->setIdRows($ids);
+            $this->session->getSection('TaskCreation')->set('newTask', $newTask);
+            $this->flashMessage('Řádek přidán.', FlashMsgType::SUCCESS->value);
+        } else {
+            $this->flashMessage('Tento řádek je již přidán.', FlashMsgType::ERROR->value);
+        }
+        $this->redirect("this");
+    }
+
+    public function handleRemoveRowFromSelection(int $rowCode): void
+    {
+        $newTask = $this->fetchCurrentNewTask();
+        $ids = $newTask->getIdRows() ?? [];
+        $updated = array_values(array_filter($ids, fn($i) => $i !== $rowCode));
+        $newTask->setIdRows($updated);
+        $this->session->getSection('TaskCreation')->set('newTask', $newTask);
+        $this->flashMessage('Řádek odebrán.', FlashMsgType::SUCCESS->value);
+        $this->redirect('this');
     }
     
 
@@ -841,7 +891,7 @@ final class TasksPresenter extends BasePresenter
     public function onSuccessMarkHarvestDoneForm(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }
@@ -851,7 +901,7 @@ final class TasksPresenter extends BasePresenter
         /** @var Harvest $harvest */
         $harvest = $this->harvestRepository->fetchById($id);
         if ($harvest === null) {
-            $this->flashMessage('Sklizeň nebyla nalezena.', 'error');
+            $this->flashMessage('Sklizeň nebyla nalezena.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }
@@ -863,10 +913,10 @@ final class TasksPresenter extends BasePresenter
             $this->user->getId()
         );
         if ($result) {
-            $this->flashMessage('Sklizeň byla úspěšně označena jako dokončená.', 'success');
+            $this->flashMessage('Sklizeň byla úspěšně označena jako dokončená.', FlashMsgType::SUCCESS->value);
             $this->redirect('Tasks:dashboard');
         } else {
-            $this->flashMessage('Při označování sklizně došlo k chybě.', 'error');
+            $this->flashMessage('Při označování sklizně došlo k chybě.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
         }
     }
@@ -874,7 +924,7 @@ final class TasksPresenter extends BasePresenter
     public function renderMarkHarvestDone(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }
@@ -882,7 +932,7 @@ final class TasksPresenter extends BasePresenter
         /** @var Harvest $harvest */
         $harvest = $this->harvestRepository->fetchById($id);
         if ($harvest === null) {
-            $this->flashMessage('Sklizeň nebyla nalezena.', 'error');
+            $this->flashMessage('Sklizeň nebyla nalezena.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }

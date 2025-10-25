@@ -529,7 +529,7 @@ final class VineyardRepository
         }
     }
 
-    public function getWineVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
+    public function getWinLeVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
     {
         $totalHeadCount = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
@@ -537,5 +537,28 @@ final class VineyardRepository
             ->sum('HEAD_COUNT');
 
         return (int)$totalHeadCount;
+    }
+    
+    public function getRowsAtVineyardWithWineVariety(int $vineyardId, int $wineVarietyId) {
+        /** @var WineRow[] $wineRows Array of wine rows matching given variety on the given vineyard */
+        $wineRows = [];
+        $rows = $this->database->table('WINE_ROW')
+            ->where('ID_VINEYARD', $vineyardId)
+            ->where('ID_WINE_VARIETY', $wineVarietyId)
+            ->where('ACTIVE', true)
+            ->fetchAll();
+
+        foreach ($rows as $row) {
+            $wineRows[] = new WineRow(
+                $row->CODE,
+                (bool)$row->ACTIVE,
+                $row->ID_VINEYARD,
+                $row->ID_WINE_VARIETY,
+                $row->HEAD_COUNT,
+                $row->PLANTING_YEAR
+            );
+        }
+
+        return $wineRows;
     }
 }
