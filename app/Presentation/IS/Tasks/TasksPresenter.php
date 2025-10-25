@@ -20,7 +20,7 @@ use App\Model\Task\TaskState;
 use App\Model\Task\Harvest\HarvestRepository;  
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineRepository;
-use App\Model\Vineyards\VineyardRepository;
+use App\Model\Vineyard\VineyardRepository;
 use App\Model\Image\ImageRepository;
 use App\Model\Image\Image;
 use Nette\Forms\Controls\Button;
