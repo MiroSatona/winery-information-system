@@ -102,7 +102,7 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
     
-        $form->addDate('planned_date', 'Datum plánovaného provedení')
+        $form->addDateTime('planned_date', 'Datum plánovaného provedení')
             ->setValue(new DateTime('now'))
             ->setRequired('Zadejte plánované datum provedení.')
             ->setHtmlAttribute('class', 'form-control')
@@ -223,7 +223,7 @@ final class TasksPresenter extends BasePresenter
         $planned = null;
         if (isset($values->planned_date) && $values->planned_date !== '') {
             try {
-                $planned = new DateTime((string) $values->planned_date->format('Y-m-d') . ' 00:00:00');
+                $planned = DateTime::from($values->planned_date);
             } catch (\Exception $e) {
                 // keep null on parse failure
                 $planned = null;
@@ -987,7 +987,7 @@ final class TasksPresenter extends BasePresenter
     {
         $form = new Form();
 
-        $form->addDate('execution_date', 'Datum provedení')
+        $form->addDateTime('execution_date', 'Datum provedení')
             ->setValue(new DateTime('now'))
             ->setRequired('Zadejte datum provedení.')
             ->setHtmlAttribute('class', 'form-control');
@@ -1015,7 +1015,7 @@ final class TasksPresenter extends BasePresenter
         $result = $this->taskRepository->markTaskDone(
             $task,
             $this->user->getId(),
-            new DateTime((string)$values->execution_date->format('Y-m-d') . ' 00:00:00')
+            DateTime::from($values->execution_date)
         );
 
         if ($result) {
