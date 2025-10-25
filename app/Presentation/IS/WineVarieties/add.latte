@@ -27,6 +27,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input name}
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -35,6 +38,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input color}
+                            <span class="invalid-feedback">
+                                {inputError color}
+                            </span>
                         </div>
                         
                         <div class="mb-3">
@@ -42,6 +48,9 @@
                                 <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
                             </label>
                             {input description}
+                            <span class="invalid-feedback">
+                                {inputError description}
+                            </span>
                         </div>
                         
                         <div class="mb-3">
@@ -49,6 +58,9 @@
                                 <i class="fas fa-camera me-2 text-muted"></i>{label image /}
                             </label>
                             {input image}
+                            <span class="invalid-feedback">
+                                {inputError image}
+                            </span>
                         </div>
 
                         <div class="border-top pt-4">
@@ -60,6 +72,9 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>

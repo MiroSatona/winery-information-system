@@ -21,6 +21,9 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 {input name}
+                                <span class="invalid-feedback">
+                                    {inputError name}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -29,6 +32,9 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 {input surname}
+                                <span class="invalid-feedback">
+                                    {inputError surname}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -37,6 +43,9 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 {input email}
+                                <span class="invalid-feedback">
+                                    {inputError email}
+                                </span>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="username" class="form-label fw-semibold">
@@ -44,12 +53,18 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 {input username}
+                                <span class="invalid-feedback">
+                                    {inputError username}
+                                </span>
                             </div>
                             <div class="col-12 col-md-6">
                                 <label for="city" class="form-label fw-semibold">
                                     <i class="fas fa-city me-2 text-muted"></i>Město
                                 </label>
                                 {input city}
+                                <span class="invalid-feedback">
+                                    {inputError city}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -57,6 +72,9 @@
                                     <i class="fas fa-road me-2 text-muted"></i>Ulice
                                 </label>
                                 {input street}
+                                <span class="invalid-feedback">
+                                    {inputError street}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -64,6 +82,9 @@
                                     <i class="fas fa-home me-2 text-muted"></i>Číslo popisné
                                 </label>
                                 {input houseNumber}
+                                <span class="invalid-feedback">
+                                    {inputError houseNumber}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -71,17 +92,26 @@
                                     <i class="fas fa-mail-bulk me-2 text-muted"></i>PSČ
                                 </label>
                                 {input postalCode}
+                                <span class="invalid-feedback">
+                                    {inputError postalCode}
+                                </span>
                             </div>
                             <div class="col-12">
                                 <label for="phone" class="form-label fw-semibold">
                                     <i class="fas fa-phone me-2 text-muted"></i>Telefon
                                 </label>
                                 {input phone}
+                                <span class="invalid-feedback">
+                                    {inputError phone}
+                                </span>
                             </div>
                             
                             <div class="col-12 col">
                                 <div class="d-grid">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>

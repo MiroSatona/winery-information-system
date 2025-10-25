@@ -35,6 +35,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input name}
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
                         </div>
                         <div class="col-md-6">
                             <label for="surname" class="form-label fw-semibold">
@@ -42,6 +45,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input surname}
+                            <span class="invalid-feedback">
+                                {inputError surname}
+                            </span>
                         </div>
                     </div>
                     <div class="row g-3">
@@ -51,6 +57,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input email}
+                            <span class="invalid-feedback">
+                                {inputError email}
+                            </span>
                         </div>
                         <div class="col-md-6">
                             <label for="phone" class="form-label fw-semibold">
@@ -58,6 +67,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input phone}
+                            <span class="invalid-feedback">
+                                {inputError phone}
+                            </span>
                         </div>
                     </div>
                     {* Section of "Kontaktní informace" *}
@@ -72,12 +84,18 @@
                                 <i class="fas fa-phone me-2 text-muted"></i>{label city/}
                             </label>
                             {input city}
+                            <span class="invalid-feedback">
+                                {inputError city}
+                            </span>
                         </div>
                         <div class="col-md-6">
                             <label for="street" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label street/}
                             </label>
                             {input street}
+                            <span class="invalid-feedback">
+                                {inputError street}
+                            </span>
                         </div>
                     </div>
                     <div class="row g-3 mb-2">
@@ -86,12 +104,18 @@
                                 <i class="fas fa-phone me-2 text-muted"></i>{label houseNumber/}
                             </label>
                             {input houseNumber}
+                            <span class="invalid-feedback">
+                                {inputError houseNumber}
+                            </span>
                         </div>
                         <div class="col-md-6">
                             <label for="postalCode" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label postalCode/}
                             </label>
                             {input postalCode}
+                            <span class="invalid-feedback">
+                                {inputError postalCode}
+                            </span>
                         </div>
                     </div>
                     {* Section of "Uživatelské informace" *}
@@ -106,6 +130,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input username}
+                            <span class="invalid-feedback">
+                                {inputError username}
+                            </span>
                         </div>
                     <div class="row g-3 mb-3">
                         <div class="col-12">
@@ -130,6 +157,12 @@
                                     {input isAdmin}
                                     {label isAdmin/}
                                 </div>
+                                <span class="invalid-feedback">
+                                    {inputError isUser}
+                                    {inputError isWorker}
+                                    {inputError isVintner}
+                                    {inputError isAdmin}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -143,6 +176,9 @@
                         <div class="col-12 col-md-6">
                             <div class="d-grid">
                                 {input send}
+                                <span class="invalid-feedback">
+                                    {inputError send}
+                                </span>
                             </div>
                         </div>
                     </div>

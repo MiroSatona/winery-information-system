@@ -38,7 +38,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input name}
-                            <div class="invalid-feedback">{inputError name}</div>
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -46,7 +48,9 @@
                                 <i class="fas fa-calendar-alt me-2 text-muted"></i>{label planned_date /}
                             </label>
                             {input planned_date}
-                            <div class="invalid-feedback">{inputError planned_date}</div>
+                            <span class="invalid-feedback">
+                                {inputError planned_date}
+                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -54,13 +58,18 @@
                                 <i class="fas fa-sticky-note me-2 text-muted"></i>{label note /}
                             </label>
                             {input note}
-                            <div class="invalid-feedback">{inputError note}</div>
+                            <span class="invalid-feedback">
+                                {inputError note}
+                            </span>
                         </div>
 
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 ms-auto">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -96,7 +105,9 @@
                                     <span class="text-danger">*</span>
                                 </label>
                                 {input volume}
-                                <div class="invalid-feedback">{inputError volume}</div>
+                                <span class="invalid-feedback">
+                                    {inputError volume}
+                                </span>
                             </div>
 
                             <div class="mb-3">
@@ -104,13 +115,18 @@
                                     <i class="fas fa-camera me-2 text-muted"></i>{label image /}
                                 </label>
                                 {input image}
-                                <div class="invalid-feedback">{inputError image}</div>
+                                <span class="invalid-feedback">
+                                    {inputError image}
+                                </span>
                             </div>
 
                             <div class="border-top pt-4">
                                 <div class="row">
                                     <div class="col-12 col-md-6 ms-auto">
                                         {input send}
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -130,7 +146,9 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input type}
-                                    <div class="invalid-feedback">{inputError type}</div>
+                                    <span class="invalid-feedback">
+                                        {inputError type}
+                                    </span>
                                 </div>
 
                                 <div class="col-md-6">
@@ -139,7 +157,9 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input name}
-                                    <div class="invalid-feedback">{inputError name}</div>
+                                    <span class="invalid-feedback">
+                                        {inputError name}
+                                    </span>
                                 </div>
 
                                 <div class="col-md-6">
@@ -148,7 +168,9 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input amount}
-                                    <div class="invalid-feedback">{inputError amount}</div>
+                                    <span class="invalid-feedback">
+                                        {inputError amount}
+                                    </span>
                                 </div>
 
                                 <div class="col-md-6">
@@ -157,7 +179,9 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input unit}
-                                    <div class="invalid-feedback">{inputError unit}</div>
+                                    <span class="invalid-feedback">
+                                        {inputError unit}
+                                    </span>
                                 </div>
 
                                 <div class="col-12">
@@ -165,6 +189,9 @@
                                         <div class="row">
                                             <div class="col-12 col-md-6 ms-auto">
                                                 {input send}
+                                                <span class="invalid-feedback">
+                                                    {inputError send}
+                                                </span>
                                             </div>
                                         </div>
                                     </div>
