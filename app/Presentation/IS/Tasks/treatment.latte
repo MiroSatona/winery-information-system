@@ -5,7 +5,7 @@
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
     <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
-        <i class="fas fa-arrow-right me-2"></i>Přidat úkon - Ošetření
+        <i class="fas fa-arrow-right me-2"></i>Ošetření
     </a>
 {/block topMenuISAdditional}
 
@@ -30,9 +30,15 @@
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input vineyard}
+                                    <span class="invalid-feedback">
+                                        {inputError vineyard}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input submit}
+                                    <span class="invalid-feedback">
+                                        {inputError submit}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -47,9 +53,15 @@
                                         <i class="fas fa-grip-lines me-2 text-muted"></i>{label rows /}
                                     </label>
                                     {input rows}
+                                    <span class="invalid-feedback">
+                                        {inputError rows}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input addRow}
+                                    <span class="invalid-feedback">
+                                        {inputError addRow}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -110,12 +122,21 @@
                             <div class="row g-2">
                                 <div class="col-12 col-md-4">
                                     {input backToDashboard}
+                                    <span class="invalid-feedback">
+                                        {inputError backToDashboard}
+                                    </span>
                                 </div>
                                 <div class="col-12 col-md-4">
                                     {input goBack}
+                                    <span class="invalid-feedback">
+                                        {inputError goBack}
+                                    </span>
                                 </div>
                                 <div class="col-12 col-md-4">
                                     {input next}
+                                    <span class="invalid-feedback">
+                                        {inputError next}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -124,5 +145,4 @@
             </div>
         </div>
     </div>
-
 {/block isMainPanel}

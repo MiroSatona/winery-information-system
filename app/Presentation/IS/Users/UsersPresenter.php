@@ -55,7 +55,7 @@ final class UsersPresenter extends BasePresenter
         $form->addText('pattern', '')
             ->setHtmlAttribute('type', 'search')
             ->setHtmlAttribute('placeholder', 'Hledat uživatele')
-            ->setHtmlAttribute('class', 'form-control flex-grow-1')
+            ->setHtmlAttribute('class', 'form-control form-control-sm flex-grow-1')
             ->setHtmlAttribute('style', 'width: 400px;');
 
         // Set selection bar for filtering by role
@@ -66,7 +66,7 @@ final class UsersPresenter extends BasePresenter
             'vintner' => 'Vinař',
             'admin' => 'Admin',
         ])
-        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('class', 'form-select form-select-sm')
         ->setHtmlAttribute('style', 'width: 180px;');
 
         // Set selection bar for filtering by state -> active/deactivated
@@ -75,12 +75,12 @@ final class UsersPresenter extends BasePresenter
             'active' => 'Aktivní uživatelé',
             'inactive' => 'Neaktivní uživatelé',
         ])
-        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('class', 'form-select form-select-sm')
         ->setHtmlAttribute('style', 'width: 180px;');
 
         // Button for submitting the form
         $form->addSubmit('send', 'Hledat')
-            ->setHtmlAttribute('class', 'btn btn-primary');
+            ->setHtmlAttribute('class', 'btn btn-primary btn-sm');
         
         // Config form rendering
         $formRender = $form->getRenderer();

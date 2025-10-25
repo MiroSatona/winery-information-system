@@ -81,7 +81,7 @@ final class OrderRepository
             totalPrice: (float) $row->TOTAL_PRICE,
             state: (string) $row->STATE,
             deliveryType: $row->DELIVERY_TYPE !== null ? (string) $row->DELIVERY_TYPE : null,
-            orderTimestamp: (string) $row->ORDER_TIMESTAMP,
+            orderTimestamp: $row->ORDER_TIMESTAMP->format('d.m.Y H:i:s'),
             deliveryData: (string) $row->DELIVERY_DATA,
         );
     }

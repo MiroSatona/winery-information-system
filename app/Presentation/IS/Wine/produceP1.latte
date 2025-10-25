@@ -29,9 +29,15 @@
                                         <i class="fas fa-seedling me-2 text-muted"></i>{label harvest /}
                                     </label>
                                     {input harvest}
+                                    <span class="invalid-feedback">
+                                        {inputError harvest}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input addHarvest}
+                                    <span class="invalid-feedback">
+                                        {inputError addHarvest}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -116,10 +122,16 @@
                             <div class="row g-2">
                                 <div class="col-6">
                                     {input backToDashboard}
+                                    <span class="invalid-feedback">
+                                        {inputError backToDashboard}
+                                    </span>
                                 </div>
                                 <div class="col-6">
                                     <div class="d-grid">
                                         {input toStep2}
+                                        <span class="invalid-feedback">
+                                            {inputError toStep2}
+                                        </span>
                                     </div>
                                 </div>
                             </div>

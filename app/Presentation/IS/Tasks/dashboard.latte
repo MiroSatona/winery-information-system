@@ -26,6 +26,12 @@
                                         {input type}
                                         {input state}
                                         {input send}
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                            {inputError pattern}
+                                            {inputError type}
+                                            {inputError state}
+                                        </span>
                                     </div>
                                 {/form}
                             </div>
@@ -137,6 +143,4 @@
             </div>
         </div>
     </div>
-
-    
 {/block isMainPanel}

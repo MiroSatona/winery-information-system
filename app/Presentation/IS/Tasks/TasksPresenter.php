@@ -611,9 +611,7 @@ final class TasksPresenter extends BasePresenter
         if ($bottling !== null) {
             $this->redirect('markTaskDone', $bottling->getId());
         }
-
-        $section = $this->session->getSection("TaskCreation");
-        $section->set("newTask", null);
+        $this->handleClearForm(false);
         $task = $this->fetchCurrentNewTask();
         $task->setIdWine($wineId);
         $task->setType(TaskType::BOTTLING);

@@ -27,6 +27,9 @@
                                     <i class="fas fa-wine-glass-alt me-2 text-muted"></i>{label wine /}
                                 </label>
                                 {input wine}
+                                <span class="invalid-feedback">
+                                    {inputError wine}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -34,6 +37,9 @@
                                     <i class="far fa-image me-2 text-muted"></i>{label image /}
                                 </label>
                                 {input image}
+                                <span class="invalid-feedback">
+                                    {inputError image}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6 d-flex align-items-start flex-column">
@@ -41,6 +47,9 @@
                                     <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
                                 </label>
                                 {input volume}
+                                <span class="invalid-feedback">
+                                    {inputError volume}
+                                </span>
                             </div>
 
                             <div class="col-12 border-top pt-4 mt-2">
@@ -68,27 +77,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        (function(){
-            // Find file input (we set id above), and preview image element
-            const fileInput = document.getElementById('wine-image-input');
-            const preview = document.getElementById('wine-preview');
-
-            if (!fileInput || !preview) return;
-
-            fileInput.addEventListener('change', function(e){
-                const file = this.files && this.files[0];
-                if (!file) {
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(ev){
-                    preview.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        })();
-    </script>
-
 {/block isMainPanel}

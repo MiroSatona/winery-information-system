@@ -30,9 +30,15 @@
                                         <i class="fas fa-mountain me-2 text-muted"></i>{label vineyard /}
                                     </label>
                                     {input vineyard}
+                                    <span class="invalid-feedback">
+                                        {inputError vineyard}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input submit}
+                                    <span class="invalid-feedback">
+                                        {inputError submit}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -46,9 +52,15 @@
                                         <i class="fas fa-grape-cluster me-2 text-muted"></i>{label wineVariety /}
                                     </label>
                                     {input wineVariety}
+                                    <span class="invalid-feedback">
+                                        {inputError wineVariety}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input submit}
+                                    <span class="invalid-feedback">
+                                        {inputError submit}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -62,9 +74,15 @@
                                         <i class="fas fa-ruler-vertical me-2 text-muted"></i>{label rows /}
                                     </label>
                                     {input rows}
+                                    <span class="invalid-feedback">
+                                        {inputError rows}
+                                    </span>
                                 </div>
                                 <div class="col-3">
                                     {input addRow}
+                                    <span class="invalid-feedback">
+                                        {inputError addRow}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -123,12 +141,21 @@
                             <div class="row g-2">
                                 <div class="col-4">
                                     {input backToDashboard}
+                                    <span class="invalid-feedback">
+                                        {inputError backToDashboard}
+                                    </span>
                                 </div>
                                 <div class="col-4">
                                     {input goBack}
+                                    <span class="invalid-feedback">
+                                        {inputError goBack}
+                                    </span>
                                 </div>
                                 <div class="col-4">
                                     {input next}
+                                    <span class="invalid-feedback">
+                                        {inputError next}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -137,5 +164,4 @@
             </div>
         </div>
     </div>
-
 {/block isMainPanel}
