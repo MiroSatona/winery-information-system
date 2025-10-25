@@ -94,20 +94,42 @@
                                             </td>
                                             <td>
                                                 {if $task->getPlannedTimestamp()}
-                                                    {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                    {if !$task->getExecutionTimestamp()}
+                                                        {if $task->getPlannedTimestamp() < $currentDateTime}
+                                                            <span class="badge bg-danger">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {else}
+                                                            <span class="badge bg-success">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {/if}
+                                                    {else}
+                                                        {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                    {/if}
                                                 {else}
                                                     —
                                                 {/if}
                                             </td>
                                             <td>
                                                 {if $task->getExecutionTimestamp()}
-                                                    {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                    {if $task->getPlannedTimestamp() && $task->getExecutionTimestamp() > $task->getPlannedTimestamp()}
+                                                        <span class="badge bg-danger">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {else}
+                                                        <span class="badge bg-success">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {/if}
                                                 {else}
                                                     —
                                                 {/if}
                                             </td>
                                             <td>
-                                                {if $task->getState() === $TaskStateType::PLANNED}
+                                                {if $task instanceof $HarvestType && $task->getState() === $TaskStateType::FINISHED && $task->getIdHarvestConfirmer() === null}
+                                                    <span class="badge bg-info">Zbývá potvrzení</span>
+                                                {elseif $task->getState() === $TaskStateType::PLANNED}
                                                     <span class="badge bg-warning">Plánovaný</span>
                                                 {elseif $task->getState() === $TaskStateType::FINISHED}
                                                     <span class="badge bg-success">Dokončený</span>

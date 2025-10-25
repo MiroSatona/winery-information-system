@@ -68,6 +68,7 @@ final class TasksPresenter extends BasePresenter
         
         $this->template->tasks = $this->taskRepository->fetchTasks($pattern, $type, $state);
         $this->template->roleType = TaskState::class;
+        $this->template->currentDateTime = new DateTime('now');
     }
     
     public function handleCreateNonExistentTask() 
