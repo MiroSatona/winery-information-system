@@ -3,18 +3,20 @@
         <div class="col-12">
             <div class="card shadow-sm">
                 <div class="card-header text-dark p-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h4 class="mb-0 fw-bold">
-                            {if $task instanceof App\Model\Task\Harvest\Harvest}
-                                <i class="fas fa-leaf me-2"></i>
-                                Detaily o sklizni
-                            {elseif $task instanceof App\Model\Task\Treatment\Treatment}
-                                <i class="fas fa-flask me-2"></i>
-                                Detaily o ošetření
-                            {else}
-                                <i class="fas fa-wine-bottle me-2"></i>
-                                Detaily o láhvování
-                            {/if}
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h4 class="mb-2 fw-bold">
+                                {if $task instanceof App\Model\Task\Harvest\Harvest}
+                                    <i class="fas fa-leaf me-2"></i>
+                                    Detaily o sklizni
+                                {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                                    <i class="fas fa-flask me-2"></i>
+                                    Detaily o ošetření
+                                {else}
+                                    <i class="fas fa-wine-bottle me-2"></i>
+                                    Detaily o láhvování
+                                {/if}
+                            </h4>
                             <div>
                                 {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                     <span class="badge bg-warning text-black fs-6">
@@ -30,7 +32,23 @@
                                     </span>
                                 {/if}
                             </div>
-                        </h4>
+                        </div>
+                        
+                        <div class="d-flex gap-2 flex-wrap">
+                            <a n:href="Tasks:edit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                <i class="fas fa-edit me-1"></i> Upravit
+                            </a>
+                            {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
+                                </a>
+                            {/if}
+                            {if $userVintner && $task->getState() === App\Model\Task\TaskState::FINISHED && $task instanceof App\Model\Task\Harvest\Harvest && $task->getIdHarvestConfirmer() === null}
+                                <a href="{link Tasks:markHarvestDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-check-circle me-1"></i> Potvrdit sklizeň
+                                </a>
+                            {/if}
+                        </div>
                     </div>
                 </div>
 
