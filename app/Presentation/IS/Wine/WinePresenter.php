@@ -15,6 +15,9 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineProduceData;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
+use App\Model\Wine\WineGrade;
+use App\Model\Wine\WineType;
+use App\Model\Wine\WineColor;
 use App\Model\Image\Image;
 use Nette\Application\UI\Form;
 use Nette\Forms\Controls\Button;
@@ -55,11 +58,11 @@ final class WinePresenter extends BasePresenter
 
         $form->addSelect('state', 'stav', [
             'all' => 'Všechny',
-            'PRODUCTION' => 'Ve výrobě',
-            'LIQUIDATED' => 'Zlikvidované',
-            'BOTTLED' => 'Zalahvované', 
-            'SALE' => 'Na prodej',
-            'SOLD' => 'Prodáno',
+            WineState::PRODUCTION->value => 'Ve výrobě',
+            WineState::LIQUIDATED->value => 'Zlikvidované',
+            WineState::BOTTLED->value => 'Zalahvované',
+            WineState::SALE->value => 'Na prodej',
+            WineState::SOLD->value => 'Prodáno',
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
@@ -67,13 +70,13 @@ final class WinePresenter extends BasePresenter
 
         $form->addSelect('grade', 'Přívlastek', [
             'all' => 'Všechny',
-            'NONE' => 'Bez přívlastku',
-            'CABINET' => 'Kabinetní víno',
-            'LATE' => 'Pozdní sběr',
-            'GRAPE_SELECTION' => 'Výběr z hroznů',
-            'BERRY_SELECTION' => 'Výběr z bobulí',
-            'ICE' => 'Ledové víno',
-            'STRAW' => 'Slámové víno',
+            WineGrade::NONE->value => 'Bez přívlastku',
+            WineGrade::CABINET->value => 'Kabinetní víno',
+            WineGrade::LATE->value => 'Pozdní sběr',
+            WineGrade::GRAPE_SELECTION->value => 'Výběr z hroznů',
+            WineGrade::BERRY_SELECTION->value => 'Výběr z bobulí',
+            WineGrade::ICE->value => 'Ledové víno',
+            WineGrade::STRAW->value => 'Slámové víno',
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
@@ -81,10 +84,10 @@ final class WinePresenter extends BasePresenter
 
         $form->addSelect('type', 'Typ', [
             'all' => 'Všechny',
-            'DRY' => 'Suché',
-            'HALF_DRY' => 'Polosuché',
-            'HALF_SWEET' => 'Polosladké',
-            'SWEET' => 'Sladké',
+            WineType::DRY->value => 'Suché',
+            WineType::HALF_DRY->value => 'Polosuché',
+            WineType::HALF_SWEET->value => 'Polosladké',
+            WineType::SWEET->value => 'Sladké',
         ])
             ->setHtmlAttribute('class', 'form-select form-select-sm')
             ->setDefaultValue('all')
@@ -150,7 +153,7 @@ final class WinePresenter extends BasePresenter
             $this->redirect('this');
         }
 
-        if ($wine->state !== WineState::production->value) {
+        if ($wine->state !== WineState::PRODUCTION) {
             $this->flashMessage('Lze likvidovat pouze víno ve výrobě', FlashMsgType::ERROR->value);
             $this->redirect('this');
             return;
@@ -162,8 +165,6 @@ final class WinePresenter extends BasePresenter
         } else {
             $this->flashMessage('Při likvidaci vína došlo k chybě', FlashMsgType::ERROR->value);
         }
-
-
     }
 
     public function handleBottling(int $wineId): void
@@ -186,7 +187,7 @@ final class WinePresenter extends BasePresenter
            return;
         }
 
-        if ($wine->state !== WINeState::bottled->value) {
+        if ($wine->state !== WINeState::BOTTLED->value) {
             $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
             $this->redirect(":IS:Wine:dashboard");
             return;
@@ -212,7 +213,7 @@ final class WinePresenter extends BasePresenter
            return;
         }
 
-        if ($wine->state !== WineState::sale->value) {
+        if ($wine->state !== WineState::SALE->value) {
             $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
             $this->redirect(":IS:Wine:dashboard");
             return;
@@ -268,9 +269,9 @@ final class WinePresenter extends BasePresenter
         }
         
         $result = true;
-        if ($wine->state == WineState::bottled->value) {
+        if ($wine->state == WineState::BOTTLED->value) {
             $result = $this->wineRepository->updateWinePrice($wineId, $price, false);
-            $this->wineRepository->setWineState($wineId, WineState::sale->value);
+            $this->wineRepository->setWineState($wineId, WineState::SALE->value);
         }
         $result2 = $this->wineRepository->updateWinePrice($wineId, $price, true);
         $result3 = $this->wineRepository->setWineDescription($wineId, $description);
@@ -312,34 +313,34 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
 
         $form->addSelect('type', 'Typ vína', [
-            'DRY' => 'Suché',
-            'HALF_DRY' => 'Polosuché',
-            'HALF_SWEET' => 'Polosladké',
-            'SWEET' => 'Sladké',
+            WineType::DRY->value => 'Suché',
+            WineType::HALF_DRY->value => 'Polosuché',
+            WineType::HALF_SWEET->value => 'Polosladké',
+            WineType::SWEET->value => 'Sladké',
         ])
-            ->setValue('DRY')
+            ->setValue(WineType::DRY->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte typ vína.');
 
         $form->addSelect('color', 'Barva vína', [
-            'WHITE' => 'Bílé',
-            'PINK' => 'Růžové',
-            'RED' => 'Červené',
+            WineColor::WHITE->value => 'Bílé',
+            WineColor::ROSE->value => 'Růžové',
+            WineColor::RED->value => 'Červené',
         ])
-            ->setValue('WHITE')
+            ->setValue(WineColor::WHITE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte barvu vína.');
         
         $form->addSelect('grade', 'Přívlastek vína', [
-            'NONE' => 'Bez přívlastku',
-            'CABINET' => 'Kabinetní víno',
-            'LATE' => 'Pozdní sběr',
-            'GRAPE_SELECTION' => 'Výběr z hroznů',
-            'BERRY_SELECTION' => 'Výběr z bobulí',
-            'ICE' => 'Ledové víno',
-            'STRAW' => 'Slámové víno',
+            WineGrade::NONE->value => 'Bez přívlastku',
+            WineGrade::CABINET->value => 'Kabinetní víno',
+            WineGrade::LATE->value => 'Pozdní sběr',
+            WineGrade::GRAPE_SELECTION->value => 'Výběr z hroznů',
+            WineGrade::BERRY_SELECTION->value => 'Výběr z bobulí',
+            WineGrade::ICE->value => 'Ledové víno',
+            WineGrade::STRAW->value => 'Slámové víno',
         ])
-            ->setValue('NONE')
+            ->setValue(WineGrade::NONE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte přívlastek vína.');
         
@@ -401,9 +402,9 @@ final class WinePresenter extends BasePresenter
             $wine->getIdSellApprover(),
             $values->year,
             $values->alcoholPercentage,
-            $values->type,
-            $values->color,
-            $values->grade,
+            WineType::from($values->type),
+            WineColor::from($values->color),
+            WineGrade::from($values->grade),
             $wine->getState(),
             $values->volume,
             $wine->getBottlePrice(),
@@ -443,15 +444,15 @@ final class WinePresenter extends BasePresenter
             $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
         }
-
+        
         // Populate form with current values
         $form = $this->getComponent('editWineForm');
         $form['name']->setValue($wine->getName());
         $form['year']->setValue($wine->getYear());
         $form['alcoholPercentage']->setValue($wine->getAlcoholPercentage());
-        $form['type']->setValue($wine->getType());
-        $form['color']->setValue($wine->getColor());
-        $form['grade']->setValue($wine->getGrade());
+        $form['type']->setValue($wine->getType()->value);
+        $form['color']->setValue($wine->getColor()->value);
+        $form['grade']->setValue($wine->getGrade()->value);
         $form['volume']->setValue($wine->getVolume());
         $form['leftSugar']->setValue($wine->getLeftSugar());
         $form['acidContents']->setValue($wine->getAcidContents());
@@ -773,14 +774,15 @@ final class WinePresenter extends BasePresenter
 
         $harvests = $this->getSession('wineIS')->get('harvestsInProduction');
         $this->template->harvestsInProduction = $harvests ?? [];
+        /** @var WineProduceData|null $wineData */
         $wineData = $this->getSession('wineIS')->get('wineProduceData');
         $form = $this->getComponent('produceWineForm');
         if ($wineData !== null) {
             $form['name']->setValue($wineData->getName());
             $form['year']->setValue($wineData->getYear());
-            $form['type']->setValue($wineData->getType());
-            $form['color']->setValue($wineData->getColor());
-            $form['grade']->setValue($wineData->getGrade());
+            $form['type']->setValue($wineData->getType()->value);
+            $form['color']->setValue($wineData->getColor()->value);
+            $form['grade']->setValue($wineData->getGrade()->value);
             $form['volume']->setValue($wineData->getVolume());
             $form['alcoholPercentage']->setValue($wineData->getAlcoholPercentage());
             $form['leftSugar']->setValue($wineData->getLeftSugar());
@@ -817,34 +819,34 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Max, 'Obsah alkoholu nemůže být větší než %d.', ValidationDefinitions::ALCOHOL_CONTENT_MAX);
 
         $form->addSelect('type', 'Typ vína', [
-            'DRY' => 'Suché',
-            'HALF_DRY' => 'Polosuché',
-            'HALF_SWEET' => 'Polosladké',
-            'SWEET' => 'Sladké',
+            WineType::DRY->value => 'Suché',
+            WineType::HALF_DRY->value => 'Polosuché',
+            WineType::HALF_SWEET->value => 'Polosladké',
+            WineType::SWEET->value => 'Sladké',
         ])
-            ->setValue('DRY')
+            ->setValue(WineType::DRY->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte typ vína.');
 
         $form->addSelect('color', 'Barva vína', [
-            'WHITE' => 'Bílé',
-            'ROSE' => 'Růžové',
-            'RED' => 'Červené',
+            WineColor::WHITE->value => 'Bílé',
+            WineColor::ROSE->value => 'Růžové',
+            WineColor::RED->value => 'Červené',
         ])
-            ->setValue('WHITE')
+            ->setValue(WineColor::WHITE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte barvu vína.');
         
         $form->addSelect('grade', 'Přívlastek vína', [
-            'NONE' => 'Bez přívlastku',
-            'CABINET' => 'Kabinetní víno',
-            'LATE' => 'Pozdní sběr',
-            'GRAPE_SELECTION' => 'Výběr z hroznů',
-            'BERRY_SELECTION' => 'Výběr z bobulí',
-            'ICE' => 'Ledové víno',
-            'STRAW' => 'Slámové víno',
+            WineGrade::NONE->value => 'Bez přívlastku',
+            WineGrade::CABINET->value => 'Kabinetní víno',
+            WineGrade::LATE->value => 'Pozdní sběr',
+            WineGrade::GRAPE_SELECTION->value => 'Výběr z hroznů',
+            WineGrade::BERRY_SELECTION->value => 'Výběr z bobulí',
+            WineGrade::ICE->value => 'Ledové víno',
+            WineGrade::STRAW->value => 'Slámové víno',
         ])
-            ->setValue('NONE')
+            ->setValue(WineGrade::NONE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte přívlastek vína.');
         
@@ -902,9 +904,9 @@ final class WinePresenter extends BasePresenter
         $wineProduceData = new WineProduceData(
             name: isset($data->name) ? $data->name : null,
             year: isset($data->year) ? $data->year : null,
-            type: $data->type,
-            color: $data->color,
-            grade: $data->grade,
+            type: WineType::from($data->type),
+            color: WineColor::from($data->color),
+            grade: WineGrade::from($data->grade),
             volume: isset($data->volume) ? $data->volume : null,
             alcoholPercentage: isset($data->alcoholPercentage) ? $data->alcoholPercentage : null,
             leftSugar: isset($data->leftSugar) ? $data->leftSugar : null,
@@ -935,10 +937,10 @@ final class WinePresenter extends BasePresenter
             idSellApprover: null,
             year: (int) $values->year,
             alcoholPercentage: (float) $values->alcoholPercentage,
-            type: (string) $values->type,
-            color: (string) $values->color,
-            grade: (string) $values->grade,
-            state: WineState::production->value,
+            type: WineType::from($values->type),
+            color: WineColor::from($values->color),
+            grade: WineGrade::from($values->grade),
+            state: WineState::PRODUCTION,
             volume: (int) $values->volume,
             bottlePrice: null,
             currentPrice: null,

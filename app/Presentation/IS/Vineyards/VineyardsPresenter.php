@@ -348,7 +348,7 @@ final class VineyardsPresenter extends BasePresenter
 
         if ($result) {
             $this->flashMessage('Vinohrad byl úspěšně upraven.', FlashMsgType::SUCCESS->value);
-            $this->redirect('edit', $vineyardId);
+            $this->redirect('show', $vineyardId);
         } else {
             $form->addError('Vinohrad se nepodařilo upravit.');
             $this->flashMessage('Vinohrad se nepodařilo upravit.', FlashMsgType::ERROR->value);

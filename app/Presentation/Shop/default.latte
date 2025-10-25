@@ -23,10 +23,10 @@
                 </label>
                 <select class="form-select form-select-sm border-primary text-primary" name="type"
                         onchange="document.getElementById('filterForm').submit();" style="min-width: 120px;">
-                    <option value="">Vše</option>
-                    <option value="red" n:attr="selected => $type === 'red'">Červené</option>
-                    <option value="white" n:attr="selected => $type === 'white'">Bílé</option>
-                    <option value="rose" n:attr="selected => $type === 'rose'">Růžové</option>
+                    <option value="ALL" n:attr="selected => $type === null">Vše</option>
+                    <option value="RED" n:attr="selected => $type === 'RED'">Červené</option>
+                    <option value="WHITE" n:attr="selected => $type === 'WHITE'">Bílé</option>
+                    <option value="ROSE" n:attr="selected => $type === 'ROSE'">Růžové</option>
                 </select>
             </div>
 

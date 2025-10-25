@@ -6,10 +6,9 @@ namespace App\Model\Wine;
 
 enum WineState: string
 {
-    case production = "PRODUCTION";
-    case liquidated = "LIQUIDATED";
-    case bottled = "BOTTLED";
-    case sale = "SALE";
-    case sold = "SOLD";
+    case PRODUCTION = "PRODUCTION";
+    case LIQUIDATED = "LIQUIDATED";
+    case BOTTLED = "BOTTLED";
+    case SALE = "SALE";
+    case SOLD = "SOLD";
 }
-

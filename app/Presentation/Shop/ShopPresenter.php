@@ -6,6 +6,7 @@ use App\Model\FlashMsgType;
 use App\Model\Image\ImageRepository;
 use Nette;
 use App\Model\ProductRepository;
+use App\Model\Wine\WineColor;
 use App\Presentation\BasePresenter;
 use App\Model\Orders\OrderRepository;
 use Tracy\Debugger;
@@ -22,15 +23,15 @@ final class ShopPresenter extends  BasePresenter
         parent::startup();
     }
     
-    private function convertWineTypeToInternal(string $type): ?string 
+    private function convertWineTypeToInternal(?string $type): ?WineColor 
     {
-        switch($type) {
-            case "red":
-                return "RED";
-            case "white":
-                return "WHITE";
-            case "rose":
-                return "PINK";
+        switch ($type) {
+            case 'RED':
+                return WineColor::RED;
+            case 'WHITE':
+                return WineColor::WHITE;
+            case 'ROSE':
+                return WineColor::ROSE;
             default:
                 return null;
         }
@@ -47,10 +48,11 @@ final class ShopPresenter extends  BasePresenter
        
         // do a simple search if applicable 
         $wines = $this->wineRepository->getAllProducts($search ?? "");
-        
-        // only allow certain types 
-        if ($type) {
-            $wines = array_filter($wines, fn($w) => $w->color === $this->convertWineTypeToInternal($type));
+        /** @var WineColor|null $color */
+        $color = $this->convertWineTypeToInternal($type);
+        // only allow certain types
+        if ($color !== null) {
+            $wines = array_filter($wines, fn($w) => $w->color === $color);
         }
 
         // sort by price 

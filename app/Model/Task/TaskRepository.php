@@ -132,6 +132,16 @@ class TaskRepository{
         }
     }
 
+    public function isUserAssignedToTask(int $userId, int $taskId): bool
+    {
+        $workerRow = $this->database->table('WORKER')
+            ->where('ID_USER', $userId)
+            ->where('ID_TASK', $taskId)
+            ->fetch();
+
+        return $workerRow !== null;
+    }
+
     public function createBottlingTask(TaskData $data): bool {
 
         // Basic validation
