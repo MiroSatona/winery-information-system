@@ -192,14 +192,11 @@ class TaskRepository{
 
             // compute bottles count based on wine volume if possible
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
-            bdump($wineVolume);
-            bdump($bottleVolume);
             $bottlesCount = 0;
             if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
                 // assume VOLUME is in same units as bottleVolume (best-effort)
                 $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
             }
-            bdump($bottlesCount);
 
             if ($bottlesCount <= 0) {
                 throw new \Exception('Computed bottles count is zero or invalid');
@@ -210,16 +207,19 @@ class TaskRepository{
 
             // insert task row
             $now = new DateTime();
+            
+            $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
+
             $taskRow = $this->database->table('TASK')->insert([
                 'NAME' => $name,
-                'STATE' => TaskState::PLANNED->value,
+                'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
-                'EXECUTION_TIMESTAMP' => null,
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
-                'ID_TASK_CONFIRMER' => null,
+                'ID_TASK_CONFIRMER' => $data->getIsDone() ? $userId : null,
             ]);
 
             if ($taskRow === null || !isset($taskRow->ID)) {
@@ -339,18 +339,20 @@ class TaskRepository{
 
             // start transaction
             $this->database->beginTransaction();
+            
+            $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
 
             $now = new DateTime();
             $taskRow = $this->database->table('TASK')->insert([
                 'NAME' => $name,
-                'STATE' => TaskState::PLANNED->value,
+                'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
-                'EXECUTION_TIMESTAMP' => null,
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
-                'ID_TASK_CONFIRMER' => null,
+                'ID_TASK_CONFIRMER' => $data->getIsDone() ? $userId : null,
             ]);
 
             if ($taskRow === null || !isset($taskRow->ID)) {
@@ -487,19 +489,21 @@ class TaskRepository{
 
             // Start transaction
             $this->database->beginTransaction();
-
+            
             // Insert task row
             $now = new DateTime();
+            $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
+
             $taskRow = $this->database->table('TASK')->insert([
                 'NAME' => $name,
-                'STATE' => TaskState::PLANNED->value,
+                'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
-                'EXECUTION_TIMESTAMP' => null,
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
-                'ID_TASK_CONFIRMER' => null,
+                'ID_TASK_CONFIRMER' => $data->getIsDone() ? $userId : null,
             ]);
 
             if ($taskRow === null || !isset($taskRow->ID)) {

@@ -73,6 +73,9 @@ final class TasksPresenter extends BasePresenter
     public function handleCreateNonExistentTask() 
     {
         $this->handleClearForm(false);
+        $task = $this->fetchCurrentNewTask();
+        $task->markAsDone();
+        $this->redirect("AddTask1");
     }
     
     public function renderAddTask1(): void 
@@ -91,6 +94,8 @@ final class TasksPresenter extends BasePresenter
     public function createComponentAddTaskForm(): Form
     {
         $form = new Form();
+        
+        $newTask = $this->fetchCurrentNewTask();
 
         $form->addText("name", "Název úkonu")
             ->addRule(Form::MinLength, 'Název úkolu musí mít alespoň %d znaků.', ValidationDefinitions::TASK_NAME_LENGTH_MIN)
@@ -114,9 +119,9 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
     
-        $form->addDateTime('planned_date', 'Datum plánovaného provedení')
+        $form->addDateTime('planned_date', $newTask->getIsDone() ? "Termín dokončení" : "Plánovaný termín")
             ->setValue(new DateTime('now'))
-            ->setRequired('Zadejte plánované datum provedení.')
+            ->setRequired($newTask->getIsDone() ? "Zadejte termín dokončení" : "Zadejte plánovaný termín")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('style', 'width: 200px;');
         

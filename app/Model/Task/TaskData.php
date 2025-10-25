@@ -50,7 +50,7 @@ class TaskData
         return $this->isDone;
     }
     
-    public function markAdDone(): void {
+    public function markAsDone(): void {
        $this->isDone = true; 
     }
     
