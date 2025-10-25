@@ -6,6 +6,7 @@ use App\Model\OrderItem\OrderItemRepository;
 use App\Model\Orders\CustomerOrder;
 use App\Model\Orders\OrderState;
 use App\Model\User\UserRepository;
+use Exception;
 use Nette\Database\Explorer;
 
 final class OrderRepository
@@ -140,13 +141,15 @@ final class OrderRepository
                     $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
                     $row->delete();
                 }
+            } else {
+                throw new Exception("failed to delete item order by id");
             }
             $this->db->commit();
             return $result;
 
         } catch (\Exception $e) {
             $this->db->rollBack();
-            throw $e;
+            return false;
         }
     }
 
@@ -166,13 +169,15 @@ final class OrderRepository
                     $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
                     $row->delete();
                 }
+            } else {
+                throw new Exception("failed to edit amount of item in order");
             }
             $this->db->commit();
             return $result;
 
         } catch (\Exception $e) {
             $this->db->rollBack();
-            throw $e;
+            return false;
         }
     }
     
@@ -186,12 +191,14 @@ final class OrderRepository
             $result = $this->orderItemRepository->addItem($order->id, $wineId, $amount);
             if ($result) {
                 $this->updateOrderPrice($order->id);
+            } else {
+                throw new Exception("failed to add to card");
             }
             $this->db->commit();
             return $result;
         } catch (\Exception $e) {
             $this->db->rollBack();
-            throw $e;
+            return false;
         }
     }
     
@@ -252,7 +259,7 @@ final class OrderRepository
                     "DELIVERY_DATA" => ""
                 ]);
                 $this->db->commit();
-                return true;
+                return false;
             }
             
             $row->update([

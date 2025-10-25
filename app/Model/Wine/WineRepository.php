@@ -52,7 +52,7 @@ final class WineRepository
     public function fetchAllProductionWines(): array
     {
         $rows = $this->db->table("WINE")     
-        ->where("STATE", WineState::production->value);
+        ->where("STATE", WineState::PRODUCTION->value);
         
         $wines = [];
         foreach ($rows as $row) {
@@ -163,10 +163,10 @@ final class WineRepository
             idSellApprover: $row->ID_SELL_APPROVER !== null ? (int) $row->ID_SELL_APPROVER : null,
             year: (int) $row->YEAR,
             alcoholPercentage: $row->ALCOHOL_PERCENTAGE,
-            type: (string) $row->TYPE,
-            color: (string) $row->COLOR,
-            grade: (string) $row->GRADE,
-            state: (string) $row->STATE,
+            type: WineType::from((string) $row->TYPE),
+            color: WineColor::from((string) $row->COLOR),
+            grade: WineGrade::from((string) $row->GRADE),
+            state: WineState::from((string) $row->STATE),
             volume: (int) $row->VOLUME,
             bottlePrice: $row->BOTTLE_PRICE !== null ? (int) $row->BOTTLE_PRICE : null,
             currentPrice: $row->CURRENT_PRICE !== null ? (int) $row->CURRENT_PRICE : null,
@@ -256,10 +256,11 @@ final class WineRepository
     public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
         
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
-        $this->db->beginTransaction();
+        
         if (!$this->fetchWineById($idWine)) {
             return false;
         }
+        $this->db->beginTransaction();
         try {
             $this->db->table("WINE")
             ->where("ID", $idWine)
@@ -329,7 +330,7 @@ final class WineRepository
     {
         try {
             $this->db->transaction(function () use ($wine, $harvests) {
-                // check that all harvests are correct and ready for production
+                // check that all harvests are correct and ready for PRODUCTION
                 foreach ($harvests as $harvest) {
                     $harvestNew = $this->db->table('HARVEST')
                         ->where('ID_TASK', $harvest->getId())
@@ -419,7 +420,7 @@ final class WineRepository
             return $this->db->transaction(function () use ($wineId, $image) {
                 $row = $this->db->table('WINE')->get($wineId);
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Wine not found with ID ' . $wineId);
                 }
                // Handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;

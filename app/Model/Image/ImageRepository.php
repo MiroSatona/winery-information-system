@@ -9,7 +9,7 @@ use Nette\Http\FileUpload;
 
 final class ImageRepository 
 {
-    public function __construct(private string $uploadsDir, private string $uploadsDirWeb, private Explorer $db)
+    public function __construct(private string $uploadsDir, private string $uploadsDirWeb, private string $tmpImage, private Explorer $db)
     {
     }
     
@@ -77,6 +77,11 @@ final class ImageRepository
     public function getPathForImage(Image $image): string
     {
         return $this->uploadsDirWeb . '/' . $image->src;
+    }
+    
+    public function getTmpWineImage(): string
+    {
+        return $this->tmpImage . "/" . "tempWine.jpg";
     }
 
     public function checkImageExists(string $subPath): bool

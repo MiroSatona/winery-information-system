@@ -18,7 +18,7 @@ final class ProductRepository
     {
         // Start the query
         $query = $this->database->table('WINE')
-            ->where("STATE", WineState::sale->value)
+            ->where("STATE", WineState::SALE->value)
             ->where("BOTTLES_LEFT > ?", 0);
 
         // If a search term is provided, apply fuzzy search

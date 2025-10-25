@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Presentation\IS\Tasks;
 
 use App\Model\FlashMsgType;
-use Nette;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
@@ -18,7 +17,7 @@ use App\Model\Task\Bottling\Bottling;
 use App\Model\Task\TaskRepository;
 use App\Model\User\UserRepository;
 use App\Model\Task\TaskState;
-use App\Model\Task\Harvest\HarvestRepository;
+use App\Model\Task\Harvest\HarvestRepository;  
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineRepository;
 use App\Model\Vineyards\VineyardRepository;
@@ -612,7 +611,18 @@ final class TasksPresenter extends BasePresenter
 
     public function renderBottling() {
         $task = $this->fetchCurrentNewTask();
-
+        $form = $this->getComponent("wineSelectForm");
+        
+        $form["wine"]->setValue($task->getIDWine());
+        $form["volume"]->setValue($task->getBottleVolume());
+        
+        $img = $task->getImg();
+        
+        if ($task->getImg()) {
+            $this->template->image = $this->imgRep->getPathForImage($task->getImg());
+        } else {
+            $this->template->image = null;
+        }
     }
     
     public function processBottlingForm(Form $form, \stdClass $values) {
@@ -693,6 +703,12 @@ final class TasksPresenter extends BasePresenter
 
     public function onSuccessMarkHarvestDoneForm(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
         $id = (int)$this->getParameter('id');
 
         /** @var Harvest $harvest */
@@ -720,6 +736,12 @@ final class TasksPresenter extends BasePresenter
 
     public function renderMarkHarvestDone(int $id): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K označení sklizně jako dokončené nemáte oprávnění.', 'error');
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
         /** @var Harvest $harvest */
         $harvest = $this->harvestRepository->fetchById($id);
         if ($harvest === null) {
@@ -755,12 +777,10 @@ final class TasksPresenter extends BasePresenter
         /** @var Task $task */
         $task = $this->taskRepository->fetchById($id);
         if ($task === null) {
-            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->flashMessage('Úkon nebyl nalezen.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }
-
-        // todo checks
 
         $result = $this->taskRepository->markTaskDone(
             $task,
@@ -769,20 +789,31 @@ final class TasksPresenter extends BasePresenter
         );
 
         if ($result) {
-            $this->flashMessage('Úkon byl úspěšně označen jako dokončený.', 'success');
+            $this->flashMessage('Úkon byl úspěšně označen jako dokončený.', FlashMsgType::SUCCESS->value);
             $this->redirect('Tasks:dashboard');
         } else {
-            $this->flashMessage('Při označování úkonu došlo k chybě.', 'error');
+            $this->flashMessage('Při označování úkonu došlo k chybě.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
         }
     }
 
     public function renderMarkTaskDone(int $id): void
     {
+        // all vintners can mark tasks as done
+        // only workers assigned to the task can mark it as done
+        if (!$this->user->isInRole(Role::VINTNER->name) &&
+            !($this->user->isInRole(Role::WORKER->name) &&
+            $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id))) {
+            $this->flashMessage('K označení úkonu jako dokončeného nemáte oprávnění.', FlashMsgType::ERROR->value);
+            $this->redirect('Tasks:dashboard');
+            return;
+
+        }
+
         /** @var Task $task */
         $task = $this->taskRepository->fetchById($id);
         if ($task === null) {
-            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->flashMessage('Úkon nebyl nalezen.', FlashMsgType::ERROR->value);
             $this->redirect('Tasks:dashboard');
             return;
         }

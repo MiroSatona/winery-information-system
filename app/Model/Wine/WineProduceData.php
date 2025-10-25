@@ -4,14 +4,18 @@ declare(strict_types=1);
 
 namespace App\Model\Wine;
 
+use App\Model\Wine\WineColor;
+use App\Model\Wine\WineGrade;
+use App\Model\Wine\WineType;
+
 final class WineProduceData
 {
     public function __construct(
         private ?string $name,
         private ?int $year,
-        private string $type,
-        private string $color,
-        private string $grade,
+        private WineType $type,
+        private WineColor $color,
+        private WineGrade $grade,
         private ?int $volume,
         private ?float $alcoholPercentage,
         private ?float $leftSugar,
@@ -30,17 +34,17 @@ final class WineProduceData
         return $this->year;
     }
 
-    public function getType(): string
+    public function getType(): WineType
     {
         return $this->type;
     }
 
-    public function getColor(): string
+    public function getColor(): WineColor
     {
         return $this->color;
     }
 
-    public function getGrade(): string
+    public function getGrade(): WineGrade
     {
         return $this->grade;
     }

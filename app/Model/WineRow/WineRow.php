@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace App\Model\WineRow;
 
-use App\Model\Wine\Wine;
 use App\Model\WineVariety\WineVariety;
-use App\Model\WineVariety\WineVarietyType;
-
 
 final class WineRow
 {

@@ -1,8 +1,12 @@
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
-    <i class="fas fa-arrow-right me-2"></i>Vína
-    <i class="fas fa-arrow-right me-2"></i>Detail vína
+    <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vína
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Detail vína
+    </a>
 {/block topMenuISAdditional}
 
 {block isMainPanel}
@@ -21,7 +25,7 @@
                                 <a href="{link Wine:dashboard}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
-                                {if $wine->getState() === $WineState::production->value && $userVintner}
+                                {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
                                     <button type="button" 
                                             class="btn btn-danger btn-sm" 
                                             data-bs-toggle="modal" 
@@ -30,27 +34,27 @@
                                         <i class="fas fa-trash me-2"></i>Zlikvidovat víno
                                     </button>
                                 {/if}
-                                {if $wine->getState() === $WineState::production->value && $userVintner}
+                                {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
                                     <a href="{link bottling! $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-wine-bottle me-2"></i>Zalahvovat víno
                                     </a>
                                 {/if}
-                                {if $wine->getState() === $WineState::bottled->value && $userVintner}
+                                {if $wine->getState() === $WineState::BOTTLED && $userVintner}
                                     <a href="{link selling $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-coins me-2"></i>Zařadit do prodeje
                                     </a>
                                 {/if}
-                                {if $wine->getState() === $WineState::sale->value && $userVintner}
+                                {if $wine->getState() === $WineState::SALE && $userVintner}
                                     <a href="{link changePrice $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-coins me-2"></i>Změnit cenu
                                     </a>
                                 {/if}
-                                {if $wine->getState() === $WineState::production->value && $userVintner}
+                                {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
                                     <a href="{link edit $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-edit me-2"></i>Upravit víno
                                     </a>
                                 {/if}
-                                {if ($wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::bottled->value) && $userVintner}
+                                {if ($wine->getState() === $WineState::SALE || $wine->getState() === $WineState::BOTTLED) && $userVintner}
                                     <a href="{link changeImage $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-image me-2"></i>Změna obrázku
                                     </a>
@@ -117,7 +121,7 @@
                                             </label>
                                             <p class="fs-6 text-dark mb-2">{$wine->getGradeText()}</p>
                                         </div>
-                                        {if $wine->getState() === $WineState::bottled->value || $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
+                                        {if $wine->getState() === $WineState::BOTTLED || $wine->getState() === $WineState::SALE || $wine->getState() === $WineState::SOLD}
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold text-muted">
                                                     <i class="fas fa-wine-bottle me-2"></i>Zbývá lahví
@@ -127,7 +131,7 @@
                                         {/if}
                                     </div>
 
-                                    {if $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
+                                    {if $wine->getState() === $WineState::SALE || $wine->getState() === $WineState::SOLD}
                                         <div class="row mb-3">
                                             {if $wine->getCurrentPrice() !== null}
                                                 <div class="col-md-6">
@@ -148,7 +152,7 @@
                                         </div>
                                     {/if}
 
-                                    {if $wine->getState() === $WineState::bottled->value || $wine->getState() === $WineState::sale->value || $wine->getState() === $WineState::sold->value}
+                                    {if $wine->getState() === $WineState::BOTTLED || $wine->getState() === $WineState::SALE || $wine->getState() === $WineState::SOLD}
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold text-muted">
@@ -319,7 +323,7 @@
     </div>
 
     {* Liquidation confirmation modal *}
-    {if $wine->getState() === $WineState::production->value && $userVintner}
+    {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
         <div class="modal fade" id="liquidateModal{$wine->getId()}" tabindex="-1" aria-labelledby="liquidateModalLabel{$wine->getId()}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">

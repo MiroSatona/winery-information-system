@@ -131,7 +131,7 @@ final class WineVarietyRepository
             return $this->database->transaction(function () use ($wineVariety) {
                 $row = $this->database->table('WINE_VARIETY')->get($wineVariety->getId());
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Wine variety not found with ID ' . $wineVariety->getId());
                 }
 
                 // Handle picture update
@@ -186,7 +186,7 @@ final class WineVarietyRepository
             return $this->database->transaction(function () use ($id) {
                 $row = $this->database->table('WINE_VARIETY')->get($id);
                 if ($row === null) {
-                    return false;
+                    throw new \Exception('Wine variety not found with ID ' . $id);
                 }
 
                 $pictureId = $row->ID_PICTURE;

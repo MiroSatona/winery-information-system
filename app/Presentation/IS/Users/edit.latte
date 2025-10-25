@@ -1,8 +1,12 @@
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
-    <i class="fas fa-arrow-right me-2"></i>Uživatelé
-    <i class="fas fa-arrow-right me-2"></i>Upravit uživatele
+    <a href="{link :IS:Users:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Uživatelé
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Upravit uživatele
+    </a>
 {/block topMenuISAdditional}
 
 {block isMainPanel}

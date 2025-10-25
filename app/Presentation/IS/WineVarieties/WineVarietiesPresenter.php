@@ -96,6 +96,7 @@ final class WineVarietiesPresenter extends BasePresenter
             WineVarietyType::GREY->value => 'Šedé',
             WineVarietyType::BLUE->value => 'Modré',
         ])
+            ->setDefaultValue(WineVarietyType::WHITE->value)
             ->setRequired('Zadejte prosím barvu bobulí.')
             ->setHtmlAttribute('class', 'form-select')
             ->setHtmlAttribute('placeholder', 'Zadejte barvu bobulí.');

@@ -12,7 +12,7 @@ services:
 	- App\Model\Task\Bottling\BottlingRepository
 	- App\Model\Task\Treatment\TreatmentRepository
 	- App\Model\Task\TaskRepository
-	- App\Model\Image\ImageRepository(%uploadsDir%, %uploadsDirWeb%)
+	- App\Model\Image\ImageRepository(%uploadsDir%, %uploadsDirWeb%, %tmpImage%)
 
 
 	security.passwords: Nette\Security\Passwords(::PASSWORD_ARGON2ID, [memory_cost: 65536, time_cost: 4, threads: 3])

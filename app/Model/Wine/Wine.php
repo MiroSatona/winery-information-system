@@ -3,6 +3,10 @@
 namespace App\Model\Wine;
 
 use App\Model\Image\Image;
+use App\Model\Wine\WineColor;
+use App\Model\Wine\WineType;
+use App\Model\Wine\WineGrade;
+use App\Model\Wine\WineState;
 
 class Wine
 {
@@ -20,10 +24,10 @@ class Wine
         public ?int $idSellApprover,
         public int $year,
         public float $alcoholPercentage,
-        public string $type,
-        public string $color,
-        public string $grade,
-        public string $state,
+        public WineType $type,
+        public WineColor $color,
+        public WineGrade $grade,
+        public WineState $state,
         public int $volume,
         public ?float $bottlePrice,
         public ?float $currentPrice,
@@ -47,50 +51,50 @@ class Wine
         $this->stateCz = $this->fetchState($this->state);
     }
 
-    private function fetchType(string $type): string
+    private function fetchType(WineType $type): string
     {
         return match ($type) {
-            'DRY' => 'Suché',
-            'HALF_DRY' => 'Polosuché',
-            'HALF_SWEET' => 'Polosladké',
-            'SWEET' => 'Sladké',
-            default => $type,
+            WineType::DRY => 'Suché',
+            WineType::HALF_DRY => 'Polosuché',
+            WineType::HALF_SWEET => 'Polosladké',
+            WineType::SWEET => 'Sladké',
+            default => $type->value,
         };
     }
 
-    private function fetchColor(string $color): string
+    private function fetchColor(WineColor $color): string
     {
         return match ($color) {
-            'WHITE' => 'Bílé',
-            'RED' => 'Červené',
-            'ROSE' => 'Růžové',
-            default => $color,
+            WineColor::WHITE => 'Bílé',
+            WineColor::RED => 'Červené',
+            WineColor::ROSE => 'Růžové',
+            default => $color->value,
         };
     }
 
-    private function fetchGrade(string $grade): string
+    private function fetchGrade(WineGrade $grade): string
     {
         return match ($grade) {
-            'NONE' => 'Žádný',
-            'CABINET' => 'Kabinetní víno',
-            'LATE' => 'Pozdní sběr',
-            'GRAPE_SELECTION' => 'Výběr z hroznů',
-            'BERRY_SELECTION' => 'Výběr z bobulí',
-            'ICE' => 'Ledové víno',
-            'STRAW' => 'Slámové víno',
-            default => $grade,
+            WineGrade::NONE => 'Bez přívlastku',
+            WineGrade::CABINET => 'Kabinetní víno',
+            WineGrade::LATE => 'Pozdní sběr',
+            WineGrade::GRAPE_SELECTION => 'Výběr z hroznů',
+            WineGrade::BERRY_SELECTION => 'Výběr z bobulí',
+            WineGrade::ICE => 'Ledové víno',
+            WineGrade::STRAW => 'Slámové víno',
+            default => $grade->value,
         };
     }
 
-    private function fetchState(string $state): string
+    private function fetchState(WineState $state): string
     {
         return match ($state) {
-            'PRODUCTION' => 'Ve výrobě',
-            'LIQUIDATED' => 'Zlikvidováno',
-            'BOTTLED' => 'Nalahvováno',
-            'SALE' => 'V prodeji',
-            'SOLD' => 'Prodáno',
-            default => $state,
+            WineState::PRODUCTION => 'Ve výrobě',
+            WineState::LIQUIDATED => 'Zlikvidováno',
+            WineState::BOTTLED => 'Nalahvováno',
+            WineState::SALE => 'V prodeji',
+            WineState::SOLD => 'Prodáno',
+            default => $state->value,
         };
     }
 
@@ -134,22 +138,22 @@ class Wine
         return $this->alcoholPercentage;
     }
 
-    public function getType(): string
+    public function getType(): WineType
     {
         return $this->type;
     }
 
-    public function getColor(): string
+    public function getColor(): WineColor
     {
         return $this->color;
     }
 
-    public function getGrade(): string
+    public function getGrade(): WineGrade
     {
         return $this->grade;
     }
 
-    public function getState(): string
+    public function getState(): WineState
     {
         return $this->state;
     }

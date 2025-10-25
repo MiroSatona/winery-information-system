@@ -72,6 +72,7 @@ final class OrderItemRepository
 
     public function changeItemAmount(int $wineId, int $orderId, int $amount, bool $add): bool {
         $row = $this->fetchItemRow($wineId, $orderId);
+        bdump($row);
         if ($row == null) {
             return false;
         }       
@@ -81,7 +82,8 @@ final class OrderItemRepository
         } else {
             $newAmount = $row->BOTTLES_COUNT - $amount;            
         }
-       
+        
+        bdump($newAmount);
         if ($newAmount < 0) {
             return false;
         }
@@ -91,6 +93,7 @@ final class OrderItemRepository
         }
 
         if ($newAmount > $this->wineRepository->getWineAllBottleCount($wineId)) {
+            bdump($this->wineRepository->getWineAllBottleCount($wineId));
             return false;
         }
 
