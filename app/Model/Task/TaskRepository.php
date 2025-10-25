@@ -264,6 +264,112 @@ class TaskRepository{
             bdump('Failed to create bottling task: ' . $e->getMessage());
             return false;
         }
+    }
+    
+    public function createHarvestTask(TaskData $data): bool {
+
+        try {
+            // validate basic fields
+            $name = trim($data->getName());
+            if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
+                throw new \Exception('Invalid task name');
+            }
+
+            $vineyardId = $data->getIdWineYard();
+            if ($vineyardId === null) {
+                throw new \Exception('No vineyard selected');
+            }
+
+            $wineVarietyId = $data->getIdWineVariety();
+            if ($wineVarietyId === null) {
+                throw new \Exception('No wine variety selected');
+            }
+
+            $idRows = $data->getIdRows() ?? [];
+            if (empty($idRows)) {
+                throw new \Exception('No rows selected for harvest');
+            }
+
+            // validate each row: exists, belongs to vineyard and variety, is active
+            foreach ($idRows as $code) {
+                $row = $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->where('CODE', $code)
+                    ->where('ID_WINE_VARIETY', $wineVarietyId)
+                    ->where('ACTIVE', true)
+                    ->fetch();
+                if ($row === null) {
+                    throw new \Exception('Invalid or inactive wine row selected: ' . $code);
+                }
+            }
+
+            // start transaction
+            $this->database->beginTransaction();
+
+            $now = new DateTime();
+            $taskRow = $this->database->table('TASK')->insert([
+                'NAME' => $name,
+                'STATE' => TaskState::PLANNED->value,
+                'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
+                'EXECUTION_TIMESTAMP' => null,
+                'NOTE' => $data->getNote(),
+                'ID_TASK_ISSUER' => null,
+                'ID_TASK_CONFIRMER' => null,
+            ]);
+
+            if ($taskRow === null || !isset($taskRow->ID)) {
+                throw new \Exception('Failed to insert task');
+            }
+
+            $taskId = (int) $taskRow->ID;
+
+            // insert harvest row
+            $harvestRow = $this->database->table('HARVEST')->insert([
+                'ID_TASK' => $taskId,
+                'ID_VINEYARD' => $vineyardId,
+                'ID_WINE_VARIETY' => $wineVarietyId,
+                'ID_HARVEST_CONFIRMER' => null,
+                'ID_WINE' => null,
+                'WEIGHT' => null,
+                'SUGAR_CONTENT' => null,
+            ]);
+
+            if ($harvestRow === null) {
+                throw new \Exception('Failed to insert harvest');
+            }
+
+            // link selected rows in TASK_ROW
+            foreach ($idRows as $code) {
+                $this->database->table('TASK_ROW')->insert([
+                    'ID_VINEYARD' => $vineyardId,
+                    'CODE_ROW' => $code,
+                    'ID_TASK' => $taskId,
+                ]);
+            }
+
+            // assign workers if provided
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $this->database->table('WORKER')->insert([
+                    'ID_USER' => $workerId,
+                    'ID_TASK' => $taskId,
+                ]);
+            }
+
+            $this->database->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                // ignore
+            }
+            bdump('Failed to create bottling task: ' . $e->getMessage());
+            return false;
+        }
 
     }
 }

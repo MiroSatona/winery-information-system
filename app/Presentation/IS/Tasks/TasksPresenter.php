@@ -684,7 +684,6 @@ final class TasksPresenter extends BasePresenter
 
         $vineYardFrom = $this->getComponent("selectVineyard");
         $wineVarietyFrom = $this->getComponent("selectWineVariety");
-        $wineRowsForm = $this->getComponent("selectRowsForm");
 
         if ($task->getIdWineYard()) {
             $vineYardFrom['vineyard']->setValue($task->getIdWineYard());
@@ -734,6 +733,8 @@ final class TasksPresenter extends BasePresenter
         
         if (isset($values->vineyard)) {
             $task->setIdWineYard($values->vineyard);
+            $task->setIdWineVariety(null);
+            $task->setIdRows([]);
         }
         $this->redirect("this");
     }
@@ -767,6 +768,7 @@ final class TasksPresenter extends BasePresenter
        
         if (isset($values->wineVariety)) {
             $task->setIdWineVariety($values->wineVariety);
+            $task->setIdRows([]);
         }
         $this->redirect("this");
     }
@@ -791,7 +793,7 @@ final class TasksPresenter extends BasePresenter
 
         $form = new Form();
 
-        // Use a select to add a single worker at once (server-driven flow)
+        // Use a select to add a single row at once (server-driven flow)
         $form->addSelect('rows', 'Řádky', ['' => 'Vyberte řádek ...'] + $options)
             ->setHtmlAttribute('class', 'form-select')
             ->setDefaultValue('');
@@ -1016,6 +1018,7 @@ final class TasksPresenter extends BasePresenter
                 $result = $this->taskRepository->createBottlingTask($task);
                 break; 
             case TaskType::HARVEST->value: 
+                $result = $this->taskRepository->createHarvestTask($task);
                 break; 
             case TaskType::TREATMENT->value: 
                 break;
