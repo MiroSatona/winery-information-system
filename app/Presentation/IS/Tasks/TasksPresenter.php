@@ -70,6 +70,11 @@ final class TasksPresenter extends BasePresenter
         $this->template->roleType = TaskState::class;
     }
     
+    public function handleCreateNonExistentTask() 
+    {
+        $this->handleClearForm(false);
+    }
+    
     public function renderAddTask1(): void 
     {
         $form = $this->getComponent("addTaskForm");
@@ -125,11 +130,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
-    public function handleClearForm(): void
+    public function handleClearForm(bool $redirect = true): void
     {
         $section = $this->session->getSection("TaskCreation");
         $section->set("newTask", null);
-        $this->redirect('dashboard');
+        
+        if ($redirect) {
+            $this->redirect('dashboard');
+        }
     }
     
     public function createComponentTaskWorkersForm(): Form

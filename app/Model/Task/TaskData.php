@@ -35,12 +35,24 @@ class TaskData
 
     // common 
     private array $idRows = [];
+    
+    // type of task 
+    private bool $isDone = false;
 
     public function __construct()
     {
     }
 
     // --- Getters & Setters ---
+    
+    public function getIsDone(): bool 
+    {
+        return $this->isDone;
+    }
+    
+    public function markAdDone(): void {
+       $this->isDone = true; 
+    }
     
     public function getType(): TaskType
     {
