@@ -206,6 +206,4 @@ final class WineVarietyRepository
             return false;
         }
     }
-
-
 }
