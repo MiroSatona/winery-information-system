@@ -484,6 +484,9 @@ final class TasksPresenter extends BasePresenter
         $this->template->wine = ($harvest->getIdWine() !== null)
             ? $this->wineRep->fetchWineById($harvest->getIdWine())
             : null;
+        
+        // Get wine rows of vineyard where the harvest was made
+        $this->template->wineRows = $this->vineyardRep->getWineRowsOnVineyard($harvest->getVineyard()->getId());
     }   
 
 
@@ -546,7 +549,9 @@ final class TasksPresenter extends BasePresenter
         $this->template->taskConfirmer = ($treatment->getIdTaskConfirmer() !== null) 
             ? $this->userRepository->getUserById($treatment->getIdTaskConfirmer()) 
             : null;
-        
+
+        // Get wine rows of vineyard where the treatment was made
+        $this->template->wineRows = $this->vineyardRep->getWineRowsOnVineyard($treatment->getVineyard()->getId());
     }
 
 
