@@ -1055,6 +1055,9 @@ final class TasksPresenter extends BasePresenter
     public function clearRows() {
        $task = $this->fetchCurrentNewTask(); 
        $task->setIdRows([]);
+       $this->getSession()->getSection('TaskCreation')->set('newTask', $task);
+       $this->flashMessage('Výběr řádků byl vymazán.', FlashMsgType::SUCCESS->value);
+       $this->redirect('this');
     }
     
     public function wineRowSelection(Button $button, \stdClass $values): void {

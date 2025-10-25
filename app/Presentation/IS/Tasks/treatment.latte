@@ -62,7 +62,9 @@
                                     Vybrané řádky
                                 </h5>
                                 <div>
-                                    {input clearRows}
+                                    {if $selectedRows && count($selectedRows) > 0}
+                                        {input clearRows}
+                                    {/if}
                                 </div>
                             </div>
 
