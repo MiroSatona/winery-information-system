@@ -54,12 +54,17 @@
 
                             <div class="col-12 border-top pt-4 mt-2">
                                 <div class="row g-2">
-                                    <div class="col-6">
-                                        <a href="{link selectWorkers}" class="btn btn-outline-secondary w-100">
-                                            <i class="fas fa-arrow-left me-1"></i> Zpět
+                                    <div class="col-4">
+                                        <a href="{link clearForm!}" class="btn btn-danger w-100">
+                                        Zrušit
                                         </a>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
+                                        <a href="{link selectWorkers}" class="btn btn-secondary w-100">
+                                             Zpět
+                                        </a>
+                                    </div>
+                                    <div class="col-4">
                                         <button type="submit" class="btn btn-primary w-100">
                                             <i class="fas fa-check me-1"></i> Pokračovat
                                         </button>
@@ -84,8 +89,6 @@
             fileInput.addEventListener('change', function(e){
                 const file = this.files && this.files[0];
                 if (!file) {
-                    // restore empty transparent placeholder
-                    preview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
                     return;
                 }
                 const reader = new FileReader();

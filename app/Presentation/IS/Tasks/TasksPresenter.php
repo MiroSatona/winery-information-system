@@ -181,6 +181,12 @@ final class TasksPresenter extends BasePresenter
     public function goToNextForm() 
     {
         $newTask = $this->fetchCurrentNewTask();
+        
+        if (!$newTask->getIdsOfWorkers()) {
+            $this->flashMessage("Úkon musí být někomu přiřazen!", FlashMsgType::ERROR->value);
+            $this->redirect("this");
+            return;
+        }
 
         switch($newTask->getType()) {
         case TaskType::TREATMENT: 
@@ -619,14 +625,12 @@ final class TasksPresenter extends BasePresenter
         ->setHtmlAttribute('placeholder', 'zadejte objem jedné láhve');
     
         $form->addSubmit("finish", "Pokračovat")
-            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-            ->onClick[] = [$this, "goToNextForm"];
-    
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+
         $form->onSuccess[] = [$this, "processBottlingForm"];
         return $form;
     }
-
-
+    
     public function renderBottling() {
         $task = $this->fetchCurrentNewTask();
         $form = $this->getComponent("wineSelectForm");
@@ -922,7 +926,16 @@ final class TasksPresenter extends BasePresenter
     }
 
     public function submitHarvestDetails(Button $button, \stdClass $values) {
-        $this->redirect("this");
+        
+        $task = $this->fetchCurrentNewTask();
+        
+        if (!$task->getIdWineYard() || !$task->getIdWineVariety() || !$task->getIdRows()) {
+            $this->flashMessage("Chybné údaje!", FlashMsgType::ERROR->value);
+            $this->redirect("this");
+            return;
+        }
+        
+        $this->finalizeTask($task);
     }
     
     public function goBackToWorkers(Button $button, \stdClass $values) {
