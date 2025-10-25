@@ -180,13 +180,13 @@ final class TasksPresenter extends BasePresenter
         $newTask = $this->fetchCurrentNewTask();
 
         switch($newTask->getType()) {
-        case TaskType::TREATMENT->value: 
+        case TaskType::TREATMENT: 
             $this->redirect("treatment");
             break;
-        case TaskType::HARVEST->value:
+        case TaskType::HARVEST:
             $this->redirect("harvest");
             break;
-        case TaskType::BOTTLING->value: 
+        case TaskType::BOTTLING:
             $this->redirect("bottling");
             break;
         default:
@@ -195,7 +195,7 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
-    private function fetchCurrentNewTask() {
+    private function fetchCurrentNewTask(): TaskData {
         $section = $this->session->getSection("TaskCreation");
 
         $newTask = $section->get("newTask");
@@ -232,7 +232,7 @@ final class TasksPresenter extends BasePresenter
         $newTask->setPlannedTimestamp($planned);
         
         if (isset($values->type)) {
-            $newTask->setType($values->type);
+            $newTask->setType(TaskType::from((string) $values->type));
         }
 
         // persist updated TaskData back into session
@@ -582,7 +582,7 @@ final class TasksPresenter extends BasePresenter
     public function actionStartBottling(int $wineId) {
         $task = $this->fetchCurrentNewTask();
         $task->setIdWine($wineId);
-        $task->setType(TaskType::BOTTLING->value);
+        $task->setType(TaskType::BOTTLING);
         $this->redirect("addTask1");
     }
 
@@ -676,9 +676,28 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 //                      Treatment Task 
 // ----------------------------------------------------------
-    
+
     public function renderTreatment() {
-        
+        /** @var TaskData $task */
+        $task = $this->fetchCurrentNewTask();
+
+        $vineYardFrom = $this->getComponent("selectVineyard");
+        $wineRowsForm = $this->getComponent("selectRowsForm");
+
+        if ($task->getIdWineYard()) {
+            $vineYardFrom['vineyard']->setValue($task->getIdWineYard());
+        }
+
+        // prepare selected rows for template display
+        $selectedRows = [];
+        $idRows = $task->getIdRows() ?? [];
+        foreach ($idRows as $code) {
+            $rowObj = $this->vineyardRep->getWineRowById($task->getIdWineYard(), $code);
+            if ($rowObj !== null) {
+                $selectedRows[] = $rowObj;
+            }
+        }
+        $this->template->selectedRows = $selectedRows;
     }
 
 // ----------------------------------------------------------
@@ -785,16 +804,37 @@ final class TasksPresenter extends BasePresenter
         $wineVarietyId = $task->getIdWineVariety();
        
         $options = [];
-        if ($wineVarietyId && $wineYardId) {
-            $rows = $this->vineyardRep->getRowsAtVineyardWithWineVariety($wineYardId, $wineVarietyId);
-            $already = $task->getIdRows() ?? [];
-            foreach ($rows as $r) {
-                $code = $r->getId();
-                if (in_array($code, $already, true)) {
-                    continue; // exclude already-selected rows
+        bdump($task->getType());
+        switch ($task->getType()) {
+            case TaskType::HARVEST:
+                if ($wineVarietyId && $wineYardId) {
+                    $rows = $this->vineyardRep->getRowsAtVineyardWithWineVariety($wineYardId, $wineVarietyId);
+                    $already = $task->getIdRows() ?? [];
+                    foreach ($rows as $r) {
+                        $code = $r->getId();
+                        if (in_array($code, $already, true)) {
+                            continue; // exclude already-selected rows
+                        }
+                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
+                    }
                 }
-                $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
-            }
+                break;
+            case TaskType::TREATMENT:
+                if ($wineYardId) {
+                    $rows = $this->vineyardRep->getWineRowsOnVineyard($wineYardId);
+                    $already = $task->getIdRows() ?? [];
+                    foreach ($rows as $r) {
+                        $code = $r->getId();
+                        if (in_array($code, $already, true)) {
+                            continue; // exclude already-selected rows
+                        }
+                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
+                    }
+                }
+                break;
+            default:
+
+                break;
         }
 
         $form = new Form();

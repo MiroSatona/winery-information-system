@@ -529,7 +529,7 @@ final class VineyardRepository
         }
     }
 
-    public function getWinLeVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
+    public function getWineVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
     {
         $totalHeadCount = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
