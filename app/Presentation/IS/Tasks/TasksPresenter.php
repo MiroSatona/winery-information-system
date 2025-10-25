@@ -21,6 +21,7 @@ use App\Model\Task\TaskState;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\Wine\WineRepository;
+use App\Model\Vineyards\VineyardRepository;
 use App\Model\Image\ImageRepository;
 use App\Model\Image\Image;
 use Nette\Forms\Controls\Button;
@@ -35,7 +36,9 @@ final class TasksPresenter extends BasePresenter
         private TaskRepository $taskRepository,
         private HarvestRepository $harvestRepository,
         private WineRepository $wineRep,
-        private ImageRepository $imgRep
+        private ImageRepository $imgRep,
+        private VineyardRepository $vineyardRepository
+
     ) {
         parent::__construct();
     }
@@ -453,14 +456,34 @@ final class TasksPresenter extends BasePresenter
     {
         $harvest = $this->taskRepository->fetchById($id);
 
-        if ($harvest === null) {
+        if ($harvest === null || !($harvest instanceof Harvest)) {
             $this->flashMessage('Chyba při načítání sklizně z databáze, zkuste to prosím znovu.', 'error');
             $this->redirect('dashboard');
             return;
         }
 
         $this->template->task = $harvest;
-    }
+
+        // Get task issuer to latte template
+        $this->template->taskIssuer = ($harvest->getIdTaskIssuer() !== null)
+            ? $this->userRepository->getUserById($harvest->getIdTaskIssuer())
+            : null;
+        
+        // Get task confirmer to latte template
+        $this->template->taskConfirmer = ($harvest->getIdTaskConfirmer() !== null) 
+            ? $this->userRepository->getUserById($harvest->getIdTaskConfirmer()) 
+            : null;
+        
+        // Get harvest vintner <=> confimer to latte template
+        $this->template->harvestConfirmer = ($harvest->getIdHarvestConfirmer() !== null) 
+            ? $this->userRepository->getUserById($harvest->getIdHarvestConfirmer()) 
+            : null;
+
+        // Get wine to latte template
+        $this->template->wine = ($harvest->getIdWine() !== null)
+            ? $this->wineRep->fetchWineById($harvest->getIdWine())
+            : null;
+    }   
 
 
     /**
@@ -481,6 +504,16 @@ final class TasksPresenter extends BasePresenter
         }
 
         $this->template->task = $bottling;
+        
+        // Get task issuer to latte template
+        $this->template->taskIssuer = ($bottling->getIdTaskIssuer() !== null) 
+            ? $this->userRepository->getUserById($bottling->getIdTaskIssuer()) 
+            : null;
+        
+        // Get task confirmer to latte template
+        $this->template->taskConfirmer = ($bottling->getIdTaskConfirmer() !== null) 
+            ? $this->userRepository->getUserById($bottling->getIdTaskConfirmer()) 
+            : null;
     }
 
 
@@ -502,6 +535,17 @@ final class TasksPresenter extends BasePresenter
         }
 
         $this->template->task = $treatment;
+        
+        // Get task issuer to latte template
+        $this->template->taskIssuer = ($treatment->getIdTaskIssuer() !== null) 
+            ? $this->userRepository->getUserById($treatment->getIdTaskIssuer()) 
+            : null;
+
+        // Get task confirmer to latte template
+        $this->template->taskConfirmer = ($treatment->getIdTaskConfirmer() !== null) 
+            ? $this->userRepository->getUserById($treatment->getIdTaskConfirmer()) 
+            : null;
+        
     }
 
 

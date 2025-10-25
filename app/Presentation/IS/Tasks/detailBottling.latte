@@ -6,5 +6,68 @@
 
 {block isMainPanel}
     {include 'taskHeader.latte', task: $task}
-        
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header text-dark p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-wine-bottle me-2"></i>Specifické informace o láhvování
+                            </h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <a href="{link :IS:Wine:show $task->getIdWine()}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-wine-bottle me-1"></i>{$task->getWine()->getName()}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <div class="mb-4">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-wine-glass me-2"></i>Víno
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">
+                                                {if $task->getIdWine()}
+                                                    {$task->getWine()->getName()}
+                                                {else}
+                                                    <span class="text-muted fst-italic">Není přiřazeno</span>
+                                                {/if}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-sort-numeric-up me-2"></i>Počet lahví
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getBottlesCount()} ks</p>
+                                        </div>
+                                    </div>
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-flask me-2"></i>Objem lahve
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getBottleVolume()} ml</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-calculator me-2"></i>Celkový objem
+                                            </label>
+                                            <p class="fs-6 text mb-2">
+                                                {($task->getBottledVolume() / 1000)|number:2} l
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block isMainPanel}

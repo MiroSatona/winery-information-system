@@ -5,5 +5,79 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    {include 'taskHeader.latte', task: $task}       
+    {include 'taskHeader.latte', task: $task}
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card  shadow-sm">
+                    <div class="card-header text-dark py-3">
+                        <h5 class="mb-0 fw-bold">
+                            <i class="fas fa-flask me-2"></i>Specifické informace o ošetření
+                        </h5>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <div class="mb-4">
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-tag me-2"></i>Kategorie
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getCategory()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-prescription-bottle me-2"></i>Název ošetření
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getNameTreatment()}</p>
+                                        </div>
+                                    </div>
+
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-tint me-2"></i>Množství
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getQuantity()} {$task->getUnit()}</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-ruler me-2"></i>Jednotka
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getUnit()}</p>
+                                        </div>
+                                    </div>
+
+                                    <hr>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Ošetřené vinohrady
+                                        </label>
+                                        {if count($task->getVineyards()) > 0}
+                                            <div class="list-group">
+                                                {foreach $task->getVineyards() as $vineyard}
+                                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                                        <span>
+                                                            {$vineyard->getName()}
+                                                        </span>
+                                                        <a href="{link :IS:Vineyards:show vineyardId => $vineyard->getId()}" class="btn btn-sm btn-primary">
+                                                            Zobrazit vinohrad
+                                                        </a>
+                                                    </div>
+                                                {/foreach}
+                                            </div>
+                                        {else}
+                                            <p class="text-muted fst-italic">Žádné vinice přiřazeny</p>
+                                        {/if}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block isMainPanel}
