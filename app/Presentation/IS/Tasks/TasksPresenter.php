@@ -574,11 +574,11 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
     
 
-    public function handleStartBottling(int $wineId) {
+    public function actionStartBottling(int $wineId) {
         $task = $this->fetchCurrentNewTask();
         $task->setIdWine($wineId);
         $task->setType(TaskType::BOTTLING->value);
-        $this->redirect("renderAddTask1");
+        $this->redirect("addTask1");
     }
 
     public function createComponentWineSelectForm() 
