@@ -75,7 +75,9 @@ final class TasksPresenter extends BasePresenter
         $form['name']->setValue($newTask->getName());
         $form["note"]->setValue($newTask->getNote());
         $form["type"]->setValue($newTask->getType());
-        $form["planned_date"]->setValue($newTask->getPlannedTimestamp());
+        if ($newTask->getPlannedTimestamp()) {
+            $form["planned_date"]->setValue($newTask->getPlannedTimestamp());
+        }
     }
 
     public function createComponentAddTaskForm(): Form
@@ -107,7 +109,7 @@ final class TasksPresenter extends BasePresenter
             ->setRequired('Zadejte plánované datum provedení.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('style', 'width: 200px;');
-
+        
         $send = $form->addSubmit('send', 'Pokračovat');
         $send->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
         $send->getControlPrototype();
@@ -820,7 +822,15 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, "finalizeTask"];
         
+        $form->addSubmit("goBack", "Zpět")
+            ->setHtmlAttribute('class', 'btn btn-secondary mt-2')
+            ->onClick[] = [$this, "goBackToWorkers"];
+        
         return $form;
+    }
+    
+    public function goBackToWorkers(Button $button, \stdClass $values) {
+        $this->redirect("selectWorkers");
     }
     
     public function clearRows() {

@@ -51,13 +51,18 @@ final class WineRepository
     
     public function fetchAllProductionWines(): array
     {
-        $rows = $this->db->table("WINE")     
-        ->where("STATE", WineState::PRODUCTION->value);
-        
+        // exclude wines that already have a bottling record (i.e. already assigned to a bottling task)
+        $bottledWineIds = $this->db->table('BOTTLING')->where("NOT STATE", TaskState::CANCELED->value)->select('ID_WINE');
+
+        $rows = $this->db->table('WINE')
+            ->where('STATE', WineState::PRODUCTION->value)
+            ->where('ID NOT IN ?', $bottledWineIds);
+
         $wines = [];
         foreach ($rows as $row) {
-           $wines[] = $this->createWineFromRow($row);
+            $wines[] = $this->createWineFromRow($row);
         }
+
         return $wines;
     }
 
