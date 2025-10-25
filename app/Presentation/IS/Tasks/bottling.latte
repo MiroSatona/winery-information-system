@@ -34,7 +34,6 @@
                                     <i class="far fa-image me-2 text-muted"></i>{label image /}
                                 </label>
                                 {input image}
-                                <div class="form-text">Nahrajte obrázek láhve nebo odrůdy. Náhled je níže.</div>
                             </div>
 
                             <div class="col-12 col-md-6 d-flex align-items-start flex-column">
@@ -42,26 +41,18 @@
                                     <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
                                 </label>
                                 {input volume}
-                                <div class="form-text">Zadejte objem v litrech nebo jednotkách, které projekt používá.</div>
-                            </div>
-
-                            <div class="col-12">
-                                <h6 class="fw-semibold mb-2">Náhled obrázku</h6>
-                                <div class="border rounded p-3 d-flex justify-content-center align-items-center" style="min-height:160px;">
-                                    <img id="wine-preview" src="{$image ?? ''}" alt="Obrázek - náhled" class="img-fluid" style="max-height:200px; object-fit:contain;" />
-                                </div>
                             </div>
 
                             <div class="col-12 border-top pt-4 mt-2">
                                 <div class="row g-2">
                                     <div class="col-4">
                                         <a href="{link clearForm!}" class="btn btn-danger w-100">
-                                        Zrušit
+                                            Zrušit
                                         </a>
                                     </div>
                                     <div class="col-4">
                                         <a href="{link selectWorkers}" class="btn btn-secondary w-100">
-                                             Zpět
+                                            Zpět
                                         </a>
                                     </div>
                                     <div class="col-4">
