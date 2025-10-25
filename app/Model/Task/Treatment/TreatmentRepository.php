@@ -7,6 +7,7 @@ namespace App\Model\Task\Treatment;
 use Nette\Database\Explorer;
 use App\Model\Task\Treatment\Treatment;
 use App\Model\Task\TaskState;
+use App\Model\Task\Treatment\TreatmentType;
 use App\Model\Vineyard\Vineyard;
 use App\Model\Vineyard\VineyardRepository;
 
@@ -45,13 +46,10 @@ class TreatmentRepository
             return null;
         }
 
-        /** @var Vineyard[] $vineyards */
-        $vineyards = [];
-        $vineyardRows = $this->database->table('TASK_ROW')
-            ->where('ID_TASK', $id)
-            ->select('DISTINCT ID_VINEYARD');
-        foreach ($vineyardRows as $vineyardRow) {
-            $vineyards[] = $this->vineyardRepository->fetchById((int)$vineyardRow->ID_VINEYARD);
+        /** @var Vineyard $vineyard */
+        $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
+        if ($vineyard === null) {
+            return null;
         }
 
         /** @var Treatment $treatment */
@@ -63,11 +61,11 @@ class TreatmentRepository
             $row->LAST_CHANGE_TIMESTAMP,
             $row->PLANNED_EXECUTION_TIMESTAMP,
             $row->EXECUTION_TIMESTAMP,
-            $vineyards,
             $row->NOTE,
             ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
             ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
-            $row->CATEGORY,
+            $vineyard,
+            TreatmentType::from((string)$row->TYPE),
             $row->NAME,
             $row->QUANTITY,
             $row->UNIT
@@ -110,15 +108,12 @@ class TreatmentRepository
         $treatments = [];
         foreach ($mainQuery as $row) {
 
-            /** @var Vineyard[] $vineyards */
-            $vineyards = [];
-            $vineyardRows = $this->database->table('TASK_ROW')
-                ->where('ID_TASK', $row->ID)
-                ->select('DISTINCT ID_VINEYARD')
-                ->fetchAll();
-            foreach ($vineyardRows as $vineyardRow) {
-                $vineyards[] = $this->vineyardRepository->fetchById((int)$vineyardRow->ID_VINEYARD);
+            /** @var Vineyard $vineyard */
+            $vineyard = $this->vineyardRepository->fetchById((int) $row->ID_VINEYARD);
+            if ($vineyard === null) {
+                continue;
             }
+
             $treatments[] = new Treatment(
                 (int) $row->ID,
                 (string) $row->NAME,
@@ -127,11 +122,11 @@ class TreatmentRepository
                 $row->LAST_CHANGE_TIMESTAMP,
                 $row->PLANNED_EXECUTION_TIMESTAMP ?? null,
                 $row->EXECUTION_TIMESTAMP ?? null,
-                $vineyards,
                 (string) $row->NOTE,
                 $row->ID_TASK_ISSUER !== null ? (int) $row->ID_TASK_ISSUER : null,
                 $row->ID_TASK_CONFIRMER !== null ? (int) $row->ID_TASK_CONFIRMER : null,
-                (string) $row->CATEGORY,
+                $vineyard,
+                TreatmentType::from((string) $row->TYPE),
                 (string) $row->NAME,
                 (float) $row->QUANTITY,
                 (string) $row->UNIT

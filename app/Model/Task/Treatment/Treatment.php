@@ -6,13 +6,16 @@ namespace App\Model\Task\Treatment;
 
 use App\Model\Task\Task;
 use App\Model\Task\TaskState;
+use App\Model\Task\Treatment\TreatmentType;
+use App\Model\Vineyard\Vineyard;
 use Nette\Utils\DateTime;
 
 
 final class Treatment extends Task
 {
 
-    private string $category;
+    private TreatmentType $type;
+    private Vineyard $vineyard;
     private string $nameTreatment;
     private float $quantity;
     private string $unit;
@@ -25,11 +28,11 @@ final class Treatment extends Task
         private DateTime $lastChangeTimestamp,
         private ?DateTime $plannedTimestamp,
         private ?DateTime $executionTimestamp,
-        private array $vineyards,
         private string $note,
         private ?int $idTaskIssuer,
         private ?int $idTaskConfirmer,
-        string $category,
+        Vineyard $vineyard,
+        TreatmentType $type,
         string $nameTreatment,
         float $quantity,
         string $unit
@@ -47,15 +50,37 @@ final class Treatment extends Task
             $idTaskConfirmer
         );
 
-        $this->category = $category;
+        $this->vineyard = $vineyard;
+        $this->type = $type;
         $this->nameTreatment = $nameTreatment;
         $this->quantity = $quantity;
         $this->unit = $unit;
     }
 
-    public function getCategory(): string
+    public function getType(): TreatmentType
     {
-        return $this->category;
+        return $this->type;
+    }
+
+    public function getTypeText(): string
+    {
+        switch ($this->type) {
+            case TreatmentType::CUTTING:
+                return 'Řez';
+            case TreatmentType::SPRAYING:
+                return 'Postřik';
+            case TreatmentType::FERTILIZING:
+                return 'Hnojení';
+            case TreatmentType::WEEDING:
+                return 'Odplevelení';
+            default:
+                return 'Neznámý typ';
+        }
+    }
+
+    public function getVineyard(): Vineyard
+    {
+        return $this->vineyard;
     }
 
     public function getNameTreatment(): string
@@ -72,15 +97,5 @@ final class Treatment extends Task
     public function getUnit(): string
     {
         return $this->unit;
-    }
-
-    /**
-     * getVineyards
-     *
-     * @return Vineyard[]
-     */
-    public function getVineyards(): array
-    {
-        return $this->vineyards;
     }
 }
