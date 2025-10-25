@@ -23,6 +23,8 @@ use App\Model\Wine\WineRepository;
 use App\Model\Vineyard\VineyardRepository;
 use App\Model\Image\ImageRepository;
 use App\Model\Image\Image;
+use App\Model\WineVariety\WineVariety;
+use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
@@ -36,8 +38,8 @@ final class TasksPresenter extends BasePresenter
         private HarvestRepository $harvestRepository,
         private WineRepository $wineRep,
         private ImageRepository $imgRep,
-        private VineyardRepository $vineyardRepository
-
+        private WineVarietyRepository $wineVarietyRep,
+        private VineyardRepository $vineyardRep
     ) {
         parent::__construct();
     }
@@ -659,20 +661,150 @@ final class TasksPresenter extends BasePresenter
     }
 
 // ----------------------------------------------------------
-//                       Bottling Task 
+//                      Treatment Task 
+// ----------------------------------------------------------
+    
+    public function renderTreatment() {
+        
+    }
+
+// ----------------------------------------------------------
+//                       Harvest Task 
 // ----------------------------------------------------------
 
     public function renderHarvest() {
+        
+        $task = $this->fetchCurrentNewTask();
+
+        $vineYardFrom = $this->getComponent("selectVineyard");
+        $wineVarietyFrom = $this->getComponent("selectWineVariety");
+        $wineRowsForm = $this->getComponent("selectRowsForm");
+        
+        if (!$task->getIdWineYard()) {
+            return;
+        }
+
+        $vineYardFrom['vineyard']->setValue($task->getIdWineYard());
+        
+        if (!$task->getIdWineVariety()) {
+            return;
+        }
+        
+        $wineVarietyFrom['wineVariety']->setValue($task->getIdWineVariety());
+        
+        if (!$task->getIdRows()) {
+           return; 
+        }
+        
+        foreach($task->getIdRows() as $idRow) {
+            // do stuff here to add the things ... 
+        }
+       
+    }
+    
+    public function createComponentSelectVineyard() {
+        $form = new Form();
+        
+        $options = [];
+        foreach ($this->vineyardRep->fetchAll() as $vineYard) {
+            $options[$vineYard->getId()] = $vineYard->getName();
+        }
+
+        $form->addSelect("vineyard", "Vinohrad", ['' => 'Vyberte vinohrad ...'] + $options)
+        ->setRequired("Prosím vyberte vinohrad")
+        ->setHtmlAttribute("class", "form-select")
+        ->setHtmlAttribute('placeholder', 'Vyberte Vinohrad')
+        ->setDefaultValue('');
+    
+        $form->addSubmit("submit", "vybrat");
+
+        $form->onSuccess[] = [$this, "selectVineyard"];
+
+        
+        return $form;
+    }
+    
+    public function selectVineYard(Form $form, \stdClass $values) {
+        $task = $this->fetchCurrentNewTask();
+        
+        if (isset($values->vineyard)) {
+            $task->setIdWineYard($values->vineyard);
+        }
+        $this->redirect("this");
+    }
+    
+    public function createComponentSelectWineVariety() {
+        
+        $form = new Form();
+        
+        $options = [];
+        
+        $form->addSelect("wineVariety", "Odrůda", $options)
+        ->setRequired("Prosím zadejte víno")
+        ->setHtmlAttribute('class', 'form-select')
+        ->setHtmlAttribute('placeholder', 'Vyberte odrůdu');
+    
+        $form->addSubmit("submit", "vybrat");
+    
+        $form->onSuccess[] = [$this, "selectVineVariety"];
+        
+        return $form;
+    }
+    
+    public function selectVineVariety(Form $form, \stdClass $values) {
+        $task = $this->fetchCurrentNewTask();
+       
+        if (isset($values->wineVariety)) {
+            $task->setIdWineVariety($values->wineVariety);
+        }
+        $this->redirect("this");
+    }
+    
+    public function createComponentSelectRowsForm() {
+        $task = $this->fetchCurrentNewTask();
+        $wineYardId = $task->getIdWineYard();
+        $wineVarietyId = $task->getIdWineVariety();
+       
+        $options = [];
+        if ($wineVarietyId && $wineYardId) {
+            // set the available things
+        }
+
+        $form = new Form();
+
+        // Use a select to add a single worker at once (server-driven flow)
+        $form->addSelect('rows', 'Řádky', ['' => 'Vyberte řádek ...'] + $options)
+            ->setHtmlAttribute('class', 'form-select')
+            ->setDefaultValue('');
+
+        $form->addSubmit('backToDashboard', 'Zrušit')
+            ->setHtmlAttribute('class', 'btn btn-danger w-100 fw-bold')
+            ->onClick[] = [$this, 'handleClearForm'];
+
+        $form->addSubmit('addRow', 'Přidat')
+            ->setHtmlAttribute('class', 'btn btn-primary mt-2')
+            ->onClick[] = [$this, 'windRowSelection'];
+
+        $form->addSubmit('clearRows', 'Vymazat výběr')
+            ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
+            ->onClick[] = [$this, 'clearRows'];
+        
+        $form->addSubmit("next", "Pokračovat")
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, "finalizeTask"];
+        
+        return $form;
+    }
+    
+    public function clearRows() {
+       $task = $this->fetchCurrentNewTask(); 
+       $task->setIdRows([]);
+    }
+    
+    public function windRowSelection() {
 
     }
-
-// ----------------------------------------------------------
-//                       Bottling Task 
-// ----------------------------------------------------------
-
-    public function renderTreatment() {
-
-    }
+    
 
     // HARVEST MARKING
     public function createComponentMarkHarvestDoneForm(): Form
