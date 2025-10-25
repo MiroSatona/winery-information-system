@@ -915,7 +915,7 @@ final class TasksPresenter extends BasePresenter
             ->onClick[] = [$this, $continueFunction];
         
         $form->addSubmit("goBack", "Zpět")
-            ->setHtmlAttribute('class', 'btn btn-secondary mt-2')
+            ->setHtmlAttribute('class', 'btn btn-secondary w-100 fw-bold')
             ->onClick[] = [$this, "goBackToWorkers"];
         
         return $form;
@@ -1126,14 +1126,13 @@ final class TasksPresenter extends BasePresenter
         $result = false;
         
         switch($task->getType()) {
-            case TaskType::BOTTLING->value: 
+            case TaskType::BOTTLING: 
                 $result = $this->taskRepository->createBottlingTask($task);
                 break; 
-            case TaskType::HARVEST->value: 
+            case TaskType::HARVEST: 
                 $result = $this->taskRepository->createHarvestTask($task);
                 break; 
-            case TaskType::TREATMENT->value: 
-                // todo
+            case TaskType::TREATMENT: 
                 break;
             default: 
                 break;
