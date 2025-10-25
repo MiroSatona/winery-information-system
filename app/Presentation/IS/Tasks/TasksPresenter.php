@@ -530,6 +530,7 @@ final class TasksPresenter extends BasePresenter
      */
     public function renderDetailTreatment(int $id): void
     {
+        /** @var Treatment */
         $treatment = $this->taskRepository->fetchById($id);
 
         if ($treatment === null) {
@@ -802,7 +803,7 @@ final class TasksPresenter extends BasePresenter
         $form->addSelect('rows', 'Řádky', ['' => 'Vyberte řádek ...'] + $options)
             ->setHtmlAttribute('class', 'form-select')
             ->setDefaultValue('');
-
+        
         $form->addSubmit('backToDashboard', 'Zrušit')
             ->setHtmlAttribute('class', 'btn btn-danger w-100 fw-bold')
             ->onClick[] = [$this, 'handleClearForm'];
@@ -815,7 +816,7 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
             ->onClick[] = [$this, 'clearRows'];
         
-        $form->addSubmit("next", "Pokračovat")
+        $form->addSubmit("next", "Uložit")
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, "finalizeTask"];
         
