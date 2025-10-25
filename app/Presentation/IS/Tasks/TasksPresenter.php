@@ -473,6 +473,16 @@ final class TasksPresenter extends BasePresenter
 
     }
 
+    public function actionDetails(int $taskId): void
+    {
+        $this->handleDetails($taskId);
+    }
+
+    public function actionCreateNonExistentTask(): void
+    {
+        $this->handleCreateNonExistentTask();
+    }
+
     /**
      * renderDetailHarvest
      * Method for render page with details about harvest.

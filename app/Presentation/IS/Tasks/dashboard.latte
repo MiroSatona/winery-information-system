@@ -138,11 +138,8 @@
                                                 {/if}
                                             </td>
                                             <td>
-                                                <a n:href="details! taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                                <a n:href="details! $task->getId()" class="btn btn-sm btn-outline-secondary">
                                                     Detail
-                                                </a>
-                                                <a href="" class="btn btn-sm btn-outline-secondary">
-                                                    <i class="fas fa-edit me-1"></i> Upravit
                                                 </a>
                                                 {if $task->getState() === $TaskStateType::PLANNED}
                                                     <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">

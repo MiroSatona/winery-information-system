@@ -6,9 +6,287 @@
     </a>
 {/block topMenuISAdditional}
 
-
 {block isMainPanel}
-    <h2>Přehled IS</h2>
-    <p>Zde budou funkce, možná ...</p>
+    <div class="container-fluid">
+        {* Quick action button row *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <h4 class="mb-0 fw-bold">
+                            <i class="fas fa-bolt me-2"></i>
+                            Rychlé akce
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            {if $userVintner}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:Tasks:addTask1}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-plus-circle fa-2x mb-2"></i>
+                                        <span class="fw-bold">Přidat úkon</span>
+                                    </a>
+                                </div>
+                            {/if}
+                            {if $userVintner || $userWorker}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:Tasks:createNonExistentTask}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-clipboard-check fa-2x mb-2"></i>
+                                        <span class="fw-bold">Přidat a zaznamenat úkon</span>
+                                    </a>
+                                </div>
+                            {/if}
+                            {if $userVintner}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:Wine:produceP1}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-wine-glass fa-2x mb-2"></i>
+                                        <span class="fw-bold">Vyrobit víno</span>
+                                    </a>
+                                </div>
+                            {/if}
+                            {if $userVintner}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:Vineyards:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-mountain fa-2x mb-2"></i>
+                                        <span class="fw-bold">Přidat vinohrad</span>
+                                    </a>
+                                </div>
+                            {/if}
+                            {if $userVintner}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:WineVarieties:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-seedling fa-2x mb-2"></i>
+                                        <span class="fw-bold">Přidat odrůdu</span>
+                                    </a>
+                                </div>
+                            {/if}
+                            {if $userAdmin}
+                                <div class="col-lg-2 col-md-4 col-sm-6">
+                                    <a href="{link :IS:Users:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
+                                        <i class="fas fa-user-plus fa-2x mb-2"></i>
+                                        <span class="fw-bold">Přidat uživatele</span>
+                                    </a>
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        {* Upcoming tasks table *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Nejbližší naplánované úkony
+                            </h4>
+                            <a href="{link Tasks:dashboard}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Zobrazit všechny úkony
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {if count($upcomingTasks) > 0}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-clipboard-list me-2"></i>Název
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-tags me-2"></i>Typ
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-calendar-alt me-2"></i>Plánováno
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-toggle-on me-2"></i>Stav
+                                            </th>
+                                            <th scope="col" class="fw-bold text-center" style="width: 300px;">
+                                                <i class="fas fa-cogs me-2"></i>Akce
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $upcomingTasks as $task}
+                                            <tr>
+                                                <td>{$task->getName()}</td>
+                                                <td>
+                                                    {if $task instanceof $HarvestType}
+                                                        <span class="badge bg-success">Sklizeň</span>
+                                                    {elseif $task instanceof $TreatmentType}
+                                                        <span class="badge bg-info">Ošetření</span>
+                                                    {else}
+                                                        <span class="badge bg-warning">Lahvování</span>
+                                                    {/if}
+                                                </td>
+                                                <td>
+                                                    {if $task->getPlannedTimestamp()}
+                                                        {if $task->getPlannedTimestamp() < $currentDateTime}
+                                                            <span class="badge bg-danger">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {else}
+                                                            <span class="badge bg-success">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {/if}
+                                                    {else}
+                                                        —
+                                                    {/if}
+                                                </td>
+                                                <td>
+                                                    {if $task->getState() === $TaskStateType::PLANNED}
+                                                        <span class="badge bg-warning">Plánovaný</span>
+                                                    {elseif $task->getState() === $TaskStateType::FINISHED}
+                                                        <span class="badge bg-success">Dokončený</span>
+                                                    {elseif $task->getState() === $TaskStateType::CANCELED}
+                                                        <span class="badge bg-secondary">Zrušený</span>
+                                                    {/if}
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-1">
+                                                        <a href="{link :IS:Tasks:details $task->getId()}" class="btn btn-sm btn-outline-secondary">
+                                                            <i class="fas fa-info-circle me-1"></i>Detail
+                                                        </a>
+                                                        {if $task->getState() === $TaskStateType::PLANNED && $userWorker}
+                                                            <a href="{link :IS:Tasks:markTaskDone $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                                                <i class="fas fa-clipboard-check me-1"></i>Zaznamenat
+                                                            </a>
+                                                        {/if}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {else}
+                            <div class="alert alert-info m-3">
+                                <i class="fas fa-info-circle me-2"></i>Žádné naplánované úkony nebyly nalezeny.
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {* Orders ready for delivery table *}
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-shipping-fast me-2"></i>
+                                Objednávky připravené k odeslání
+                            </h4>
+                            <a href="{link Orders:dashboard}" class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-external-link-alt me-1"></i>Zobrazit všechny objednávky
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        {if count($readyOrders) > 0}
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0 align-middle">
+                                    <thead class="table-primary">
+                                        <tr>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-hashtag me-1"></i>ID
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-user me-1"></i>Zákazník
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-money-bill me-1"></i>Celková cena
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-truck me-1"></i>Způsob doručení
+                                            </th>
+                                            <th scope="col" class="fw-bold">
+                                                <i class="fas fa-clock me-1"></i>Čas objednávky
+                                            </th>
+                                            <th scope="col" class="fw-bold text-center" style="width: 280px;">
+                                                <i class="fas fa-cogs me-1"></i>Akce
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {foreach $readyOrders as $order}
+                                            <tr class="align-middle">
+                                                <td>
+                                                    <span class="fw-semibold text-dark">{$order->id}</span>
+                                                </td>
+                                                <td>
+                                                    {var $user = $order->getUser()}
+                                                    {if $user}
+                                                        <div>
+                                                            <span class="fw-semibold text-dark">
+                                                                {$user->getName()} {$user->getSurname()}
+                                                            </span>
+                                                            <br>
+                                                            <small class="text-muted">{$user->getEmail()}</small>
+                                                        </div>
+                                                    {else}
+                                                        <em class="text-muted">Žádná data o uživateli</em>
+                                                    {/if}
+                                                </td>
+                                                <td>
+                                                    <span class="fw-semibold text-dark">
+                                                        {$order->totalPrice|number:2} CZK
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-dark">
+                                                        {switch $order->deliveryType}
+                                                            {case 'PICKUP'}Osobní odběr
+                                                            {case 'COURIER'}Kurýr
+                                                            {case 'POST'}Pošta
+                                                            {default}{$order->deliveryType}
+                                                        {/switch}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-dark">
+                                                        {$order->orderTimestamp}
+                                                    </span>
+                                                </td>
+                                                <td class="text-center">
+                                                    <div class="d-flex justify-content-center gap-1">
+                                                        <a href="{link :IS:Orders:orderDetail $order->id}" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-info-circle me-1"></i>Detail
+                                                        </a>
+                                                        {if $userWorker}
+                                                            <a n:href=":IS:Orders:changeOrderState $order->id, 'DELIVERED'" class="btn btn-outline-success btn-sm">
+                                                                <i class="fas fa-shipping-fast me-1"></i>Odeslat
+                                                            </a>
+                                                        {/if}
+                                                        {if $userWorker}
+                                                            <a n:href=":IS:Orders:changeOrderState $order->id, 'CANCELLED'" class="btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-times-circle me-1"></i>Zrušit
+                                                            </a>
+                                                        {/if}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {/foreach}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {else}
+                            <div class="alert alert-info m-3">
+                                <i class="fas fa-info-circle me-2"></i>Žádné objednávky připravené k odeslání nebyly nalezeny.
+                            </div>
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {/block isMainPanel}

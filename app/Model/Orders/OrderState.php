@@ -9,5 +9,6 @@ enum OrderState: string
     case reserved = "RESERVED";
     case paid = "PAID";
     case cancelled = "CANCELLED";
+    case delivered = "DELIVERED";
 }
 
