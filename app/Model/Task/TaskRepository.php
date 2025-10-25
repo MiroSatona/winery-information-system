@@ -553,4 +553,185 @@ class TaskRepository{
             return false;
         }
     }
+    
+    public function updateBaseTask(int $taskId, \stdClass $values): bool {
+        try {
+            $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
+            if ($taskRow === null) {
+                throw new \Exception('Task not found');
+            }
+
+            $update = [];
+            // name
+            if (property_exists($values, 'name')) {
+                $name = trim((string) $values->name);
+                if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
+                    throw new \Exception('Invalid task name');
+                }
+                $update['NAME'] = $name;
+            }
+
+            // note
+            if (property_exists($values, 'note')) {
+                $update['NOTE'] = $values->note === null ? null : (string) $values->note;
+            }
+
+            // planned date (accept any DateTimeInterface instance or parse string)
+            if (property_exists($values, 'planned_date') && $values->planned_date !== null) {
+                if ($values->planned_date instanceof \DateTimeInterface) {
+                    $update['PLANNED_EXECUTION_TIMESTAMP'] = $values->planned_date->format('Y-m-d H:i:s');
+                } else {
+                    // try to parse string
+                    $dt = new \DateTime((string) $values->planned_date);
+                    $update['PLANNED_EXECUTION_TIMESTAMP'] = $dt->format('Y-m-d H:i:s');
+                }
+            }
+
+            // always update last change timestamp when something changed
+            if (!empty($update)) {
+                $update['LAST_CHANGE_TIMESTAMP'] = (new DateTime())->format('Y-m-d H:i:s');
+                $this->database->table('TASK')->where('ID', $taskId)->update($update);
+            }
+
+            return true;
+        } catch (\Exception $e) {
+            Debugger::log('Failed to update base task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
+
+    }
+    
+    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): bool {
+        try {
+            $this->database->beginTransaction();
+
+            $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
+            if ($taskRow === null) {
+                throw new \Exception('Task not found');
+            }
+
+            // fetch bottling row
+            $bottlingRow = $this->database->table('BOTTLING')->where('ID_TASK', $taskId)->fetch();
+            if ($bottlingRow === null) {
+                throw new \Exception('Bottling record not found for task');
+            }
+
+            if (!empty($updatesTask)) {
+                $updatesTask['LAST_CHANGE_TIMESTAMP'] = (new DateTime())->format('Y-m-d H:i:s');
+                $this->database->table('TASK')->where('ID', $taskId)->update($updatesTask);
+            }
+
+            $wineId = $bottlingRow->ID_WINE;
+
+            // bottle volume change
+            $bottleVolume = $bottlingRow->BOTTLE_VOLUME;
+            if (property_exists($values, 'volume') && $values->volume !== null) {
+                $bv = (float) $values->volume;
+                if ($bv < ValidationDefinitions::BOTTLE_VOLUME_MIN || $bv > ValidationDefinitions::BOTTLE_VOLUME_MAX) {
+                    throw new \Exception('Bottle volume out of allowed range');
+                }
+                $bottleVolume = $bv;
+            }
+
+            // compute bottles count if wine volume available
+            $wineRow = $this->database->table('WINE')->where('ID', $wineId)->fetch();
+            $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
+            $bottlesCount = $bottlingRow->BOTTLES_COUNT;
+            if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
+                $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
+            }
+
+            // update bottling row
+            $this->database->table('BOTTLING')->where('ID_TASK', $taskId)->update([
+                'ID_WINE' => $wineId,
+                'BOTTLES_COUNT' => $bottlesCount,
+                'BOTTLE_VOLUME' => $bottleVolume,
+            ]);
+
+            // handle image: if provided, insert into PICTURE and update wine
+            if ($img instanceof ImageEntity) {
+                $picture = $this->database->table('PICTURE')->insert([
+                    'IMAGE_NAME' => $img->name,
+                    'LINK' => $img->src,
+                    'DESCRIPTION' => $img->description,
+                ]);
+                if ($picture === null || !isset($picture->ID)) {
+                    throw new \Exception('Failed to insert picture');
+                }
+                $pictureId = (int) $picture->ID;
+                // update wine picture reference
+                $this->database->table('WINE')->where('ID', $wineId)->update([
+                    'ID_PICTURE' => $pictureId,
+                ]);
+            }
+
+            $this->database->commit();
+            return true;
+        } catch (\Exception $e) {
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                // ignore
+            }
+            Debugger::log('Failed to update bottling task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
+    }
+    
+    public function updateTreatmentTask(int $taskId, \stdClass $values): bool {
+        try {
+            $this->database->beginTransaction();
+
+            $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
+            if ($taskRow === null) {
+                throw new \Exception('Task not found');
+            }
+
+            $treatmentRow = $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->fetch();
+            if ($treatmentRow === null) {
+                throw new \Exception('Treatment record not found for task');
+            }
+
+            if (!empty($updatesTask)) {
+                $updatesTask['LAST_CHANGE_TIMESTAMP'] = (new DateTime())->format('Y-m-d H:i:s');
+                $this->database->table('TASK')->where('ID', $taskId)->update($updatesTask);
+            }
+
+            // update treatment-specific fields
+            $treatmentUpdates = [];
+            if (property_exists($values, 'type')) {
+                $treatmentUpdates['TYPE'] = (string) $values->type;
+            }
+            if (property_exists($values, 'treatmentName')) {
+                $treatmentUpdates['TREAT_NAME'] = (string) $values->treatmentName;
+            }
+            if (property_exists($values, 'amount')) {
+                $amt = (float) $values->amount;
+                if ($amt < ValidationDefinitions::TREATMENT_QUANTITY_MIN || $amt > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
+                    throw new \Exception('Invalid amount');
+                }
+                $treatmentUpdates['QUANTITY'] = $amt;
+            }
+            if (property_exists($values, 'unit')) {
+                $treatmentUpdates['UNIT'] = (string) $values->unit;
+            }
+
+            if (!empty($treatmentUpdates)) {
+                $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->update($treatmentUpdates);
+            }
+
+            $this->database->commit();
+            return true;
+        } catch (\Exception $e) {
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                // ignore
+            }
+            Debugger::log('Failed to update treatment task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
+
+    }
+
 }

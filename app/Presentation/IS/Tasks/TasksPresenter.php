@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Tasks;
 
+use App\Model\Bottle\Bottle;
 use App\Model\FlashMsgType;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
@@ -1273,6 +1274,189 @@ final class TasksPresenter extends BasePresenter
 
         $this->handleClearForm();
         $this->redirect("dashboard");
+    }
+    
+    public function renderTaskEdit(int $taskId) {
+        $task = $this->taskRepository->fetchById($taskId);
+        if (!$task) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->redirect("dashboard");
+            return;
+        }
+        
+        if ($task->getState() != TaskState::PLANNED) {
+            $this->flashMessage("Tento Úkon již nelze editovat!", FlashMsgType::ERROR->value);
+            $this->redirect("dashboard");
+            return;
+        }
+        
+        $this->template->imageRepository = $this->imgRep;
+        $this->template->task = $task;
+        
+        if ($task instanceof Bottling) {
+            /** @var Bottling */
+            $task = $task;
+            
+            $this->template->image = $task->getWine()->getImage();
+            
+            $bottleForm = $this->getComponent("editBottling");
+            $bottleForm['volume']->setValue($task->getBottleVolume());
+
+        } else if ($task instanceof Treatment) {
+            /** @var Treatment*/
+            $task = $task;
+            $treatmentFrom = $this->getComponent("editTreatment");
+            $treatmentFrom['type']->setValue($task->getType());
+            $treatmentFrom['name']->setValue($task->getNameTreatment());
+            $treatmentFrom['amount']->setValue($task->getQuantity());
+            $treatmentFrom['unit']->setValue($task->getUnit());
+        }
+        
+        $basicForm = $this->getComponent("basicTaskEdit");
+        
+        $basicForm['name']->setValue($task->getName());
+        $basicForm["note"]->setValue($task->getNote());
+        $basicForm["planned_date"]->setValue($task->getPlannedTimestamp());
+
+    }
+    
+    public function createComponentBasicTaskEdit() {
+        $form = new Form();
+
+        $form->addText("name", "Název úkonu")
+            ->setHtmlAttribute("class", "form-control")
+            ->setHtmlAttribute("placeholder", "Zadejte název úkolu ...");
+       
+        $form->addTextArea("note", "Poznámka")
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('rows', 4)
+            ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
+    
+        $form->addDateTime('planned_date', 'Datum plánovaného provedení')
+            ->setValue(new DateTime('now'))
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('style', 'width: 200px;');
+        
+        $send = $form->addSubmit('send', 'Uložit');
+        $send->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+        $send->getControlPrototype();
+
+        // handle form success
+        $form->onSuccess[] = [$this, 'submitBasicTaskEdit'];
+        
+        return $form;
+    }
+    
+    public function submitBasicTaskEdit(Form $form, \stdClass $values) {
+        $taskId = (int)$this->getParameter("taskId");
+        
+        if (!$this->taskRepository->updateBaseTask($taskId, $values)) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        }
+    }
+    
+    public function createComponentEditBottling() {
+        $form = new Form();
+        
+        $form->addFloat("volume", "Objem lahve")
+        ->addRule(Form::Min, "minimum", ValidationDefinitions::VOLUME_MIN)
+        ->addRule(Form::Max, "maximum", ValidationDefinitions::VOLUME_MAX)
+        ->setHtmlAttribute('class', 'form-control')
+        ->setHtmlAttribute('placeholder', 'zadejte objem jedné láhve');
+    
+        $form->addUpload("image", "Obrázek vína")
+        ->addRule($form::Image, "Nahrajte obrázek vína")
+        ->setHtmlAttribute('class', 'form-control')
+        ->setHtmlAttribute('placeholder', 'Nahrajte obrázek odrůdy vína');
+    
+        $form->addSubmit('send', 'Uložit')
+        ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
+
+        $form->onSuccess[] = [$this, "submitBottlingTaskEdit"];
+        
+        return $form;
+    }
+    
+    public function submitBottlingTaskEdit(Form $form, \stdClass $values) {
+        
+        $taskId = (int)$this->getParameter("taskId");
+        /** @var Bottling */
+        $task = $this->taskRepository->fetchById($taskId);
+        
+        $image = $values->image;
+        $imagePath = null;
+        $imageEntity = null;
+        if ($image->hasFile()) {
+            $imagePath = $this->imgRep->uploadImage($values->image);
+            if ($imagePath === '') {
+                Debugger::log('Image upload failed', ILogger::ERROR);
+                $form->addError('Obrázek se nepodařilo nahrát.');
+                return;
+            }
+            $imageEntity = new Image(
+                null,
+                $imagePath, 
+                $task->getWine()->getImage()->name, 
+                'Obrázek vína ' . $task->getWine()->getImage()->name
+            );
+        } 
+        
+        if (!$this->taskRepository->updateBottlingTask($taskId, $values, $imageEntity)) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        }
+    }
+    
+    public function createComponentEditTreatment() {
+        $form = new Form();
+        $form->addSelect("type", "Typ ošetření", [
+                TreatmentType::SPRAYING->value => "Postřik",
+                TreatmentType::FERTILIZING->value => "Hnojení",
+                TreatmentType::CUTTING->value => "Řez",
+                TreatmentType::WEEDING->value => "Odplevelení",
+                TreatmentType::OTHER->value => "Ostatní",
+            ])
+                ->setHtmlAttribute('class', 'form-select')
+                ->setDefaultValue(TreatmentType::SPRAYING->value)
+                ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
+            
+            $form->addText('name', 'Název ošetření')
+                ->addRule(Form::MinLength, 'Název ošetření musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MIN)
+                ->addRule(Form::MaxLength, 'Název ošetření může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MAX)
+                ->setHtmlAttribute("class", "form-control")
+                ->setHtmlAttribute("placeholder", "Zadejte název ošetření ...");
+            
+            $form->addFloat('amount', 'Množství')
+                ->addRule(Form::Min, 'Množství použitých prostředků musí být alespoň %d.', ValidationDefinitions::TREATMENT_QUANTITY_MIN)
+                ->addRule(Form::Max, 'Množství použitých prostředků může být maximálně %d.', ValidationDefinitions::TREATMENT_QUANTITY_MAX)
+                ->setHtmlAttribute('class', 'form-control')
+                ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
+
+            $form->addText("unit", "Jednotka množství")
+                ->addRule(Form::MinLength, 'Jednotka množství musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MIN)
+                ->addRule(Form::MaxLength, 'Jednotka množství může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX)
+                ->setHtmlAttribute("class", "form-control")
+                ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
+
+            $form->addSubmit("send", "Uložit")
+                ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+                ->onClick[] = [$this, "submitTreatmentTaskEdit"];
+            
+            return $form;
+    }
+    
+    public function submitTreatmentTaskEdit(Form $form, \stdClass $values) {
+
+        $taskId = (int)$this->getParameter("taskId");
+        
+        if (!$this->taskRepository->updateTreatmentTask($taskId, $values)) {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        }
     }
 }
 
