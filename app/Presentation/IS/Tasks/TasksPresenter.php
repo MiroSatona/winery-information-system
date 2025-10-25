@@ -23,6 +23,7 @@ use App\Model\Wine\WineRepository;
 use App\Model\Vineyard\VineyardRepository;
 use App\Model\Image\ImageRepository;
 use App\Model\Image\Image;
+use App\Model\Task\Treatment\TreatmentType;
 use App\Model\WineVariety\WineVariety;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Forms\Controls\Button;
@@ -678,7 +679,6 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 //                      Treatment Task 
 // ----------------------------------------------------------
-
     public function renderTreatment() {
         /** @var TaskData $task */
         $task = $this->fetchCurrentNewTask();
@@ -702,6 +702,54 @@ final class TasksPresenter extends BasePresenter
         $this->template->selectedRows = $selectedRows;
     }
 
+    public function submitTreatmentDetails(Button $button, \stdClass $values) {
+        $this->redirect("this");
+    }
+
+
+    public function createComponentTreatmentDetailsForm(): Form {
+        $form = new Form();
+
+        $form->addSelect("type", "Typ ošetření", [
+            TreatmentType::SPRAYING->value => "Postřik",
+            TreatmentType::FERTILIZING->value => "Hnojení",
+            TreatmentType::CUTTING->value => "Řez",
+            TreatmentType::WEEDING->value => "Odplevelení",
+            TreatmentType::OTHER->value => "Ostatní",
+        ])
+            ->setRequired("Zvolte typ ošetření")
+            ->setHtmlAttribute('class', 'form-select')
+            ->setDefaultValue(TreatmentType::SPRAYING->value)
+            ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
+        
+        $form->addText('name', 'Název ošetření')
+            ->setRequired('Zadejte název ošetření.')
+            ->setHtmlAttribute("class", "form-control")
+            ->setHtmlAttribute("placeholder", "Zadejte název ošetření ...");
+        
+        $form->addInteger('amount', 'Množství')
+            ->setRequired('Zadejte množství použitých prostředků.')
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
+
+        $form->addText("unit", "Jednotka množství")
+            ->setRequired("Zadejte jednotku množství (např. litr, kg, ...)")
+            ->setHtmlAttribute("class", "form-control")
+            ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
+        
+        $form->
+
+        $form->addSubmit("finish", "Dokončit ošetření")
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, "finalizeTask"];
+        return $form;
+    }
+
+    public function renderTreatmentFinalize() {
+        // todo
+    }
+
+    
 // ----------------------------------------------------------
 //                       Harvest Task 
 // ----------------------------------------------------------
@@ -806,7 +854,6 @@ final class TasksPresenter extends BasePresenter
         $wineVarietyId = $task->getIdWineVariety();
        
         $options = [];
-        bdump($task->getType());
         switch ($task->getType()) {
             case TaskType::HARVEST:
                 if ($wineVarietyId && $wineYardId) {
@@ -835,7 +882,6 @@ final class TasksPresenter extends BasePresenter
                 }
                 break;
             default:
-
                 break;
         }
 
@@ -858,15 +904,25 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
             ->onClick[] = [$this, 'clearRows'];
         
+        $continueFunction = match ($task->getType()) {
+            TaskType::HARVEST => 'submitHarvestDetails',
+            TaskType::TREATMENT => 'submitTreatmentDetails',
+            default => null,
+        };
+        
         $form->addSubmit("next", "Uložit")
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-            ->onClick[] = [$this, "finalizeTask"];
+            ->onClick[] = [$this, $continueFunction];
         
         $form->addSubmit("goBack", "Zpět")
             ->setHtmlAttribute('class', 'btn btn-secondary mt-2')
             ->onClick[] = [$this, "goBackToWorkers"];
         
         return $form;
+    }
+
+    public function submitHarvestDetails(Button $button, \stdClass $values) {
+        $this->redirect("this");
     }
     
     public function goBackToWorkers(Button $button, \stdClass $values) {
@@ -1077,6 +1133,7 @@ final class TasksPresenter extends BasePresenter
                 $result = $this->taskRepository->createHarvestTask($task);
                 break; 
             case TaskType::TREATMENT->value: 
+                // todo
                 break;
             default: 
                 break;
