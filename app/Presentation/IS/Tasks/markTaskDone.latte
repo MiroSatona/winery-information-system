@@ -49,13 +49,11 @@
                                 <strong>Typ:</strong> Ošetření
                             </div>
                             <div class="mb-1">
-                                <strong>Vinohrady:</strong>
-                                {foreach $task->getVineyards() as $vineyard}
-                                    {$vineyard->getName()}{if !$iterator->isLast()}, {/if}
-                                {/foreach}
+                                <strong>Vinohrad:</strong>
+                                {$task->getVineyard()->getName()}
                             </div>
                             <div class="mb-1">
-                                <strong>Kategorie:</strong> {$task->getCategory()}
+                                <strong>Kategorie:</strong> {$task->getTypeText()}
                             </div>
                             <div class="mb-1">
                                 <strong>Název ošetření:</strong> {$task->getNameTreatment()}

@@ -8,7 +8,7 @@ namespace App\Model\Task;
 use App\Model\Task\TaskType;
 use Nette\Utils\DateTime;
 use App\Model\Image\Image;
-
+use App\Model\Task\Treatment\TreatmentType;
 
 class TaskData
 {
@@ -16,7 +16,7 @@ class TaskData
     private string $note = '';
     private ?DateTime $plannedTimestamp = null;
     private array $idsOfWorkers = [];
-    private string $taskType = TaskType::TREATMENT->value; 
+    private TaskType $taskType = TaskType::TREATMENT;
 
     // Harvest task
     private ?int $idWineYard = null;
@@ -28,7 +28,7 @@ class TaskData
     private ?Image $img = null;
 
     // Treatment
-    private string $category = '';
+    private TreatmentType $type = TreatmentType::SPRAYING;
     private string $treatmentName = '';
     private string $mnozstvi = '';
     private string $unit = '';
@@ -42,12 +42,12 @@ class TaskData
 
     // --- Getters & Setters ---
     
-    public function getType(): string
+    public function getType(): TaskType
     {
         return $this->taskType;
     }
-    
-    public function setType(string $type) 
+
+    public function setType(TaskType $type): void
     {
         $this->taskType = $type;
     }
@@ -155,14 +155,14 @@ class TaskData
         $this->idRows = $idRows;
     }
 
-    public function getCategory(): string
+    public function getTreatmentType(): TreatmentType
     {
-        return $this->category;
+        return $this->type;
     }
 
-    public function setCategory(string $category): void
+    public function setTreatmentType(TreatmentType $type): void
     {
-        $this->category = $category;
+        $this->type = $type;
     }
 
     public function getTreatmentName(): string

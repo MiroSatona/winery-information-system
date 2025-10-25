@@ -1,1 +1,46 @@
- a real treat :)
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <a href=":IS:Tasks:dashboard" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Přidat úkon
+    </a>
+
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+
+    {control selectVineyard}
+
+    {control selectRowsForm}
+
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col" class="fw-bold">Řádek</th>
+                    <th scope="col" class="fw-bold">Počet trsů</th>
+                    <th scope="col" class="fw-bold">Rok výsadby</th>
+                    <th scope="col" class="fw-bold text-center" style="width: 120px;">Akce</th>
+                </tr>
+            </thead>
+            <tbody>
+                {foreach $selectedRows as $row}
+                    <tr class="align-middle">
+                        <td class="fw-semibold">{$row->getId()}</td>
+                        <td>{$row->getHeadCount()}</td>
+                        <td>{$row->getYearPlanted()}</td>
+                        <td class="text-center">
+                            <a href="{link removeRowFromSelection! $row->getId()}" class="btn btn-sm btn-outline-danger">
+                                <i class="fas fa-trash-alt me-1"></i>Odebrat
+                            </a>
+                        </td>
+                    </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    </div>
+
+{/block isMainPanel}
