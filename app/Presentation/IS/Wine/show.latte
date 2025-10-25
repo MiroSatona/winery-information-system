@@ -35,7 +35,7 @@
                                     </button>
                                 {/if}
                                 {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
-                                    <a href="{link bottling! $wine->getId()}" class="btn btn-primary btn-sm">
+                                    <a href="{link :IS:Tasks:startBottling, $wine->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-wine-bottle me-2"></i>Zalahvovat víno
                                     </a>
                                 {/if}
