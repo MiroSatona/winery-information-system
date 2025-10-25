@@ -706,8 +706,9 @@ final class TasksPresenter extends BasePresenter
         $this->template->selectedRows = $selectedRows;
     }
 
-    public function submitTreatmentDetails(Button $button, \stdClass $values) {
-        $this->redirect("this");
+    public function submitTreatmentRows(Button $button, \stdClass $values) {
+        // todo
+        $this->redirect("treatmentFinal");
     }
 
 
@@ -727,29 +728,89 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
         
         $form->addText('name', 'Název ošetření')
+            ->addRule(Form::MinLength, 'Název ošetření musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Název ošetření může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MAX)
             ->setRequired('Zadejte název ošetření.')
             ->setHtmlAttribute("class", "form-control")
             ->setHtmlAttribute("placeholder", "Zadejte název ošetření ...");
         
-        $form->addInteger('amount', 'Množství')
+        $form->addFloat('amount', 'Množství')
+            ->addRule(Form::Min, 'Množství použitých prostředků musí být alespoň %d.', ValidationDefinitions::TREATMENT_QUANTITY_MIN)
+            ->addRule(Form::Max, 'Množství použitých prostředků může být maximálně %d.', ValidationDefinitions::TREATMENT_QUANTITY_MAX)
             ->setRequired('Zadejte množství použitých prostředků.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
 
         $form->addText("unit", "Jednotka množství")
+            ->addRule(Form::MinLength, 'Jednotka množství musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Jednotka množství může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX)
             ->setRequired("Zadejte jednotku množství (např. litr, kg, ...)")
             ->setHtmlAttribute("class", "form-control")
             ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
-        
-        $form->
 
         $form->addSubmit("finish", "Dokončit ošetření")
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-            ->onClick[] = [$this, "finalizeTask"];
+            ->onClick[] = [$this, "treatmentDetailsFinalize"];
+
+        $form->addSubmit("cancel", "Zrušit")
+            ->setHtmlAttribute('class', 'btn btn-danger w-100 fw-bold')
+            ->onClick[] = [$this, "handleClearForm"];
+        
+        $form->addSubmit("back", "Zpět")
+            ->setHtmlAttribute('class', 'btn btn-secondary w-100 fw-bold')
+            ->onClick[] = [$this, "treatmentGoBackToRowsSelection"];
+
+        
         return $form;
     }
 
-    public function renderTreatmentFinalize() {
+    public function obtainDataFromTreatmentDetailsForm(\stdClass $values) {
+        $task = $this->fetchCurrentNewTask();
+
+        if (isset($values->type)) {
+            $task->setTreatmentType(TreatmentType::from((string) $values->type));
+        }
+
+        if (isset($values->name)) {
+            $task->setTreatmentName((string) $values->name);
+        }
+
+        if (isset($values->amount)) {
+            $task->setAmount((float) $values->amount);
+        }
+
+        if (isset($values->unit)) {
+            $task->setUnit((string) $values->unit);
+        }
+    }
+
+    public function treatmentGoBackToRowsSelection(Button $button, \stdClass $values) {
+        $this->obtainDataFromTreatmentDetailsForm($values);
+        $this->redirect("treatment");
+    }
+
+    public function treatmentDetailsFinalize(Button $button, \stdClass $values) {
+        $this->obtainDataFromTreatmentDetailsForm($values);
+        $this->finalizeTask();
+    }
+
+    public function renderTreatmentFinal() {
+        /** @var TaskData $task */
+        $task = $this->fetchCurrentNewTask();
+
+        // set default values for form
+        $form = $this->getComponent('treatmentDetailsForm');
+
+        $form['type']->setValue($task->getTreatmentType()?->value);
+        $form['name']->setValue($task->getTreatmentName());
+        $form['amount']->setValue($task->getAmount());
+        $form['unit']->setValue($task->getUnit());
+
+        /** @var Vineyard $vineyard */
+        $vineyard = $this->vineyardRep->fetchById($task->getIdWineYard());
+
+        $this->template->vineyard = $vineyard;
+        $this->template->task = $task;
         // todo
     }
 
@@ -799,7 +860,8 @@ final class TasksPresenter extends BasePresenter
         ->setHtmlAttribute('placeholder', 'Vyberte Vinohrad')
         ->setDefaultValue('');
     
-        $form->addSubmit("submit", "vybrat");
+        $form->addSubmit("submit", "Vybrat")
+            ->setHtmlAttribute('class', 'btn btn-primary');
 
         $form->onSuccess[] = [$this, "selectVineyard"];
 
@@ -868,7 +930,7 @@ final class TasksPresenter extends BasePresenter
                         if (in_array($code, $already, true)) {
                             continue; // exclude already-selected rows
                         }
-                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
+                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' keřů (' . $r->getYearPlanted() . ')';
                     }
                 }
                 break;
@@ -881,7 +943,7 @@ final class TasksPresenter extends BasePresenter
                         if (in_array($code, $already, true)) {
                             continue; // exclude already-selected rows
                         }
-                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' trsů (' . $r->getYearPlanted() . ')';
+                        $options[$code] = 'Řádek ' . $code . ' — ' . $r->getHeadCount() . ' keřů (' . $r->getYearPlanted() . ')';
                     }
                 }
                 break;
@@ -908,15 +970,20 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-outline-danger mt-2')
             ->onClick[] = [$this, 'clearRows'];
         
-        $continueFunction = match ($task->getType()) {
-            TaskType::HARVEST => 'submitHarvestDetails',
-            TaskType::TREATMENT => 'submitTreatmentDetails',
-            default => null,
-        };
-        
-        $form->addSubmit("next", "Uložit")
-            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-            ->onClick[] = [$this, $continueFunction];
+        switch ($task->getType()) {
+            case TaskType::HARVEST:
+                $form->addSubmit("next", "Uložit sklizeň")
+                    ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+                    ->onClick[] = [$this, 'submitHarvestDetails'];
+                break;
+            case TaskType::TREATMENT:
+                $form->addSubmit("next", "Pokračovat k detailům ošetření")
+                    ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+                    ->onClick[] = [$this, 'submitTreatmentRows'];
+                break;
+            default:
+                break;
+        }
         
         $form->addSubmit("goBack", "Zpět")
             ->setHtmlAttribute('class', 'btn btn-secondary w-100 fw-bold')
@@ -1140,12 +1207,13 @@ final class TasksPresenter extends BasePresenter
         
         switch($task->getType()) {
             case TaskType::BOTTLING: 
-                $result = $this->taskRepository->createBottlingTask($task);
+                $result = $this->taskRepository->createBottlingTask($task, $this->user->getId());
                 break; 
             case TaskType::HARVEST: 
-                $result = $this->taskRepository->createHarvestTask($task);
+                $result = $this->taskRepository->createHarvestTask($task, $this->user->getId());
                 break; 
-            case TaskType::TREATMENT: 
+            case TaskType::TREATMENT:
+                 $result = $this->taskRepository->createTreatmentTask($task, $this->user->getId());
                 break;
             default: 
                 break;

@@ -142,7 +142,7 @@ class TaskRepository{
         return $workerRow !== null;
     }
 
-    public function createBottlingTask(TaskData $data): bool {
+    public function createBottlingTask(TaskData $data, int $userId): bool {
 
         // Basic validation
         try {
@@ -173,6 +173,23 @@ class TaskRepository{
                 throw new \Exception('Specified wine does not exist');
             }
 
+            // Validate users exist and have worker role
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $userRow = $this->database->table('USER')
+                    ->where('ID', $workerId)
+                    ->where('ACTIVE', true)
+                    ->fetch();
+                
+                if ($userRow === null) {
+                    throw new \Exception('Invalid or inactive user: ' . $workerId);
+                }
+                
+                if (!$userRow->ROLE_WORKER) {
+                    throw new \Exception('User ' . $workerId . ' does not have worker role');
+                }
+            }
+
             // compute bottles count based on wine volume if possible
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
             bdump($wineVolume);
@@ -201,7 +218,7 @@ class TaskRepository{
                 'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
                 'EXECUTION_TIMESTAMP' => null,
                 'NOTE' => $data->getNote(),
-                'ID_TASK_ISSUER' => null,
+                'ID_TASK_ISSUER' => $userId,
                 'ID_TASK_CONFIRMER' => null,
             ]);
 
@@ -266,7 +283,7 @@ class TaskRepository{
         }
     }
     
-    public function createHarvestTask(TaskData $data): bool {
+    public function createHarvestTask(TaskData $data, int $userId): bool {
 
         try {
             // validate basic fields
@@ -303,6 +320,23 @@ class TaskRepository{
                 }
             }
 
+            // Validate users exist and have worker role
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $userRow = $this->database->table('USER')
+                    ->where('ID', $workerId)
+                    ->where('ACTIVE', true)
+                    ->fetch();
+                
+                if ($userRow === null) {
+                    throw new \Exception('Invalid or inactive user: ' . $workerId);
+                }
+                
+                if (!$userRow->ROLE_WORKER) {
+                    throw new \Exception('User ' . $workerId . ' does not have worker role');
+                }
+            }
+
             // start transaction
             $this->database->beginTransaction();
 
@@ -315,7 +349,7 @@ class TaskRepository{
                 'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
                 'EXECUTION_TIMESTAMP' => null,
                 'NOTE' => $data->getNote(),
-                'ID_TASK_ISSUER' => null,
+                'ID_TASK_ISSUER' => $userId,
                 'ID_TASK_CONFIRMER' => null,
             ]);
 
@@ -371,5 +405,152 @@ class TaskRepository{
             return false;
         }
 
+    }
+
+    public function createTreatmentTask(TaskData $data, int $userId): bool {
+        try {
+            // Validate basic fields
+            $name = trim($data->getName());
+            if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
+                throw new \Exception('Invalid task name');
+            }
+
+            $vineyardId = $data->getIdWineYard();
+            if ($vineyardId === null) {
+                throw new \Exception('No vineyard selected');
+            }
+
+            $idRows = $data->getIdRows() ?? [];
+            if (empty($idRows)) {
+                throw new \Exception('No rows selected for treatment');
+            }
+
+            // Validate treatment-specific fields
+            $treatmentType = $data->getTreatmentType();
+            if ($treatmentType === null) {
+                throw new \Exception('No treatment type selected');
+            }
+
+            $treatmentName = trim($data->getTreatmentName());
+            if ($treatmentName === '') {
+                throw new \Exception('Treatment name is required');
+            }
+
+            $amount = $data->getAmount();
+            if ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
+                $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
+                throw new \Exception('Invalid amount');
+            }
+
+            $unit = trim($data->getUnit());
+            if ($unit === '') {
+                throw new \Exception('Unit is required');
+            }
+
+            // Validate each row: exists, belongs to vineyard, is active
+            foreach ($idRows as $code) {
+                $row = $this->database->table('WINE_ROW')
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->where('CODE', $code)
+                    ->where('ACTIVE', true)
+                    ->fetch();
+                if ($row === null) {
+                    throw new \Exception('Invalid or inactive wine row selected: ' . $code);
+                }
+            }
+
+            // Validate vineyard exists
+            $vineyardRow = $this->database->table('VINEYARD')
+                ->where('ID', $vineyardId)
+                ->where('ACTIVE', true)
+                ->fetch();
+            if ($vineyardRow === null) {
+                throw new \Exception('Invalid or inactive vineyard');
+            }
+
+            // Validate users exist and have worker role
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $userRow = $this->database->table('USER')
+                    ->where('ID', $workerId)
+                    ->where('ACTIVE', true)
+                    ->fetch();
+                
+                if ($userRow === null) {
+                    throw new \Exception('Invalid or inactive user: ' . $workerId);
+                }
+                
+                if (!$userRow->ROLE_WORKER) {
+                    throw new \Exception('User ' . $workerId . ' does not have worker role');
+                }
+            }
+
+            // Start transaction
+            $this->database->beginTransaction();
+
+            // Insert task row
+            $now = new DateTime();
+            $taskRow = $this->database->table('TASK')->insert([
+                'NAME' => $name,
+                'STATE' => TaskState::PLANNED->value,
+                'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
+                'PLANNED_EXECUTION_TIMESTAMP' => $data->getPlannedTimestamp()?->format('Y-m-d H:i:s'),
+                'EXECUTION_TIMESTAMP' => null,
+                'NOTE' => $data->getNote(),
+                'ID_TASK_ISSUER' => $userId,
+                'ID_TASK_CONFIRMER' => null,
+            ]);
+
+            if ($taskRow === null || !isset($taskRow->ID)) {
+                throw new \Exception('Failed to insert task');
+            }
+
+            $taskId = (int) $taskRow->ID;
+
+            // Insert treatment row
+            $treatmentRow = $this->database->table('TREATMENT')->insert([
+                'ID_TASK' => $taskId,
+                'ID_VINEYARD' => $vineyardId,
+                'TYPE' => $treatmentType->value,
+                'TREAT_NAME' => $treatmentName,
+                'QUANTITY' => $amount,
+                'UNIT' => $unit,
+            ]);
+
+            if ($treatmentRow === null) {
+                throw new \Exception('Failed to insert treatment');
+            }
+
+            // Link selected rows in TASK_ROW
+            foreach ($idRows as $code) {
+                $this->database->table('TASK_ROW')->insert([
+                    'ID_VINEYARD' => $vineyardId,
+                    'CODE_ROW' => $code,
+                    'ID_TASK' => $taskId,
+                ]);
+            }
+
+            // Assign workers if provided
+            $idsOfWorkers = $data->getIdsOfWorkers() ?? [];
+            foreach ($idsOfWorkers as $workerId) {
+                $this->database->table('WORKER')->insert([
+                    'ID_USER' => $workerId,
+                    'ID_TASK' => $taskId,
+                ]);
+            }
+
+            $this->database->commit();
+            return true;
+
+        } catch (\Exception $e) {
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                // ignore
+            }
+            Debugger::log('Failed to create treatment task: ' . $e->getMessage(), ILogger::ERROR);
+            return false;
+        }
     }
 }

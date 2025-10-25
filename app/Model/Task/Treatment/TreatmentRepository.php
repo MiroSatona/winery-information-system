@@ -66,7 +66,7 @@ class TreatmentRepository
             ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
             $vineyard,
             TreatmentType::from((string)$row->TYPE),
-            $row->NAME,
+            $row->TREAT_NAME,
             $row->QUANTITY,
             $row->UNIT
         );
@@ -127,7 +127,7 @@ class TreatmentRepository
                 $row->ID_TASK_CONFIRMER !== null ? (int) $row->ID_TASK_CONFIRMER : null,
                 $vineyard,
                 TreatmentType::from((string) $row->TYPE),
-                (string) $row->NAME,
+                (string) $row->TREAT_NAME,
                 (float) $row->QUANTITY,
                 (string) $row->UNIT
             );
