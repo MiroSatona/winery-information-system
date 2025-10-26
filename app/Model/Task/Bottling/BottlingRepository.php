@@ -127,5 +127,45 @@ class BottlingRepository
         return $bottlings;
     }
 
+    public function getUnfinishedBottlingTaskForWine(int $wineId): ?Bottling
+    {
+        $row = $this->database->table('BOTTLING')
+            ->where('ID_WINE', $wineId)
+            ->joinWhere('TASK', 'TASK.ID = ID_TASK')
+            ->select('BOTTLING.*, TASK.*')
+            ->where('TASK.STATE = ?', TaskState::PLANNED->value)
+            ->fetch();
+
+        if ($row === null) {
+            return null;
+        }
+
+        /** @var Wine $wine */
+        $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+        if ($wine === null) {
+            return null;
+        }
+
+        /** @var Bottling $bottling */
+        $bottling = new Bottling(
+            $row->ID,
+            $row->NAME,
+            TaskState::from((string)$row->STATE),
+            $row->CREATION_TIMESTAMP,
+            $row->LAST_CHANGE_TIMESTAMP,
+            $row->PLANNED_EXECUTION_TIMESTAMP,
+            $row->EXECUTION_TIMESTAMP,
+            $wine,
+            $row->NOTE,
+            ($row->ID_TASK_ISSUER !== null) ? (int)$row->ID_TASK_ISSUER : 0,
+            ($row->ID_TASK_CONFIRMER !== null) ? (int)$row->ID_TASK_CONFIRMER : 0,
+            ($row->ID_WINE !== null) ? (int)$row->ID_WINE : null,
+            (int)$row->BOTTLES_COUNT,
+            (float)$row->BOTTLE_VOLUME
+        );
+
+        return $bottling;
+    }
+
 }
 

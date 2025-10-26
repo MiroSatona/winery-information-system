@@ -12,6 +12,7 @@ use App\Model\Wine\Wine;
 use App\Model\Image\ImageRepository;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Validation\ValidationDefinitions;
+use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Wine\WineProduceData;
 use App\Model\WineVariety\WineVarietyType;
 use App\Model\Wine\WineState;
@@ -35,7 +36,8 @@ final class WinePresenter extends BasePresenter
     public function __construct(
         private WineRepository $wineRepository,
         private ImageRepository $imageRepository,
-        private HarvestRepository $harvestRepository
+        private HarvestRepository $harvestRepository,
+        private BottlingRepository $bottlingRepository
     ) {
         parent::__construct();
     }
@@ -132,6 +134,12 @@ final class WinePresenter extends BasePresenter
         }
 
         $this->wineRepository->fetchBottlingInfoForWine($wine);
+
+        $bottling = $this->bottlingRepository->getUnfinishedBottlingTaskForWine($wineId);
+        $this->template->unfinishedBottlingTask = null;
+        if ($bottling !== null) {
+            $this->template->unfinishedBottlingTask = $bottling;
+        }
 
         $this->template->wine = $wine;
         $this->template->imageRepository = $this->imageRepository;

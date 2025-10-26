@@ -26,6 +26,12 @@
                                         {input type}
                                         {input state}
                                         {input send}
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                            {inputError pattern}
+                                            {inputError type}
+                                            {inputError state}
+                                        </span>
                                     </div>
                                 {/form}
                             </div>
@@ -34,7 +40,7 @@
                                 <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Přehled
                                 </a>
-                                <a href="" class="btn btn-outline-primary btn-sm">
+                                <a href="{link createNonExistentTask!}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-clipboard me-2"></i>Zaznamenat neexistující
                                 </a>
                                 <a href="{link addTask1}" class="btn btn-primary btn-sm">
@@ -88,20 +94,42 @@
                                             </td>
                                             <td>
                                                 {if $task->getPlannedTimestamp()}
-                                                    {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                    {if !$task->getExecutionTimestamp()}
+                                                        {if $task->getPlannedTimestamp() < $currentDateTime}
+                                                            <span class="badge bg-danger">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {else}
+                                                            <span class="badge bg-success">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {/if}
+                                                    {else}
+                                                        {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                    {/if}
                                                 {else}
                                                     —
                                                 {/if}
                                             </td>
                                             <td>
                                                 {if $task->getExecutionTimestamp()}
-                                                    {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                    {if $task->getPlannedTimestamp() && $task->getExecutionTimestamp() > $task->getPlannedTimestamp()}
+                                                        <span class="badge bg-danger">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {else}
+                                                        <span class="badge bg-success">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {/if}
                                                 {else}
                                                     —
                                                 {/if}
                                             </td>
                                             <td>
-                                                {if $task->getState() === $TaskStateType::PLANNED}
+                                                {if $task instanceof $HarvestType && $task->getState() === $TaskStateType::FINISHED && $task->getIdHarvestConfirmer() === null}
+                                                    <span class="badge bg-info">Zbývá potvrzení</span>
+                                                {elseif $task->getState() === $TaskStateType::PLANNED}
                                                     <span class="badge bg-warning">Plánovaný</span>
                                                 {elseif $task->getState() === $TaskStateType::FINISHED}
                                                     <span class="badge bg-success">Dokončený</span>
@@ -110,7 +138,7 @@
                                                 {/if}
                                             </td>
                                             <td>
-                                                <a n:href="details! taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                                <a n:href="details! $task->getId()" class="btn btn-sm btn-outline-secondary">
                                                     Detail
                                                 </a>
                                                 {if $task->getState() === $TaskStateType::PLANNED}
@@ -134,6 +162,4 @@
             </div>
         </div>
     </div>
-
-    
 {/block isMainPanel}

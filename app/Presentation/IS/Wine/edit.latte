@@ -136,11 +136,14 @@
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
                                     <a href="{link 'Wine:show', $wine->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
-                                        <i class="fas fa-arrow-left me-2"></i>Zrušit
+                                        <i class="fas fa-xmark me-2"></i>Zrušit
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-6">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>

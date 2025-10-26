@@ -1,14 +1,120 @@
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
-    <a href=":IS:Tasks:dashboard" class="nav-link nav-button py-2 fw-bold fs-5">
+    <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
     <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
-        <i class="fas fa-arrow-right me-2"></i>Naplánovat Ošetření
+        <i class="fas fa-arrow-right me-2"></i>Dokončit ošetření
     </a>
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-seedling me-2"></i>
+                        Detaily ošetření
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {* Summary of task details *}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Shrnutí úkonu
+                        </h6>
+                        <div class="mb-1">
+                            <strong>Název:</strong> {$task->getName()}
+                        </div>
+                        <div class="mb-1">
+                            <strong>Plánované datum:</strong> {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                        </div>
+                        {if $vineyard !== null}
+                            <div class="mb-1">
+                                <strong>Vinohrad:</strong> {$vineyard->getName()}
+                            </div>
+                        {/if}
+                        {if $task->getIdRows() && count($task->getIdRows()) > 0}
+                            <div>
+                                <strong>Počet řádků:</strong> {count($task->getIdRows())}
+                            </div>
+                        {/if}
+                    </div>
 
+                    {form treatmentDetailsForm}
+                        <div class="row g-3">
+                            <div class="col-12 col-md-6">
+                                <label for="type" class="form-label fw-semibold">
+                                    <i class="fas fa-tag me-2 text-muted"></i>{label type /}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input type}
+                                <span class="invalid-feedback">
+                                    {inputError type}
+                                </span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="name" class="form-label fw-semibold">
+                                    <i class="fas fa-prescription-bottle me-2 text-muted"></i>{label name /}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input name}
+                                <span class="invalid-feedback">
+                                    {inputError name}
+                                </span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="amount" class="form-label fw-semibold">
+                                    <i class="fas fa-tint me-2 text-muted"></i>{label amount /}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input amount}
+                                <span class="invalid-feedback">
+                                    {inputError amount}
+                                </span>
+                            </div>
+
+                            <div class="col-12 col-md-6">
+                                <label for="unit" class="form-label fw-semibold">
+                                    <i class="fas fa-ruler me-2 text-muted"></i>{label unit /}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input unit}
+                                <span class="invalid-feedback">
+                                    {inputError unit}
+                                </span>
+                            </div>
+
+                        {* Action Buttons *}
+                        <div class="border-top pt-4 mt-4">
+                            <div class="row g-2">
+                                <div class="col-12 col-md-4">
+                                    {input cancel}
+                                    <span class="invalid-feedback">
+                                        {inputError cancel}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input back}
+                                    <span class="invalid-feedback">
+                                        {inputError back}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input finish}
+                                    <span class="invalid-feedback">
+                                        {inputError finish}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
 {/block isMainPanel}

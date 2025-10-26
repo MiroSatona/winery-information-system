@@ -35,7 +35,7 @@
                         </div>
                         
                         <div class="d-flex gap-2 flex-wrap">
-                            <a n:href="Tasks:edit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                            <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
                                 <i class="fas fa-edit me-1"></i> Upravit
                             </a>
                             {if $task->getState() === App\Model\Task\TaskState::PLANNED}

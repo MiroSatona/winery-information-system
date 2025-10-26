@@ -35,9 +35,15 @@
                                     </button>
                                 {/if}
                                 {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
-                                    <a href="{link :IS:Tasks:startBottling, $wine->getId()}" class="btn btn-primary btn-sm">
-                                        <i class="fas fa-wine-bottle me-2"></i>Zalahvovat víno
-                                    </a>
+                                    {if $unfinishedBottlingTask === null}
+                                        <a href="{link :IS:Tasks:startBottling, $wine->getId()}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-wine-bottle me-2"></i>Zalahvovat víno
+                                        </a>
+                                    {else}
+                                        <a href="{link :IS:Tasks:markTaskDone, $unfinishedBottlingTask->getId()}" class="btn btn-primary btn-sm">
+                                            <i class="fas fa-wine-bottle me-2"></i>Dokončit lahvování
+                                        </a>
+                                    {/if}
                                 {/if}
                                 {if $wine->getState() === $WineState::BOTTLED && $userVintner}
                                     <a href="{link selling $wine->getId()}" class="btn btn-primary btn-sm">

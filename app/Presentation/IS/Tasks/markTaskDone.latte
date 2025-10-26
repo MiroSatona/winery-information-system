@@ -29,7 +29,7 @@
                             <strong>Název:</strong> {$task->getName()}
                         </div>
                         <div class="mb-1">
-                            <strong>Termín plánovaný:</strong> {$task->getPlannedTimestamp()->format('d.m.Y')}
+                            <strong>Termín plánovaný:</strong> {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
                         </div>
                         
                         {if $task instanceof $HarvestType}
@@ -97,6 +97,9 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>

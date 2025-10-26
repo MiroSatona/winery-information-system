@@ -32,10 +32,10 @@
                             <strong>Odrůda:</strong> {$harvest->getWineVariety()->getName()}
                         </div>
                         <div class="mb-1">
-                            <strong>Termín plánovaný:</strong> {$harvest->getPlannedTimestamp()->format('d.m.Y')}
+                            <strong>Termín plánovaný:</strong> {$harvest->getPlannedTimestamp()->format('d.m.Y H:i')}
                         </div>
                         <div>
-                            <strong>Termín dokončení:</strong> {$harvest->getExecutionTimestamp()->format('d.m.Y')}
+                            <strong>Termín dokončení:</strong> {$harvest->getExecutionTimestamp()->format('d.m.Y H:i')}
                         </div>
                     </div>
 
@@ -79,5 +79,4 @@
             </div>
         </div>
     </div>
-
 {/block isMainPanel}

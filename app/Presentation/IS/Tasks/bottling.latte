@@ -27,6 +27,9 @@
                                     <i class="fas fa-wine-glass-alt me-2 text-muted"></i>{label wine /}
                                 </label>
                                 {input wine}
+                                <span class="invalid-feedback">
+                                    {inputError wine}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6">
@@ -34,7 +37,9 @@
                                     <i class="far fa-image me-2 text-muted"></i>{label image /}
                                 </label>
                                 {input image}
-                                <div class="form-text">Nahrajte obrázek láhve nebo odrůdy. Náhled je níže.</div>
+                                <span class="invalid-feedback">
+                                    {inputError image}
+                                </span>
                             </div>
 
                             <div class="col-12 col-md-6 d-flex align-items-start flex-column">
@@ -42,24 +47,24 @@
                                     <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
                                 </label>
                                 {input volume}
-                                <div class="form-text">Zadejte objem v litrech nebo jednotkách, které projekt používá.</div>
-                            </div>
-
-                            <div class="col-12">
-                                <h6 class="fw-semibold mb-2">Náhled obrázku</h6>
-                                <div class="border rounded p-3 d-flex justify-content-center align-items-center" style="min-height:160px;">
-                                    <img id="wine-preview" src="{$image ?? ''}" alt="Obrázek - náhled" class="img-fluid" style="max-height:200px; object-fit:contain;" />
-                                </div>
+                                <span class="invalid-feedback">
+                                    {inputError volume}
+                                </span>
                             </div>
 
                             <div class="col-12 border-top pt-4 mt-2">
                                 <div class="row g-2">
-                                    <div class="col-6">
-                                        <a href="{link selectWorkers}" class="btn btn-outline-secondary w-100">
-                                            <i class="fas fa-arrow-left me-1"></i> Zpět
+                                    <div class="col-4">
+                                        <a href="{link clearForm!}" class="btn btn-danger w-100">
+                                            Zrušit
                                         </a>
                                     </div>
-                                    <div class="col-6">
+                                    <div class="col-4">
+                                        <a href="{link selectWorkers}" class="btn btn-secondary w-100">
+                                            Zpět
+                                        </a>
+                                    </div>
+                                    <div class="col-4">
                                         <button type="submit" class="btn btn-primary w-100">
                                             <i class="fas fa-check me-1"></i> Pokračovat
                                         </button>
@@ -72,29 +77,4 @@
             </div>
         </div>
     </div>
-
-    <script>
-        (function(){
-            // Find file input (we set id above), and preview image element
-            const fileInput = document.getElementById('wine-image-input');
-            const preview = document.getElementById('wine-preview');
-
-            if (!fileInput || !preview) return;
-
-            fileInput.addEventListener('change', function(e){
-                const file = this.files && this.files[0];
-                if (!file) {
-                    // restore empty transparent placeholder
-                    preview.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
-                    return;
-                }
-                const reader = new FileReader();
-                reader.onload = function(ev){
-                    preview.src = ev.target.result;
-                };
-                reader.readAsDataURL(file);
-            });
-        })();
-    </script>
-
 {/block isMainPanel}

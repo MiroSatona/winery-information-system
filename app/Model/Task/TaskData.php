@@ -30,17 +30,29 @@ class TaskData
     // Treatment
     private TreatmentType $type = TreatmentType::SPRAYING;
     private string $treatmentName = '';
-    private string $mnozstvi = '';
+    private float $amount = 0.0;
     private string $unit = '';
 
     // common 
     private array $idRows = [];
+    
+    // type of task 
+    private bool $isDone = false;
 
     public function __construct()
     {
     }
 
     // --- Getters & Setters ---
+    
+    public function getIsDone(): bool 
+    {
+        return $this->isDone;
+    }
+    
+    public function markAsDone(): void {
+       $this->isDone = true; 
+    }
     
     public function getType(): TaskType
     {
@@ -175,14 +187,14 @@ class TaskData
         $this->treatmentName = $treatmentName;
     }
 
-    public function getMnozstvi(): string
+    public function getAmount(): float
     {
-        return $this->mnozstvi;
+        return $this->amount;
     }
 
-    public function setMnozstvi(string $mnozstvi): void
+    public function setAmount(float $amount): void
     {
-        $this->mnozstvi = $mnozstvi;
+        $this->amount = $amount;
     }
 
     public function getUnit(): string

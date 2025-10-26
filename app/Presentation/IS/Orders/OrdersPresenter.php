@@ -60,5 +60,9 @@ final class OrdersPresenter extends BasePresenter
        $this->template->order = $this->ordRepository->fetchOrderById($orderId, true);
     }
     
-
+    public function actionChangeOrderState(int $orderId, string $newState): void
+    {
+        $this->handleChangeOrderState($orderId, $newState);
+        $this->redirect('dashboard');
+    }
 }

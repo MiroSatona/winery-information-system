@@ -28,6 +28,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input name}
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
                         </div>
 
                         <div class="mb-3">
@@ -36,6 +39,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input location}
+                            <span class="invalid-feedback">
+                                {inputError location}
+                            </span>
                         </div>
                         
                         <div class="mb-3">
@@ -44,6 +50,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input year}
+                            <span class="invalid-feedback">
+                                {inputError year}
+                            </span>
                         </div>
                         
                         <div class="mb-3">
@@ -52,6 +61,9 @@
                                 <span class="text-danger">*</span>
                             </label>
                             {input description}
+                            <span class="invalid-feedback">
+                                {inputError description}
+                            </span>
                         </div>
                         
                         <div class="mb-3">
@@ -59,6 +71,9 @@
                                 <i class="fas fa-camera me-2 text-muted"></i>{label image /}
                             </label>
                             {input image}
+                            <span class="invalid-feedback">
+                                {inputError image}
+                            </span>
                         </div>
 
                         {* Information note *}
@@ -80,6 +95,9 @@
                                 </div>
                                 <div class="col-12 col-md-6">
                                     {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
                                 </div>
                             </div>
                         </div>

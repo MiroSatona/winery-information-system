@@ -49,6 +49,9 @@
                             <span class="text-danger">*</span>
                         </label>
                         {input price}
+                        <span class="invalid-feedback">
+                            {inputError price}
+                        </span>
                     </div>
 
                     <hr class="my-4">
@@ -59,7 +62,10 @@
                             <i class="fas fa-file-alt me-2 text-muted"></i>{label popis /}
                             <span class="text-danger">*</span>
                         </label>
-                        {input popis, rows => 8, class => 'form-control', style => 'resize: vertical;'}
+                        {input popis}
+                        <span class="invalid-feedback">
+                            {inputError popis}
+                        </span>
                         <small class="form-text text-muted">
                             Tento popis se zobrazí zákazníkům v detailu produktu.
                         </small>
@@ -83,6 +89,9 @@
                             </div>
                             <div class="col-12 col-md-6">
                                 {input send, class => 'btn btn-success w-100 fw-bold'}
+                                <span class="invalid-feedback">
+                                    {inputError send}
+                                </span>
                             </div>
                         </div>
                     </div>
