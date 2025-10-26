@@ -62,9 +62,20 @@
                                         {if !empty($wineRows)}
                                         <div class="row mt-4">
                                             <div class="col-12">
-                                                <h5 class="fw-semibold text-muted mb-3">
-                                                    <i class="fas fa-list me-2"></i>Ošetřené řádky
-                                                </h5>
+                                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                                    <h5 class="fw-semibold text-muted mb-0">
+                                                        <i class="fas fa-list me-2"></i>Ošetřené řádky
+                                                    </h5>
+                                                    {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                        {form addRowForm}
+                                                            <div class="d-flex align-items-end gap-2">
+                                                                {input rowCode}
+                                                                {input send}
+                                                            </div>
+                                                        {/form}
+                                                    {/if}
+                                                </div>
+                                                
                                                 <div class="table-responsive">
                                                     <table class="table table-primary">
                                                         <thead>
@@ -73,6 +84,9 @@
                                                             <th><i class="fas fa-seedling me-2"></i>Počet keřů</th>
                                                             <th><i class="fas fa-calendar-alt me-2"></i>Rok výsadby</th>
                                                             <th><i class="fas fa-check-circle me-2"></i>Aktivní</th>
+                                                             {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                <th><i class="fas fa-cog me-2"></i>Akce</th>
+                                                            {/if}
                                                         </tr>
                                                         </thead>
                                                         <tbody class="table-light">
@@ -92,6 +106,14 @@
                                                                             <span class="badge bg-danger">Ne</span>
                                                                         {/if}
                                                                     </td>
+                                                                    {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                        <td class="text-center">
+                                                                            <a href="" 
+                                                                            class="btn btn-sm btn-outline-danger">
+                                                                                <i class="fas fa-minus me-1"></i>Odebrat
+                                                                            </a>
+                                                                        </td>
+                                                                    {/if}
                                                                 </tr>
                                                             {/foreach}
                                                             </tbody>

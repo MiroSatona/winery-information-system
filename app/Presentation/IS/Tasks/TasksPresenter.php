@@ -27,6 +27,7 @@ use App\Model\WineVariety\WineVariety;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
+use App\Model\User\User;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -485,8 +486,8 @@ final class TasksPresenter extends BasePresenter
             ? $this->wineRep->fetchWineById($harvest->getIdWine())
             : null;
         
-        // Get wine rows of vineyard where the harvest was made
-        $this->template->wineRows = $this->vineyardRep->getWineRowsOnVineyard($harvest->getVineyard()->getId());
+        $this->template->wineRows = $this->taskRepository->fetchTaskRows($harvest->getId());
+        $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($harvest->getId());
     }   
 
 
@@ -518,6 +519,9 @@ final class TasksPresenter extends BasePresenter
         $this->template->taskConfirmer = ($bottling->getIdTaskConfirmer() !== null) 
             ? $this->userRepository->getUserById($bottling->getIdTaskConfirmer()) 
             : null;
+
+        $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($bottling->getId());
+
     }
 
 
@@ -551,28 +555,10 @@ final class TasksPresenter extends BasePresenter
             ? $this->userRepository->getUserById($treatment->getIdTaskConfirmer()) 
             : null;
 
-        // Get wine rows of vineyard where the treatment was made
-        $this->template->wineRows = $this->vineyardRep->getWineRowsOnVineyard($treatment->getVineyard()->getId());
+        $this->template->wineRows = $this->taskRepository->fetchTaskRows($treatment->getId());
+        $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($treatment->getId());
     }
 
-
-   /**
-    * formError
-    * Method for handling form errors.
-    *
-    * @param Form $form Form where the error was detected.
-    * @return void
-    */
-    public function formError(Form $form): void
-    {
-        $errors = $form->getErrors();
-
-            if (!empty($errors)) {
-                $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
-            } else {
-                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
-            }
-    }
 
     
 // ----------------------------------------------------------
@@ -1081,6 +1067,219 @@ final class TasksPresenter extends BasePresenter
         $this->handleClearForm();
         $this->redirect("dashboard");
     }
+
+   public function createComponentAddWorkersForm(): Form
+    {
+        $form = new Form;
+
+        $taskId = (int)$this->getParameter('id');
+
+        $notSelectedUsers = $this->taskRepository->fetchAllNotSetWorkers($taskId);
+
+        $userOptions = [];
+        foreach ($notSelectedUsers as $user) {
+            $userOptions[$user->getId()] = $user->getName() . ' ' . $user->getSurname();
+        }
+
+        $form->addSelect('worker', 'Pracovník', $userOptions)
+            ->setPrompt('Přidat pracovníka')
+            ->setRequired()
+            ->setHtmlAttribute('class', 'form-select form-select-sm')
+            ->setHtmlAttribute('style', 'width: 200px;');
+
+        $form->addSubmit('send', 'Přidat pracovníka')
+            ->setHtmlAttribute('class', 'btn btn-primary btn-sm');
+
+        $form->onSuccess[] = [$this, 'addWorkerFormSucceeded'];
+        $form->onError[] = [$this, 'formError'];
+        return $form;        
+    }
+
+    /**
+     * 
+     * 
+     * Details add and delete users.-------------------------------------------------------------
+     * 
+     */
+    
+    public function addWorkerFormSucceeded(Button $button, \stdClass $values): void
+    {
+        $taskId = (int)$this->getParameter('id');
+        $workerId = (int)$values->worker;
+
+        if (!$workerId) {
+            $this->flashMessage('Prosím vyberte pracovníka.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
+        $error = $this->taskRepository->addWorkerToTask($taskId, $workerId);
+        
+        if ($error === '') {
+            $this->flashMessage('Pracovník byl úspěšně přidán k úkolu.', 'success');
+        } else {
+            $this->flashMessage($error, 'error');
+        }
+        
+        $this->redirect('this');
+    }
+    
+    public function handleDeleteUserFromTask(int $workerId):void
+    {
+        $taskId = (int)$this->getParameter('id');
+
+        $result = $this->taskRepository->removeWorkerFromTask($taskId, $workerId);
+
+        if($result === ''){
+            $this->flashMessage('Pracovník byl úspěšně odstraněn z úkolu.', 'success');
+        } else {
+            $this->flashMessage($result, 'error');
+        }
+
+
+    }
+
+    public function createComponentAddRowForm(): Form
+    {
+        $form = new Form;
+        $taskId = (int)$this->getParameter('id');
+        
+        $task = $this->taskRepository->fetchById($taskId);
+        
+        if ($task === null) {
+            return $form;
+        }
+
+
+        if(!($task instanceof Treatment) && !($task instanceof Harvest)) {
+            // TODO: How hadnle this?
+            return $form;
+        }
+
+        $vineyardId = $task->getVineyard()->getId();
+
+        bdump($vineyardId);
+
+        $availableRows = [];
+
+        if($task instanceof Treatment) {
+            $availableRows = $this->taskRepository->fetchAllNotSetRows(
+            $taskId, 
+            $vineyardId, 
+            null
+            );
+        } else {
+            bdump($task->getWineVariety()->getId());
+            $availableRows = $this->taskRepository->fetchAllNotSetRows(
+            $taskId, 
+            $vineyardId, 
+            $task->getWineVariety()->getId()
+            );
+        }
+
+        
+        
+        $rowOptions = [];
+        foreach ($availableRows as $row) {
+            $rowOptions[$row->getId()] = "Řádek {$row->getId()})";
+        }
+
+        $form->addSelect('rowCode', 'Řádek', $rowOptions)
+            ->setPrompt('Vyberte řádek')
+            ->setRequired('Prosím vyberte řádek.')
+            ->setHtmlAttribute('class', 'form-select form-select-sm')
+            ->setHtmlAttribute('style', 'width: 300px;');
+
+        $form->addSubmit('send', 'Přidat řádek')
+            ->setHtmlAttribute('class', 'btn btn-primary btn-sm');
+
+        $form->onSuccess[] = [$this, 'addRowsFormSucceeded'];
+        $form->onError[] = [$this, 'formError'];
+
+        return $form;
+    }
+
+    public function addRowsFormSucceeded(Form $form, \stdClass $values): void
+    {
+        $taskId = (int)$this->getParameter('id');
+        $rowCode = (int)$values->rowCode;
+        
+        $task = $this->taskRepository->fetchById($taskId);
+        
+        if ($task === null) {
+            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->redirect('this');
+            return;
+        }
+        
+        if (!($task instanceof Treatment) && !($task instanceof Harvest)) {
+            $this->flashMessage('Tento typ úkonu nepodporuje přidávání řádků.', 'error');
+            $this->redirect('this');
+            return;
+        }
+        
+        $vineyardId = $task->getVineyard()->getId();
+
+        $result = $this->taskRepository->addTaskRow($taskId, $vineyardId, $rowCode);
+
+        if ($result === '') {
+            $this->flashMessage('Řádek byl úspěšně přidán.', 'success');
+        } else {
+            $this->flashMessage($result, 'error');
+        }
+
+        $this->redirect('this');
+    }
+
+    public function handleDeleteTaskRows(int $rowId): void
+    { 
+
+        $taskId = (int)$this->getParameter('id');
+
+        $task = $this->taskRepository->fetchById($taskId);
+        
+        if ($task === null) {
+            $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->redirect('this');
+            return;
+        }
+        
+        if (!($task instanceof Treatment) && !($task instanceof Harvest)) {
+            $this->flashMessage('Tento typ úkonu nepodporuje mazání řádků.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
+        $vineyardId = $task->getVineyard()->getId();
+
+        $result = $this->taskRepository->removeTaskRow($taskId, $vineyardId, $rowId);
+
+        if ($result === '') {
+            $this->flashMessage('Řádek byl úspěšně odstraněn.', 'success');
+        } else {
+            $this->flashMessage($result, 'error');
+        }
+
+        $this->redirect('this');
+
+    }
+
+   /**
+    * formError
+    * Method for handling form errors.
+    *
+    * @param Form $form Form where the error was detected.
+    * @return void
+    */
+    public function formError(Form $form): void
+    {
+        $errors = $form->getErrors();
+
+            if (!empty($errors)) {
+                $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
+            } else {
+                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
+            }
+    }
+
 }
-
-

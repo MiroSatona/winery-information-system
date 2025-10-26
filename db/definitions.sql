@@ -484,6 +484,30 @@ VALUES
 (2, 1, 15, 12.00),
 (2, 3, 10, 20.00);
 
+
+-- WORKER
+INSERT INTO WORKER (ID_USER, ID_TASK) VALUES
+    (1, 1),
+    (3, 1),
+    (2, 2),
+    (3, 2),
+    (1, 4),
+    (2, 5),
+    (3, 5),
+    (3, 6),
+    (1, 7),
+    (2, 7),
+    (2, 8),
+    (3, 8),
+    (1, 10),
+    (2, 11),
+    (3, 11),
+    (1, 13),
+    (3, 13),
+    (2, 14),
+    (3, 14)
+;
+
 -- Restore MySQL settings
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

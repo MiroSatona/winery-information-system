@@ -9,12 +9,15 @@ use App\Model\Task\Bottling\Bottling;
 use Nette\Database\Explorer;
 use Nette\Utils\DateTime;
 use App\Model\Task\TaskState;
+use App\Model\Vineyard\VineyardRepository;
 use App\Model\Task\Treatment\TreatmentRepository;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Task\TaskData;
 use App\Model\Image\Image as ImageEntity;
 use App\Model\Validation\ValidationDefinitions;
+use App\Model\WineRow\WineRow;
+use App\Model\User\User;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -23,17 +26,20 @@ class TaskRepository{
     private TreatmentRepository $treatmentRepository;
     private BottlingRepository $bottlingRepository;
     private HarvestRepository $harvestRepository;
+    private VineyardRepository $vineyardRepository;
 
     public function __construct(
         Explorer $database,
         TreatmentRepository $treatmentRepository,
         BottlingRepository $bottlingRepository,
-        HarvestRepository $harvestRepository
+        HarvestRepository $harvestRepository,
+        VineyardRepository $vineyardRepository
     ) {
         $this->database = $database;
         $this->treatmentRepository = $treatmentRepository;
         $this->bottlingRepository = $bottlingRepository;
         $this->harvestRepository = $harvestRepository;
+        $this->vineyardRepository = $vineyardRepository;
     }
 
     /**
@@ -372,4 +378,255 @@ class TaskRepository{
         }
 
     }
+
+    /**
+     * fetchTaskWorkers
+     * Fetch all workers of the specific task.
+     *
+     * @param int $id Task ID.
+     * @return User[] Array of User objects <=> workers  of the task.
+     */
+    public function fetchTaskWorkers(int $id): array
+    {
+        $users = $this->database->table('USER')
+            ->where(':WORKER.ID_TASK', $id)
+            ->fetchAll();
+
+        $usersObjects = [];
+                foreach ($users as $user) {
+            $usersObjects[] = new User(
+                (int)$user->ID,
+                (string)$user->NAME,
+                (bool)$user->ACTIVE,
+                (string)$user->SURNAME,
+                (string)$user->USERNAME,
+                (string)$user->EMAIL,
+                $user->PHONE_NUMBER !== null ? (string)$user->PHONE_NUMBER : null,
+                $user->CITY !== null ? (string)$user->CITY : null,
+                $user->POST_CODE !== null ? (string)$user->POST_CODE : null,
+                $user->STREET !== null ? (string)$user->STREET : null,
+                $user->HOUSE_NUMBER !== null ? (string)$user->HOUSE_NUMBER : null,
+                $user->REGISTRATION_TIMESTAMP instanceof \DateTimeInterface ? $user->REGISTRATION_TIMESTAMP : new DateTime(),
+                (bool)$user->ROLE_USER,
+                (bool)$user->ROLE_WORKER,
+                (bool)$user->ROLE_VINTNER,
+                (bool)$user->ROLE_ADMIN
+            );
+        }
+        return $usersObjects;
+    }
+
+    public function fetchAllNotSetWorkers(int $id): array{
+        $assignedWorkerIds = $this->database->table('WORKER')
+            ->where('ID_TASK', $id)
+            ->select('ID_USER')
+            ->fetchPairs(null, 'ID_USER');
+
+        $query = $this->database->table('USER')
+            ->where('ROLE_WORKER', true)
+            ->where('ACTIVE', true);
+
+        if (!empty($assignedWorkerIds)) {
+            $query->where('ID NOT IN ?', $assignedWorkerIds);
+        }
+
+        $users = $query->fetchAll();
+
+        $usersObjects = [];
+        foreach ($users as $user) {
+            $usersObjects[] = new User(
+                (int)$user->ID,
+                (string)$user->NAME,
+                (bool)$user->ACTIVE,
+                (string)$user->SURNAME,
+                (string)$user->USERNAME,
+                (string)$user->EMAIL,
+                $user->PHONE_NUMBER !== null ? (string)$user->PHONE_NUMBER : null,
+                $user->CITY !== null ? (string)$user->CITY : null,
+                $user->POST_CODE !== null ? (string)$user->POST_CODE : null,
+                $user->STREET !== null ? (string)$user->STREET : null,
+                $user->HOUSE_NUMBER !== null ? (string)$user->HOUSE_NUMBER : null,
+                $user->REGISTRATION_TIMESTAMP instanceof \DateTimeInterface ? $user->REGISTRATION_TIMESTAMP : new DateTime(),
+                (bool)$user->ROLE_USER,
+                (bool)$user->ROLE_WORKER,
+                (bool)$user->ROLE_VINTNER,
+                (bool)$user->ROLE_ADMIN
+            );
+        }
+        return $usersObjects; 
+    }
+
+    
+
+    public function addWorkerToTask(int $taskId, int $workerId): string
+    {   
+        /** @var string $error Error message */
+        $error='';
+        $this->database->beginTransaction();
+
+
+        try 
+        {
+            $this->database->table('WORKER')->insert([
+                'ID_TASK' => $taskId,
+                'ID_USER' => $workerId,
+            ]);
+            $this->database->commit();
+            return $error;
+        }
+        catch (\Exception $exception) {
+            $this->database->rollBack();
+            $error = 'Chyba při přidávání pracovníka:' . $exception->getMessage();
+            return $error;
+        }
+    }
+
+
+    public function removeWorkerFromTask(int $taskId, int $workerId): string
+    {
+         /** @var string $error Error message */
+        $error='';
+        $this->database->beginTransaction();
+
+        try 
+        {   $this->database->table('WORKER')->where('ID_TASK', $taskId)->where('ID_USER', $workerId)->delete();
+            $this->database->commit();
+            return $error;
+        }
+        catch (\Exception $exception) {
+            $this->database->rollBack();
+            $error = 'Chyba při odebírání pracovníka:' . $exception->getMessage();
+            return $error;
+        }
+    }
+
+    public function fetchTaskRows(int $taskId): array
+    {
+        $taskRows = $this->database->table('TASK_ROW')
+            ->where('ID_TASK', $taskId)
+            ->fetchAll();
+
+        $wineRowObjects = [];
+        
+        foreach ($taskRows as $taskRow) {
+            $wineRow = $this->database->table('WINE_ROW')
+                ->where('ID_VINEYARD', $taskRow->ID_VINEYARD)
+                ->where('CODE', $taskRow->CODE_ROW)
+                ->fetch();
+            
+            if ($wineRow) {
+                $wineRowObjects[] = new WineRow(
+                    (int)$wineRow->CODE,
+                    (bool)$wineRow->ACTIVE,
+                    (int)$wineRow->ID_VINEYARD,
+                    (int)$wineRow->ID_WINE_VARIETY,
+                    (int)$wineRow->HEAD_COUNT,
+                    (int)$wineRow->PLANTING_YEAR
+                );
+            }
+        }
+        
+        return $wineRowObjects;
+    }
+
+        public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
+        {   
+            /** @var WineRow[] $allRows */
+            $allRows = [];
+            if($wineVarietyId === null){ 
+                $allRows = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
+            }
+            else{
+                $allRows = $this->vineyardRepository->getRowsAtVineyardWithWineVariety($vineyardId, $wineVarietyId);
+            }
+
+            $assignedRowCodes = $this->database->table('TASK_ROW')
+                    ->where('ID_TASK', $taskId)
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->select('CODE_ROW')
+                    ->fetchPairs(null, 'CODE_ROW');
+            $filteredRows = [];
+            bdump($assignedRowCodes);
+
+            foreach ($allRows as $row) {
+                $code = (int) $row->getId();
+
+                if (in_array($code, $assignedRowCodes, true)) {
+                    bdump('Row ' . $code . ' is already assigned.');
+                    continue;
+                }
+
+                $filteredRows[] = $row;
+            }
+
+            return $filteredRows;
+        }
+
+
+    public function addTaskRow(int $taskId, int $vineyardId, int $codeRow): string
+    {   
+        $error = '';
+        try
+        {   
+            $this->database->beginTransaction();
+            
+            bdump('Before insert - taskId: ' . $taskId);
+            bdump('Before insert - vineyardId: ' . $vineyardId);
+            bdump('Before insert - codeRow: ' . $codeRow);
+
+            $this->database->table('TASK_ROW')->insert([
+                'ID_TASK' => $taskId,
+                'ID_VINEYARD' => $vineyardId,
+                'CODE_ROW' => $codeRow,
+            ]);
+
+            bdump('After insert - success');
+            
+            $this->database->commit();
+            
+            bdump('After commit - transaction completed');
+             
+        }
+        catch(\Exception $exception)
+        {
+            $this->database->rollBack();
+            bdump('Exception caught: ' . $exception->getMessage());
+            return 'Chyba při přidávání řádku úkonu:' . $exception->getMessage();
+        }
+
+        return $error;
+        
+    }
+
+    
+    public function removeTaskRow(int $taskId, int $vineyardId, int $codeRow): string
+    {
+        $error = '';
+
+        try
+        {   
+            $this->database->beginTransaction();
+
+            $this->database->table('TASK_ROW')
+                ->where('ID_TASK', $taskId)
+                ->where('ID_VINEYARD', $vineyardId)
+                ->where('CODE_ROW', $codeRow)
+                ->delete();
+
+            $this->database->commit();
+        }
+        catch(\Exception $exception)
+        {
+            $this->database->rollBack();
+            return 'Chyba při odebírání řádku úkonu:' . $exception->getMessage();
+        }
+
+        return $error;
+    }
+
+    
 }
+
+
+
+    
