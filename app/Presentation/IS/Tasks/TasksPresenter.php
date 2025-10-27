@@ -1369,6 +1369,7 @@ final class TasksPresenter extends BasePresenter
         } else {
             $this->flashMessage($result, 'error');
         }
+    }
     
     public function renderTaskEdit(int $taskId) {
         $task = $this->taskRepository->fetchById($taskId);
@@ -1552,10 +1553,6 @@ final class TasksPresenter extends BasePresenter
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
         }
     }
-}
-
-
-    }
 
     public function createComponentAddRowForm(): Form
     {
@@ -1682,22 +1679,6 @@ final class TasksPresenter extends BasePresenter
 
     }
 
-   /**
-    * formError
-    * Method for handling form errors.
-    *
-    * @param Form $form Form where the error was detected.
-    * @return void
-    */
-    public function formError(Form $form): void
-    {
-        $errors = $form->getErrors();
-
-            if (!empty($errors)) {
-                $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
-            } else {
-                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
-            }
-    }
-
 }
+
+   

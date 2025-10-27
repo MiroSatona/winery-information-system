@@ -660,13 +660,8 @@ class TaskRepository{
         return $error;
     }
 
-    
-}
 
-
-
-    
-    public function createTreatmentTask(TaskData $data, int $userId): bool {
+        public function createTreatmentTask(TaskData $data, int $userId): bool {
         try {
             // Validate basic fields
             $name = trim($data->getName());
@@ -995,4 +990,11 @@ class TaskRepository{
 
     }
 
+    
 }
+
+
+
+    
+
+
