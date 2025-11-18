@@ -613,6 +613,11 @@ class TaskRepository{
 
         public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
         {   
+
+            bdump($taskId,);
+            bdump($vineyardId);
+            bdump($wineVarietyId);
+
             /** @var WineRow[] $allRows */
             $allRows = [];
             if($wineVarietyId === null){ 
@@ -628,17 +633,17 @@ class TaskRepository{
                     ->select('CODE_ROW')
                     ->fetchPairs(null, 'CODE_ROW');
             $filteredRows = [];
-            bdump($assignedRowCodes);
+
+            bdump($assignedRowCodes, 'Assigned row codes');
+            bdump($allRows, 'All rows');
 
             foreach ($allRows as $row) {
                 $code = (int) $row->getId();
 
-                if (in_array($code, $assignedRowCodes, true)) {
-                    bdump('Row ' . $code . ' is already assigned.');
-                    continue;
+                if (!in_array($code, $assignedRowCodes, true)) {
+                    $filteredRows[] = $row;
                 }
 
-                $filteredRows[] = $row;
             }
 
             return $filteredRows;
