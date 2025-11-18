@@ -1336,7 +1336,7 @@ final class TasksPresenter extends BasePresenter
      * 
      */
     
-    public function addWorkerFormSucceeded(Button $button, \stdClass $values): void
+    public function addWorkerFormSucceeded(Form $form, \stdClass $values): void
     {
         $taskId = (int)$this->getParameter('id');
         $workerId = (int)$values->worker;
@@ -1346,7 +1346,7 @@ final class TasksPresenter extends BasePresenter
             $this->redirect('this');
             return;
         }
-
+        
         $error = $this->taskRepository->addWorkerToTask($taskId, $workerId);
         
         if ($error === '') {
