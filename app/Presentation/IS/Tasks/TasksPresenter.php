@@ -1574,7 +1574,6 @@ final class TasksPresenter extends BasePresenter
 
         $vineyardId = $task->getVineyard()->getId();
 
-        bdump($vineyardId);
 
         $availableRows = [];
 
@@ -1585,7 +1584,6 @@ final class TasksPresenter extends BasePresenter
             null
             );
         } else {
-            bdump($task->getWineVariety()->getId());
             $availableRows = $this->taskRepository->fetchAllNotSetRows(
             $taskId, 
             $vineyardId, 
