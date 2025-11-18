@@ -18,6 +18,7 @@ use App\Model\Image\Image as ImageEntity;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\WineRow\WineRow;
 use App\Model\User\User;
+use App\Model\Task\TaskOperationStatus;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -289,8 +290,10 @@ class TaskRepository{
         }
     }
     
-    public function createHarvestTask(TaskData $data, int $userId): bool {
-
+    public function createHarvestTask(TaskData $data, int $userId): TaskOperationStatus {
+        
+        $currentStatus = TaskOperationStatus::SUCCESS;
+        
         try {
             // validate basic fields
             $name = trim($data->getName());
@@ -347,6 +350,49 @@ class TaskRepository{
             $this->database->beginTransaction();
             
             $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
+            $harvestDate = $data->getPlannedTimestamp() ?? new DateTime();
+            
+            // Check each row for the closest SPRAYING treatment
+            // to make sure the harvest takes place at least 14 days after the closest treatment on each row
+            foreach ($idRows as $code) {
+                // Step 1: Find all task rows for this specific row in the vineyard
+                $taskRowsForThisRow = $this->database->table('TASK_ROW')
+                    ->where('CODE_ROW', $code)
+                    ->where('ID_VINEYARD', $vineyardId)
+                    ->fetchAll();
+                
+                // Step 2: For each task row, check if it's a SPRAYING treatment
+                foreach ($taskRowsForThisRow as $taskRow) {
+                    $taskId = $taskRow->ID_TASK;
+                    
+                    // Step 3: Check if this task is a SPRAYING treatment
+                    $treatment = $this->database->table('TREATMENT')
+                        ->where('ID_TASK', $taskId)
+                        ->where('TYPE', 'SPRAYING')
+                        ->where('ID_VINEYARD', $vineyardId)
+                        ->fetch();
+                    
+                    if ($treatment) {
+                        // Step 4: Get the task details (dates)
+                        $task = $this->database->table('TASK')
+                            ->where('ID', $taskId)
+                            ->fetch();
+                        
+                        if ($task) {
+                            $sprayingDate = $task->EXECUTION_TIMESTAMP 
+                                ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                                : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+                            
+                            $daysDifference = $sprayingDate->diff($harvestDate)->days;
+                            
+                            if ($daysDifference < 14) {
+                                $currentStatus = TaskOperationStatus::CONFLICT_WITH_TREATMENT;
+                                // Don't break - we still want to create the task, just mark it as conflicted
+                            }
+                        }
+                    }
+                }
+            }
 
             $now = new DateTime();
             $taskRow = $this->database->table('TASK')->insert([
@@ -401,7 +447,7 @@ class TaskRepository{
             }
 
             $this->database->commit();
-            return true;
+            return $currentStatus;
 
         } catch (\Exception $e) {
             try {
@@ -410,7 +456,7 @@ class TaskRepository{
                 // ignore
             }
             bdump('Failed to create bottling task: ' . $e->getMessage());
-            return false;
+            return TaskOperationStatus::FAILED;
         }
 
     }
@@ -661,7 +707,8 @@ class TaskRepository{
     }
 
 
-        public function createTreatmentTask(TaskData $data, int $userId): bool {
+        public function createTreatmentTask(TaskData $data, int $userId): TaskOperationStatus{
+            $currentState = TaskOperationStatus::SUCCESS;
         try {
             // Validate basic fields
             $name = trim($data->getName());
@@ -742,9 +789,56 @@ class TaskRepository{
             // Start transaction
             $this->database->beginTransaction();
             
+            $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
+            $treatmentDate = $data->getPlannedTimestamp() ?? new DateTime();
+            
+            // Check each row for any harvest tasks
+            // to make sure the treatment is at least 14 days away from any harvest on each row
+            // Only check if this is a SPRAYING treatment
+            if ($treatmentType->value === 'SPRAYING') {
+                foreach ($idRows as $code) {
+                    // Step 1: Find all task rows for this specific row in the vineyard
+                    $taskRowsForThisRow = $this->database->table('TASK_ROW')
+                        ->where('CODE_ROW', $code)
+                        ->where('ID_VINEYARD', $vineyardId)
+                        ->fetchAll();
+                    
+                    // Step 2: For each task row, check if it's a harvest
+                    foreach ($taskRowsForThisRow as $taskRow) {
+                        $taskId = $taskRow->ID_TASK;
+                        
+                        // Step 3: Check if this task is a harvest
+                        $harvest = $this->database->table('HARVEST')
+                            ->where('ID_TASK', $taskId)
+                            ->where('ID_VINEYARD', $vineyardId)
+                            ->fetch();
+                        
+                        if ($harvest) {
+                            // Step 4: Get the task details (dates)
+                            $task = $this->database->table('TASK')
+                                ->where('ID', $taskId)
+                                ->fetch();
+                            
+                            if ($task) {
+                                $harvestDate = $task->EXECUTION_TIMESTAMP 
+                                    ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                                    : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+                                
+                                // Calculate days difference (absolute value since treatment could be before or after harvest)
+                                $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
+                                
+                                if ($daysDifference < 14) {
+                                    $currentState = TaskOperationStatus::CONFLICT_WITH_HARVEST;
+                                    // Don't break - we still want to create the task, just mark it as conflicted
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             // Insert task row
             $now = new DateTime();
-            $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
 
             $taskRow = $this->database->table('TASK')->insert([
                 'NAME' => $name,
@@ -797,7 +891,7 @@ class TaskRepository{
             }
 
             $this->database->commit();
-            return true;
+            return $currentState;
 
         } catch (\Exception $e) {
             try {
@@ -806,7 +900,7 @@ class TaskRepository{
                 // ignore
             }
             Debugger::log('Failed to create treatment task: ' . $e->getMessage(), ILogger::ERROR);
-            return false;
+            return TaskOperationStatus::FAILED;
         }
     }
     

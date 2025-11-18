@@ -25,6 +25,7 @@ use App\Model\Vineyard\VineyardRepository;
 use App\Model\Image\ImageRepository;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Image\Image;
+use App\Model\Task\TaskOperationStatus;
 use App\Model\Task\Treatment\TreatmentType;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Forms\Controls\Button;
@@ -846,7 +847,10 @@ final class TasksPresenter extends BasePresenter
             return;
         }
         $result = $this->taskRepository->createTreatmentTask($task, $this->user->getId());
-        if ($result) {
+        if ($result == TaskOperationStatus::CONFLICT_WITH_HARVEST) {
+           $this->flashMessage("Oštření postřik bude provedeno méně než 14 dní před sklizní!", FlashMsgType::WARNING->value);
+            $this->redirect('dashboard');
+        } else if ($result == TaskOperationStatus::SUCCESS) {
             $this->flashMessage('Ošetření bylo úspěšně vytvořeno.', FlashMsgType::SUCCESS->value);
             $this->redirect('dashboard');
         } else {
@@ -1276,7 +1280,7 @@ final class TasksPresenter extends BasePresenter
     
     public function finalizeTask() {
         $task = $this->fetchCurrentNewTask();
-        $result = false;
+        $result = null;
         
         switch($task->getType()) {
             case TaskType::BOTTLING: 
@@ -1292,10 +1296,16 @@ final class TasksPresenter extends BasePresenter
                 break;
         }
         
-        if (!$result) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
-        } else {
+        bdump($result->value);
+        
+        if ($result === TaskOperationStatus::SUCCESS) {
             $this->flashMessage("Úkon uložen", FlashMsgType::SUCCESS->value);
+        } elseif ($result === TaskOperationStatus::CONFLICT_WITH_HARVEST) {
+            $this->flashMessage("Ošetření postřik bude provedeno méně než 14 dní před sklizní!", FlashMsgType::WARNING->value);
+        } elseif ($result === TaskOperationStatus::CONFLICT_WITH_TREATMENT) {
+            $this->flashMessage("Sklizeň bude provedena méně než 14 dní po ošetření postřikem!", FlashMsgType::WARNING->value);
+        } else {
+            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
         }
 
         $this->handleClearForm();
