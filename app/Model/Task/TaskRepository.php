@@ -149,6 +149,109 @@ class TaskRepository{
         return $workerRow !== null;
     }
 
+    
+    /**
+     * rowIsSafeForHarvest
+     * Check if a vineyard row is safe for harvest (no spraying treatment within 14 days before harvest).
+     *
+     * @param int $vineyardId Vineyard ID
+     * @param int $rowCode Row code
+     * @param DateTime $harvestDate Planned harvest date
+     * @return bool True if safe, false if there's a conflict
+     */
+    private function rowIsSafeForHarvest(int $vineyardId, int $rowCode, DateTime $harvestDate): bool
+    {
+        // Step 1: Find all task rows for this specific row in the vineyard
+        $taskRowsForThisRow = $this->database->table('TASK_ROW')
+            ->where('CODE_ROW', $rowCode)
+            ->where('ID_VINEYARD', $vineyardId)
+            ->fetchAll();
+        
+        // Step 2: For each task row, check if it's a SPRAYING treatment
+        foreach ($taskRowsForThisRow as $taskRow) {
+            $taskId = $taskRow->ID_TASK;
+            
+            // Step 3: Check if this task is a SPRAYING treatment
+            $treatment = $this->database->table('TREATMENT')
+                ->where('ID_TASK', $taskId)
+                ->where('TYPE', 'SPRAYING')
+                ->where('ID_VINEYARD', $vineyardId)
+                ->fetch();
+            
+            if ($treatment) {
+                // Step 4: Get the task details (dates)
+                $task = $this->database->table('TASK')
+                    ->where('ID', $taskId)
+                    ->fetch();
+                
+                if ($task) {
+                    $sprayingDate = $task->EXECUTION_TIMESTAMP 
+                        ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                        : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+                    
+                    $daysDifference = $sprayingDate->diff($harvestDate)->days;
+                    
+                    if ($daysDifference < 14) {
+                        return false; // Not safe - conflict detected
+                    }
+                }
+            }
+        }
+        
+        return true; // Safe - no conflicts found
+    }
+
+    /**
+     * rowIsSafeForSprayingTreatment
+     * Check if a vineyard row is safe for spraying treatment (no harvest within 14 days before or after treatment).
+     *
+     * @param int $vineyardId Vineyard ID
+     * @param int $rowCode Row code
+     * @param DateTime $treatmentDate Planned treatment date
+     * @return bool True if safe, false if there's a conflict
+     */
+    private function rowIsSafeForSprayingTreatment(int $vineyardId, int $rowCode, DateTime $treatmentDate): bool
+    {
+        // Step 1: Find all task rows for this specific row in the vineyard
+        $taskRowsForThisRow = $this->database->table('TASK_ROW')
+            ->where('CODE_ROW', $rowCode)
+            ->where('ID_VINEYARD', $vineyardId)
+            ->fetchAll();
+        
+        // Step 2: For each task row, check if it's a harvest
+        foreach ($taskRowsForThisRow as $taskRow) {
+            $taskId = $taskRow->ID_TASK;
+            
+            // Step 3: Check if this task is a harvest
+            $harvest = $this->database->table('HARVEST')
+                ->where('ID_TASK', $taskId)
+                ->where('ID_VINEYARD', $vineyardId)
+                ->fetch();
+            
+            if ($harvest) {
+                // Step 4: Get the task details (dates)
+                $task = $this->database->table('TASK')
+                    ->where('ID', $taskId)
+                    ->fetch();
+                
+                if ($task) {
+                    $harvestDate = $task->EXECUTION_TIMESTAMP 
+                        ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                        : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+                    
+                    // Calculate days difference (absolute value since treatment could be before or after harvest)
+                    $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
+                    
+                    if ($daysDifference < 14) {
+                        return false; // Not safe - conflict detected
+                    }
+                }
+            }
+        }
+        
+        return true; // Safe - no conflicts found
+    }
+
     public function createBottlingTask(TaskData $data, int $userId): bool {
 
         // Basic validation
@@ -355,42 +458,9 @@ class TaskRepository{
             // Check each row for the closest SPRAYING treatment
             // to make sure the harvest takes place at least 14 days after the closest treatment on each row
             foreach ($idRows as $code) {
-                // Step 1: Find all task rows for this specific row in the vineyard
-                $taskRowsForThisRow = $this->database->table('TASK_ROW')
-                    ->where('CODE_ROW', $code)
-                    ->where('ID_VINEYARD', $vineyardId)
-                    ->fetchAll();
-                
-                // Step 2: For each task row, check if it's a SPRAYING treatment
-                foreach ($taskRowsForThisRow as $taskRow) {
-                    $taskId = $taskRow->ID_TASK;
-                    
-                    // Step 3: Check if this task is a SPRAYING treatment
-                    $treatment = $this->database->table('TREATMENT')
-                        ->where('ID_TASK', $taskId)
-                        ->where('TYPE', 'SPRAYING')
-                        ->where('ID_VINEYARD', $vineyardId)
-                        ->fetch();
-                    
-                    if ($treatment) {
-                        // Step 4: Get the task details (dates)
-                        $task = $this->database->table('TASK')
-                            ->where('ID', $taskId)
-                            ->fetch();
-                        
-                        if ($task) {
-                            $sprayingDate = $task->EXECUTION_TIMESTAMP 
-                                ? DateTime::from($task->EXECUTION_TIMESTAMP)
-                                : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-                            
-                            $daysDifference = $sprayingDate->diff($harvestDate)->days;
-                            
-                            if ($daysDifference < 14) {
-                                $currentStatus = TaskOperationStatus::CONFLICT_WITH_TREATMENT;
-                                // Don't break - we still want to create the task, just mark it as conflicted
-                            }
-                        }
-                    }
+                if (!$this->rowIsSafeForHarvest($vineyardId, $code, $harvestDate)) {
+                    $currentStatus = TaskOperationStatus::CONFLICT_WITH_TREATMENT;
+                    // Don't break - we still want to create the task, just mark it as conflicted
                 }
             }
 
@@ -802,42 +872,9 @@ class TaskRepository{
             // Only check if this is a SPRAYING treatment
             if ($treatmentType->value === 'SPRAYING') {
                 foreach ($idRows as $code) {
-                    // Step 1: Find all task rows for this specific row in the vineyard
-                    $taskRowsForThisRow = $this->database->table('TASK_ROW')
-                        ->where('CODE_ROW', $code)
-                        ->where('ID_VINEYARD', $vineyardId)
-                        ->fetchAll();
-                    
-                    // Step 2: For each task row, check if it's a harvest
-                    foreach ($taskRowsForThisRow as $taskRow) {
-                        $taskId = $taskRow->ID_TASK;
-                        
-                        // Step 3: Check if this task is a harvest
-                        $harvest = $this->database->table('HARVEST')
-                            ->where('ID_TASK', $taskId)
-                            ->where('ID_VINEYARD', $vineyardId)
-                            ->fetch();
-                        
-                        if ($harvest) {
-                            // Step 4: Get the task details (dates)
-                            $task = $this->database->table('TASK')
-                                ->where('ID', $taskId)
-                                ->fetch();
-                            
-                            if ($task) {
-                                $harvestDate = $task->EXECUTION_TIMESTAMP 
-                                    ? DateTime::from($task->EXECUTION_TIMESTAMP)
-                                    : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-                                
-                                // Calculate days difference (absolute value since treatment could be before or after harvest)
-                                $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
-                                
-                                if ($daysDifference < 14) {
-                                    $currentState = TaskOperationStatus::CONFLICT_WITH_HARVEST;
-                                    // Don't break - we still want to create the task, just mark it as conflicted
-                                }
-                            }
-                        }
+                    if (!$this->rowIsSafeForSprayingTreatment($vineyardId, $code, $treatmentDate)) {
+                        $currentState = TaskOperationStatus::CONFLICT_WITH_HARVEST;
+                        // Don't break - we still want to create the task, just mark it as conflicted
                     }
                 }
             }
