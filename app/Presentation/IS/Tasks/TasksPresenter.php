@@ -138,7 +138,7 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
-    public function handleClearForm(bool $redirect = true): void
+    public function handleClearForm($redirect = true): void
     {
         $section = $this->session->getSection("TaskCreation");
         $section->set("newTask", null);
@@ -846,16 +846,7 @@ final class TasksPresenter extends BasePresenter
             $this->flashMessage('Chyba při získávání údajů o ošetření.', 'error');
             return;
         }
-        $result = $this->taskRepository->createTreatmentTask($task, $this->user->getId());
-        if ($result == TaskOperationStatus::CONFLICT_WITH_HARVEST) {
-           $this->flashMessage("Oštření postřik bude provedeno méně než 14 dní před sklizní!", FlashMsgType::WARNING->value);
-            $this->redirect('dashboard');
-        } else if ($result == TaskOperationStatus::SUCCESS) {
-            $this->flashMessage('Ošetření bylo úspěšně vytvořeno.', FlashMsgType::SUCCESS->value);
-            $this->redirect('dashboard');
-        } else {
-            $this->flashMessage('Chyba při vytváření ošetření, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
-        }
+        $this->finalizeTask();
     }
 
     public function renderTreatmentFinal() {

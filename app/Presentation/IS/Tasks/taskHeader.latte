@@ -35,9 +35,11 @@
                         </div>
                         
                         <div class="d-flex gap-2 flex-wrap">
-                            <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
-                                <i class="fas fa-edit me-1"></i> Upravit
-                            </a>
+                            {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit me-1"></i> Upravit
+                                </a>
+                            {/if}
                             {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                 <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
