@@ -17,8 +17,8 @@ final class Treatment extends Task
     private TreatmentType $type;
     private Vineyard $vineyard;
     private string $nameTreatment;
-    private float $quantity;
-    private string $unit;
+    private ?float $quantity;
+    private ?string $unit;
 
     public function __construct(
         private int $id,
@@ -34,8 +34,8 @@ final class Treatment extends Task
         Vineyard $vineyard,
         TreatmentType $type,
         string $nameTreatment,
-        float $quantity,
-        string $unit
+        ?float $quantity,
+        ?string $unit
     ) {
         parent::__construct(
             $id,
@@ -88,13 +88,13 @@ final class Treatment extends Task
         return $this->nameTreatment;
     }
 
-    public function getQuantity(): float
+    public function getQuantity(): ?float
     {
         return $this->quantity;
     }
 
 
-    public function getUnit(): string
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
