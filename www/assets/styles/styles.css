@@ -27,7 +27,6 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Navigation buttons styling */
 .nav-button {
     border-radius: 8px;
     transition: all 0.3s ease;
@@ -47,7 +46,6 @@ html {
     transform: translateY(0);
 }
 
-/* Auth buttons specific styling */
 .auth-button {
     border: 2px solid rgba(0, 123, 255, 0.3);
 }
@@ -382,7 +380,7 @@ html {
     margin: 0;
 }
 
-/* Only remove padding from the main layout columns, not internal content */
+/* Main section layout must have no padding (but the content must not) */
 .is-layout-container > .row > .col-lg-3.col-xl-2,
 .is-layout-container > .row > .col-lg-9.col-xl-10 {
     padding: 0;
@@ -394,12 +392,12 @@ html {
     padding: 1.5rem;
 }
 
-/* For IS pages that don't use container-fluid as direct child, add padding */
+/* IS pages that don't use container-fluid as direct child need padding */
 .content-wrapper > *:not(.container-fluid):not(.row) {
     padding: 1.5rem;
 }
 
-/* Ensure internal Bootstrap components maintain their natural spacing */
+/* Natural spacing for bootstrap components (there were some issues without it) */
 .content-wrapper .container-fluid .row {
     --bs-gutter-x: 1.5rem;
     margin-left: calc(-0.5 * var(--bs-gutter-x));
@@ -411,8 +409,7 @@ html {
     padding-right: calc(var(--bs-gutter-x) * 0.5);
 }
 
-
-/* Ensure modals work correctly and are always on top */
+/* Modal needs to appear above everything */
 .modal-backdrop {
     z-index: 9998 !important;
     position: fixed !important;
@@ -428,7 +425,6 @@ html {
     position: relative !important;
 }
 
-/* Ensure modal appears above everything */
 .modal.show {
     display: block !important;
     z-index: 9999 !important;
@@ -437,5 +433,3 @@ html {
 .modal.show .modal-dialog {
     z-index: 10000 !important;
 }
-
-/* No width constraints - full screen */
