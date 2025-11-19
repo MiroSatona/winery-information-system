@@ -84,30 +84,9 @@ html {
         text-align: center;
     }
 }
-
-/* Wine shop specific styles */
-.wine-card {
-    transition: all 0.3s ease;
-}
-
-.wine-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
-}
-
 .wine-image-container {
     height: 280px;
     overflow: hidden;
-}
-
-.wine-image {
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-}
-
-.wine-card:hover .wine-image {
-    transform: scale(1.05);
 }
 
 /* Form styling improvements */
@@ -130,11 +109,6 @@ html {
     font-size: 0.875rem;
     margin-top: 0.25rem;
     display: block;
-}
-
-/* Text effects */
-.text-shadow {
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
 }
 
 /* Authentication page centering */
@@ -322,26 +296,11 @@ html {
 
 /* IS Layout styling */
 
-/* Override main-content margin for IS layout */
-.main-content:has(.is-layout-container),
-body:has(.is-layout-container) .main-content {
-    margin-top: 0;
-}
-
-/* Fallback for browsers that don't support :has() */
-.is-layout-container {
-    margin-top: -80px;
-    position: relative;
-    top: 80px;
-}
-
 .is-sidebar {
     min-height: calc(100vh - 80px);
     margin: 0;
     padding: 0;
 }
-
-/* Remove all responsive sidebar width constraints to allow full flexibility */
 
 .sidebar-header {
     min-height: 60px;
@@ -452,19 +411,6 @@ body:has(.is-layout-container) .main-content {
     padding-right: calc(var(--bs-gutter-x) * 0.5);
 }
 
-/* Ensure Bootstrap margin utilities work properly inside content */
-.content-wrapper .mb-1 { margin-bottom: 0.25rem !important; }
-.content-wrapper .mb-2 { margin-bottom: 0.5rem !important; }
-.content-wrapper .mb-3 { margin-bottom: 1rem !important; }
-.content-wrapper .mb-4 { margin-bottom: 1.5rem !important; }
-.content-wrapper .mb-5 { margin-bottom: 3rem !important; }
-
-/* Restore card spacing and ensure Bootstrap utilities work */
-.content-wrapper .card {
-    margin-bottom: 0;
-}
-
-/* Ensure Bootstrap spacing utilities work correctly inside content-wrapper */
 
 /* Ensure modals work correctly and are always on top */
 .modal-backdrop {
@@ -490,23 +436,6 @@ body:has(.is-layout-container) .main-content {
 
 .modal.show .modal-dialog {
     z-index: 10000 !important;
-}
-
-/* Responsive adjustments for IS layout */
-@media (max-width: 991px) {
-    .is-sidebar {
-        min-height: auto;
-        max-width: 100%;
-    }
-    
-    .is-main-content {
-        min-height: auto;
-    }
-    
-    .is-layout-container {
-        margin-top: 0;
-        top: 0;
-    }
 }
 
 /* No width constraints - full screen */
