@@ -146,15 +146,17 @@
                                                             </tr>
                                                         </thead>
                                                         {if $task->isInConflict()}
-                                                            <div class="text-danger mt-2">
+                                                            <div class="text-danger mt-2 mb-1">
                                                                 <i class="fas fa-exclamation-triangle ms-2"></i>
                                                                 Červěně označené řádky jsou v konfliktu s vybranými řádky v rámci vedeného postřiku.
                                                             </div>
                                                         {/if}
-                                                        <tbody class="table-light">
+                                                        <tbody>
                                                             {foreach $wineRows as $wineRow}
                                                                 <tr class="{if $task->isInConflict()} 
-                                                                                bg-danger text-white 
+                                                                                table-danger text-white
+                                                                            {else}
+                                                                                table-light text-dark  
                                                                             {/if}">
                                                                     <td><strong>{$wineRow->getId()}</strong></td>
                                                                     <td>{$wineRow->getHeadCount()}</td>
@@ -170,11 +172,7 @@
                                                                     {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                         <td class="text-center">
                                                                             <a n:href="deleteTaskRows! $wineRow->getId()"
-                                                                            class="btn btn-sm {if $task->isInConflict()}
-                                                                                                    btn-outline-light
-                                                                                                {else}
-                                                                                                    btn-outline-danger
-                                                                                                {/if}">
+                                                                            class="btn btn-sm btn-outline-danger">
                                                                                 <i class="fas fa-minus me-1"></i>Odebrat
                                                                             </a>
                                                                         </td>
@@ -182,6 +180,7 @@
                                                                 </tr>
                                                             {/foreach}
                                                         </tbody>
+
                                                     </table>
                                                 </div>
                                             {else}
