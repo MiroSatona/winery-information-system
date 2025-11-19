@@ -1331,7 +1331,10 @@ final class TasksPresenter extends BasePresenter
     /**
      * 
      * 
-     * Details add and delete users.-------------------------------------------------------------
+     * Details add and delete users and wine rows
+     * 
+     * TODO: Redirect if error is reached
+     * TODO: How to solve issues
      * 
      */
     
@@ -1620,13 +1623,13 @@ final class TasksPresenter extends BasePresenter
         
         if ($task === null) {
             $this->flashMessage('Úkon nebyl nalezen.', 'error');
-            $this->redirect('this');
+            $this->redirect('this'); //TODO: redirect
             return;
         }
         
         if (!($task instanceof Treatment) && !($task instanceof Harvest)) {
             $this->flashMessage('Tento typ úkonu nepodporuje přidávání řádků.', 'error');
-            $this->redirect('this');
+            $this->redirect('this'); 
             return;
         }
         
@@ -1640,7 +1643,7 @@ final class TasksPresenter extends BasePresenter
             $this->flashMessage($result, 'error');
         }
 
-        $this->redirect('this');
+        $this->redirect('this'); 
     }
 
     public function handleDeleteTaskRows(int $rowId): void

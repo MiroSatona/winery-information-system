@@ -32,8 +32,15 @@
                                     </span>
                                 {/if}
                             </div>
+                            {if ($task instanceof App\Model\Task\Harvest\Harvest || $task instanceof App\Model\Task\Treatment\Treatment) && $task->isInConflict() }
+                            <div class="mt-2">
+                                <span class="badge bg-danger text-white fs-6">
+                                    <i class="fas fa-exclamation-triangle text-white ms-2"></i>
+                                    Úkon je v konfliktu s vybranými řádky v rámci vedeného postřiku.
+                                </span>
+                            </div>
+                            {/if}
                         </div>
-                        
                         <div class="d-flex gap-2 flex-wrap">
                             {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                 <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">

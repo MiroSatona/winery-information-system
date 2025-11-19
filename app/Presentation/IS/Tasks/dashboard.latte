@@ -82,7 +82,12 @@
                                 <tbody>
                                     {foreach $tasks as $task}
                                         <tr>
-                                            <td>{$task->getName()}</td>
+                                            <td>
+                                                {$task->getName()}
+                                                {if ($task instanceof $HarvestType || $task instanceof $TreatmentType) && $task->isInConflict()}
+                                                    <i class="fas fa-exclamation-triangle text-danger ms-2"></i>
+                                                {/if}
+                                            </td>
                                             <td>
                                                 {if $task instanceof $HarvestType}
                                                     Sklizeň
