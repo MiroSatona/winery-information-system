@@ -167,6 +167,15 @@
                                             </td>
                                         </tr>
                                     {/foreach}
+                                    {if count($orders) === 0}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné objednávky</h5>
+                                                <p>Zatím nebyly nalezeny žádné objednávky.</p>
+                                            </td>
+                                        </tr>
+                                    {/if}
                                 </tbody>
                             </table>
                         </div>
@@ -175,11 +184,5 @@
             </div>
         </div>
     </div>
-
-    {if count($orders) === 0}
-        <div class="alert alert-warning">
-            <i class="fas fa-exclamation-triangle me-2"></i>Žádné objednávky nebyly nalezeny.
-        </div>
-    {/if}
 
 {/block isMainPanel}
