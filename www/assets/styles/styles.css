@@ -9,6 +9,7 @@ body {
     width: 100%;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 .mainMenu {
@@ -320,8 +321,22 @@ html {
 }
 
 /* IS Layout styling */
+
+/* Override main-content margin for IS layout */
+.main-content:has(.is-layout-container),
+body:has(.is-layout-container) .main-content {
+    margin-top: 0;
+}
+
+/* Fallback for browsers that don't support :has() */
+.is-layout-container {
+    margin-top: -80px;
+    position: relative;
+    top: 80px;
+}
+
 .is-sidebar {
-    height: 100%;
+    min-height: calc(100vh - 80px);
     margin: 0;
     padding: 0;
 }
@@ -376,7 +391,7 @@ html {
 
 .is-main-content {
     background: #f8f9fa;
-    height: 100%;
+    min-height: calc(100vh - 80px);
     margin: 0;
     padding: 0;
 }
@@ -385,24 +400,20 @@ html {
     background: white;
     border-radius: 0;
     box-shadow: none;
-    height: 100%;
+    min-height: calc(100vh - 80px);
     width: 100%;
     margin: 0;
     padding: 0;
-    overflow-y: auto;
 }
 
-/* IS layout should take full viewport */
+/* IS layout should take full viewport without fixed positioning */
 .is-layout-container {
-    position: fixed;
-    top: 80px;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
     width: 100vw;
+    min-height: calc(100vh - 80px);
     max-width: none;
     overflow-x: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 /* Only apply constraints to the main layout grid, not internal content */
@@ -455,15 +466,46 @@ html {
 
 /* Ensure Bootstrap spacing utilities work correctly inside content-wrapper */
 
+/* Ensure modals work correctly and are always on top */
+.modal-backdrop {
+    z-index: 9998 !important;
+    position: fixed !important;
+}
+
+.modal {
+    z-index: 9999 !important;
+    position: fixed !important;
+}
+
+.modal-dialog {
+    z-index: 10000 !important;
+    position: relative !important;
+}
+
+/* Ensure modal appears above everything */
+.modal.show {
+    display: block !important;
+    z-index: 9999 !important;
+}
+
+.modal.show .modal-dialog {
+    z-index: 10000 !important;
+}
+
 /* Responsive adjustments for IS layout */
 @media (max-width: 991px) {
     .is-sidebar {
-        height: auto;
+        min-height: auto;
         max-width: 100%;
     }
     
     .is-main-content {
-        height: auto;
+        min-height: auto;
+    }
+    
+    .is-layout-container {
+        margin-top: 0;
+        top: 0;
     }
 }
 

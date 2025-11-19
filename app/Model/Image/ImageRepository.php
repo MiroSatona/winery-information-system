@@ -76,7 +76,11 @@ final class ImageRepository
 
     public function getPathForImage(Image $image): string
     {
-        return $this->uploadsDirWeb . '/' . $image->src;
+        if ($this->checkImageExists($image->src)) {
+            return $this->uploadsDirWeb . '/' . $image->src;
+        } else {
+            return $this->tmpImage . "/" . "tempImage.png";
+        }
     }
     
     public function getTmpWineImage(): string
