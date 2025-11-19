@@ -1595,7 +1595,7 @@ final class TasksPresenter extends BasePresenter
         
         $rowOptions = [];
         foreach ($availableRows as $row) {
-            $rowOptions[$row->getId()] = "Řádek {$row->getId()})";
+            $rowOptions[$row->getId()] = "Řádek {$row->getId()}";
         }
 
         $form->addSelect('rowCode', 'Řádek', $rowOptions)

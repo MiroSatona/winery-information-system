@@ -51,13 +51,6 @@
                                             </label>
                                             <p class="fs-6 text-dark mb-2">{$task->getQuantity()} {$task->getUnit()}</p>
                                         </div>
-
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold text-muted">
-                                                <i class="fas fa-ruler me-2"></i>Jednotka
-                                            </label>
-                                            <p class="fs-6 text-dark mb-2">{$task->getUnit()}</p>
-                                        </div>
                                     </div>
 
                                     <hr>
@@ -104,7 +97,7 @@
                                                             {if $task->isInConflict()}
                                                                 <div class="text-danger mt-2 mb-1">
                                                                     <i class="fas fa-exclamation-triangle ms-2"></i>
-                                                                    Červěně označené řádky jsou v konfliktu s vybranými řádky v rámci vedeného postřiku.
+                                                                    Červeně označené řádky jsou v konfliktu se sklizní (méně než 14 dní sklizeň - postřik).
                                                                 </div>
                                                             {/if}
                                                                 <tbody>
