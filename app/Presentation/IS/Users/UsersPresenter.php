@@ -56,7 +56,7 @@ final class UsersPresenter extends BasePresenter
             ->setHtmlAttribute('type', 'search')
             ->setHtmlAttribute('placeholder', 'Hledat uživatele')
             ->setHtmlAttribute('class', 'form-control form-control-sm flex-grow-1')
-            ->setHtmlAttribute('style', 'width: 400px;');
+            ->setHtmlAttribute('style', 'width: 300px;');
 
         // Set selection bar for filtering by role
         $form->addSelect('role', '', [

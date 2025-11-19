@@ -7,113 +7,128 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <span class="text-muted">Celkem uživatelů: <strong>{count($users)}</strong></span>
-        </div>
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-users me-2"></i>
+                                Přehled uživatelů
+                            </h4>
 
-        <div>
-            {control filterForm}
-        </div>
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                {control filterForm}
+                            </div>
 
-        <a href="{link Users:add}" class="btn btn-primary btn-sm">
-            <i class="fas fa-plus me-2"></i>Přidat nového uživatele
-        </a>
-    </div>
-
-    <div class="card border-0 shadow-sm">
-        <div class="card-body p-0">
-            <div class="table-responsive">
-                <table class="table table-hover mb-0">
-                    <thead class="table-primary">
-                        <tr>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-id-card-clip me-2"></i>ID
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-users me-2"></i>Jméno uživatele
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-user me-2"></i>Login
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-crown me-2"></i>Role
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-toggle-on me-2"></i>Stav
-                            </th>
-                            <th scope="col" class="fw-bold">
-                                <i class="fas fa-calendar me-2"></i>Registrován od
-                            </th>
-                            <th scope="col" class="fw-bold text-center" style="width: 240px;">
-                                <i class="fas fa-cogs me-2"></i>Akce
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {if $users}
-                            {foreach $users as $us}
-                                <tr class="align-middle ">
-                                    <td>
-                                        <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getId()}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getFullName()}</p>
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 text-dark px-3 py-2">{$us->getUsername()}</p>
-                                    </td>
-                                    <td>
-                                        {foreach $us->getRoles() as $role}
-                                            <span class="badge text-white" style="background-color:#0d6efd; m-0">{$role}</span>
+                            <div class="d-flex gap-2">
+                                <a href="{link Users:add}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus me-2"></i>Přidat uživatele
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <span class="text-muted">Celkem uživatelů: <strong>{count($users)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-id-card-clip me-2"></i>ID
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-users me-2"></i>Jméno uživatele
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-user me-2"></i>Login
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-crown me-2"></i>Role
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-toggle-on me-2"></i>Stav
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-calendar me-2"></i>Registrován od
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center" style="width: 240px;">
+                                            <i class="fas fa-cogs me-2"></i>Akce
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {if $users}
+                                        {foreach $users as $us}
+                                            <tr class="align-middle ">
+                                                <td>
+                                                    <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getId()}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 fw-semibold text-dark px-3 py-2">{$us->getFullName()}</p>
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 text-dark px-3 py-2">{$us->getUsername()}</p>
+                                                </td>
+                                                <td>
+                                                    {foreach $us->getRoles() as $role}
+                                                        <span class="badge text-white" style="background-color:#0d6efd; m-0">{$role}</span>
+                                                    {/foreach}
+                                                </td>
+                                                <td>
+                                                    {if $us->getState()}
+                                                        <span class="badge bg-success">Aktivní</span>
+                                                    {else}
+                                                        <span class="badge bg-secondary">Neaktivní</span>
+                                                    {/if}
+                                                </td>
+                                                <td>
+                                                    <p class="mb-0 text-dark px-3 py-2">{$us->getTimeStamp()->format('d.m.Y H:i')}</p>
+                                                </td>
+                                                <td>
+                                                    <div class="d-flex gap-2 justify-content-center">
+                                                        <a href="{link edit, id => $us->getId()}" 
+                                                        class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-edit me-1"></i>Upravit
+                                                        </a>
+                                                        {if $us->getState()}
+                                                        <button type="button" 
+                                                                class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deactivateUserModal{$us->getId()}">
+                                                                <i class="fas fa-trash me-1"></i>Deaktivovat
+                                                        </button>
+                                                        {else}
+                                                        <button type="button" 
+                                                                class="btn btn-outline-success btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#activateUserModal{$us->getId()}">
+                                                            <i class="fas fa-check me-1"></i>Aktivovat
+                                                        </button>
+                                                        {/if}
+                                                    </div>
+                                                </td>
+                                            </tr>
                                         {/foreach}
-                                    </td>
-                                    <td>
-                                        {if $us->getState()}
-                                            <span class="badge bg-success">Aktivní</span>
-                                        {else}
-                                            <span class="badge bg-secondary">Neaktivní</span>
-                                        {/if}
-                                    </td>
-                                    <td>
-                                        <p class="mb-0 text-dark px-3 py-2">{$us->getTimeStamp()->format('d.m.Y H:i')}</p>
-                                    </td>
-                                    <td>
-                                        <div class="d-flex gap-2 justify-content-center">
-                                            <a href="{link edit, id => $us->getId()}" 
-                                            class="btn btn-outline-primary btn-sm">
-                                                <i class="fas fa-edit me-1"></i>Upravit
-                                            </a>
-                                            {if $us->getState()}
-                                            <button type="button" 
-                                                    class="btn btn-outline-danger btn-sm" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#deactivateUserModal{$us->getId()}">
-                                                    <i class="fas fa-trash me-1"></i>Deaktivovat
-                                            </button>
-                                            {else}
-                                            <button type="button" 
-                                                    class="btn btn-outline-success btn-sm" 
-                                                        data-bs-toggle="modal" 
-                                                        data-bs-target="#activateUserModal{$us->getId()}">
-                                                <i class="fas fa-check me-1"></i>Aktivovat
-                                            </button>
-                                            {/if}
-                                        </div>
-                                    </td>
-                                </tr>
-                            {/foreach}
-                        {else}
-                            <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
-                                    <h5 class="text-muted">Žádní uživatelé</h5>
-                                    <p class="text-muted">Žádní uživatelé nejsou v těchto kategoriích k nalezení.</p>
-                                </td>
-                            </tr>
-                        {/if}
-                    </tbody>
-                </table>
+                                    {else}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-4">
+                                                <i class="fas fa-user-slash fa-3x text-muted mb-3"></i>
+                                                <h5 class="text-muted">Žádní uživatelé</h5>
+                                                <p class="text-muted">Žádní uživatelé nejsou v těchto kategoriích k nalezení.</p>
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

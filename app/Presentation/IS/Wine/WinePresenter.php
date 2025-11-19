@@ -970,10 +970,10 @@ final class WinePresenter extends BasePresenter
         if ($result) {
             // Clear session harvests
             $this->getSession('wineIS')->set('harvestsInProduction', []);
-            $this->flashMessage('Víno bylo úspěšně vyrobeno.', FlashMsgType::SUCCESS->value);
+            $this->flashMessage('Výroba vína byla úspěšně započata', FlashMsgType::SUCCESS->value);
             $this->redirect(':IS:Wine:dashboard');
         } else {
-            $this->flashMessage('Při výrobě vína došlo k chybě.', FlashMsgType::ERROR->value);
+            $this->flashMessage('Při nastavení začátku výroby vína došlo k chybě.', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
     }
