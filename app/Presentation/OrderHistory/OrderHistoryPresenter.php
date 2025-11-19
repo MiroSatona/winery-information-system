@@ -6,6 +6,7 @@ namespace App\Presentation\OrderHistory;
 
 use Nette;
 use App\Model\Orders\OrderRepository;
+use App\Model\Orders\OrderState;
 use App\Presentation\BasePresenter;
 use App\Model\FlashMsgType;
 use App\Model\Image\ImageRepository;
@@ -37,7 +38,7 @@ final class OrderHistoryPresenter extends BasePresenter
         
         $this->template->orders = $orders;
         $this->template->message = '';
-        
+        $this->template->OrderState = OrderState::class;
     }
 }
 

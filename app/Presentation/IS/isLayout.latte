@@ -21,8 +21,8 @@
 
 {block content}
 	<div class="is-layout-container h-100">
-		<div class="row g-0 h-100">
-			<div class="col-lg-3 col-xl-2 is-sidebar bg-light border-end d-flex flex-column">
+		<div class="row g-0 h-100 m-0">
+			<div class="col-lg-3 col-xl-2 is-sidebar bg-light border-end d-flex flex-column p-0">
 				<div class="sidebar-header p-3 border-bottom bg-primary text-white">
 					<h5 class="mb-0 fw-bold">
 						<i class="fas fa-cogs me-2"></i>IS Panel
@@ -36,7 +36,7 @@
 					{/if}
 					{if $userWorker || $userVintner}
 					<a href="{link Tasks:dashboard}" class="is-nav-btn">
-						<i class="fas fa-tasks me-2"></i>Úkony
+						<i class="fas fa-clipboard-list me-2"></i>Úkony
 					</a>
 					{/if}
 					{if $userWorker || $userVintner}
@@ -66,8 +66,8 @@
 					{/if}
 				</nav>
 			</div>
-			<div class="col-lg-9 col-xl-10 is-main-content">
-				<div class="content-wrapper p-4 h-100">
+			<div class="col-lg-9 col-xl-10 is-main-content p-0 m-0">
+				<div class="content-wrapper h-100">
 					{include isMainPanel}
 				</div>
 			</div>

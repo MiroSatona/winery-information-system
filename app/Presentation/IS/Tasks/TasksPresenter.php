@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Tasks;
 
-use App\Model\Bottle\Bottle;
 use App\Model\FlashMsgType;
 use Nette\Application\UI\Form;
 use App\Presentation\BasePresenter;
@@ -30,7 +29,6 @@ use App\Model\Task\Treatment\TreatmentType;
 use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
-use App\Model\User\User;
 use Tracy\Debugger;
 use Tracy\ILogger;
 

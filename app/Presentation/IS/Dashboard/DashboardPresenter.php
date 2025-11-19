@@ -13,11 +13,6 @@ use App\Model\Task\Treatment\Treatment;
 use App\Model\Task\Bottling\Bottling;
 use App\Model\Orders\OrderRepository;
 use App\Model\Orders\OrderState;
-use App\Model\User\UserRepository;
-use App\Model\Wine\WineRepository;
-use App\Model\Vineyard\VineyardRepository;
-use App\Model\WineVariety\WineVarietyRepository;
-use App\Model\FlashMsgType;
 use Nette\Utils\DateTime;
 
 final class DashboardPresenter extends BasePresenter
@@ -25,11 +20,7 @@ final class DashboardPresenter extends BasePresenter
 
     public function __construct(
         private TaskRepository $taskRepository,
-        private OrderRepository $orderRepository,
-        private UserRepository $userRepository,
-        private WineRepository $wineRepository,
-        private VineyardRepository $vineyardRepository,
-        private WineVarietyRepository $wineVarietyRepository
+        private OrderRepository $orderRepository
     ) {
         parent::__construct();
     }
@@ -93,7 +84,7 @@ final class DashboardPresenter extends BasePresenter
         
         // Filter orders awaiting delivery
         $readyOrders = array_filter($allOrders, function($order) {
-            return $order->state === OrderState::paid->value;
+            return $order->state === OrderState::PAID->value;
         });
         
         // Sort by timestamp
