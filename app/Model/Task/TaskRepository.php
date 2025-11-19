@@ -19,6 +19,9 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\WineRow\WineRow;
 use App\Model\User\User;
 use App\Model\Task\TaskOperationStatus;
+use App\Model\Task\Harvest\Harvest;
+use App\Model\Task\Treatment\Treatment;
+use App\Model\Task\Treatment\TreatmentType;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
@@ -77,6 +80,7 @@ class TaskRepository{
             $tasks = array_merge($harvests, $treatments, $bottlings);
         }
 
+        $this->updateTasksConflicts($tasks);
         return $tasks;
     }
 
@@ -85,9 +89,10 @@ class TaskRepository{
      * Method for fetch a task joined with its specific table (bottling, harvest, or treatment).
      *
      * @param int $id ID of the task.
+     * @param bool $updateConflicts Whether to check and update conflict status
      * @return Task|null Returns the corresponding Task object, or null if not found.
      */
-    public function fetchById(int $id): ?Task
+    public function fetchById(int $id, bool $updateConflicts = true): ?Task
     {
        
         $bottling = $this->bottlingRepository->fetchById($id);
@@ -96,15 +101,54 @@ class TaskRepository{
         }
         $harvest = $this->harvestRepository->fetchById($id);
         if ($harvest !== null) {
+            if ($updateConflicts) {
+                $this->updateTaskConflicts($harvest);
+            }
             return $harvest;
         }
         $treatment = $this->treatmentRepository->fetchById($id);
         if ($treatment !== null) {
+            if ($updateConflicts) {
+                $this->updateTaskConflicts($treatment);
+            }
             return $treatment;
         }
 
         return null;
 
+    }
+   
+    /**
+     * Method to add information about task conflicts
+     *
+     * @param Task $oneTask
+     * @return void
+     */
+    private function updateTaskConflicts(Task $oneTask) {
+       
+        /**
+        * @var WineRow[]
+        */
+        $taskRows = $this->fetchTaskRows($oneTask->getId());
+       
+        foreach($taskRows as $row) {
+            if ($row->isInConflict()) {
+                $oneTask->setInConflict();
+                return;
+            }
+        }
+    }
+
+    /**
+     * Method to add information about task conflicts
+     *
+     * @param Task[] $oneTask
+     * @return void
+     */
+    private function updateTasksConflicts(array $tasks) {
+        foreach ($tasks as $task) {
+           $this->updateTaskConflicts($task);
+        }
     }
 
     public function markTaskDone(Task $task, int $confirmerId, DateTime $executionDate): bool
@@ -460,7 +504,6 @@ class TaskRepository{
             foreach ($idRows as $code) {
                 if (!$this->rowIsSafeForHarvest($vineyardId, $code, $harvestDate)) {
                     $currentStatus = TaskOperationStatus::CONFLICT_WITH_TREATMENT;
-                    // Don't break - we still want to create the task, just mark it as conflicted
                 }
             }
 
@@ -654,6 +697,9 @@ class TaskRepository{
 
     public function fetchTaskRows(int $taskId): array
     {
+        $task = $this->fetchById($taskId, false); // Pass false to prevent infinite recursion
+        $planedDate = $task->getExecutionTimestamp() ?? $task->getPlannedTimestamp();
+
         $taskRows = $this->database->table('TASK_ROW')
             ->where('ID_TASK', $taskId)
             ->fetchAll();
@@ -667,7 +713,7 @@ class TaskRepository{
                 ->fetch();
             
             if ($wineRow) {
-                $wineRowObjects[] = new WineRow(
+                $row = new WineRow(
                     (int)$wineRow->CODE,
                     (bool)$wineRow->ACTIVE,
                     (int)$wineRow->ID_VINEYARD,
@@ -675,6 +721,24 @@ class TaskRepository{
                     (int)$wineRow->HEAD_COUNT,
                     (int)$wineRow->PLANTING_YEAR
                 );
+                if ($task instanceof Harvest) {
+                    if (!$this->rowIsSafeForHarvest(
+                        $task->getVineyard()->getId(),
+                        $row->getId(),
+                        $planedDate                 
+                        )) {
+                            $row->setInConflict();
+                        }
+                } else if ($task instanceof Treatment && $task->getType() == TreatmentType::SPRAYING) {
+                    if (!$this->rowIsSafeForSprayingTreatment(
+                        $task->getVineyard()->getId(),
+                        $row->getId(),
+                        $planedDate
+                    )) {
+                        $row->setInConflict();
+                    }
+                }
+                $wineRowObjects[] = $row;
             }
         }
         
