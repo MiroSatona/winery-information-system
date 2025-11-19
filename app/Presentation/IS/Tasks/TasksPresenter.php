@@ -953,7 +953,8 @@ final class TasksPresenter extends BasePresenter
         ->setHtmlAttribute('class', 'form-select')
         ->setHtmlAttribute('placeholder', 'Vyberte odrůdu');
     
-        $form->addSubmit("submit", "vybrat");
+        $form->addSubmit("submit", "Vybrat")
+            ->setHtmlAttribute('class', 'btn btn-primary');
     
         $form->onSuccess[] = [$this, "selectVineVariety"];
         
@@ -1284,8 +1285,6 @@ final class TasksPresenter extends BasePresenter
             default: 
                 break;
         }
-        
-        bdump($result->value);
         
         if ($result === TaskOperationStatus::SUCCESS) {
             $this->flashMessage("Úkon uložen", FlashMsgType::SUCCESS->value);
