@@ -15,34 +15,40 @@
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-primary text-white py-3">
                 <h4 class="mb-0 fw-bold">
-                    <i class="fas fa-wine-bottle me-2"></i>
+                    <i class="fas fa-wine-glass me-2"></i>
                     Zařazení vína do prodeje
                 </h4>
             </div>
 
             <div class="card-body p-4">
-                {* === WINE INFO === *}
-                <div class="d-flex align-items-center mb-4">
-                    {if $wine->img !== null}
-                        <img src="{asset $imageRepository->getPathForImage($wine->img)}"
-                            alt="{$wine->name}" class="img-thumbnail me-3 shadow-sm"
-                            style="width: 100px; height: auto; object-fit: cover;">
-                    {else}
-                        <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded me-3"
-                            style="width: 100px; height: 100px;">
-                            <i class="fas fa-wine-bottle fa-2x text-muted"></i>
+                {* === WINE INFO CARD === *}
+                <div class="mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light py-3">
+                            <h5 class="mb-0 fw-bold text-primary">
+                                <i class="fas fa-wine-glass me-2"></i>{$wine->name}
+                            </h5>
                         </div>
-                    {/if}
-                    <div>
-                        <h5 class="fw-bold mb-1 text-primary">{$wine->name}</h5>
-                        <small class="text-muted">Nastavte prodejní cenu a potvrďte zařazení vína do nabídky.</small>
+                        <div class="card-body p-3 text-center">
+                            <div class="current-image-container">
+                                {if $wine->img !== null}
+                                    <img src="{asset $imageRepository->getPathForImage($wine->img)}"
+                                         alt="{$wine->name}" 
+                                         class="img-fluid rounded shadow-sm"
+                                         style="max-height: 200px; object-fit: cover;">
+                                {else}
+                                    <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded"
+                                         style="height: 200px;">
+                                        <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                <hr class="mb-4">
-
                 {* === PRICE FORM === *}
-                 {form setWinePriceForm}
+                {form setWinePriceForm}
                     <div class="mb-3">
                         <label for="price" class="form-label fw-semibold">
                             <i class="fas fa-coins me-2 text-muted"></i>{label price /}
@@ -66,9 +72,6 @@
                         <span class="invalid-feedback">
                             {inputError popis}
                         </span>
-                        <small class="form-text text-muted">
-                            Tento popis se zobrazí zákazníkům v detailu produktu.
-                        </small>
                     </div>
 
                     <div class="alert alert-info mb-4">
@@ -88,7 +91,7 @@
                                 </a>
                             </div>
                             <div class="col-12 col-md-6">
-                                {input send, class => 'btn btn-success w-100 fw-bold'}
+                                {input send, class => 'btn btn-primary w-100 fw-bold'}
                                 <span class="invalid-feedback">
                                     {inputError send}
                                 </span>

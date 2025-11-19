@@ -6,9 +6,9 @@ namespace App\Model\Orders;
 
 enum OrderState: string
 {
-    case reserved = "RESERVED";
-    case paid = "PAID";
-    case cancelled = "CANCELLED";
-    case delivered = "DELIVERED";
+    case RESERVED = "RESERVED";
+    case PAID = "PAID";
+    case CANCELLED = "CANCELLED";
+    case DELIVERED = "DELIVERED";
 }
 

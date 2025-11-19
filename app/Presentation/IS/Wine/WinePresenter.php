@@ -195,7 +195,7 @@ final class WinePresenter extends BasePresenter
            return;
         }
 
-        if ($wine->state !== WINeState::BOTTLED->value) {
+        if ($wine->state !== WineState::BOTTLED) {
             $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
             $this->redirect(":IS:Wine:dashboard");
             return;
@@ -221,7 +221,7 @@ final class WinePresenter extends BasePresenter
            return;
         }
 
-        if ($wine->state !== WineState::SALE->value) {
+        if ($wine->state !== WineState::SALE) {
             $this->flashMessage("Jen víno, které je ve fázi lahvování se může přidat do prodeje!", FlashMsgType::ERROR->value);
             $this->redirect(":IS:Wine:dashboard");
             return;
@@ -240,17 +240,20 @@ final class WinePresenter extends BasePresenter
         $form = new Form();
 
         $form->addFloat('price', 'Cena za láhev (Kč)')
-            ->addRule(Form::Min, "jsi bot", ValidationDefinitions::PRICE_MIN)
-            ->addRule(Form::Max, "jis bot v2", ValidationDefinitions::PRICE_MAX)
+            ->addRule(Form::Min, "Minimální cena láhve je %d", ValidationDefinitions::PRICE_MIN)
+            ->addRule(Form::Max, "Maximální cena láhve je %d", ValidationDefinitions::PRICE_MAX)
             ->setRequired('Zadejte cenu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte cenu např. 249.90');
 
         $form ->addTextArea("popis", "Prodejní popis")
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('rows', '3')
+            ->setHtmlAttribute('placeholder', 'Poznámka zobrazená k vínu v obchodě...')
             ->setRequired("Zadejte prodejní popis");
 
         $form->addSubmit('send', 'Potvrdit')
-            ->setHtmlAttribute('class', 'btn btn-success');
+            ->setHtmlAttribute('class', 'btn btn-primary');
 
         $form->onSuccess[] = [$this, 'setWinePriceFormSucceeded'];
         return $form;
@@ -277,7 +280,7 @@ final class WinePresenter extends BasePresenter
         }
         
         $result = true;
-        if ($wine->state == WineState::BOTTLED->value) {
+        if ($wine->state == WineState::BOTTLED) {
             $result = $this->wineRepository->updateWinePrice($wineId, $price, false);
             $this->wineRepository->setWineState($wineId, WineState::SALE->value);
         }

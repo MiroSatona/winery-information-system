@@ -89,7 +89,7 @@ final class OrderRepository
     public function fetchCustomerOrder(int $userId, bool $createIfNotfound = false) {
         $row = $this->db->table("CUSTOMER_ORDER")
         ->where("ID_CUSTOMER", $userId)
-        ->where("STATE", OrderState::reserved)
+        ->where("STATE", OrderState::RESERVED)
         ->fetch();
    
         if ($row !== null) {
@@ -104,7 +104,7 @@ final class OrderRepository
         $insertData = [
             "ID_CUSTOMER" => $userId,
             "TOTAL_PRICE" => 0.00,
-            "STATE" => OrderState::reserved,
+            "STATE" => OrderState::RESERVED,
             "DELIVERY_TYPE" => "PICKUP",      // Required (no default)
             "DELIVERY_DATA" => "",
         ];

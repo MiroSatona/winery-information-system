@@ -32,17 +32,21 @@
                                 </div>
                                 <div>
                                     {switch $order->state}
-                                        {case 'RESERVED'}
+                                        {case $OrderState::RESERVED->value}
                                             <span class="badge bg-warning text-dark">
                                                 <i class="fa-solid fa-clock me-1"></i> Rezervováno
                                             </span>
-                                        {case 'PAID'}
+                                        {case $OrderState::PAID->value}
                                             <span class="badge bg-success">
                                                 <i class="fa-solid fa-check me-1"></i> Zaplaceno
                                             </span>
-                                        {case 'CANCELLED'}
+                                        {case $OrderState::CANCELLED->value}
                                             <span class="badge bg-danger">
                                                 <i class="fa-solid fa-xmark me-1"></i> Zrušeno
+                                            </span>
+                                        {case $OrderState::DELIVERED->value}
+                                            <span class="badge bg-success">
+                                                <i class="fa-solid fa-check me-1"></i> Odesláno
                                             </span>
                                         {default}
                                             <span class="badge bg-secondary">

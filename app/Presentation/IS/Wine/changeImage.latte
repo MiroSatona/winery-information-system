@@ -15,7 +15,7 @@
             <div class="card border-0 shadow-sm">
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0 fw-bold">
-                        <i class="fas fa-camera me-2"></i>
+                        <i class="fas fa-image me-2"></i>
                         Změna obrázku vína {$wine->getName()}
                     </h4>
                 </div>
@@ -24,9 +24,6 @@
                     <div class="text-center">
                         <div class="current-image-container border rounded p-3 bg-light">
                             {if $wine->getImage()}
-                                <h6 class="text-muted mb-3">
-                                    <i class="fas fa-image me-2"></i>Současný obrázek
-                                </h6>
                                 <img src="{asset $imageRepository->getPathForImage($wine->getImage())}" 
                                         alt="{$wine->getImage()->description}" 
                                         class="img-fluid rounded shadow-sm current-wine-image"
@@ -50,11 +47,12 @@
                             {/if}
                         </div>
                     </div>
+                    <hr>
                 {* Upload form *}
                     {form changeImageForm}
                         <div class="mb-3">
                             <label for="image" class="form-label fw-semibold">
-                                <i class="fas fa-camera me-2 text-muted"></i>
+                                <i class="fas fa-image me-2 text-muted"></i>
                                 {if $wine->getImage()}
                                     Změnit obrázek vína
                                 {else}

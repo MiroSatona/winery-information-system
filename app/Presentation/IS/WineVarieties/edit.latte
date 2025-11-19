@@ -28,7 +28,7 @@
                             {form editWineVariety}
                                 <div class="mb-3">
                                     <label for="name" class="form-label fw-semibold">
-                                        <i class="fas fa-tag me-2 text-muted"></i>{label name /}
+                                        <i class="fas fa-seedling me-2 text-muted"></i>{label name /}
                                         <span class="text-danger">*</span>
                                     </label>
                                     {input name}
@@ -50,7 +50,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="description" class="form-label fw-semibold">
-                                        <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
+                                        <i class="fas fa-align-left me-2 text-muted"></i>{label description /}
                                     </label>
                                     {input description}
                                     <span class="invalid-feedback">
@@ -60,7 +60,7 @@
                                 
                                 <div class="mb-3">
                                     <label for="image" class="form-label fw-semibold">
-                                        <i class="fas fa-camera me-2 text-muted"></i>
+                                        <i class="fas fa-image me-2 text-muted"></i>
                                         {if $wineVariety->getImage()}
                                             Změnit obrázek
                                         {else}
