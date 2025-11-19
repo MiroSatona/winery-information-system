@@ -153,7 +153,6 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Zadejte lokaci vinohradu');
 
         $form->addTextArea('description', 'Detailní popis')
-            ->setRequired('Zadejte popis vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
@@ -201,13 +200,18 @@ final class VineyardsPresenter extends BasePresenter
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek vinohradu ' . $values->name);
         }
 
+        $description = null;
+        if ($values->description !== null && strlen($values->description) > 0) {
+            $description = $values->description;
+        }
+
         $vineyard = new Vineyard(
             null,
             true,
             $values->name,
             $values->location,
             $imageEntity,
-            $values->description,
+            $description,
             $values->year
         );
 
@@ -272,7 +276,6 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Zadejte lokaci vinohradu');
 
         $form->addTextArea('description', 'Detailní popis')
-            ->setRequired('Zadejte popis vinohradu.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis vinohradu');
@@ -333,6 +336,11 @@ final class VineyardsPresenter extends BasePresenter
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek vinohradu ' . $values->name);
         }
 
+        $description = null;
+        if ($values->description !== null && strlen($values->description) > 0) {
+            $description = $values->description;
+        }
+
         // Update vineyard with new values
         $updatedVineyard = new Vineyard(
             $vineyardId,
@@ -340,7 +348,7 @@ final class VineyardsPresenter extends BasePresenter
             $values->name,
             $values->location,
             $imageEntity,
-            $values->description,
+            $description,
             $values->year
         );
 
