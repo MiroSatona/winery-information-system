@@ -21,9 +21,19 @@ class Task
         private ?DateTime $executionTimestamp,
         private ?string $note,
         private ?int $idTaskIssuer,
-        private ?int $idTaskConfirmer
+        private ?int $idTaskConfirmer,
+        private bool $inConflict=false
     ) {
 
+    }
+    
+    public function isInConflict(): bool 
+    {
+        return $this->inConflict;
+    }
+    
+    public function setInConflict() {
+        $this->inConflict = true;
     }
 
     public function getId(): int

@@ -16,8 +16,17 @@ final class WineRow
         private int $vineyardId,
         private int $wineVarietyId,
         private int $headCount,
-        private int $yearPlanted
+        private int $yearPlanted,
+        private bool $inConflict=false
     ) {
+    }
+    
+    public function setInConflict() {
+        $this->inConflict=true;
+    }
+    
+    public function isInConflict() {
+        return $this->inConflict;
     }
 
 
