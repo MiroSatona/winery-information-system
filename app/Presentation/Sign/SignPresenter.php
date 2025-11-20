@@ -1,4 +1,14 @@
 <?php
+//FILE:     SignPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Presenter for sing in operation	
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 
 declare(strict_types=1);
 
@@ -15,33 +25,62 @@ use Nette\Security\AuthenticationException;
 use Nette\Forms\Controls\TextInput;
 use Nette\Forms\Controls\TextArea;
 
+/**
+ * Presenter for user authentication operations
+ * Handles sign in, sign up, and sign out functionality
+ */
 final class SignPresenter extends BasePresenter
 {
+    /**
+     * Constructor for SignPresenter
+     * @param SignUpWorker $signUpWorker Worker for handling user registration
+     * @param ValidationDefinitions $validationDefinitions Validation rules and patterns
+     */
     public function __construct(private SignUpWorker $signUpWorker, private ValidationDefinitions $validationDefinitions)
     {
         parent::__construct();
     }
 
+    /**
+     * Startup method called before any action
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
     }
 
+    /**
+     * Renders the default sign page
+     * @return void
+     */
     public function renderDefault(): void
     {
 
     }
 
+    /**
+     * Renders the sign in page
+     * @return void
+     */
     public function renderIn(): void
     {
 
     }
 
+    /**
+     * Renders the sign up page
+     * @return void
+     */
     public function renderUp(): void
     {
         
     }
 
+    /**
+     * Creates the sign in form component
+     * @return Form Form for user authentication
+     */
     public function createComponentSignInForm(): Form
     {
         $form = new Form;
@@ -76,6 +115,12 @@ final class SignPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Processes the sign in form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing username and password
+     * @return void
+     */
     public function processSignInForm(Form $form, \stdClass $values): void
     {
         try {
@@ -87,6 +132,10 @@ final class SignPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the sign up form component
+     * @return Form Form for new user registration
+     */
     public function createComponentSignUpForm(): Form
     {
         $form = new Form;
@@ -188,6 +237,12 @@ final class SignPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Processes the sign up form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing user registration data
+     * @return void
+     */
     public function processSignUpForm(Form $form, \stdClass $values): void
     {
         $phone = null;
@@ -240,6 +295,10 @@ final class SignPresenter extends BasePresenter
         $this->redirect('Sign:in');
     }
 
+    /**
+     * Action for logging out the user
+     * @return void
+     */
     public function actionOut(): void
     {
         $this->getUser()->logout();

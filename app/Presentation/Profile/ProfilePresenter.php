@@ -1,4 +1,14 @@
 <?php
+//FILE:     ProfilePresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for the User Profile
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 
 namespace App\Presentation\Profile;
 
@@ -9,8 +19,10 @@ use Nette\Application\UI\Form;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\Profile\ProfileModel;
 
-
-
+/**
+ * Presenter for user profile management
+ * Handles viewing and editing user profile information and password changes
+ */
 class ProfilePresenter extends BasePresenter
 {
     /** @var int|null ID of the user who is logged in */
@@ -24,9 +36,10 @@ class ProfilePresenter extends BasePresenter
     private ProfileModel $profileModel;
 
     /**
-     * ProfilePresenter constructor.
-     *
-     * @param UserRepository $userRepository Repository used to fetch user data.
+     * ProfilePresenter constructor
+     * @param UserRepository $userRepository Repository used to fetch user data
+     * @param ValidationDefinitions $validationDefinitions Repository used for validation definitions
+     * @param ProfileModel $profileModel Model used for profile operations
      */
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions, ProfileModel $profileModel)
     {
@@ -36,6 +49,11 @@ class ProfilePresenter extends BasePresenter
         $this->profileModel = $profileModel;
     }
 
+    /**
+     * Startup method called before any action
+     * Initializes the userId from the current logged-in user
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -43,9 +61,8 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-     * renderDefault
-     * Method to render the default profile view.
-     *
+     * Renders the default profile view
+     * Displays the current user's profile information
      * @return void
      */
     public function renderDefault(): void
@@ -64,6 +81,11 @@ class ProfilePresenter extends BasePresenter
         $this->template->currentUser = $currentUser;
     }
     
+    /**
+     * Renders the profile edit view
+     * Loads user data and populates the edit form with current values
+     * @return void
+     */
     public function renderEdit():void
     {
 
@@ -93,10 +115,9 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-     * createComponentEditProfileByUserForm
-     * Method to create the form for editing user profile by user.
-     *
-     * @return Form Form with data for editing user profile.
+     * Creates the form component for editing user profile
+     * Form contains fields for personal information, address, and username
+     * @return Form Form with data for editing user profile
      */
     public function createComponentEditProfileByUserForm(): Form
     {
@@ -173,10 +194,9 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-     * resetPasswordForm
-     * Method to create the reset password form.
-     *
-     * @return Form The reset password form.
+     * Creates the form component for resetting user password
+     * Form requires old password and new password confirmation
+     * @return Form The reset password form
      */
     public function createComponentResetPasswordForm(): Form
     {
@@ -209,8 +229,8 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-     * editDetailsByUser
-     *  Method for handling user details of his profile when he wants edit
+     * Handles user profile details editing by the user themselves
+     * Compares old and new data and saves only the changed fields
      * @param Form $form Form for editing user details
      * @param \stdClass $values Values submitted from the form
      * @return void
@@ -270,10 +290,10 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-     * editDetailsByUser
-     *
-     * @param Form $form
-     * @param \stdClass $values
+     * Handles password reset for the logged-in user
+     * Verifies old password and sets the new password
+     * @param Form $form The password reset form
+     * @param \stdClass $values Values submitted from the form (oldPassword, newPassword)
      * @return void
      */
     public function resetPassword(Form $form, \stdClass $values): void
@@ -295,12 +315,10 @@ class ProfilePresenter extends BasePresenter
     }
 
     /**
-    * formError
-    * Method for handling form errors.
-    *
-    * @param Form $form Form where the error was detected.
-    * @return void
-    */
+     * Handles form errors by displaying them as flash messages
+     * @param Form $form Form where the error was detected
+     * @return void
+     */
     public function formError(Form $form): void
     {
         $errors = $form->getErrors();
