@@ -151,6 +151,14 @@ class TaskRepository{
         }
     }
 
+    /**
+     * method for marking task as complete
+     * 
+     * @param Task $task
+     * @param integer $confirmerId
+     * @param DateTime $executionDate
+     * @return boolean
+     */
     public function markTaskDone(Task $task, int $confirmerId, DateTime $executionDate): bool
     {
         try {
@@ -183,6 +191,13 @@ class TaskRepository{
         }
     }
 
+    /**
+     * method for finding out, if a user is assigned to a task
+     *
+     * @param integer $userId
+     * @param integer $taskId
+     * @return boolean
+     */
     public function isUserAssignedToTask(int $userId, int $taskId): bool
     {
         $workerRow = $this->database->table('WORKER')
@@ -296,35 +311,43 @@ class TaskRepository{
         return true; // Safe - no conflicts found
     }
 
-    public function createBottlingTask(TaskData $data, int $userId): bool {
+    /**
+     * method for creating a bottling task
+     * 
+     * @param TaskData $data
+     * @param integer $userId
+     * @return void 
+     */
+    public function createBottlingTask(TaskData $data, int $userId): void {
 
         // Basic validation
         try {
             // name
             $name = trim($data->getName());
             if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
-                throw new \Exception('Invalid task name');
+                throw new \Exception("Neplatné jméno");
             }
 
             // wine id
             $idWine = $data->getIdWine();
             if ($idWine === null) {
-                throw new \Exception('No wine selected for bottling');
+                throw new \Exception('Nebylo vybráno žádné víno pro lahvování');
             }
 
             // bottle volume
             $bottleVolume = $data->getBottleVolume();
             if ($bottleVolume === null || !is_numeric($bottleVolume) || $bottleVolume <= 0.0) {
-                throw new \Exception('Invalid bottle volume');
+                throw new \Exception('Neplatný objem láhve');
             }
+
             if ($bottleVolume < ValidationDefinitions::BOTTLE_VOLUME_MIN || $bottleVolume > ValidationDefinitions::BOTTLE_VOLUME_MAX) {
-                throw new \Exception('Bottle volume out of allowed range');
+                throw new \Exception('Objem láhve je mimo povolený rozsah');
             }
 
             // check wine exists and is in correct state (production)
             $wineRow = $this->database->table('WINE')->where('ID', $idWine)->fetch();
             if ($wineRow === null) {
-                throw new \Exception('Specified wine does not exist');
+                throw new \Exception('Zadané víno neexistuje');
             }
 
             // Validate users exist and have worker role
@@ -353,7 +376,7 @@ class TaskRepository{
             }
 
             if ($bottlesCount <= 0) {
-                throw new \Exception('Computed bottles count is zero or invalid');
+                throw new \Exception('Vypočtený počet lahví je nula nebo neplatný');
             }
 
             // begin transaction
@@ -411,7 +434,7 @@ class TaskRepository{
             ]);
 
             if ($bottlingRow === null) {
-                throw new \Exception('Failed to insert bottling');
+                throw new \Exception('Nepodařilo se vložit lahvování');
             }
 
             // assign workers if provided
@@ -424,19 +447,26 @@ class TaskRepository{
             }
 
             $this->database->commit();
-            return true;
 
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
                 // ignore
+                bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             bdump('Failed to create bottling task: ' . $e->getMessage());
-            return false;
+            throw $e;
         }
     }
     
+    /**
+     * Method for creating a Harvest task
+     *
+     * @param TaskData $data
+     * @param integer $userId
+     * @return TaskOperationStatus
+     */
     public function createHarvestTask(TaskData $data, int $userId): TaskOperationStatus {
         
         $currentStatus = TaskOperationStatus::SUCCESS;
@@ -445,22 +475,22 @@ class TaskRepository{
             // validate basic fields
             $name = trim($data->getName());
             if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
-                throw new \Exception('Invalid task name');
+                throw new \Exception('Neplatné jméno úkonu');
             }
 
             $vineyardId = $data->getIdWineYard();
             if ($vineyardId === null) {
-                throw new \Exception('No vineyard selected');
+                throw new \Exception('Nebyl vybrán žádný vinohrad');
             }
 
             $wineVarietyId = $data->getIdWineVariety();
             if ($wineVarietyId === null) {
-                throw new \Exception('No wine variety selected');
+                throw new \Exception('Nebyla vybrána žádná odrůda vína');
             }
 
             $idRows = $data->getIdRows() ?? [];
             if (empty($idRows)) {
-                throw new \Exception('No rows selected for harvest');
+                throw new \Exception('Nebyly vybrány žádné řádky pro sklizeň');
             }
 
             // validate each row: exists, belongs to vineyard and variety, is active
@@ -485,11 +515,11 @@ class TaskRepository{
                     ->fetch();
                 
                 if ($userRow === null) {
-                    throw new \Exception('Invalid or inactive user: ' . $workerId);
+                    throw new \Exception('Neplatný nebo neaktivní uživatel: ' . $workerId);
                 }
                 
                 if (!$userRow->ROLE_WORKER) {
-                    throw new \Exception('User ' . $workerId . ' does not have worker role');
+                    throw new \Exception('Uživatel ' . $workerId . ' nemá roli pracovníka');
                 }
             }
 
@@ -521,7 +551,7 @@ class TaskRepository{
             ]);
 
             if ($taskRow === null || !isset($taskRow->ID)) {
-                throw new \Exception('Failed to insert task');
+                throw new \Exception('Nepodařilo se vložit úkon');
             }
 
             $taskId = (int) $taskRow->ID;
@@ -538,7 +568,7 @@ class TaskRepository{
             ]);
 
             if ($harvestRow === null) {
-                throw new \Exception('Failed to insert harvest');
+                throw new \Exception('Nepodařilo se vložit sklizeň');
             }
 
             // link selected rows in TASK_ROW
@@ -567,9 +597,11 @@ class TaskRepository{
                 $this->database->rollBack();
             } catch (\Throwable $t) {
                 // ignore
+                bdump("Failed to do a db rollback: " . $t->getMessage());
             }
+
             bdump('Failed to create bottling task: ' . $e->getMessage());
-            return TaskOperationStatus::FAILED;
+            throw $e;
         }
 
     }
@@ -652,13 +684,18 @@ class TaskRepository{
     }
 
     
-
+    /**
+     * Method for adding workers to a task
+     * 
+     * @param integer $taskId
+     * @param integer $workerId
+     * @return string
+     */
     public function addWorkerToTask(int $taskId, int $workerId): string
     {   
         /** @var string $error Error message */
         $error='';
         $this->database->beginTransaction();
-
 
         try 
         {
@@ -670,13 +707,23 @@ class TaskRepository{
             return $error;
         }
         catch (\Exception $exception) {
-            $this->database->rollBack();
+            try {
+                $this->database->rollBack();
+            } catch (\Throwable $t) {
+                bdump("Failed to do a db rollback: " . $t->getMessage());
+            }
             $error = 'Chyba při přidávání pracovníka:' . $exception->getMessage();
             return $error;
         }
     }
 
-
+    /**
+     * Method for removing worker form a task
+     * 
+     * @param integer $taskId
+     * @param integer $workerId
+     * @return string
+     */
     public function removeWorkerFromTask(int $taskId, int $workerId): string
     {
          /** @var string $error Error message */
@@ -695,6 +742,12 @@ class TaskRepository{
         }
     }
 
+    /**
+     * Method for fetching task Rows
+     * 
+     * @param integer $taskId
+     * @return array
+     */
     public function fetchTaskRows(int $taskId): array
     {
         $task = $this->fetchById($taskId, false); // Pass false to prevent infinite recursion
@@ -745,45 +798,61 @@ class TaskRepository{
         return $wineRowObjects;
     }
 
-        public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
-        {   
+    /**
+     * Method for fetching all not set workers
+     * 
+     * @param integer $taskId
+     * @param integer $vineyardId
+     * @param integer|null $wineVarietyId
+     * @return array
+     */
+    public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
+    {   
 
-            bdump($taskId,);
-            bdump($vineyardId);
-            bdump($wineVarietyId);
+        bdump($taskId,);
+        bdump($vineyardId);
+        bdump($wineVarietyId);
 
-            /** @var WineRow[] $allRows */
-            $allRows = [];
-            if($wineVarietyId === null){ 
-                $allRows = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
-            }
-            else{
-                $allRows = $this->vineyardRepository->getRowsAtVineyardWithWineVariety($vineyardId, $wineVarietyId);
-            }
-
-            $assignedRowCodes = $this->database->table('TASK_ROW')
-                    ->where('ID_TASK', $taskId)
-                    ->where('ID_VINEYARD', $vineyardId)
-                    ->select('CODE_ROW')
-                    ->fetchPairs(null, 'CODE_ROW');
-            $filteredRows = [];
-
-            bdump($assignedRowCodes, 'Assigned row codes');
-            bdump($allRows, 'All rows');
-
-            foreach ($allRows as $row) {
-                $code = (int) $row->getId();
-
-                if (!in_array($code, $assignedRowCodes, true)) {
-                    $filteredRows[] = $row;
-                }
-
-            }
-
-            return $filteredRows;
+        /** @var WineRow[] $allRows */
+        $allRows = [];
+        if($wineVarietyId === null){ 
+            $allRows = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
+        }
+        else{
+            $allRows = $this->vineyardRepository->getRowsAtVineyardWithWineVariety($vineyardId, $wineVarietyId);
         }
 
+        $assignedRowCodes = $this->database->table('TASK_ROW')
+                ->where('ID_TASK', $taskId)
+                ->where('ID_VINEYARD', $vineyardId)
+                ->select('CODE_ROW')
+                ->fetchPairs(null, 'CODE_ROW');
+        $filteredRows = [];
 
+        bdump($assignedRowCodes, 'Assigned row codes');
+        bdump($allRows, 'All rows');
+
+        foreach ($allRows as $row) {
+            $code = (int) $row->getId();
+
+            if (!in_array($code, $assignedRowCodes, true)) {
+                $filteredRows[] = $row;
+            }
+
+        }
+
+        return $filteredRows;
+    }
+
+
+    /**
+     * Method for adding a row to a task
+     * 
+     * @param integer $taskId
+     * @param integer $vineyardId
+     * @param integer $codeRow
+     * @return string
+     */
     public function addTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {   
         $error = '';
@@ -819,7 +888,15 @@ class TaskRepository{
         
     }
 
-    
+   
+    /**
+     * Method for removing a Row form a task 
+     * 
+     * @param integer $taskId
+     * @param integer $vineyardId
+     * @param integer $codeRow
+     * @return string
+     */
     public function removeTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {
         $error = '';
@@ -846,35 +923,43 @@ class TaskRepository{
     }
 
 
+    /**
+     * Method for creating a treatment Task
+     *
+     * @param TaskData $data
+     * @param integer $userId
+     * @return TaskOperationStatus
+     * @throws Exception
+     */
     public function createTreatmentTask(TaskData $data, int $userId): TaskOperationStatus
     {
-            $currentState = TaskOperationStatus::SUCCESS;
+        $currentState = TaskOperationStatus::SUCCESS;
         try {
             // Validate basic fields
             $name = trim($data->getName());
             if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
-                throw new \Exception('Invalid task name');
+                throw new \Exception('Neplatné jméno úkonu');
             }
 
             $vineyardId = $data->getIdWineYard();
             if ($vineyardId === null) {
-                throw new \Exception('No vineyard selected');
+                throw new \Exception('Nebyl vybrán žádný vinohrad');
             }
 
             $idRows = $data->getIdRows() ?? [];
             if (empty($idRows)) {
-                throw new \Exception('No rows selected for treatment');
+                throw new \Exception('Nebyly vybrány žádné řádky pro ošetření');
             }
 
             // Validate treatment-specific fields
             $treatmentType = $data->getTreatmentType();
             if ($treatmentType === null) {
-                throw new \Exception('No treatment type selected');
+                throw new \Exception('Nebyl vybrán typ ošetření');
             }
 
             $treatmentName = trim($data->getTreatmentName());
             if ($treatmentName === '') {
-                throw new \Exception('Treatment name is required');
+                throw new \Exception('Název ošetření je povinný');
             }
 
             /** @var float|null  */
@@ -882,14 +967,14 @@ class TaskRepository{
             
             if ($amount !== null && ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
                     $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX)) {
-                    throw new \Exception('Invalid amount');
+                    throw new \Exception('Neplatné množství');
                 }
 
             $unit = $data->getUnit();
             if ($unit !== null) {
                 $unit = trim($unit);
                 if ($unit === '' || strlen($unit) > ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX) {
-                    throw new \Exception('Invalid unit');
+                    throw new \Exception('Neplatná jednotka');
                 }
             }
 
@@ -905,7 +990,7 @@ class TaskRepository{
                     ->where('ACTIVE', true)
                     ->fetch();
                 if ($row === null) {
-                    throw new \Exception('Invalid or inactive wine row selected: ' . $code);
+                    throw new \Exception('Vybrán neplatný nebo neaktivní řádek vinice: ' . $code);
                 }
             }
 
@@ -915,7 +1000,7 @@ class TaskRepository{
                 ->where('ACTIVE', true)
                 ->fetch();
             if ($vineyardRow === null) {
-                throw new \Exception('Invalid or inactive vineyard');
+                throw new \Exception('Neplatný nebo neaktivní vinohrad');
             }
 
             // Validate users exist and have worker role
@@ -927,11 +1012,11 @@ class TaskRepository{
                     ->fetch();
                 
                 if ($userRow === null) {
-                    throw new \Exception('Invalid or inactive user: ' . $workerId);
+                    throw new \Exception('Neplatný nebo neaktivní uživatel: ' . $workerId);
                 }
                 
                 if (!$userRow->ROLE_WORKER) {
-                    throw new \Exception('User ' . $workerId . ' does not have worker role');
+                    throw new \Exception('Uživatel ' . $workerId . ' nemá roli pracovníka');
                 }
             }
 
@@ -948,7 +1033,6 @@ class TaskRepository{
                 foreach ($idRows as $code) {
                     if (!$this->rowIsSafeForSprayingTreatment($vineyardId, $code, $treatmentDate)) {
                         $currentState = TaskOperationStatus::CONFLICT_WITH_HARVEST;
-                        // Don't break - we still want to create the task, just mark it as conflicted
                     }
                 }
             }
@@ -970,7 +1054,7 @@ class TaskRepository{
             ]);
 
             if ($taskRow === null || !isset($taskRow->ID)) {
-                throw new \Exception('Failed to insert task');
+                throw new \Exception('Nepodařilo se vložit úkon');
             }
 
             $taskId = (int) $taskRow->ID;
@@ -989,7 +1073,7 @@ class TaskRepository{
 
 
             if ($treatmentRow === null) {
-                throw new \Exception('Failed to insert treatment');
+                throw new \Exception('Nepodařilo se vložit ošetření');
             }
 
             // Link selected rows in TASK_ROW
@@ -1019,13 +1103,22 @@ class TaskRepository{
                 $this->database->rollBack();
             } catch (\Throwable $t) {
                 // ignore
+                bdump("Failed to do a db rollback: " . $t->getMessage());
             }
-            Debugger::log('Failed to create treatment task: ' . $e->getMessage(), ILogger::ERROR);
-            return TaskOperationStatus::FAILED;
+            bdump("failed with error: $e");
+            throw $e;
         }
     }
-    
-    public function updateBaseTask(int $taskId, \stdClass $values): bool 
+   
+    /**
+     * Method for updating Base Task
+     * 
+     * @param integer $taskId
+     * @param \stdClass $values
+     * @return void
+     * @throws Exception
+     */
+    public function updateBaseTask(int $taskId, \stdClass $values): void
     {
         try {
             $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
@@ -1038,7 +1131,7 @@ class TaskRepository{
             if (property_exists($values, 'name')) {
                 $name = trim((string) $values->name);
                 if ($name === '' || strlen($name) < ValidationDefinitions::TASK_NAME_LENGTH_MIN) {
-                    throw new \Exception('Invalid task name');
+                    throw new \Exception('Neplatné jméno úkonu');
                 }
                 $update['NAME'] = $name;
             }
@@ -1065,28 +1158,35 @@ class TaskRepository{
                 $this->database->table('TASK')->where('ID', $taskId)->update($update);
             }
 
-            return true;
         } catch (\Exception $e) {
             Debugger::log('Failed to update base task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
-            return false;
+            throw $e;
         }
 
     }
-    
-    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): bool 
+   
+    /**
+     * Method for updating Bottling task
+     * 
+     * @param integer $taskId
+     * @param \stdClass $values
+     * @param ImageEntity|null $img
+     * @return boolean
+     */
+    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): void
     {
         try {
             $this->database->beginTransaction();
 
             $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
             if ($taskRow === null) {
-                throw new \Exception('Task not found');
+                throw new \Exception('Úkon nebyl nalezen');
             }
 
             // fetch bottling row
             $bottlingRow = $this->database->table('BOTTLING')->where('ID_TASK', $taskId)->fetch();
             if ($bottlingRow === null) {
-                throw new \Exception('Bottling record not found for task');
+                throw new \Exception('Záznam lahvování nebyl nalezen pro úkon');
             }
 
             if (!empty($updatesTask)) {
@@ -1101,7 +1201,7 @@ class TaskRepository{
             if (property_exists($values, 'volume') && $values->volume !== null) {
                 $bv = (float) $values->volume;
                 if ($bv < ValidationDefinitions::BOTTLE_VOLUME_MIN || $bv > ValidationDefinitions::BOTTLE_VOLUME_MAX) {
-                    throw new \Exception('Bottle volume out of allowed range');
+                    throw new \Exception('Objem láhve je mimo povolený rozsah');
                 }
                 $bottleVolume = $bv;
             }
@@ -1129,7 +1229,7 @@ class TaskRepository{
                     'DESCRIPTION' => $img->description,
                 ]);
                 if ($picture === null || !isset($picture->ID)) {
-                    throw new \Exception('Failed to insert picture');
+                    throw new \Exception('Nepodařilo se vložit obrázek');
                 }
                 $pictureId = (int) $picture->ID;
                 // update wine picture reference
@@ -1139,31 +1239,39 @@ class TaskRepository{
             }
 
             $this->database->commit();
-            return true;
+
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
-                // ignore
+                bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             Debugger::log('Failed to update bottling task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
-            return false;
+            throw $e;
         }
     }
     
-    public function updateTreatmentTask(int $taskId, \stdClass $values): bool 
+    /**
+     * Method for updating treatment task
+     * 
+     * @param integer $taskId
+     * @param \stdClass $values
+     * @return void
+     * @throws Exception
+     */
+    public function updateTreatmentTask(int $taskId, \stdClass $values): void
     {
         try {
             $this->database->beginTransaction();
 
             $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
             if ($taskRow === null) {
-                throw new \Exception('Task not found');
+                throw new \Exception('Úkon nebyl nalezen');
             }
 
             $treatmentRow = $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->fetch();
             if ($treatmentRow === null) {
-                throw new \Exception('Treatment record not found for task');
+                throw new \Exception('Záznam ošetření nebyl nalezen pro úkon');
             }
 
             if (!empty($updatesTask)) {
@@ -1179,42 +1287,42 @@ class TaskRepository{
             if (property_exists($values, 'treatmentName')) {
                 $treatmentUpdates['TREAT_NAME'] = (string) $values->treatmentName;
             }
-
-            ///////////////////////////////////////////////////////////////////////////////// TODO: check 
-            if (property_exists($values, 'amount')) {
+            
+            $hasValue = property_exists($values, "amount") && $values->amount != 0;
+            $hasUnit = property_exists($values, "unit") && $values->unit != "";
+            
+            if (!$hasValue || !$hasUnit) {
+                $treatmentUpdates['UNIT'] = null; 
+                $treatmentUpdates['QUANTITY'] = null;
+            } else {
                 if ($values->amount !== null) {
                     $amt = (float) $values->amount;
                     if ($amt < ValidationDefinitions::TREATMENT_QUANTITY_MIN || $amt > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
-                        throw new \Exception('Invalid amount');
+                        throw new \Exception('Neplatné množství');
                     }
                     $treatmentUpdates['QUANTITY'] = $amt;
                 }
-            }
-            if (property_exists($values, 'unit')) {
                 if ($values->unit !== null) {
                     $treatmentUpdates['UNIT'] = (string) $values->unit;
                 }
             }
             
-            /////////////////////////////////////////////////////////////////////////////////
             if (!empty($treatmentUpdates)) {
                 $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->update($treatmentUpdates);
             }
 
             $this->database->commit();
-            return true;
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
                 // ignore
+                bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             Debugger::log('Failed to update treatment task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
-            return false;
+            throw $e;
         }
-
     }
-
 }
     
 

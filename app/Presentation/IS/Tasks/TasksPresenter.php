@@ -27,6 +27,7 @@ use App\Model\Image\Image;
 use App\Model\Task\TaskOperationStatus;
 use App\Model\Task\Treatment\TreatmentType;
 use App\Model\WineVariety\WineVarietyRepository;
+use Exception;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
@@ -1275,29 +1276,32 @@ final class TasksPresenter extends BasePresenter
     {
         $task = $this->fetchCurrentNewTask();
         $result = null;
-        
-        switch($task->getType()) {
-            case TaskType::BOTTLING: 
-                $result = $this->taskRepository->createBottlingTask($task, $this->user->getId());
-                break; 
-            case TaskType::HARVEST: 
-                $result = $this->taskRepository->createHarvestTask($task, $this->user->getId());
-                break; 
-            case TaskType::TREATMENT:
-                $result = $this->taskRepository->createTreatmentTask($task, $this->user->getId());
-                break;
-            default: 
-                break;
-        }
-        
-        if ($result === TaskOperationStatus::SUCCESS) {
-            $this->flashMessage("Úkon uložen", FlashMsgType::SUCCESS->value);
-        } elseif ($result === TaskOperationStatus::CONFLICT_WITH_HARVEST) {
-            $this->flashMessage("Ošetření postřik bude provedeno méně než 14 dní před sklizní!", FlashMsgType::WARNING->value);
-        } elseif ($result === TaskOperationStatus::CONFLICT_WITH_TREATMENT) {
-            $this->flashMessage("Sklizeň bude provedena méně než 14 dní po ošetření postřikem!", FlashMsgType::WARNING->value);
-        } else {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+       
+        try {
+            switch($task->getType()) {
+                case TaskType::BOTTLING: 
+                    $this->taskRepository->createBottlingTask($task, $this->user->getId());
+                    break; 
+                case TaskType::HARVEST: 
+                    $result = $this->taskRepository->createHarvestTask($task, $this->user->getId());
+                    break; 
+                case TaskType::TREATMENT:
+                    $result = $this->taskRepository->createTreatmentTask($task, $this->user->getId());
+                    break;
+                default: 
+                    break;
+            }
+            
+            if (!$result || $result == TaskOperationStatus::SUCCESS) {
+                $this->flashMessage("Úkon uložen", FlashMsgType::SUCCESS->value);
+            } elseif ($result === TaskOperationStatus::CONFLICT_WITH_HARVEST) {
+                $this->flashMessage("Ošetření postřik bude provedeno méně než 14 dní před sklizní!", FlashMsgType::WARNING->value);
+            } elseif ($result === TaskOperationStatus::CONFLICT_WITH_TREATMENT) {
+                $this->flashMessage("Sklizeň bude provedena méně než 14 dní po ošetření postřikem!", FlashMsgType::WARNING->value);
+            }
+            
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), FlashMsgType::ERROR->value);
         }
 
         $this->handleClearForm();
@@ -1450,10 +1454,11 @@ final class TasksPresenter extends BasePresenter
     public function submitBasicTaskEdit(Form $form, \stdClass $values) {
         $taskId = (int)$this->getParameter("taskId");
         
-        if (!$this->taskRepository->updateBaseTask($taskId, $values)) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
-        } else {
+        try {
+            $this->taskRepository->updateBaseTask($taskId, $values);
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), FlashMsgType::ERROR->value);
         }
     }
     
@@ -1503,10 +1508,11 @@ final class TasksPresenter extends BasePresenter
             );
         } 
         
-        if (!$this->taskRepository->updateBottlingTask($taskId, $values, $imageEntity)) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
-        } else {
+        try {
+            $this->taskRepository->updateBottlingTask($taskId, $values, $imageEntity);
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        } catch (Exception $e) {
+            $this->flashMessage($e->getMessage(), FlashMsgType::ERROR->value);
         }
     }
     
@@ -1552,10 +1558,11 @@ final class TasksPresenter extends BasePresenter
 
         $taskId = (int)$this->getParameter("taskId");
         
-        if (!$this->taskRepository->updateTreatmentTask($taskId, $values)) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
-        } else {
+        try {
+            $this->taskRepository->updateTreatmentTask($taskId, $values);
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
+        } catch(Exception $e) {
+            $this->flashMessage($e->getMessage(), FlashMsgType::ERROR->value);
         }
     }
 
