@@ -1,5 +1,12 @@
 <?php
 
+//FILE:     ProfileModel.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Model for user profile.
+
 namespace App\Model\Profile;
 
 use APP\Model\User\User;
@@ -43,9 +50,11 @@ class ProfileModel
         /** @var string $resultMessage Message with error message, or empty if everything will be right during the run method. */
         $resultMessage = '';
 
+        // Begin transaction for updating user profile
         $this->database->beginTransaction();
         try 
-        {
+        {   
+            // Update user by provided data
             $this->database->table('USER')->where('ID', $id)->update($newData);
             $this->database->commit();
         } catch (\Exception $databaseException) 
@@ -76,20 +85,21 @@ class ProfileModel
         /** @var string $saltedPassword Old password salted with salt from database. */
         $saltedPassword = $oldPassword . $saltOfOldPassword;
 
+        // Verify old password
         if (!$this->password->verify($saltedPassword, $oldPasswordHash)) {
             $resultMessage = 'Staré heslo není správné.';
-            bdump($resultMessage);
-
             return $resultMessage;
         }
-        bdump($resultMessage);
 
+        // Begin transaction for 
         $this->database->beginTransaction();
         try
         {
-            // Generate new salt and hash the new password
+            /** @var string $newSalt New salt for the new password. */
             $newSalt = bin2hex(random_bytes(16));
+            /** @var string $saltedNewPassword New password salted with new salt. */
             $saltedNewPassword = $newPassword . $newSalt;
+            /** @var string $hashedNewPassword Hashed new password with salt. */
             $hashedNewPassword = $this->password->hash($saltedNewPassword);
 
             // Update the users password in the database
@@ -104,9 +114,6 @@ class ProfileModel
             $this->database->rollBack();
             $resultMessage = 'Změnu hesla se nepodařilo provést v databázi.';
         }
-
-
         return $resultMessage;
-
     }
 }

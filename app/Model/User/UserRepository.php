@@ -1,5 +1,12 @@
 <?php
 
+//FILE:     UserRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository class for managing operations related on the internal represetation of User in the system.
+
 namespace App\Model\User;
 
 use Nette;
@@ -13,11 +20,17 @@ use Nette\Mail\Message;
 use Nette\Mail\SendException;
 use Nette\Utils\DateTime;
 
+/**
+ * Class UserRepository
+ * Class for managing operations related to the internal representation of User in the system.
+ */
 class UserRepository
 {   
     /** @var Explorer Instance of the database explorer */
     private Explorer $database;
+    /** @var Passwords Instance of Nette Passwords class */
     private Passwords $passwords;
+    /** @var Mailer Instance of Nette Mailer class */
     private Mailer $mailer;
 
     /**
@@ -42,10 +55,12 @@ class UserRepository
      */
     public function fetchAll(): array
     {
-        /** @var User[] $users Array of all users in database. */
+        /** @var User[] $users Array of all users in the database. */
         $users = [];
+        /** @var T[] $rows All rows USER table in the database.*/
         $rows = $this->database->table('USER')->fetchAll();
 
+        // Create from all users in the table USER internal representation.
         foreach ($rows as $row) {
             $users[] = new User(
                 $row->ID,
@@ -69,7 +84,6 @@ class UserRepository
         return $users;
     }
 
-
     /**
      * getUserById
      * Method for fetching a user by ID from the database.
@@ -79,11 +93,15 @@ class UserRepository
      */
     public function getUserById(int $id): ?User
     {   
+        /** @var  T|null $user  Fetch user row by ID */
         $user = $this->database->table('USER')->get($id);
+
+        // User was not found.
         if ($user === null) {
             return null;
         }
 
+        // Return instance of the found user.
         return new User(
             $user->ID,
             $user->NAME,
@@ -164,11 +182,13 @@ class UserRepository
             $queryResult = $queryResult->where('ACTIVE', false);
         }
 
-        $result = $queryResult->fetchAll();
+        // Fetch by search all users
+        $queryResult->fetchAll();
 
         /** @var User[] $users Array of user instances which is get by fetching by filters */
         $users = [];
 
+        // Create internal representation of all users for USER table
         foreach ($queryResult as $userRow) {
             $users[] = new User(
                 $userRow->ID,
@@ -245,6 +265,7 @@ class UserRepository
     $this->database->beginTransaction();
     try 
     {
+        // Insert new user to the database
         $this->database->table('USER')->insert([
             'NAME' => $name,
             'SURNAME' => $surname,
@@ -266,6 +287,7 @@ class UserRepository
             'ROLE_ADMIN' => $isAdmin
         ]);
 
+        // Commit changes to database
         $this->database->commit();
     }
     catch (\Exception $exception) {
@@ -275,6 +297,7 @@ class UserRepository
 
     // Send email to the new user by method sendAddUserMail
     $this->sendAddUserMail($name, $email, $username, $password);
+
     }
 
     /**
@@ -288,22 +311,25 @@ class UserRepository
     {   
         /** @var string $error Error message */
         $error='';
-        $this->database->beginTransaction();
 
+        // Begin transaction for deactivating user
+        $this->database->beginTransaction();
         try 
         {
         
-        /** Check if the use is not the last admin of the system */
+        /** @var T[] $adminUsers Array of all admins in the sytem. */
         $adminUsers = $this->database->table('USER')->where('ROLE_ADMIN', true)->fetchAll();
+        /** @var T|null $deletedUser User to be deactivated. */
         $deletedUser = $this->database->table('USER')->where('ID', $userId)->where('ROLE_ADMIN', true)->fetch();
-
+        
+        // Check if the deactivated user is not last admin. If yes, return error.
         if (count($adminUsers) === 1 && $deletedUser) {
             $error = 'Nelze deaktivovat jediného administrátora.';
             $this->database->rollBack();
             return $error;
         }
 
-        /** Deactivate user  */
+        // Deactivate user 
         $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => false]);
         $this->database->commit();
         return $error;
@@ -327,11 +353,12 @@ class UserRepository
     {   
         /** @var string $error Error message */
         $error='';
+        // Begin transaction for activate user
         $this->database->beginTransaction();
 
         try 
         {
-        /** Activate user  */
+        // Activate user 
         $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
         $this->database->commit();
         return $error;
@@ -356,7 +383,7 @@ class UserRepository
      */
     private function sendAddUserMail(string $name, string $email, string $username, string $password): void
     {
-
+        /** @var string $textBody Text body of the email. */
         $textBody = "Dobrý den {$name},\n\n" .
             "Byl\Byla jste úspěšně přidán do systému Andrej Vinářství.\n\n" .
             "Přihlašovací údaje:\n" .
@@ -364,12 +391,14 @@ class UserRepository
             "Heslo: {$password}\n\n" .
             "S pozdravem,\nAndrejovo Vinářství\n";
 
+        /** @var Message $mail Email message object wich will be send. */
         $mail = (new Message())
             ->setFrom('no-reply@andrejvinarstvi.cz', 'Andrej Vinářství')
             ->addTo($email, $name)
             ->setSubject('Byli jste přidáni do systému Andrej Vinářství')
             ->setBody($textBody);
 
+        // Send email
         try {
             $this->mailer->send($mail);
         } catch (SendException $emailException) {
@@ -386,19 +415,22 @@ class UserRepository
      * @return string[] Array containing 'password', 'salt' and 'hashedPassword'
      */
     public function createNewPassword() : array{
-        // Generate random password
+        /** @var string $password Generated random password. */
         $password = bin2hex(random_bytes(4));
-        // Generate random salt for password hashing
+        /** @var string $salt Generated random salt for password hashing. */
         $salt = bin2hex(random_bytes(16));
-        // Hash the password with the salt
+        /** @var string $saltedPassword Password with the salt.*/
         $saltedPassword = $password . $salt;
+        /** @var string $hashedPassword Hashed password with salt. */
         $hashedPassword = $this->passwords->hash($saltedPassword);
 
+        // Return array with password, salt, hashedPassword.
         return ['password' => $password, 'salt' => $salt, 'hashedPassword' => $hashedPassword];
     }
 
     /**
      * editUserByAdmin
+     * Method for edit user in the system by user.
      *
      * @param integer $userId Id of the user to edit.
      * @param array $data Array of data to edit the user.
@@ -408,8 +440,10 @@ class UserRepository
         /** @var string $error Error message */
         $error = '';
 
+        // Begin transaction for update user
         $this->database->beginTransaction();
         try{
+            // Update user
             $this->database->table('USER')->where('ID', $userId)->update($data);
             $this->database->commit();
         }
@@ -417,10 +451,8 @@ class UserRepository
             $this->database->rollBack();
             $error = 'Chyba při úpravě uživatele: ' . $exception->getMessage();
         }
-
         return $error;
     }
-
 
     /**
      * resetPasswordByAdmin
@@ -434,10 +466,12 @@ class UserRepository
         /** @var User|null $foundUser User found by ID */
         $foundUser = $this->getUserById($userId);
 
+        // User was not found
         if (!$foundUser) {
             return 'Chyba při načítání uživatele, heslo nebylo resetováno.';
         }
 
+        // Begin transaction for password reset
         $this->database->beginTransaction();
         try{
             /** @var string[] $newLoginData New password, salt and hashed password.*/
@@ -449,6 +483,7 @@ class UserRepository
                 'PSWD_SALT' => $newLoginData['salt']
             ]);
 
+            // Send mail with new password
             $this->sendResetPasswordMail(
                 $foundUser->getName(),
                 $foundUser->getEmail(),
@@ -456,7 +491,6 @@ class UserRepository
                 $newLoginData['password']
             );
 
-           
             $this->database->commit();
         }
         catch(\Exception $exception){
@@ -467,8 +501,6 @@ class UserRepository
             $this->database->rollBack();
             return 'Chyba při odesílání e-mailu: ' . $emailException->getMessage();
         }
-
-
         return '';
     }
 
@@ -483,20 +515,21 @@ class UserRepository
      * @return void
      */
     private function sendResetPasswordMail(string $name, string $email, string $username, string $password): void{
+        /** @var string $textBody Text body of the email message. */
         $textBody = "Dobrý den {$name},\n\n" .
             "Vaše heslo bylo úspěšně resetováno administrátorem v Andrej Vinářství systému.\n\n" .
             "Nové přihlašovací údaje:\n" .
             "Uživatelské jméno: {$username}\n" .
             "Heslo: {$password}\n\n" .
             "S pozdravem,\nAndrejovo Vinářství\n";
-
+        /** @var Message $mail Email which will be sent. */
         $mail = (new Message())
             ->setFrom('no-reply@andrejvinarstvi.cz', 'Andrej Vinářství')
             ->addTo($email, $name)
             ->setSubject('Vaše heslo bylo resetováno')
             ->setBody($textBody);
+        // Send email
         $this->mailer->send($mail);
         return;
     }
-
 }
