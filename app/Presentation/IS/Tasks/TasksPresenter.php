@@ -754,7 +754,8 @@ final class TasksPresenter extends BasePresenter
     }
 
 
-    public function createComponentTreatmentDetailsForm(): Form {
+    public function createComponentTreatmentDetailsForm(): Form 
+    {
         $form = new Form();
 
         $form->addSelect("type", "Typ ošetření", [
@@ -779,14 +780,12 @@ final class TasksPresenter extends BasePresenter
         $form->addFloat('amount', 'Množství')
             ->addRule(Form::Min, 'Množství použitých prostředků musí být alespoň %d.', ValidationDefinitions::TREATMENT_QUANTITY_MIN)
             ->addRule(Form::Max, 'Množství použitých prostředků může být maximálně %d.', ValidationDefinitions::TREATMENT_QUANTITY_MAX)
-            ->setRequired('Zadejte množství použitých prostředků.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
 
         $form->addText("unit", "Jednotka množství")
             ->addRule(Form::MinLength, 'Jednotka množství musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MIN)
             ->addRule(Form::MaxLength, 'Jednotka množství může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX)
-            ->setRequired("Zadejte jednotku množství (např. litr, kg, ...)")
             ->setHtmlAttribute("class", "form-control")
             ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
 
@@ -806,7 +805,8 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
-    public function obtainDataFromTreatmentDetailsForm(\stdClass $values): ?TaskData {
+    public function obtainDataFromTreatmentDetailsForm(\stdClass $values): ?TaskData 
+    {
         $task = $this->fetchCurrentNewTask();
         try {
             if (isset($values->type)) {
@@ -818,11 +818,11 @@ final class TasksPresenter extends BasePresenter
             }
 
             if (isset($values->amount)) {
-                $task->setAmount((float) $values->amount);
+                $task->setAmount(isset($values->amount) && $values->amount !== '' ? (float)$values->amount : null);
             }
 
             if (isset($values->unit)) {
-                $task->setUnit((string) $values->unit);
+                $task->setUnit(isset($values->unit) && $values->unit !== '' ? (string)$values->unit : null);
             }
 
         } catch (\Exception $e) {
@@ -833,12 +833,14 @@ final class TasksPresenter extends BasePresenter
         return $task;
     }
 
-    public function treatmentGoBackToRowsSelection(Button $button, \stdClass $values) {
+    public function treatmentGoBackToRowsSelection(Button $button, \stdClass $values) 
+    {
         $this->obtainDataFromTreatmentDetailsForm($values);
         $this->redirect("treatment");
     }
 
-    public function treatmentDetailsFinalize(Button $button, \stdClass $values) {
+    public function treatmentDetailsFinalize(Button $button, \stdClass $values) 
+    {
         $task = $this->obtainDataFromTreatmentDetailsForm($values);
         if ($task === null) {
             $this->flashMessage('Chyba při získávání údajů o ošetření.', 'error');
@@ -847,7 +849,8 @@ final class TasksPresenter extends BasePresenter
         $this->finalizeTask();
     }
 
-    public function renderTreatmentFinal() {
+    public function renderTreatmentFinal() 
+    {
         /** @var TaskData $task */
         $task = $this->fetchCurrentNewTask();
 
@@ -856,8 +859,8 @@ final class TasksPresenter extends BasePresenter
 
         $form['type']->setValue($task->getTreatmentType()?->value);
         $form['name']->setValue($task->getTreatmentName());
-        $form['amount']->setValue($task->getAmount());
-        $form['unit']->setValue($task->getUnit());
+        $form['amount']->setValue($task->getAmount() ?? '');
+        $form['unit']->setValue($task->getUnit() ?? '');
 
         /** @var Vineyard $vineyard */
         $vineyard = $this->vineyardRep->fetchById($task->getIdWineYard());
@@ -1268,7 +1271,8 @@ final class TasksPresenter extends BasePresenter
 //                      Finalization 
 // ----------------------------------------------------------
     
-    public function finalizeTask() {
+    public function finalizeTask() 
+    {
         $task = $this->fetchCurrentNewTask();
         $result = null;
         

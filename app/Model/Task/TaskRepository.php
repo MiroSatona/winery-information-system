@@ -846,7 +846,8 @@ class TaskRepository{
     }
 
 
-        public function createTreatmentTask(TaskData $data, int $userId): TaskOperationStatus{
+    public function createTreatmentTask(TaskData $data, int $userId): TaskOperationStatus
+    {
             $currentState = TaskOperationStatus::SUCCESS;
         try {
             // Validate basic fields
@@ -876,17 +877,19 @@ class TaskRepository{
                 throw new \Exception('Treatment name is required');
             }
 
+            /** @var float|null  */
             $amount = $data->getAmount();
-            if ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
-                $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
-                throw new \Exception('Invalid amount');
-            }
+            
+            if ($amount !== null && ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
+                    $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX)) {
+                    throw new \Exception('Invalid amount');
+                }
 
-            $unit = trim($data->getUnit());
-            if ($unit === '') {
-                throw new \Exception('Unit is required');
+            $unit = $data->getUnit();
+            if ($unit !== null) {
+                $unit = trim($unit);
             }
-
+                
             // Validate each row: exists, belongs to vineyard, is active
             foreach ($idRows as $code) {
                 $row = $this->database->table('WINE_ROW')
@@ -942,6 +945,7 @@ class TaskRepository{
                     }
                 }
             }
+
             
             // Insert task row
             $now = new DateTime();
@@ -964,15 +968,18 @@ class TaskRepository{
 
             $taskId = (int) $taskRow->ID;
 
+            
             // Insert treatment row
             $treatmentRow = $this->database->table('TREATMENT')->insert([
                 'ID_TASK' => $taskId,
                 'ID_VINEYARD' => $vineyardId,
                 'TYPE' => $treatmentType->value,
                 'TREAT_NAME' => $treatmentName,
-                'QUANTITY' => $amount,
+                'QUANTITY'   => $amount,
                 'UNIT' => $unit,
             ]);
+
+
 
             if ($treatmentRow === null) {
                 throw new \Exception('Failed to insert treatment');
@@ -1000,6 +1007,7 @@ class TaskRepository{
             return $currentState;
 
         } catch (\Exception $e) {
+            bdump($e);
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
@@ -1010,7 +1018,8 @@ class TaskRepository{
         }
     }
     
-    public function updateBaseTask(int $taskId, \stdClass $values): bool {
+    public function updateBaseTask(int $taskId, \stdClass $values): bool 
+    {
         try {
             $taskRow = $this->database->table('TASK')->where('ID', $taskId)->fetch();
             if ($taskRow === null) {
@@ -1057,7 +1066,8 @@ class TaskRepository{
 
     }
     
-    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): bool {
+    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): bool 
+    {
         try {
             $this->database->beginTransaction();
 
@@ -1134,7 +1144,8 @@ class TaskRepository{
         }
     }
     
-    public function updateTreatmentTask(int $taskId, \stdClass $values): bool {
+    public function updateTreatmentTask(int $taskId, \stdClass $values): bool 
+    {
         try {
             $this->database->beginTransaction();
 
@@ -1161,17 +1172,24 @@ class TaskRepository{
             if (property_exists($values, 'treatmentName')) {
                 $treatmentUpdates['TREAT_NAME'] = (string) $values->treatmentName;
             }
+
+            ///////////////////////////////////////////////////////////////////////////////// TODO: check 
             if (property_exists($values, 'amount')) {
-                $amt = (float) $values->amount;
-                if ($amt < ValidationDefinitions::TREATMENT_QUANTITY_MIN || $amt > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
-                    throw new \Exception('Invalid amount');
+                if ($values->amount !== null) {
+                    $amt = (float) $values->amount;
+                    if ($amt < ValidationDefinitions::TREATMENT_QUANTITY_MIN || $amt > ValidationDefinitions::TREATMENT_QUANTITY_MAX) {
+                        throw new \Exception('Invalid amount');
+                    }
+                    $treatmentUpdates['QUANTITY'] = $amt;
                 }
-                $treatmentUpdates['QUANTITY'] = $amt;
             }
             if (property_exists($values, 'unit')) {
-                $treatmentUpdates['UNIT'] = (string) $values->unit;
+                if ($values->unit !== null) {
+                    $treatmentUpdates['UNIT'] = (string) $values->unit;
+                }
             }
-
+            
+            /////////////////////////////////////////////////////////////////////////////////
             if (!empty($treatmentUpdates)) {
                 $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->update($treatmentUpdates);
             }
@@ -1190,11 +1208,7 @@ class TaskRepository{
 
     }
 
-    
 }
-
-
-
     
 
 
