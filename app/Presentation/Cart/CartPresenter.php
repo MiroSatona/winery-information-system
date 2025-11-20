@@ -4,7 +4,7 @@
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Presenter for users shopping cart 	
+//DESC:     Presenter for users shopping carts. 	
 
 declare(strict_types=1);
 namespace App\Presentation\Cart;
@@ -14,17 +14,20 @@ use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
 use App\Model\FlashMsgType;
 use App\Model\Image\ImageRepository;
+use App\Model\User\User;
+use App\Model\Orders\Order;
+use Nette\Application\UI\Form;
 
 /**
- * Presenter for shopping cart management
- * Handles cart display, item management, and delivery options
+ * Presenter for shopping cart management.
+ * Handles cart display, item management, and delivery options.
  */
 final class CartPresenter extends BasePresenter 
 {
     /**
      * Constructor for CartPresenter
-     * @param OrderRepository $orderRepository Repository for managing orders and cart operations
-     * @param ImageRepository $imageRepository Repository for accessing product images
+     * @param OrderRepository $orderRepository Repository for managing orders and cart operations.
+     * @param ImageRepository $imageRepository Repository for accessing product images.
      */
     public function __construct(
         private OrderRepository $orderRepository,
@@ -34,40 +37,51 @@ final class CartPresenter extends BasePresenter
     }
 
     /**
-     * Renders the shopping cart page
-     * Displays current order items, prices, and delivery options
-     * Redirects to sign-in if user is not authenticated
+     * Renders the shopping cart page.
+     * Displays current order items, prices, and delivery options.
+     * Redirects to sign-in if user is not authenticated.
      * @return void
      */
     public function renderDefault(): void
-    {
+    {   
+        /** @var User $user Actual user. */
         $user = $this->user;
 
+        // Check if the user is logged in
         if (!$user->isLoggedIn()) {
             $this->redirect(':Sign:in');
             return;
         }
 
+        /** @var int $userId ID of the current user. */
         $userId = $user->getId();
+        /** @var Order[] $order Array of orders for the user. */
         $order = $this->orderRepository->fetchCustomerOrder($userId);
 
+        // Check if the order exists
         if (!$order) {
             $this->template->order = null;
             $this->template->message = 'nákupní košík je prázdný';
             return;
         }
+
+        // Update the total price of the order
         $this->orderRepository->updateOrderPrice($order->id, true);
 
-        // Optionally fetch all items for that order
+        // Fetch all items for this order
         $order->items = $this->orderRepository
             ->fetchOrderById($order->id, includeItems: true)
             ->items;
 
+        // Give template a order and image repository for rendering
         $this->template->order = $order;
         $this->template->imageRepository = $this->imageRepository;
 
-        $order->deliveryType = $order->deliveryType; // assuming STATE holds delivery type
+        // State of the delivery
+        $order->deliveryType = $order->deliveryType;
+        // Data about delivery
         $order->deliveryData = $order->deliveryData ?? '';
+        // Give template the updated order
         $this->template->order = $order;
     }
 
@@ -78,10 +92,13 @@ final class CartPresenter extends BasePresenter
      */
     public function handleRemoveItem(int $wineId): void
     {
+        /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
-        
+
+        /** @var bool $success Flag of success for item removal. */
         $success = $this->orderRepository->removeItemFromOrder($userId, $wineId);
 
+        // Handle success or failure of item removal
         if ($success) {
             $this->flashMessage('Položka', FlashMsgType::SUCCESS->value);
         } else {
@@ -98,10 +115,13 @@ final class CartPresenter extends BasePresenter
      * @return void
      */
     public function handleChangeAmount(int $wineId, bool $add): void
-    {
+    {   
+        /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
+        /** @var bool $success Flag of success for changing item amount. */
         $success = $this->orderRepository->editAmountOrItemInOrder($userId, $wineId, 1, $add);
 
+        // Handle success or failure of changing item amount
         if ($success) {
             $this->flashMessage('Změna počtu položky uložena', FlashMsgType::SUCCESS->value);
         } else {
@@ -114,19 +134,24 @@ final class CartPresenter extends BasePresenter
     /**
      * Creates the delivery options form component
      * Form allows selecting delivery type and entering delivery address
-     * @return \Nette\Application\UI\Form Form for delivery options
+     * @return Form Form for delivery options
      */
-    protected function createComponentDeliveryForm(): \Nette\Application\UI\Form
-    {
-        $form = new \Nette\Application\UI\Form;
+    protected function createComponentDeliveryForm(): Form
+    {   
+        /** @var Form $form Form for delivery options. */
+        $form = new Form;
 
-        // Fetch current order for the user
+        /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
+        /** @var CostumerOrder $order Order of the current user. */
         $order = $this->orderRepository->fetchCustomerOrder($userId);
 
+        /** @var string|null $deliveryType Delivery type of the current order. */
         $deliveryType = $order->deliveryType?? 'PICKUP';
+        /** @var string|null $address Delivery address of the current order. */
         $address = $order->deliveryData?? null;
 
+        // Form for delivery options
         $form->addRadioList('deliveryType', 'Způsob doručení', [
             'PICKUP' => 'Osobní odběr',
             'COURIER' => 'Kurýr',
@@ -155,17 +180,21 @@ final class CartPresenter extends BasePresenter
      */
     public function deliveryFormSucceeded(\Nette\Application\UI\Form $form, \stdClass $values): void
     {
+        /** @var string $type Delivery type from the form. */
         $type= $values->deliveryType;
+        /** @var string|null $address Delivery address from the form. */
         $address = $values->address ?: null;
-
+        /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
 
-        // For PICKUP, clear address
+        // For PICKUP clear address
         if ($address === 'PICKUP') {
             $address = null;
         }
 
+        /** @var bool $result Flag of success for updating delivery address. */
         $result = $this->orderRepository->updateDeliveryAddress($userId, $type, $address);
+        // Handle success or failure of updating delivery address
         if ($result) {
             $this->flashMessage("Způsob doručení byl uložen", FlashMsgType::SUCCESS->value);
         } else {
