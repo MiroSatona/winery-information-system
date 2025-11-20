@@ -10,5 +10,3 @@ final class Bottle {
         public float $bottleVolume,
     ) {}
 }
-
-

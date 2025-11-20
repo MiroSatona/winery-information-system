@@ -1,6 +1,12 @@
-<?php 
+<?php
+//FILE:     ProductRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository for tasks related to products (DB operations)
 
-namespace App\Model;
+namespace App\Model\Shop;
 
 use Nette\Database\Explorer;
 use App\Model\Wine\Wine;
