@@ -67,8 +67,8 @@ class TreatmentRepository
             $vineyard,
             TreatmentType::from((string)$row->TYPE),
             $row->TREAT_NAME,
-            $row->QUANTITY,
-            $row->UNIT
+            $row->QUANTITY ? (float)$row->QUANTITY : null,
+            $row->UNIT ? (string)$row->UNIT : null
         );
 
         return $treatment;
@@ -128,8 +128,8 @@ class TreatmentRepository
                 $vineyard,
                 TreatmentType::from((string) $row->TYPE),
                 (string) $row->TREAT_NAME,
-                (float) $row->QUANTITY,
-                (string) $row->UNIT
+                $row->QUANTITY ? (float) $row->QUANTITY : null,
+                $row->UNIT ? (string) $row->UNIT : null
             );
         }
 

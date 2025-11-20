@@ -30,8 +30,8 @@ class TaskData
     // Treatment
     private TreatmentType $type = TreatmentType::SPRAYING;
     private string $treatmentName = '';
-    private float $amount = 0.0;
-    private string $unit = '';
+    private ?float $amount = null;
+    private ?string $unit = null;
 
     // common 
     private array $idRows = [];
@@ -187,22 +187,22 @@ class TaskData
         $this->treatmentName = $treatmentName;
     }
 
-    public function getAmount(): float
+    public function getAmount(): ?float
     {
         return $this->amount;
     }
 
-    public function setAmount(float $amount): void
+    public function setAmount(?float $amount): void
     {
         $this->amount = $amount;
     }
 
-    public function getUnit(): string
+    public function getUnit(): ?string
     {
         return $this->unit;
     }
 
-    public function setUnit(string $unit): void
+    public function setUnit(?string $unit): void
     {
         $this->unit = $unit;
     }
