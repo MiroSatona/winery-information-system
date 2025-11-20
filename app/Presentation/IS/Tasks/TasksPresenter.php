@@ -31,15 +31,29 @@ use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Image\Image;
 use App\Model\Task\TaskOperationStatus;
 use App\Model\Task\Treatment\TreatmentType;
-use App\Model\WineVariety\WineVarietyRepository;
 use Exception;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Class TasksPresenter
+ * Class for presenting tasks, details about tasks and parts of the system for forms for creating and editing tasks. 
+ */
 final class TasksPresenter extends BasePresenter
 {
+    /**
+     * Constructor for class TasksPresenter.
+     *
+     * @param UserRepository $userRepository Repository for managing user model operations.
+     * @param TaskRepository $taskRepository Repository for managing task model operations.
+     * @param BottlingRepository $bottlingRepository  Repository for managing bottling model operations.
+     * @param HarvestRepository $harvestRepository Repository for managing harvest model operations.
+     * @param WineRepository $wineRep Repository for managing wine model operations.
+     * @param ImageRepository $imgRep Repository for managing image model operations.
+     * @param VineyardRepository $vineyardRep Repository for managing vineyard model operations.
+     */
     public function __construct(
         private UserRepository $userRepository,
         private TaskRepository $taskRepository,
@@ -47,9 +61,9 @@ final class TasksPresenter extends BasePresenter
         private HarvestRepository $harvestRepository,
         private WineRepository $wineRep,
         private ImageRepository $imgRep,
-        private WineVarietyRepository $wineVarietyRep,
         private VineyardRepository $vineyardRep
     ) {
+        // Call parent constructor
         parent::__construct();
     }
 
@@ -76,18 +90,25 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function renderDashboard(): void
-    {
+    {   
+        /** @var string Pattern from searchbar for filter tasks. */
         $pattern = $this->getParameter('pattern') ?? '';
+        /** @var string Type of task from selection bar for filter tasks. */
         $type = $this->getParameter('type') ?? '';
+        /** @var string State of task from selection bar for filter tasks. */
         $state = $this->getParameter('state') ?? '';
         
+        // Give template the filtered tasks
         $this->template->tasks = $this->taskRepository->fetchTasks($pattern, $type, $state);
+        // Give template state of task
         $this->template->roleType = TaskState::class;
+        // Give template current date and time
         $this->template->currentDateTime = new DateTime('now');
     }
    
     /**
-     * Method for creating a new task
+     * handleCreateNonExistentTask
+     * Method for handling creation of a non existent task.
      * 
      * @return void
      */
@@ -100,7 +121,7 @@ final class TasksPresenter extends BasePresenter
     }
    
     /**
-     * Method to create part 1 of an N part formular for creating tasks
+     * Method to create part 1 of an N part formular for creating tasks.
      * 
      * @return void
      */
@@ -118,7 +139,7 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
-     * Method for creating a form for adding 
+     * Method for creating a form for adding a task.
      * 
      * @return Form
      */
@@ -167,7 +188,7 @@ final class TasksPresenter extends BasePresenter
     }
   
     /**
-     * Method for clearing the current form 
+     * Method for clearing the current form.
      *
      * @param boolean $redirect
      * @return void
@@ -183,7 +204,7 @@ final class TasksPresenter extends BasePresenter
     }
    
     /**
-     * Method for creating a form for assigning workers to the task
+     * Method for creating a form for assigning workers to the task.
      * 
      * @return Form
      */
@@ -234,7 +255,7 @@ final class TasksPresenter extends BasePresenter
     }
    
     /**
-     * Method for going to the first part of the adding component workflow
+     * Method for going to the first part of the adding component workflow.
      *
      * @return void
      */
@@ -244,7 +265,7 @@ final class TasksPresenter extends BasePresenter
     
     
     /**
-     * Method for going to the next form
+     * Method for going to the next form.
      *
      * @return void
      */
@@ -275,7 +296,7 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
-     * Method for fetching the current new task 
+     * Method for fetching the current new task.
      *
      * @return TaskData
      */
@@ -293,7 +314,7 @@ final class TasksPresenter extends BasePresenter
     
     
     /**
-     * Method for moving to the next form 
+     * Method for moving to the next form. 
      * @param Form $form
      * @param \stdClass $values
      * @return void
@@ -316,7 +337,6 @@ final class TasksPresenter extends BasePresenter
             try {
                 $planned = DateTime::from($values->planned_date);
             } catch (\Exception $e) {
-                // keep null on parse failure
                 $planned = null;
             }
         }
@@ -586,7 +606,7 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
-     * Method for logging a task, that was done, but was not initialized
+     * Method for logging a task, that was done, but was not initialized.
      * @return void
      */
     public function actionCreateNonExistentTask(): void
@@ -731,7 +751,7 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 
     /**
-     * Method for staring the bottling task
+     * Method for staring the bottling task.
      * 
      * @param integer $wineId
      * @return void
