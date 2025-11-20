@@ -32,9 +32,9 @@
 
                 <ul class="list-unstyled text-secondary mb-4">
                     <li><strong>Rok:</strong> {$wine->year}</li>
-                    <li><strong>Typ:</strong> {$wine->typeCz}</li>
-                    <li><strong>Barva:</strong> {$wine->colorCz}</li>
-                    <li><strong>Přívlastek:</strong> {$wine->gradeCz}</li>
+                    <li><strong>Typ:</strong> {$wine->getTypeText()}</li>
+                    <li><strong>Barva:</strong> {$wine->getColorText()}</li>
+                    <li><strong>Přívlastek:</strong> {$wine->getGradeText()}</li>
                     <li><strong>Obsah alkoholu:</strong> {$wine->alcoholPercentage}%</li>
                     <li><strong>Objem:</strong> {$wine->volume} ml</li>
                 </ul>
