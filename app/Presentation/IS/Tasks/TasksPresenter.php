@@ -31,7 +31,6 @@ use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Image\Image;
 use App\Model\Task\TaskOperationStatus;
 use App\Model\Task\Treatment\TreatmentType;
-use App\Model\WineVariety\WineVarietyRepository;
 use Exception;
 use Nette\Forms\Controls\Button;
 use Nette\Utils\DateTime;
