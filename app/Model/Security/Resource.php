@@ -1,10 +1,18 @@
 <?php
+//FILE:     Resource.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Enumeration of security resources.
 
 declare(strict_types=1);
 
 namespace App\Model\Security;
 
-
+/**
+ * Security resources
+ */
 enum Resource : string {
     case ADMIN_PAGE = "admin_page";
     case USER_PAGE = "user_page";

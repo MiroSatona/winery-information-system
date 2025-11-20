@@ -1,4 +1,10 @@
 <?php
+//FILE:     BottlingRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Repository for managing Bottling tasks.
 
 declare(strict_types=1);
 
@@ -10,6 +16,9 @@ use App\Model\Wine\Wine;
 use App\Model\Task\Bottling\Bottling;
 use App\Model\Wine\WineRepository;
 
+/**
+ * Handles data operations for Bottling tasks
+ */
 class BottlingRepository
 {
     private Explorer $database;
@@ -19,6 +28,7 @@ class BottlingRepository
      * Constructor of the BottlingRepository.
      *
      * @param Explorer $database Database explorer.
+     * @param WineRepository $wineRepository Wine repository.
      */
     public function __construct(Explorer $database, WineRepository $wineRepository)
     {
@@ -81,7 +91,7 @@ class BottlingRepository
      */
     public function fetchBottling(string $pattern, string $state): array
     {
-        // Fetch joined teble of tasks and bottlings
+        // fetch joined table of tasks and bottlings
         $mainQuery = $this->database->table('BOTTLING')
                         ->joinWhere('TASK', 'TASK.ID = ID_TASK')
                         ->select('TASK.*, BOTTLING.*');
@@ -127,8 +137,15 @@ class BottlingRepository
         return $bottlings;
     }
 
+    /**
+     * Get unfinished bottling task for a specific wine
+     *
+     * @param int $wineId
+     * @return Bottling|null
+     */
     public function getUnfinishedBottlingTaskForWine(int $wineId): ?Bottling
     {
+        // fetch joined table of tasks and bottlings
         $row = $this->database->table('BOTTLING')
             ->where('ID_WINE', $wineId)
             ->joinWhere('TASK', 'TASK.ID = ID_TASK')
@@ -166,6 +183,4 @@ class BottlingRepository
 
         return $bottling;
     }
-
 }
-
