@@ -1,6 +1,16 @@
+
+<!--
+//FILE:     changeImage.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for changing wine image in IS
+-->
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and current page -->
     <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vína
     </a>
@@ -10,6 +20,7 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <!-- Main panel for changing wine image -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-10 col-md-8 col-lg-6 col-xl-5">
             <div class="card border-0 shadow-sm">
@@ -20,10 +31,11 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
-                    {* Current image *}
+                    {* Display current wine image or placeholder *}
                     <div class="text-center">
                         <div class="current-image-container border rounded p-3 bg-light">
                             {if $wine->getImage()}
+                                <!-- Show current wine image with remove button -->
                                 <img src="{asset $imageRepository->getPathForImage($wine->getImage())}" 
                                         alt="{$wine->getImage()->description}" 
                                         class="img-fluid rounded shadow-sm current-wine-image"
@@ -37,6 +49,7 @@
                                     </button>
                                 </div>
                             {else}
+                                <!-- Placeholder if no image is assigned -->
                                 <div class="no-image-placeholder">
                                     <i class="fas fa-wine-bottle fa-4x text-muted mb-3"></i>
                                     <h6 class="text-muted mb-2">Bez obrázku</h6>
@@ -48,7 +61,7 @@
                         </div>
                     </div>
                     <hr>
-                {* Upload form *}
+                    {* Form for uploading or changing wine image *}
                     {form changeImageForm}
                         <div class="mb-3">
                             <label for="image" class="form-label fw-semibold">
@@ -69,11 +82,13 @@
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-6">
+                                    <!-- Cancel button returns to wine detail -->
                                     <a href="{link show, $wine->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
                                         <i class="fas fa-times me-1"></i>Zrušit
                                     </a>
                                 </div>
                                 <div class="col-6">
+                                    <!-- Submit button for image upload/change -->
                                     {input send}
                                     <span class="invalid-feedback">
                                         {inputError send}
@@ -87,7 +102,7 @@
         </div>
     </div>
 
-    {* Confirmation modal for removing image *}
+    {* Modal dialog for confirming image removal *}
     {if $wine->getImage()}
         <div class="modal fade" id="removeImageModal" tabindex="-1" aria-labelledby="removeImageModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -108,6 +123,7 @@
                         <p class="text-muted mt-3 mb-0">Obrázek bude trvale odstraněn z tohoto vína.</p>
                     </div>
                     <div class="modal-footer">
+                        <!-- Cancel and confirm removal buttons -->
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                             <i class="fas fa-times me-1"></i>Zrušit
                         </button>

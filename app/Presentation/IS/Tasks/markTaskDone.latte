@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     markTaskDone.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for marking a task as done in the IS module
+-->
+
+{* Use the IS layout for consistent look and feel *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current action *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -20,7 +32,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    {* Information about the task *}
+                    {* Display information about the current task, including type-specific details *}
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Informace o úkonu
@@ -32,6 +44,7 @@
                             <strong>Termín plánovaný:</strong> {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
                         </div>
                         
+                        {* Show details for Harvest tasks *}
                         {if $task instanceof $HarvestType}
                             <div class="mb-1">
                                 <strong>Typ:</strong> Sklizeň
@@ -44,6 +57,7 @@
                             </div>
                         {/if}
                         
+                        {* Show details for Treatment tasks *}
                         {if $task instanceof $TreatmentType}
                             <div class="mb-1">
                                 <strong>Typ:</strong> Ošetření
@@ -63,6 +77,7 @@
                             </div>
                         {/if}
                         
+                        {* Show details for Bottling tasks *}
                         {if $task instanceof $BottlingType}
                             <div class="mb-1">
                                 <strong>Typ:</strong> Lahvování
@@ -76,6 +91,7 @@
                         {/if}
                     </div>
 
+                    {* Form for marking the task as done *}
                     {form markTaskDoneForm}
                         <div class="mb-3">
                             <label for="execution_date" class="form-label fw-semibold">
@@ -91,11 +107,13 @@
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    {* Button to return to the list of tasks *}
                                     <a href="{link Tasks:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
                                         <i class="fas fa-arrow-left me-2"></i>Zpět na úkony
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-6">
+                                    {* Button to submit the form and mark the task as done *}
                                     {input send}
                                     <span class="invalid-feedback">
                                         {inputError send}

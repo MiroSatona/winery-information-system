@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     add.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for adding a new wine variety
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Navigation links for wine varieties dashboard and add variety page -->
     <a href="{link :IS:WineVarieties:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
     </a>
@@ -10,6 +21,7 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <!-- Main panel for adding a new wine variety -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-8 col-lg-6 col-xl-5">
             <div class="card border-0 shadow-sm">
@@ -21,6 +33,7 @@
                 </div>
                 <div class="card-body p-4">
                     {form addWineVariety}
+                        <!-- Input for wine variety name (required) -->
                         <div class="mb-3">
                             <label for="name" class="form-label fw-semibold">
                                 <i class="fas fa-seedling me-2 text-muted"></i>{label name /}
@@ -32,6 +45,7 @@
                             </span>
                         </div>
 
+                        <!-- Input for wine color (required) -->
                         <div class="mb-3">
                             <label for="color" class="form-label fw-semibold">
                                 <i class="fas fa-palette me-2 text-muted"></i>{label color /}
@@ -43,6 +57,7 @@
                             </span>
                         </div>
                         
+                        <!-- Input for wine description (optional) -->
                         <div class="mb-3">
                             <label for="description" class="form-label fw-semibold">
                                 <i class="fas fa-align-left me-2 text-muted"></i>{label description /}
@@ -53,6 +68,7 @@
                             </span>
                         </div>
                         
+                        <!-- Input for wine image (optional) -->
                         <div class="mb-3">
                             <label for="image" class="form-label fw-semibold">
                                 <i class="fas fa-image me-2 text-muted"></i>{label image /}
@@ -63,6 +79,7 @@
                             </span>
                         </div>
 
+                        <!-- Form action buttons: cancel and submit -->
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">

@@ -1,5 +1,15 @@
+
+<!--
+//FILE:     treatmentFinal.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for finalizing a vineyard treatment task
+-->
 {layout '../isLayout.latte'}
 
+{* Additional navigation menu for IS Tasks *}
 {block topMenuISAdditional}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
@@ -9,6 +19,7 @@
     </a>
 {/block topMenuISAdditional}
 
+{* Main content panel for treatment finalization *}
 {block isMainPanel}
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-10 col-lg-8 col-xl-6">
@@ -20,7 +31,7 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
-                    {* Summary of task details *}
+                    {* Summary of task details (displayed at the top) *}
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Shrnutí úkonu
@@ -43,9 +54,11 @@
                         {/if}
                     </div>
 
+                    {* Form for entering treatment details *}
                     {form treatmentDetailsForm}
                         <div class="row g-3">
                             <div class="col-12 col-md-6">
+                                {* Required: select treatment type *}
                                 <label for="type" class="form-label fw-semibold">
                                     <i class="fas fa-tag me-2 text-muted"></i>{label type /}
                                     <span class="text-danger">*</span>
@@ -57,6 +70,7 @@
                             </div>
 
                             <div class="col-12 col-md-6">
+                                {* Required: treatment name *}
                                 <label for="name" class="form-label fw-semibold">
                                     <i class="fas fa-prescription-bottle me-2 text-muted"></i>{label name /}
                                     <span class="text-danger">*</span>
@@ -68,6 +82,7 @@
                             </div>
 
                             <div class="col-12 col-md-6">
+                                {* Optional: amount of substance *}
                                 <label for="amount" class="form-label fw-semibold">
                                     <i class="fas fa-tint me-2 text-muted"></i>{label amount /}
                                 </label>
@@ -78,6 +93,7 @@
                             </div>
 
                             <div class="col-12 col-md-6">
+                                {* Optional: unit for amount *}
                                 <label for="unit" class="form-label fw-semibold">
                                     <i class="fas fa-ruler me-2 text-muted"></i>{label unit /}
                                 </label>
@@ -87,6 +103,7 @@
                                 </span>
                             </div>
 
+                            {* Info: both amount and unit must be filled to be saved *}
                             <div class="alert alert-info mb-4">
                                 <h6 class="fw-bold mb-2">
                                     <i class="fas fa-info-circle me-2"></i>Informace
@@ -95,22 +112,25 @@
                             </div>
                         </div>
 
-                        {* Action Buttons *}
+                        {* Action buttons for form submission *}
                         <div class="border-top pt-4 mt-4">
                             <div class="row g-2">
                                 <div class="col-12 col-md-4">
+                                    {* Cancel button *}
                                     {input cancel}
                                     <span class="invalid-feedback">
                                         {inputError cancel}
                                     </span>
                                 </div>
                                 <div class="col-12 col-md-4">
+                                    {* Back button *}
                                     {input back}
                                     <span class="invalid-feedback">
                                         {inputError back}
                                     </span>
                                 </div>
                                 <div class="col-12 col-md-4">
+                                    {* Finish/submit button *}
                                     {input finish}
                                     <span class="invalid-feedback">
                                         {inputError finish}

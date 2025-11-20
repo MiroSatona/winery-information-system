@@ -1,6 +1,19 @@
+
+<!--
+//FILE:     edit.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for editing a wine variety
+-->
+
+{* Use the main IS layout *}
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    {* Navigation links for wine varieties dashboard and current edit page *}
     <a href="{link :IS:WineVarieties:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
     </a>
@@ -9,7 +22,9 @@
     </a>
 {/block topMenuISAdditional}
 
+
 {block isMainPanel}
+    {* Main panel for editing a wine variety *}
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-lg-10 col-xl-8">
             <div class="card border-0 shadow-sm">
@@ -22,10 +37,10 @@
                 <div class="card-body p-4">
                     <div class="row">
                         
-
-                        {* Edit form *}
+                        {* Edit form for wine variety *}
                         <div class="col-12 col-md-8">
                             {form editWineVariety}
+                                {* Name input *}
                                 <div class="mb-3">
                                     <label for="name" class="form-label fw-semibold">
                                         <i class="fas fa-seedling me-2 text-muted"></i>{label name /}
@@ -37,6 +52,7 @@
                                     </span>
                                 </div>
 
+                                {* Color input *}
                                 <div class="mb-3">
                                     <label for="color" class="form-label fw-semibold">
                                         <i class="fas fa-palette me-2 text-muted"></i>{label color /}
@@ -48,6 +64,7 @@
                                     </span>
                                 </div>
                                 
+                                {* Description input (optional) *}
                                 <div class="mb-3">
                                     <label for="description" class="form-label fw-semibold">
                                         <i class="fas fa-align-left me-2 text-muted"></i>{label description /}
@@ -58,6 +75,7 @@
                                     </span>
                                 </div>
                                 
+                                {* Image upload input *}
                                 <div class="mb-3">
                                     <label for="image" class="form-label fw-semibold">
                                         <i class="fas fa-image me-2 text-muted"></i>
@@ -73,6 +91,7 @@
                                     </span>
                                 </div>
 
+                                {* Form actions: cancel and submit *}
                                 <div class="border-top pt-4">
                                     <div class="row">
                                         <div class="col-12 col-md-6 mb-3 mb-md-0">
@@ -91,7 +110,7 @@
                             {/form}
                         </div>
 
-                        {* Current image *}
+                        {* Display current image or placeholder *}
                         <div class="col-12 col-md-4 mb-4">
                             <div class="text-center">
                                 <div class="current-image-container border rounded p-3 bg-light">
@@ -122,7 +141,7 @@
         </div>
     </div>
 
-    {* Confirmation modal for removing image *}
+    {* Modal dialog for confirming image removal *}
     {if $wineVariety->getImage()}
         <div class="modal fade" id="removeImageModal" tabindex="-1" aria-labelledby="removeImageModalLabel" aria-hidden="true">
             <div class="modal-dialog">

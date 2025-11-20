@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     edit.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for editing wine details
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and edit page -->
     <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vína
     </a>
@@ -9,10 +20,13 @@
     </a>
 {/block topMenuISAdditional}
 
+
 {block isMainPanel}
+    <!-- Main panel for editing wine details -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-lg-10 col-xl-8">
             <div class="card border-0 shadow-lg">
+                <!-- Card header with title -->
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0 fw-bold">
                         <i class="fas fa-wine-glass me-2"></i>
@@ -21,7 +35,9 @@
                 </div>
                 <div class="card-body p-4">
                     {form editWineForm}
+                        <!-- Form fields for wine properties -->
                         <div class="row g-3">
+                            <!-- Wine name input -->
                             <div class="col-4">
                                 <label for="name" class="form-label fw-semibold">
                                     <i class="fas fa-wine-glass me-2 text-muted"></i>{label name /}
@@ -33,6 +49,7 @@
                                 </span>
                             </div>
 
+                            <!-- Year input -->
                             <div class="col-4">
                                 <label for="year" class="form-label fw-semibold">
                                     <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
@@ -44,6 +61,7 @@
                                 </span>
                             </div>
 
+                            <!-- Volume input -->
                             <div class="col-4">
                                 <label for="volume" class="form-label fw-semibold">
                                     <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
@@ -55,6 +73,7 @@
                                 </span>
                             </div>
 
+                            <!-- Type input -->
                             <div class="col-4">
                                 <label for="type" class="form-label fw-semibold">
                                     <i class="fas fa-tint me-2 text-muted"></i>{label type /}
@@ -66,6 +85,7 @@
                                 </span>
                             </div>
 
+                            <!-- Color input -->
                             <div class="col-4">
                                 <label for="color" class="form-label fw-semibold">
                                     <i class="fas fa-palette me-2 text-muted"></i>{label color /}
@@ -77,6 +97,7 @@
                                 </span>
                             </div>
 
+                            <!-- Grade input -->
                             <div class="col-4">
                                 <label for="grade" class="form-label fw-semibold">
                                     <i class="fas fa-award me-2 text-muted"></i>{label grade /}
@@ -88,6 +109,7 @@
                                 </span>
                             </div>
 
+                            <!-- Alcohol percentage input -->
                             <div class="col-4">
                                 <label for="alcoholPercentage" class="form-label fw-semibold">
                                     <i class="fas fa-percentage me-2 text-muted"></i>{label alcoholPercentage /}
@@ -99,6 +121,7 @@
                                 </span>
                             </div>
 
+                            <!-- Left sugar input -->
                             <div class="col-4">
                                 <label for="leftSugar" class="form-label fw-semibold">
                                     <i class="fas fa-cube me-2 text-muted"></i>{label leftSugar /}
@@ -110,6 +133,7 @@
                                 </span>
                             </div>
 
+                            <!-- Acid contents input -->
                             <div class="col-4">
                                 <label for="acidContents" class="form-label fw-semibold">
                                     <i class="fas fa-vial me-2 text-muted"></i>{label acidContents /}
@@ -121,6 +145,7 @@
                                 </span>
                             </div>
 
+                            <!-- Production note input -->
                             <div class="col-12">
                                 <label for="productionNote" class="form-label fw-semibold">
                                     <i class="fas fa-clipboard me-2 text-muted"></i>{label productionNote /}
@@ -132,14 +157,17 @@
                             </div>
                         </div>
 
+                        <!-- Form actions: cancel and submit -->
                         <div class="border-top pt-4 mt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <!-- Cancel button, returns to wine detail -->
                                     <a href="{link 'Wine:show', $wine->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
                                         <i class="fas fa-xmark me-2"></i>Zrušit
                                     </a>
                                 </div>
                                 <div class="col-12 col-md-6">
+                                    <!-- Submit button for saving changes -->
                                     {input send}
                                     <span class="invalid-feedback">
                                         {inputError send}

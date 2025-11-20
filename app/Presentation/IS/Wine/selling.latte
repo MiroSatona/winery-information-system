@@ -1,5 +1,16 @@
+
+<!--
+//FILE:     selling.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for selling wine (add wine to sale)
+-->
 {layout '../isLayout.latte'}
 
+
+{* Top menu navigation for wine dashboard and selling page *}
 {block topMenuISAdditional}
     <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vína
@@ -9,6 +20,8 @@
     </a>
 {/block topMenuISAdditional}
 
+
+{* Main panel for selling wine (add wine to sale) *}
 {block isMainPanel}
 <div class="d-flex justify-content-center align-items-center h-100">
     <div class="col-12 col-md-8 col-lg-6 col-xl-5">
@@ -21,7 +34,7 @@
             </div>
 
             <div class="card-body p-4">
-                {* === WINE INFO CARD === *}
+                {* Wine information card *}
                 <div class="mb-4">
                     <div class="card border-0 shadow-sm">
                         <div class="card-header bg-light py-3">
@@ -32,11 +45,13 @@
                         <div class="card-body p-3 text-center">
                             <div class="current-image-container">
                                 {if $wine->img !== null}
+                                    {* Show wine image if available *}
                                     <img src="{asset $imageRepository->getPathForImage($wine->img)}"
                                          alt="{$wine->name}" 
                                          class="img-fluid rounded shadow-sm"
                                          style="max-height: 200px; object-fit: cover;">
                                 {else}
+                                    {* Placeholder if no image is available *}
                                     <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded"
                                          style="height: 200px;">
                                         <i class="fas fa-wine-bottle fa-4x text-muted"></i>
@@ -47,7 +62,7 @@
                     </div>
                 </div>
 
-                {* === PRICE FORM === *}
+                {* Form for setting wine price and description *}
                 {form setWinePriceForm}
                     <div class="mb-3">
                         <label for="price" class="form-label fw-semibold">
@@ -62,7 +77,7 @@
 
                     <hr class="my-4">
 
-                    {* === PRODUCT DESCRIPTION BELOW === *}
+                    {* Product description input *}
                     <div class="mb-4">
                         <label for="popis" class="form-label fw-semibold">
                             <i class="fas fa-file-alt me-2 text-muted"></i>{label popis /}
@@ -74,6 +89,7 @@
                         </span>
                     </div>
 
+                    {* Info alert about the process *}
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Informace
@@ -86,11 +102,13 @@
                     <div class="border-top pt-4">
                         <div class="row">
                             <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                {* Cancel button returns to dashboard *}
                                 <a href="{link Wine:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
                                     <i class="fas fa-times me-2"></i>Zrušit
                                 </a>
                             </div>
                             <div class="col-12 col-md-6">
+                                {* Submit button to add wine to sale *}
                                 {input send, class => 'btn btn-primary w-100 fw-bold'}
                                 <span class="invalid-feedback">
                                     {inputError send}

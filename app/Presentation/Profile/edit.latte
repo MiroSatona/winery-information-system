@@ -1,20 +1,33 @@
+
+<!--
+//FILE:     edit.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for editing user profile and password
+-->
 {layout ../@layout.latte}
 
-{block title}Editace profilu{/block}
+{block title}Editace profilu{/block} <!-- Page title block -->
 
 {block content}
+    <!-- Main container for centering the profile edit card -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-lg-8 col-xl-6">
             <div class="card border-0 shadow-lg">
+                <!-- Card header with title -->
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0 fw-bold">
                         <i class="fas fa-edit me-2"></i>
-                        Úprava uživatele
+                        Úprava uživatele <!-- User edit heading -->
                     </h4>
                 </div>
                 <div class="card-body p-4">
+                    <!-- Profile edit form -->
                     {form editProfileByUserForm}
                         <div class="row g-3">
+                            <!-- Name input -->
                             <div class="col-12 col-md-6">
                                 <label for="name" class="form-label fw-semibold">
                                     <i class="fas fa-user me-2 text-muted"></i>Jméno
@@ -26,6 +39,7 @@
                                 </span>
                             </div>
 
+                            <!-- Surname input -->
                             <div class="col-12 col-md-6">
                                 <label for="surname" class="form-label fw-semibold">
                                     <i class="fas fa-user me-2 text-muted"></i>Příjmení
@@ -37,6 +51,7 @@
                                 </span>
                             </div>
 
+                            <!-- Email input -->
                             <div class="col-12 col-md-6">
                                 <label for="email" class="form-label fw-semibold">
                                     <i class="fas fa-envelope me-2 text-muted"></i>E-mail
@@ -47,6 +62,7 @@
                                     {inputError email}
                                 </span>
                             </div>
+                            <!-- Username input -->
                             <div class="col-12 col-md-6">
                                 <label for="username" class="form-label fw-semibold">
                                     <i class="fas fa-user-check me-2 text-muted"></i>Login
@@ -57,6 +73,7 @@
                                     {inputError username}
                                 </span>
                             </div>
+                            <!-- City input -->
                             <div class="col-12 col-md-6">
                                 <label for="city" class="form-label fw-semibold">
                                     <i class="fas fa-city me-2 text-muted"></i>Město
@@ -67,6 +84,7 @@
                                 </span>
                             </div>
 
+                            <!-- Street input -->
                             <div class="col-12 col-md-6">
                                 <label for="street" class="form-label fw-semibold">
                                     <i class="fas fa-road me-2 text-muted"></i>Ulice
@@ -77,6 +95,7 @@
                                 </span>
                             </div>
 
+                            <!-- House number input -->
                             <div class="col-12 col-md-6">
                                 <label for="houseNumber" class="form-label fw-semibold">
                                     <i class="fas fa-home me-2 text-muted"></i>Číslo popisné
@@ -87,6 +106,7 @@
                                 </span>
                             </div>
 
+                            <!-- Postal code input -->
                             <div class="col-12 col-md-6">
                                 <label for="postalCode" class="form-label fw-semibold">
                                     <i class="fas fa-mail-bulk me-2 text-muted"></i>PSČ
@@ -96,6 +116,7 @@
                                     {inputError postalCode}
                                 </span>
                             </div>
+                            <!-- Phone input -->
                             <div class="col-12">
                                 <label for="phone" class="form-label fw-semibold">
                                     <i class="fas fa-phone me-2 text-muted"></i>Telefon
@@ -106,6 +127,7 @@
                                 </span>
                             </div>
                             
+                            <!-- Submit button for profile edit -->
                             <div class="col-12 col">
                                 <div class="d-grid">
                                     {input send}
@@ -117,13 +139,16 @@
                         </div>
                     {/form}
 
+                    <!-- Section for password change -->
                     <div class="d-flex justify-content-start align-items-center flex-row mt-5 mb-2">
                         <h4 class="fw-bold text-danger border-bottom border-2 pb-2 w-100">
                             <i class="fas fa-lock me-2"></i> Změna hesla
                         </h4>
                     </div>
+                    <!-- Password reset form -->
                     {form resetPasswordForm}
                         <div class="row g-3">
+                            <!-- Old password input -->
                             <div class="col-12">
                                 <label for="newPassword" class="form-label fw-semibold">
                                     <i class="fas fa-lock me-2 text-danger"></i>Staré heslo
@@ -132,6 +157,7 @@
                                 {input oldPassword class}
                             </div>
 
+                            <!-- New password input -->
                             <div class="col-12 col-md-6">
                                 <label for="newPasswordAgain" class="form-label fw-semibold">
                                     <i class="fas fa-lock me-2 text-danger"></i>Potvrzení hesla
@@ -140,6 +166,7 @@
                                 {input newPassword}
                             </div>
 
+                            <!-- New password confirmation input -->
                             <div class="col-12 col-md-6">
                                 <label for="newPasswordAgain" class="form-label fw-semibold">
                                     <i class="fas fa-lock me-2 text-danger"></i>Potvrzení hesla
@@ -148,6 +175,7 @@
                                 {input newPasswordAgain }
                             </div>
 
+                            <!-- Submit button for password change -->
                             <div class="col-12">
                                 <div class="d-grid">
                                     {input changePassword }

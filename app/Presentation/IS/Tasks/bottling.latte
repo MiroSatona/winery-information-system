@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     bottling.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for wine bottling task selection and form
+-->
+
+{* Use the main IS layout for this page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for IS tasks and current bottling page *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -10,6 +22,7 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    {* Main panel for wine bottling task selection *}
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-10 col-lg-9 col-xl-7">
             <div class="card border-0 shadow-sm">
@@ -20,9 +33,11 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
+                    {* Form for selecting wine, image, and bottle volume *}
                     {form wineSelectForm}
                         <div class="row g-3">
                             <div class="col-12">
+                                {* Wine selection input *}
                                 <label for="wine" class="form-label fw-semibold">
                                     <i class="fas fa-wine-glass-alt me-2 text-muted"></i>{label wine /}
                                 </label>
@@ -33,6 +48,7 @@
                             </div>
 
                             <div class="col-12 col-md-6">
+                                {* Image upload input for wine *}
                                 <label for="wine-image-input" class="form-label fw-semibold">
                                     <i class="far fa-image me-2 text-muted"></i>{label image /}
                                 </label>
@@ -43,6 +59,7 @@
                             </div>
 
                             <div class="col-12 col-md-6 d-flex align-items-start flex-column">
+                                {* Bottle volume input *}
                                 <label class="form-label fw-semibold">
                                     <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
                                 </label>
@@ -55,16 +72,19 @@
                             <div class="col-12 border-top pt-4 mt-2">
                                 <div class="row g-2">
                                     <div class="col-4">
+                                        {* Cancel button, clears the form *}
                                         <a href="{link clearForm!}" class="btn btn-danger w-100">
                                             Zrušit
                                         </a>
                                     </div>
                                     <div class="col-4">
+                                        {* Back button, returns to worker selection *}
                                         <a href="{link selectWorkers}" class="btn btn-secondary w-100">
                                             Zpět
                                         </a>
                                     </div>
                                     <div class="col-4">
+                                        {* Submit button, proceeds to next step *}
                                         <button type="submit" class="btn btn-primary w-100">
                                             <i class="fas fa-check me-1"></i> Pokračovat
                                         </button>

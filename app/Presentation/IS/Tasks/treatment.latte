@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     treatment.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for selecting vineyard and rows for treatment
+-->
+
+{* Use the main IS layout for this page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for IS Tasks and Treatment *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -20,7 +32,7 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
-                    {* Vineyard Selection Form *}
+                    {* Form for selecting a vineyard to treat *}
                     {form selectVineyard}
                         <div class="mb-4">
                             <div class="row g-3 align-items-end">
@@ -44,7 +56,7 @@
                         </div>
                     {/form}
 
-                    {* Wine Rows Selection Form *}
+                    {* Form for selecting rows within the chosen vineyard *}
                     {form selectRowsForm}
                         <div class="mb-4">
                             <div class="row g-3 align-items-end">
@@ -66,7 +78,7 @@
                             </div>
                         </div>
 
-                        {* Selected Rows Display *}
+                        {* Display of currently selected rows for treatment *}
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold m-0">
@@ -75,7 +87,7 @@
                                 </h5>
                                 <div>
                                     {if $selectedRows && count($selectedRows) > 0}
-                                        {input clearRows}
+                                        {input clearRows} {* Button to clear all selected rows *}
                                     {/if}
                                 </div>
                             </div>
@@ -98,6 +110,7 @@
                                                     <td>{$row->getHeadCount()}</td>
                                                     <td>{$row->getYearPlanted()}</td>
                                                     <td class="text-center">
+                                                        {* Remove row from selection *}
                                                         <a href="{link removeRowFromSelection! $row->getId()}" class="btn btn-sm btn-outline-danger">
                                                             <i class="fas fa-trash-alt me-1"></i>Odebrat
                                                         </a>
@@ -117,7 +130,7 @@
                             {/if}
                         </div>
 
-                        {* Action Buttons *}
+                        {* Navigation and action buttons for the form *}
                         <div class="border-top pt-4">
                             <div class="row g-2">
                                 <div class="col-12 col-md-4">

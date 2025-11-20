@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     selectWorkers.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for selecting workers for a task in the IS module
+-->
+
+{* Use the IS layout for this page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current page *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -20,8 +32,10 @@
                     </h4>
                 </div>
                 <div class="card-body p-4">
+                    {* Form for selecting workers for a task *}
                     {form taskWorkersForm}
 
+                        {* Section for adding a new worker to the selection *}
                         <div class="mb-4">
                             <div class="row g-3 align-items-end">
                                 <div class="col-9">
@@ -42,6 +56,7 @@
                             </div>
                         </div>
 
+                        {* Section displaying the list of selected workers *}
                         <div class="mb-4">
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <h5 class="fw-bold m-0">
@@ -50,6 +65,7 @@
                                 </h5>
 
                                 <div>
+                                    {* Show clear button only if there are selected workers *}
                                     {if $selectedWorkers && count($selectedWorkers) > 0}
                                         {input clearWorkers}
                                     {/if}
@@ -67,6 +83,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {* List each selected worker with option to remove *}
                                             {foreach $selectedWorkers as $worker}
                                                 <tr class="align-middle">
                                                     <td class="fw-semibold">{$worker->getFullName()}</td>
@@ -82,6 +99,7 @@
                                     </table>
                                 </div>
                             {else}
+                                {* Info message if no workers are selected *}
                                 <div class="alert alert-info">
                                     <h6 class="fw-bold mb-2">
                                         <i class="fas fa-info-circle me-2"></i>Informace
@@ -92,6 +110,7 @@
                         </div>
                         <div class="border-top pt-4">
                             <div class="row g-2">
+                                {* Navigation buttons for form actions *}
                                 <div class="col-12 col-md-4">
                                     {input backToDashboard}
                                     <span class="invalid-feedback">

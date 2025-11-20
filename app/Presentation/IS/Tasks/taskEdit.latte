@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     taskEdit.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for editing a task (úkon) in the IS module. Provides forms for editing general task info and, depending on type, bottling or treatment details.
+-->
+
+{* Use the IS layout for this page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current edit page *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -16,9 +28,11 @@
                  <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
                     <h4 class="mb-0 fw-bold">
                         <i class="fas fa-edit me-2"></i>
+                        {* Display the task ID being edited *}
                         Úprava úkonu #{$task->getId()}
                     </h4>
 
+                    {* Back button to dashboard *}
                     <a href="{link dashboard}" class="btn btn-outline-light btn-sm d-flex align-items-center">
                         <i class="fas fa-arrow-left me-2"></i>
                         Zpět
@@ -26,7 +40,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    {* Basic task information form *}
+                    {* Form for editing basic task information (name, date, note) *}
                     {form basicTaskEdit}
                         <h5 class="mb-3 fw-semibold text-primary">
                             <i class="fas fa-info-circle me-2"></i>Základní informace
@@ -66,6 +80,7 @@
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 ms-auto">
+                                    {* Submit button for basic info form *}
                                     {input send}
                                     <span class="invalid-feedback">
                                         {inputError send}
@@ -77,12 +92,14 @@
 
                     <hr class="my-4">
 
+                    {* Show additional form depending on the type of task *}
                     {if $task instanceof App\Model\Task\Bottling\Bottling}
-                        {* Bottling-specific form *}
+                        {* Bottling-specific form section *}
                         <h5 class="mb-3 fw-semibold text-primary">
                             <i class="fas fa-wine-bottle me-2"></i>Údaje o láhvování
                         </h5>
                         
+                        {* Display wine info and image for bottling task *}
                         <div class="alert alert-info mb-3">
                             <div class="d-flex align-items-center">
                                 <img src="{asset $image? $imageRepository->getPathForImage($image) : $imageRepository->getTmpWineImage()}" 
@@ -123,6 +140,7 @@
                             <div class="border-top pt-4">
                                 <div class="row">
                                     <div class="col-12 col-md-6 ms-auto">
+                                        {* Submit button for bottling form *}
                                         {input send}
                                         <span class="invalid-feedback">
                                             {inputError send}
@@ -133,7 +151,7 @@
                         {/form}
 
                     {elseif $task instanceof App\Model\Task\Treatment\Treatment}
-                        {* Treatment-specific form *}
+                        {* Treatment-specific form section *}
                         <h5 class="mb-3 fw-semibold text-primary">
                             <i class="fas fa-flask me-2"></i>Údaje o ošetření
                         </h5>
@@ -182,6 +200,7 @@
                                     </span>
                                 </div>
 
+                                {* Info alert about optional fields for treatment *}
                                 <div class="alert alert-info mb-4">
                                     <h6 class="fw-bold mb-2">
                                         <i class="fas fa-info-circle me-2"></i>Informace
@@ -193,6 +212,7 @@
                                     <div class="border-top pt-4">
                                         <div class="row">
                                             <div class="col-12 col-md-6 ms-auto">
+                                                {* Submit button for treatment form *}
                                                 {input send}
                                                 <span class="invalid-feedback">
                                                     {inputError send}

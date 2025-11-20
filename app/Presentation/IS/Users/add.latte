@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     add.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for adding a new user
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Navigation links for user dashboard and add user page -->
     <a href="{link :IS:Users:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Uživatelé
     </a>
@@ -10,26 +21,29 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
-     <div class="d-flex justify-content-center align-items-center h-100">
-    <div class="col-12 col-lg-8 col-xl-6">
-        <div class="card border-0 shadow-lg">
-            <div class="card-header bg-primary text-white py-3">
-                <h4 class="mb-0 fw-bold">
-                    <i class="fas fa-user-plus me-2"></i>
-                    Přidání uživatele
-                </h4>
-            </div>
-            
-            <div class="card-body p-4">
-                {form addUserForm}
-                {* Section of "Základní informace" *}
-                <div class="d-flex justify-content-start align-items-center flex-row mt-2 mb-2">
-                    <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
-                        <i class="fas fa-person me-2"></i> Základní informace
+    <!-- Main panel for the Add User form -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-8 col-xl-6">
+            <div class="card border-0 shadow-lg">
+                <!-- Card header with title -->
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-user-plus me-2"></i>
+                        Přidání uživatele
                     </h4>
                 </div>
+                <!-- Card body with the user form -->
+                <div class="card-body p-4">
+                    {form addUserForm}
+                    <!-- Section: Basic Information -->
+                    <div class="d-flex justify-content-start align-items-center flex-row mt-2 mb-2">
+                        <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
+                            <i class="fas fa-person me-2"></i> Základní informace
+                        </h4>
+                    </div>
                     <div class="row g-3 mb-2">
                         <div class="col-md-6">
+                            <!-- Name input -->
                             <label for="name" class="form-label fw-semibold">
                                 <i class="fas fa-user me-2 text-muted"></i>{label name/}
                                 <span class="text-danger">*</span>
@@ -40,6 +54,7 @@
                             </span>
                         </div>
                         <div class="col-md-6">
+                            <!-- Surname input -->
                             <label for="surname" class="form-label fw-semibold">
                                 <i class="fas fa-user me-2 text-muted"></i>{label surname/}
                                 <span class="text-danger">*</span>
@@ -52,6 +67,7 @@
                     </div>
                     <div class="row g-3">
                         <div class="col-md-6">
+                            <!-- Email input -->
                             <label for="email" class="form-label fw-semibold">
                                 <i class="fas fa-user me-2 text-muted"></i>{label email/}
                                 <span class="text-danger">*</span>
@@ -62,6 +78,7 @@
                             </span>
                         </div>
                         <div class="col-md-6">
+                            <!-- Phone input -->
                             <label for="phone" class="form-label fw-semibold">
                                 <i class="fas fa-user me-2 text-muted"></i>{label phone/}
                                 <span class="text-danger">*</span>
@@ -72,14 +89,15 @@
                             </span>
                         </div>
                     </div>
-                    {* Section of "Kontaktní informace" *}
+                    <!-- Section: Contact Information -->
                     <div class="d-flex justify-content-start align-items-center flex-row mt-4 mb-2">
                         <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
                             <i class="fas fa-phone me-2"></i> Kontaktní informace
                         </h4>
                     </div>
-                     <div class="row g-3 mb-2">
+                    <div class="row g-3 mb-2">
                         <div class="col-md-6">
+                            <!-- City input -->
                             <label for="city" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label city/}
                             </label>
@@ -89,6 +107,7 @@
                             </span>
                         </div>
                         <div class="col-md-6">
+                            <!-- Street input -->
                             <label for="street" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label street/}
                             </label>
@@ -100,6 +119,7 @@
                     </div>
                     <div class="row g-3 mb-2">
                         <div class="col-md-6">
+                            <!-- House number input -->
                             <label for="houseNumber" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label houseNumber/}
                             </label>
@@ -109,6 +129,7 @@
                             </span>
                         </div>
                         <div class="col-md-6">
+                            <!-- Postal code input -->
                             <label for="postalCode" class="form-label fw-semibold">
                                 <i class="fas fa-phone me-2 text-muted"></i>{label postalCode/}
                             </label>
@@ -118,41 +139,39 @@
                             </span>
                         </div>
                     </div>
-                    {* Section of "Uživatelské informace" *}
+                    <!-- Section: User Information -->
                     <div class="d-flex justify-content-start align-items-center flex-row mt-4 mb-2">
                         <h4 class="fw-bold text-primary border-bottom border-2 pb-2 w-100">
                             <i class="fas fa-user-shield me-2"></i> Uživatelské informace
                         </h4>
                     </div>
                     <div class="col mb-3">
-                            <label for="username" class="form-label fw-semibold">
-                                <i class="fas fa-user-shield me-2 text-muted"></i>{label username/}
-                                <span class="text-danger">*</span>
-                            </label>
-                            {input username}
-                            <span class="invalid-feedback">
-                                {inputError username}
-                            </span>
-                        </div>
+                        <!-- Username input -->
+                        <label for="username" class="form-label fw-semibold">
+                            <i class="fas fa-user-shield me-2 text-muted"></i>{label username/}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {input username}
+                        <span class="invalid-feedback">
+                            {inputError username}
+                        </span>
+                    </div>
                     <div class="row g-3 mb-3">
                         <div class="col-12">
+                            <!-- User roles checkboxes -->
                             <div class="d-flex flex-wrap gap-4">
-
                                 <div class="form-check">
                                     {input isUser}
                                     {label isUser/}
                                 </div>
-
                                 <div class="form-check">
                                     {input isWorker}
                                     {label isWorker/}
                                 </div>
-
                                 <div class="form-check">
                                     {input isVintner}
                                     {label isVintner/}
                                 </div>
-
                                 <div class="form-check">
                                     {input isAdmin}
                                     {label isAdmin/}
@@ -166,15 +185,17 @@
                             </div>
                         </div>
                     </div>
+                    <!-- Form action buttons -->
                     <div class="row g-2 mt-4">
                         <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <!-- Cancel button -->
                             <a href="{link Users:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
                                 <i class="fas fa-times me-2"></i>Zrušit
                             </a>
                         </div>
-
                         <div class="col-12 col-md-6">
                             <div class="d-grid">
+                                <!-- Submit button -->
                                 {input send}
                                 <span class="invalid-feedback">
                                     {inputError send}
@@ -182,11 +203,9 @@
                             </div>
                         </div>
                     </div>
-                {/form}
+                    {/form}
+                </div>
             </div>
         </div>
     </div>
-</div>
-
-
 {/block isMainPanel}

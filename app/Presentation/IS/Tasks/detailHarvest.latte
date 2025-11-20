@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     detailHarvest.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for displaying detailed information about a harvest task, including vineyard, wine variety, harvested rows, and related actions.
+-->
+
+{* Use the main IS layout for the page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current harvest details *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -10,6 +22,7 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    {* Header for the harvest task detail, includes task info *}
     {include 'detailHeader.latte', task: $task}
 
     <div class="container-fluid">
@@ -23,12 +36,15 @@
                             </h5>
 
                             <div class="d-flex gap-2 flex-wrap">
+                                {* Link to the vineyard detail *}
                                 <a href="{link :IS:Vineyards:show vineyardId => $task->getVineyard()->getId()}" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-map-marker-alt me-1"></i>{$task->getVineyard()->getName()}
                                 </a>
+                                {* Link to the wine variety edit page *}
                                 <a href="{link :IS:WineVarieties:edit id => $task->getWineVariety()->getId()}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-wine-glass me-1"></i>{$task->getWineVariety()->getName()}
                                 </a>
+                                {* Link to the produced wine detail, if available *}
                                 {if $wine}
                                     <a href="{link :IS:Wine:show $wine->getId()}" class="btn btn-sm btn-primary">
                                         <i class="fas fa-wine-bottle me-1"></i>{$wine->getName()}
@@ -42,6 +58,7 @@
                         <div class="row">
                             <div class="col-12 col-md-8">
                                 <div class="mb-4">
+                                    {* Vineyard and wine variety info *}
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
@@ -58,6 +75,7 @@
                                         </div>
                                     </div>
 
+                                    {* Weight and sugar content info *}
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
@@ -86,6 +104,7 @@
                                         </div>
                                     </div>
 
+                                    {* Confirmer and produced wine info *}
                                     <div class="row mb-3">
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
@@ -114,6 +133,7 @@
                                         </div>
                                     </div>
 
+                                    {* List of harvested rows, with add form if task is planned *}
                                     <div class="row mt-4">
                                         <div class="col-12">
                                             <div class="d-flex justify-content-between align-items-center mb-3">
@@ -121,6 +141,7 @@
                                                     <i class="fas fa-list me-2"></i>Sklizené řádky
                                                 </h5>
 
+                                                {* Show add row form only if task is in PLANNED state *}
                                                 {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                     {form addRowForm}
                                                         <div class="d-flex align-items-end gap-2">
@@ -145,10 +166,11 @@
                                                                 {/if}
                                                             </tr>
                                                         </thead>
+                                                        {* Show warning if there are rows in conflict with spraying *}
                                                         {if $task->isInConflict()}
                                                             <div class="text-danger mt-2 mb-1">
                                                                 <i class="fas fa-exclamation-triangle ms-2"></i>
-                                                                Červeně označené řádky jsou v konfliktu s postřikem (méně než 14 dní sklizeň - postřik).
+                                                                Rows marked in red are in conflict with spraying (less than 14 days between harvest and spraying).
                                                             </div>
                                                         {/if}
                                                         <tbody>
@@ -169,6 +191,7 @@
                                                                         {/if}
                                                                     </td>
 
+                                                                    {* Show delete button for rows if task is planned *}
                                                                     {if $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                         <td class="text-center">
                                                                             <a n:href="deleteTaskRows! $wineRow->getId()"
@@ -184,7 +207,7 @@
                                                     </table>
                                                 </div>
                                             {else}
-                                                <p class="text-muted">Žádné vinné řádky nejsou přiřazeny.</p>
+                                                <p class="text-muted">No vineyard rows are assigned.</p>
                                             {/if}
                                         </div>
                                     </div>

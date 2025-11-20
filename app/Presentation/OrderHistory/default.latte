@@ -1,7 +1,19 @@
+
+<!--
+//FILE:     default.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for displaying user's order history
+-->
+
 {block content}
 
 <div class="container my-5">
+    <!-- Main container for order history page -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Header with title and back to cart button -->
         <h2 class="mb-0">
             <i class="fa-solid fa-receipt me-2"></i>Historie objednávek
         </h2>
@@ -10,20 +22,23 @@
         </a>
     </div>
     {if $message}
+        <!-- Display info message if present -->
         <div class="alert alert-info text-center py-3">
             <i class="fa-solid fa-circle-info me-2"></i>{$message}
         </div>
     {else}
+        <!-- List of orders -->
         <div class="row gy-4">
             {foreach $orders as $order}
                 <div class="col-12">
                     <div class="card shadow-sm border-0 rounded-3">
                         <div class="card-body">
+                            <!-- Order header: number, date, and state badge -->
                             <div class="d-flex justify-content-between align-items-center flex-wrap mb-2">
                                 <div>
                                     <h5 class="card-title mb-0">
                                         <i class="fa-solid fa-box me-2 text-primary"></i>
-                                        Číslo objednávky: {$order->id}
+                                        Order number: {$order->id}
                                     </h5>
                                     <small class="text-muted">
                                         <i class="fa-regular fa-calendar-days me-1"></i>
@@ -31,26 +46,27 @@
                                     </small>
                                 </div>
                                 <div>
+                                    <!-- Order state badge -->
                                     {switch $order->state}
                                         {case $OrderState::RESERVED->value}
                                             <span class="badge bg-warning text-dark">
-                                                <i class="fa-solid fa-clock me-1"></i> Rezervováno
+                                                <i class="fa-solid fa-clock me-1"></i> Reserved
                                             </span>
                                         {case $OrderState::PAID->value}
                                             <span class="badge bg-success">
-                                                <i class="fa-solid fa-check me-1"></i> Zaplaceno
+                                                <i class="fa-solid fa-check me-1"></i> Paid
                                             </span>
                                         {case $OrderState::CANCELLED->value}
                                             <span class="badge bg-danger">
-                                                <i class="fa-solid fa-xmark me-1"></i> Zrušeno
+                                                <i class="fa-solid fa-xmark me-1"></i> Cancelled
                                             </span>
                                         {case $OrderState::DELIVERED->value}
                                             <span class="badge bg-success">
-                                                <i class="fa-solid fa-check me-1"></i> Odesláno
+                                                <i class="fa-solid fa-check me-1"></i> Delivered
                                             </span>
                                         {default}
                                             <span class="badge bg-secondary">
-                                                <i class="fa-solid fa-question me-1"></i> Neznámý stav
+                                                <i class="fa-solid fa-question me-1"></i> Unknown state
                                             </span>
                                     {/switch}
                                 </div>
@@ -59,18 +75,19 @@
                             <hr class="my-3">
 
                             <div class="row">
+                                <!-- Delivery info -->
                                 <div class="col-md-6">
                                     <p class="mb-1">
-                                        <strong><i class="fa-solid fa-truck me-1"></i>Doručení:</strong>
+                                        <strong><i class="fa-solid fa-truck me-1"></i>Delivery:</strong>
                                         {if $order->deliveryType}
                                             {switch $order->deliveryType}
-                                                {case 'PICKUP'} Osobní odběr 
-                                                {case 'COURIER'} Kurýr 
-                                                {case 'POST'} Pošta 
-                                                {default} Jiný způsob 
+                                                {case 'PICKUP'} Personal pickup 
+                                                {case 'COURIER'} Courier 
+                                                {case 'POST'} Post 
+                                                {default} Other method 
                                             {/switch}
                                         {else}
-                                            <span class="text-muted">Nezadáno</span>
+                                            <span class="text-muted">Not specified</span>
                                         {/if}
                                     </p>
                                     <p class="mb-0 text-muted small">
@@ -78,17 +95,19 @@
                                     </p>
                                 </div>
 
+                                <!-- Total price -->
                                 <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                     <h5 class="mb-1">
                                         <i class="fa-solid fa-money-bill-wave me-1 text-success"></i>
-                                        Celkem: <strong>{$order->totalPrice} Kč</strong>
+                                        Total: <strong>{$order->totalPrice} Kč</strong>
                                     </h5>
                                 </div>
                             </div>
 
                             {if !empty($order->items)}
                                 <hr class="my-3">
-                                <p class="fw-bold mb-2"><i class="fa-solid fa-wine-bottle me-1"></i>Položky objednávky:</p>
+                                <!-- List of order items -->
+                                <p class="fw-bold mb-2"><i class="fa-solid fa-wine-bottle me-1"></i>Order items:</p>
                                 <ul class="list-group list-group-flush">
                                     {foreach $order->items as $item}
                                         <li class="list-group-item d-flex justify-content-between align-items-center">

@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     show.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     latte template for vineyard detail
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Top navigation menu for vineyards and detail -->
     <a href="{link :IS:Vineyards:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vinohrady
     </a>
@@ -10,9 +21,10 @@
 {/block topMenuISAdditional}
 
 
+
 {block isMainPanel}
     <div class="container-fluid">
-        {* Main vineyard details section *}
+        <!-- Main vineyard details section -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -23,10 +35,12 @@
                                 Detail vinohradu
                             </h4>
                             <div class="d-flex gap-2">
+                                <!-- Back to vineyard dashboard button -->
                                 <a href="{link Vineyards:dashboard}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
                                 {if $userVintner}
+                                    <!-- Edit vineyard button for vintner -->
                                     <a href="{link Vineyards:edit, vineyardId => $vineyard->getId()}" class="btn btn-primary btn-sm">
                                         <i class="fas fa-edit me-2"></i>Upravit vinohrad
                                     </a>
@@ -35,12 +49,12 @@
                         </div>
                     </div>
 
-
                     <div class="card-body p-4">
                         <div class="row">
-                            {* Vineyard information *}
+                            <!-- Vineyard information (left column) -->
                             <div class="col-12 col-md-8">
                                 <div class="mb-4">
+                                    <!-- Vineyard name -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-mountain me-2"></i>Název vinohradu
@@ -48,6 +62,7 @@
                                         <p class="fs-5 fw-bold text-dark mb-2">{$vineyard->getName()}</p>
                                     </div>
 
+                                    <!-- Vineyard location -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-map-marker-alt me-2"></i>Lokalita
@@ -55,6 +70,7 @@
                                         <p class="fs-6 text-dark mb-2">{$vineyard->getLocation()}</p>
                                     </div>
                                     
+                                    <!-- Year established -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-calendar-alt me-2"></i>Rok založení
@@ -62,6 +78,7 @@
                                         <p class="fs-6 text-dark mb-2">{$vineyard->getYearEstablished()}</p>
                                     </div>
                                     
+                                    <!-- Detailed description -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-align-left me-2"></i>Detailní popis
@@ -71,36 +88,39 @@
 
                                     <hr>
 
+                                    <!-- Unique wine varieties count -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-seedling me-2"></i>Unikátní počet odrůd: {$vineyard->getWineVarietiesCount()} 
                                         </label>
                                     </div>
 
+                                    <!-- Wine rows count -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-grip-lines me-2"></i>Počet řádků: {$vineyard->getWineRowsCount()}
                                         </label>
                                     </div>
 
+                                    <!-- Total head count -->
                                     <div class="mb-3">
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-calculator me-2"></i>Celkový počet keřů: {$vineyard->getTotalHeadCount()}
                                         </label>
                                     </div>
                                 </div>
-                                
-                                
                             </div>
 
-                            {* Vineyard image *}
+                            <!-- Vineyard image (right column) -->
                             <div class="col-12 col-md-4">
                                 <div class="vineyard-image-container border rounded p-3 bg-light">
                                     {if $vineyard->getImage()}
+                                        <!-- Display vineyard image if available -->
                                         <img src="{asset $imageRepository->getPathForImage($vineyard->getImage())}" 
                                              alt="{$vineyard->getImage()->description}" 
                                              class="img-fluid rounded shadow-sm">
                                     {else}
+                                        <!-- Placeholder if no image -->
                                         <div class="no-image-placeholder text-center">
                                             <i class="fas fa-image fa-4x text-muted mb-3"></i>
                                             <p class="text-muted mb-0">Bez obrázku</p>
@@ -114,7 +134,7 @@
             </div>
         </div>
 
-        {* Wine varieties section *}
+        <!-- Wine varieties section -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -129,6 +149,7 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
+                        <!-- Display wine varieties table if any exist -->
                         {if count($wineVarieties) > 0}
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
@@ -156,6 +177,7 @@
                                                 </td>
                                                 <td>
                                                     <span class="fw-semibold">
+                                                        <!-- Display color of wine variety -->
                                                         {switch $variety->getColor()}
                                                             {case $WineVarietyType::WHITE}
                                                                 Bílé
@@ -172,6 +194,7 @@
                                                 </td>
                                                 <td>
                                                     <p class="mb-0 text-muted">
+                                                        <!-- Truncate description if too long -->
                                                         {if strlen($variety->getDescription()) > 120}
                                                             {$variety->getDescription()|truncate:120}
                                                         {else}
@@ -190,6 +213,7 @@
                                 </table>
                             </div>
                         {else}
+                            <!-- No wine varieties found -->
                             <div class="text-center py-5">
                                 <i class="fas fa-wine-glass fa-3x text-muted mb-3 opacity-50"></i>
                                 <h5 class="text-muted">Žádné odrůdy vína</h5>
@@ -201,7 +225,7 @@
             </div>
         </div>
 
-        {* Wine rows section *}
+        <!-- Wine rows section -->
         <div class="row">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -212,6 +236,7 @@
                             </h5>
 
                             <div class="flex-fill d-flex justify-content-center px-3">
+                                <!-- Search form for wine rows -->
                                 {form searchWineRowsForm}
                                     <div class="d-flex gap-2 align-items-center" style="max-width:650px; min-width:650px;">
                                         {input search}
@@ -233,6 +258,7 @@
                         </div>
                     </div>
                     <div class="card-body p-0">
+                        <!-- Display wine rows table if any exist -->
                         {if count($wineRows) > 0}
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
@@ -277,6 +303,7 @@
                                                 {if $userVintner}
                                                     <td>
                                                         <div class="d-flex gap-2 justify-content-center">
+                                                            <!-- Edit, delete, or reactivate row actions for vintner -->
                                                             {if $row->isActive()}
                                                                 <a href="{link editWineRow $vineyard->getId(), $row->getId()}" 
                                                                 class="btn btn-outline-primary btn-sm" 
@@ -301,8 +328,6 @@
                                                                     <i class="fas fa-eye me-1"></i>Obnovit
                                                                 </button>
                                                             {/if}
-                                                            
-
                                                         </div>
                                                     </td>
                                                 {/if}
@@ -312,6 +337,7 @@
                                 </table>
                             </div>
                         {else}
+                            <!-- No wine rows found -->
                             <div class="text-center py-5">
                                 <i class="fas fa-grip-lines fa-3x text-muted mb-3 opacity-50"></i>
                                 <h5 class="text-muted">Žádné řádky vína</h5>
@@ -324,7 +350,7 @@
         </div>
     </div>
 
-    {* Delete Confirmation Modals for Wine Rows *}
+    <!-- Delete Confirmation Modals for Wine Rows -->
     {foreach $wineRows as $row}
         <div class="modal fade" id="deleteRowModal{$row->getId()}" tabindex="-1" aria-labelledby="deleteRowModalLabel{$row->getId()}" aria-hidden="true">
             <div class="modal-dialog">
@@ -362,7 +388,7 @@
         </div>
     {/foreach}
 
-    {* Reactivation Confirmation Modals for Wine Rows *}
+    <!-- Reactivation Confirmation Modals for Wine Rows -->
     {foreach $wineRows as $row}
         {if !$row->isActive()}
             <div class="modal fade" id="reactivateRowModal{$row->getId()}" tabindex="-1" aria-labelledby="reactivateRowModalLabel{$row->getId()}" aria-hidden="true">

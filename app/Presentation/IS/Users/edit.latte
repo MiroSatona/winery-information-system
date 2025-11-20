@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     edit.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for editing user details in the IS section
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Navigation links for user dashboard and edit user page -->
     <a href="{link :IS:Users:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Uživatelé
     </a>
@@ -9,10 +20,13 @@
     </a>
 {/block topMenuISAdditional}
 
+
 {block isMainPanel}
+    <!-- Main panel for editing user details -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-lg-8 col-xl-6">
             <div class="card border-0 shadow-lg">
+                <!-- Card header with title -->
                 <div class="card-header bg-primary text-white py-3">
                     <h4 class="mb-0 fw-bold">
                         <i class="fas fa-edit me-2"></i>
@@ -21,7 +35,9 @@
                 </div>
                 <div class="card-body p-4">
                     {form editUserForm}
+                        <!-- User edit form fields -->
                         <div class="row g-3">
+                            <!-- Name input -->
                             <div class="col-12 col-md-6">
                                 <label for="name" class="form-label fw-semibold">
                                     <i class="fas fa-user me-2 text-muted"></i>Jméno
@@ -33,6 +49,7 @@
                                 </span>
                             </div>
 
+                            <!-- Surname input -->
                             <div class="col-12 col-md-6">
                                 <label for="surname" class="form-label fw-semibold">
                                     <i class="fas fa-user me-2 text-muted"></i>Příjmení
@@ -44,6 +61,7 @@
                                 </span>
                             </div>
 
+                            <!-- Email input -->
                             <div class="col-12 col-md-6">
                                 <label for="email" class="form-label fw-semibold">
                                     <i class="fas fa-envelope me-2 text-muted"></i>E-mail
@@ -55,6 +73,7 @@
                                 </span>
                             </div>
 
+                            <!-- Phone input -->
                             <div class="col-12 col-md-6">
                                 <label for="phone" class="form-label fw-semibold">
                                     <i class="fas fa-phone me-2 text-muted"></i>Telefon
@@ -66,6 +85,7 @@
                                 </span>
                             </div>
 
+                            <!-- City input -->
                             <div class="col-12 col-md-6">
                                 <label for="city" class="form-label fw-semibold">
                                     <i class="fas fa-city me-2 text-muted"></i>Město
@@ -76,6 +96,7 @@
                                 </span>
                             </div>
 
+                            <!-- Street input -->
                             <div class="col-12 col-md-6">
                                 <label for="street" class="form-label fw-semibold">
                                     <i class="fas fa-road me-2 text-muted"></i>Ulice
@@ -86,6 +107,7 @@
                                 </span>
                             </div>
 
+                            <!-- House number input -->
                             <div class="col-12 col-md-6">
                                 <label for="houseNumber" class="form-label fw-semibold">
                                     <i class="fas fa-home me-2 text-muted"></i>Číslo popisné
@@ -96,6 +118,7 @@
                                 </span>
                             </div>
 
+                            <!-- Postal code input -->
                             <div class="col-12 col-md-6">
                                 <label for="postalCode" class="form-label fw-semibold">
                                     <i class="fas fa-mail-bulk me-2 text-muted"></i>PSČ
@@ -106,6 +129,7 @@
                                 </span>
                             </div>
 
+                            <!-- Username (login) input -->
                             <div class="col-12">
                                 <label for="username" class="form-label fw-semibold">
                                     <i class="fas fa-user-check me-2 text-muted"></i>Login
@@ -117,8 +141,10 @@
                                 </span>
                             </div>
 
+                            <!-- User roles checkboxes -->
                             <div class="col-12">
                                 <div class="d-flex flex-wrap gap-3 align-items-center">
+                                    <!-- Checkbox for each user role -->
                                     <div class="form-check">
                                         {input isUser}
                                         <label class="form-check-label ms-2" for="isUser"></label>
@@ -144,15 +170,18 @@
                                 </div>
                             </div>
 
+                            <!-- Action buttons: cancel, reset password, submit -->
                             <div class="col-12">
                                 <div class="row g-2">
                                     <div class="col-12 col-md-4">
+                                        <!-- Cancel button -->
                                         <a href="{link Users:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
                                             <i class="fas fa-times me-2"></i>Zrušit
                                         </a>
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <div class="d-grid">
+                                            <!-- Reset password button -->
                                             {input resetPassword}
                                             <span class="invalid-feedback">
                                                 {inputError resetPassword}
@@ -161,6 +190,7 @@
                                     </div>
                                     <div class="col-12 col-md-4">
                                         <div class="d-grid">
+                                            <!-- Submit (save) button -->
                                             {input send}
                                             <span class="invalid-feedback">
                                                 {inputError send}

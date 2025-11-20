@@ -1,15 +1,32 @@
+
+<!--
+//FILE:     isLayout.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Layout template for the IS (Information System) section. Defines the structure, navigation, and content blocks for IS-related pages.
+-->
+
+{* Use the main layout as a base *}
 {layout '../@layout.latte'}
 
+
+{* Page title block *}
 {block title}
 	IS
 {/block}
 
+
+{* Top left menu: Back to Home *}
 {block topMenuLeft}
 	<a href="{link :Home:default}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5 text-decoration-none">
 		<i class="fas fa-arrow-left me-2"></i>Zpět Domů
 	</a>
 {/block topMenuLeft}
 
+
+{* Top center menu: IS Dashboard and additional menu *}
 {block topMenuCenter}
 		<a href="{link :IS:Dashboard:view}" class="nav-link nav-button mx-2 px-3 py-2 fw-bold fs-5">
 			<i class="fas fa-cogs me-2"></i>Informační systém
@@ -19,9 +36,12 @@
 		{/block topMenuISAdditional}
 {/block topMenuCenter}
 
+
+{* Main content block: IS layout with sidebar and main content area *}
 {block content}
 	<div class="is-layout-container h-100">
 		<div class="row g-0 h-100 m-0">
+			{* Sidebar navigation for IS section *}
 			<div class="col-lg-3 col-xl-2 is-sidebar bg-light border-end d-flex flex-column p-0">
 				<div class="sidebar-header p-3 border-bottom bg-primary text-white">
 					<h5 class="mb-0 fw-bold">
@@ -29,36 +49,43 @@
 					</h5>
 				</div>
 				<nav class="sidebar-nav flex-grow-1 p-2">
+					{* Show dashboard link for all IS roles *}
 					{if $userWorker || $userVintner || $userAdmin}
 						<a href="{link Dashboard:view}" class="is-nav-btn">
 							<i class="fas fa-tachometer-alt me-2"></i>Přehled
 						</a>
 					{/if}
+					{* Show task link for workers and vintners *}
 					{if $userWorker || $userVintner}
 					<a href="{link Tasks:dashboard}" class="is-nav-btn">
 						<i class="fas fa-clipboard-list me-2"></i>Úkony
 					</a>
 					{/if}
+					{* Show wine link for workers and vintners *}
 					{if $userWorker || $userVintner}
 					<a href="{link Wine:dashboard}" class="is-nav-btn">
 						<i class="fas fa-wine-glass me-2"></i>Víno
 					</a>
 					{/if}
+					{* Show vineyards link for workers and vintners *}
 					{if $userWorker || $userVintner}
 					<a href="{link Vineyards:dashboard}" class="is-nav-btn">
 						<i class="fas fa-mountain me-2"></i>Vinohrady
 					</a>
 					{/if}
+					{* Show wine varieties link for workers and vintners *}
 					{if $userWorker || $userVintner}
 					<a href="{link WineVarieties:dashboard}" class="is-nav-btn">
 						<i class="fas fa-seedling me-2"></i>Odrůdy
 					</a>
 					{/if}
+					{* Show users link for admins only *}
 					{if $userAdmin}
 					<a href="{link Users:dashboard}" class="is-nav-btn">
 						<i class="fas fa-users me-2"></i>Uživatelé
 					</a>
 					{/if}
+					{* Show orders link for workers and vintners *}
 					{if $userWorker || $userVintner}
 					<a href="{link Orders:dashboard}" class="is-nav-btn">
 						<i class="fas fa-shopping-cart me-2"></i>Objednávky
@@ -66,6 +93,7 @@
 					{/if}
 				</nav>
 			</div>
+			{* Main content area where IS panels are included *}
 			<div class="col-lg-9 col-xl-10 is-main-content p-0 m-0">
 				<div class="content-wrapper h-100">
 					{include isMainPanel}

@@ -1,6 +1,18 @@
+
+<!--
+//FILE:     view.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Dashboard page for IS module – provides quick actions, upcoming tasks, and orders ready for delivery.
+-->
+
+{* Use the IS layout for this dashboard page *}
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Additional top menu item for dashboard overview *}
     <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Přehled
     </a>
@@ -8,7 +20,7 @@
 
 {block isMainPanel}
     <div class="container-fluid">
-        {* Quick action button row *}
+        {* --- Quick action buttons for main IS features --- *}
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -20,6 +32,7 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
+                            {* Show only to vintner users *}
                             {if $userVintner}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:Tasks:addTask1}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -28,6 +41,7 @@
                                     </a>
                                 </div>
                             {/if}
+                            {* Show to both vintner and worker users *}
                             {if $userVintner || $userWorker}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:Tasks:createNonExistentTask}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -36,6 +50,7 @@
                                     </a>
                                 </div>
                             {/if}
+                            {* Vintner: produce wine *}
                             {if $userVintner}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:Wine:produceP1}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -44,6 +59,7 @@
                                     </a>
                                 </div>
                             {/if}
+                            {* Vintner: add vineyard *}
                             {if $userVintner}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:Vineyards:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -52,6 +68,7 @@
                                     </a>
                                 </div>
                             {/if}
+                            {* Vintner: add wine variety *}
                             {if $userVintner}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:WineVarieties:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -60,6 +77,7 @@
                                     </a>
                                 </div>
                             {/if}
+                            {* Admin: add user *}
                             {if $userAdmin}
                                 <div class="col-lg-2 col-md-4 col-sm-6">
                                     <a href="{link :IS:Users:add}" class="btn btn-primary w-100 d-flex flex-column align-items-center py-3">
@@ -74,7 +92,7 @@
             </div>
         </div>
 
-        {* Upcoming tasks table *}
+        {* --- Table of upcoming/planned tasks --- *}
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -113,10 +131,12 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {* Loop through each upcoming task *}
                                         {foreach $upcomingTasks as $task}
                                             <tr>
                                                 <td>{$task->getName()}</td>
                                                 <td>
+                                                    {* Show task type as badge *}
                                                     {if $task instanceof $HarvestType}
                                                         <span class="badge bg-success">Sklizeň</span>
                                                     {elseif $task instanceof $TreatmentType}
@@ -126,6 +146,7 @@
                                                     {/if}
                                                 </td>
                                                 <td>
+                                                    {* Show planned date, highlight if overdue *}
                                                     {if $task->getPlannedTimestamp()}
                                                         {if $task->getPlannedTimestamp() < $currentDateTime}
                                                             <span class="badge bg-danger">
@@ -141,6 +162,7 @@
                                                     {/if}
                                                 </td>
                                                 <td>
+                                                    {* Show task state as badge *}
                                                     {if $task->getState() === $TaskStateType::PLANNED}
                                                         <span class="badge bg-warning">Plánovaný</span>
                                                     {elseif $task->getState() === $TaskStateType::FINISHED}
@@ -151,9 +173,11 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center gap-1">
+                                                        {* Link to task detail *}
                                                         <a href="{link :IS:Tasks:details $task->getId()}" class="btn btn-sm btn-outline-secondary">
                                                             <i class="fas fa-info-circle me-1"></i>Detail
                                                         </a>
+                                                        {* Allow marking as done if planned and user is worker *}
                                                         {if $task->getState() === $TaskStateType::PLANNED && $userWorker}
                                                             <a href="{link :IS:Tasks:markTaskDone $task->getId()}" class="btn btn-sm btn-outline-primary">
                                                                 <i class="fas fa-clipboard-check me-1"></i>Zaznamenat
@@ -167,6 +191,7 @@
                                 </table>
                             </div>
                         {else}
+                            {* No upcoming tasks found *}
                             <div class="alert alert-info m-3">
                                 <i class="fas fa-info-circle me-2"></i>Žádné naplánované úkony nebyly nalezeny.
                             </div>
@@ -176,7 +201,7 @@
             </div>
         </div>
 
-        {* Orders ready for delivery table *}
+        {* --- Table of orders ready for delivery --- *}
         <div class="row mb-4">
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
@@ -218,12 +243,14 @@
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        {* Loop through each order ready for delivery *}
                                         {foreach $readyOrders as $order}
                                             <tr class="align-middle">
                                                 <td>
                                                     <span class="fw-semibold text-dark">{$order->id}</span>
                                                 </td>
                                                 <td>
+                                                    {* Show customer info if available *}
                                                     {var $user = $order->getUser()}
                                                     {if $user}
                                                         <div>
@@ -244,6 +271,7 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-dark">
+                                                        {* Show delivery type *}
                                                         {switch $order->deliveryType}
                                                             {case 'PICKUP'}Osobní odběr
                                                             {case 'COURIER'}Kurýr
@@ -259,9 +287,11 @@
                                                 </td>
                                                 <td class="text-center">
                                                     <div class="d-flex justify-content-center gap-1">
+                                                        {* Link to order detail *}
                                                         <a href="{link :IS:Orders:orderDetail $order->id}" class="btn btn-outline-primary btn-sm">
                                                             <i class="fas fa-info-circle me-1"></i>Detail
                                                         </a>
+                                                        {* Allow marking as delivered or cancelled for workers *}
                                                         {if $userWorker}
                                                             <a n:href=":IS:Orders:changeOrderState $order->id, 'DELIVERED'" class="btn btn-outline-success btn-sm">
                                                                 <i class="fas fa-shipping-fast me-1"></i>Odeslat
@@ -280,6 +310,7 @@
                                 </table>
                             </div>
                         {else}
+                            {* No ready orders found *}
                             <div class="alert alert-info m-3">
                                 <i class="fas fa-info-circle me-2"></i>Žádné objednávky připravené k odeslání nebyly nalezeny.
                             </div>

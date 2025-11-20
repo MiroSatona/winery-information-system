@@ -1,6 +1,16 @@
+
+<!--
+//FILE:     orderDetail.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for order detail page in the IS module. Displays order information, customer details, and ordered items.
+-->
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    <!-- Navigation links for the order dashboard and current order detail -->
     <a href="{link :IS:Orders:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Objednávky
     </a>
@@ -9,10 +19,11 @@
     </a>
 {/block topMenuISAdditional}
 
+
 {block isMainPanel}
 <div class="container mt-4">
 
-    {* === ORDER ACTION BAR === *}
+    <!-- ORDER ACTION BAR: Shows order number, creation date, and action buttons for state changes -->
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h4 class="fw-bold mb-0">
@@ -24,7 +35,7 @@
         </div>
 
         <div class="d-flex gap-2">
-            {* Ship Order Button (only if PAID) *}
+            <!-- Ship Order Button: Only visible if order is PAID -->
             {if $order->state === 'PAID'}
                 <a n:href="changeOrderState! $order->id, 'DELIVERED'"  
                    class="btn btn-outline-success btn-sm">
@@ -32,7 +43,7 @@
                 </a>
             {/if}
 
-            {* Cancel Order Button (only if RESERVED or PAID) *}
+            <!-- Cancel Order Button: Only visible if order is RESERVED or PAID -->
             {if $order->state === 'RESERVED' || $order->state === 'PAID'}
                 <a n:href="changeOrderState! $order->id, 'CANCELLED'" 
                    class="btn btn-outline-danger btn-sm">
@@ -40,13 +51,14 @@
                 </a>
             {/if}
 
+            <!-- Back to Orders Dashboard -->
             <a n:href="Orders:dashboard" class="btn btn-outline-secondary btn-sm">
                 <i class="fas fa-arrow-left me-1"></i>Zpět na přehled
             </a>
         </div>
     </div>
 
-    {* === ORDER INFORMATION CARD === *}
+    <!-- ORDER INFORMATION CARD: Displays customer and order details -->
     <div class="card shadow-sm border-0 mb-4">
         <div class="card-body">
             <h5 class="fw-bold mb-3">
@@ -54,6 +66,7 @@
             </h5>
             {var $user = $order->getUser()}
             {if $user}
+                <!-- Customer name and email -->
                 <p class="mb-1"><strong>Jméno:</strong> {$user->getName()} {$user->getSurname()}</p>
                 <p class="mb-1"><strong>Email:</strong> {$user->getEmail()}</p>
             {else}
@@ -62,7 +75,9 @@
 
             <hr>
 
+            <!-- Order total price -->
             <p class="mb-1"><strong>Celková cena:</strong> {$order->totalPrice},-</p>
+            <!-- Order state badge -->
             <p class="mb-1"><strong>Stav objednávky:</strong>
                 {switch $order->state}
                     {case 'RESERVED'}<span class="badge bg-warning text-dark">Rezervováno</span>
@@ -72,6 +87,7 @@
                 {/switch}
             </p>
 
+            <!-- Delivery type badge -->
             <p class="mb-1"><strong>Způsob doručení:</strong>
                 {switch $order->deliveryType}
                     {case 'PICKUP'}
@@ -85,6 +101,7 @@
                 {/switch}
             </p>
 
+            <!-- Delivery note, only for courier or post -->
             {if $order->deliveryType === 'COURIER' || $order->deliveryType === 'POST'}
                 <p class="mb-0">
                     <strong>Poznámka k doručení:</strong> {$order->deliveryData|escape}
@@ -93,7 +110,7 @@
         </div>
     </div>
 
-    {* === ORDER ITEMS TABLE === *}
+    <!-- ORDER ITEMS TABLE: Lists all wines in the order -->
     <div class="card shadow-sm border-0">
         <div class="card-body p-0">
             <div class="table-responsive">
@@ -120,6 +137,7 @@
                                 <tr>
                                     <td class="text-start">
                                         <div class="d-flex align-items-center">
+                                            <!-- Wine image and name with link to wine detail -->
                                             <img src="{asset $imgRep->getPathForImage($item->wine->getImage())}"
                                                 alt="{$item->wine->getName()}" 
                                                 class="img-thumbnail me-2"
@@ -131,8 +149,11 @@
                                             </a>
                                         </div>
                                     </td>
+                                    <!-- Number of bottles -->
                                     <td>{$item->bottlesCount}</td>
+                                    <!-- Price per bottle -->
                                     <td>{$item->pricePerBottle|number:2},-</td>
+                                    <!-- Total price for this item -->
                                     <td>{($item->pricePerBottle * $item->bottlesCount)|number:2},-</td>
                                 </tr>
                             {/foreach}

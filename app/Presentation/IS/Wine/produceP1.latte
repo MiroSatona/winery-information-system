@@ -1,6 +1,17 @@
+
+<!--
+//FILE:     produceP1.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for the first step of wine production (harvest selection)
+-->
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and wine production -->
     <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vína
     </a>
@@ -10,6 +21,7 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    <!-- Main panel for wine production step 1: harvest selection -->
     <div class="d-flex justify-content-center align-items-center h-100">
         <div class="col-12 col-md-10 col-lg-9 col-xl-7">
             <div class="card border-0 shadow-sm">
@@ -21,7 +33,7 @@
                 </div>
                 <div class="card-body p-4">
                     {form harvestSelectionForm}
-                        {* Harvest selection section *}
+                        <!-- Harvest selection input section -->
                         <div class="mb-4">
                             <div class="row g-3 align-items-end">
                                 <div class="col-9">
@@ -42,7 +54,7 @@
                             </div>
                         </div>
 
-                        {* Selected harvests section *}
+                        <!-- Selected harvests table section -->
                         <div class="mb-4">
                             <h5 class="fw-bold mb-3">
                                 <i class="fas fa-check-circle me-2 text-success"></i>
@@ -95,6 +107,7 @@
                                                         <span class="fw-semibold">{$harvest->getSugarContent()} °NM</span>
                                                     </td>
                                                     <td class="text-center">
+                                                        <!-- Remove selected harvest from production -->
                                                         <a href="{link removeHarvestFromProduction! $harvest->getId()}" 
                                                            class="btn btn-sm btn-outline-danger">
                                                             <i class="fas fa-trash-alt me-1"></i>Odebrat
@@ -106,6 +119,7 @@
                                     </table>
                                 </div>
                             {else}
+                                <!-- Info alert if no harvests are selected -->
                                 <div class="alert alert-info">
                                     <h6 class="fw-bold mb-2">
                                         <i class="fas fa-info-circle me-2"></i>Informace
@@ -117,7 +131,7 @@
                             {/if}
                         </div>
 
-                        {* Action buttons *}
+                        <!-- Action buttons for navigation -->
                         <div class="border-top pt-4">
                             <div class="row g-2">
                                 <div class="col-6">

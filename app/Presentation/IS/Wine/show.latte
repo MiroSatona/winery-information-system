@@ -1,6 +1,16 @@
+
+<!--
+//FILE:     show.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for displaying wine detail in IS
+-->
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    {* Top navigation menu for wine detail page *}
     <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Vína
     </a>
@@ -10,9 +20,11 @@
 {/block topMenuISAdditional}
 
 {block isMainPanel}
+    {* Main content panel for wine detail *}
     <div class="container-fluid">
         {* Main wine details section *}
         <div class="row mb-4">
+            {* Section: Wine detail card with actions and info *}
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white text-dark py-3">
@@ -22,6 +34,7 @@
                                 Detail vína
                             </h4>
                             <div class="d-flex gap-2">
+                                {* Action buttons for wine management, shown based on wine state and user role *}
                                 <a href="{link Wine:dashboard}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
                                 </a>
@@ -72,10 +85,13 @@
 
                     <div class="card-body p-4">
                         <div class="row">
+                            {* Two-column layout: wine info and wine image *}
                             {* Wine information *}
                             <div class="col-12 col-md-8">
+                                {* Left column: wine attributes and details *}
                                 <div class="mb-4">
                                     <div class="row mb-3">
+                                        {* Wine name and state *}
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-wine-glass me-2"></i>Název vína
@@ -91,6 +107,7 @@
                                     </div>
 
                                     <div class="row mb-3">
+                                        {* Wine year and volume *}
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-calendar-alt me-2"></i>Ročník
@@ -106,6 +123,7 @@
                                     </div>
 
                                     <div class="row mb-3">
+                                        {* Wine type and color *}
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-tint me-2"></i>Typ
@@ -121,6 +139,7 @@
                                     </div>
 
                                     <div class="row mb-3">
+                                        {* Wine grade and bottles left (if bottled/sale/sold) *}
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-award me-2"></i>Přívlastek
@@ -138,6 +157,7 @@
                                     </div>
 
                                     {if $wine->getState() === $WineState::SALE || $wine->getState() === $WineState::SOLD}
+                                        {* Show current and original price if available *}
                                         <div class="row mb-3">
                                             {if $wine->getCurrentPrice() !== null}
                                                 <div class="col-md-6">
@@ -159,6 +179,7 @@
                                     {/if}
 
                                     {if $wine->getState() === $WineState::BOTTLED || $wine->getState() === $WineState::SALE || $wine->getState() === $WineState::SOLD}
+                                        {* Show total bottles produced and bottle volume *}
                                         <div class="row mb-3">
                                             <div class="col-md-6">
                                                 <label class="form-label fw-semibold text-muted">
@@ -178,6 +199,7 @@
                                     
                                     
                                     {if $wine->getLeftSugar() !== null || $wine->getAcidContents() !== null}
+                                        {* Show left sugar and acid content if available *}
                                         <div class="row mb-3">
                                             {if $wine->getLeftSugar() !== null}
                                                 <div class="col-md-6 mb-3">
@@ -198,6 +220,7 @@
                                         </div>
                                     {/if}
                                     <div class="row mb-3">
+                                        {* Alcohol percentage *}
                                         <div class="col-md-6">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-percentage me-2"></i>Obsah alkoholu
@@ -209,6 +232,7 @@
                                     <hr>
 
                                     {if $wine->getSalesDescription()}
+                                        {* Sales description if available *}
                                         <div class="mb-3">
                                             <label class="form-label fw-semibold text-muted">
                                                 <i class="fas fa-align-left me-2"></i>Prodejní popis
@@ -218,6 +242,7 @@
                                     {/if}
 
                                     <div class="mb-3">
+                                        {* Production note *}
                                         <label class="form-label fw-semibold text-muted">
                                             <i class="fas fa-clipboard me-2"></i>Poznámka z výroby
                                         </label>
@@ -228,6 +253,7 @@
 
                             {* Wine image *}
                             <div class="col-12 col-md-4">
+                                {* Right column: wine image or placeholder *}
                                 <div class="wine-image-container border rounded p-3 bg-light d-flex justify-content-center">
                                     {if $wine->getImage()}
                                         <img src="{asset $imageRepository->getPathForImage($wine->getImage())}" 
@@ -250,6 +276,7 @@
 
         {* Wine varieties section *}
         <div class="row mb-4">
+            {* Section: Wine varieties *}
             <div class="col-12">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header bg-white text-dark py-3">
@@ -264,6 +291,7 @@
                     </div>
                     <div class="card-body p-0">
                         {if count($wine->getVarieties()) > 0}
+                            {* Table of wine varieties *}
                             <div class="table-responsive">
                                 <table class="table table-hover mb-0">
                                     <thead class="table-primary">
@@ -281,6 +309,7 @@
                                     </thead>
                                     <tbody>
                                         {foreach $wine->getVarieties() as $variety}
+                                            {* Each variety row *}
                                             <tr class="align-middle">
                                                 <td>
                                                     <h6 class="mb-0 fw-semibold text-dark">{$variety->getName()}</h6>
@@ -316,6 +345,7 @@
                                 </table>
                             </div>
                         {else}
+                            {* No varieties assigned message *}
                             <div class="text-center py-5">
                                 <i class="fas fa-seedling fa-3x text-muted mb-3 opacity-50"></i>
                                 <h5 class="text-muted">Žádné odrůdy vína</h5>
@@ -328,7 +358,7 @@
         </div>
     </div>
 
-    {* Liquidation confirmation modal *}
+    {* Liquidation confirmation modal for wine in production *}
     {if $wine->getState() === $WineState::PRODUCTION && $userVintner}
         <div class="modal fade" id="liquidateModal{$wine->getId()}" tabindex="-1" aria-labelledby="liquidateModalLabel{$wine->getId()}" aria-hidden="true">
             <div class="modal-dialog">

@@ -1,6 +1,16 @@
+
+<!--
+//FILE:     addTask1.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for creating a new task in the IS module. Displays a form for entering task details.
+-->
 {layout '../isLayout.latte'}
 
 {block topMenuISAdditional}
+    <!-- Navigation links for the tasks dashboard and current add task page -->
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -8,6 +18,7 @@
         <i class="fas fa-arrow-right me-2"></i>Tvorba úkonu
     </a>
 {/block}
+
 
 {block isMainPanel}
 <div class="d-flex justify-content-center align-items-center h-100">
@@ -20,7 +31,9 @@
             </div>
 
             <div class="card-body p-4">
+                <!-- Task creation form -->
                 {form addTaskForm}
+                    <!-- Task name input -->
                     <div class="mb-3">
                         <label for="name" class="form-label fw-semibold">
                             <i class="fas fa-tag me-2 text-muted"></i>{label name /}
@@ -32,6 +45,7 @@
                         </span>
                     </div>
 
+                    <!-- Task type input -->
                     <div class="mb-3">
                         <label for="type" class="form-label fw-semibold">
                             <i class="fas fa-list me-2 text-muted"></i>{label type /}
@@ -43,6 +57,7 @@
                         </span>
                     </div>
 
+                    <!-- Planned date input -->
                     <div class="mb-3">
                         <label for="planned_date" class="form-label fw-semibold">
                             <i class="fas fa-calendar-alt me-2 text-muted"></i>{label planned_date /}
@@ -54,6 +69,7 @@
                         </span>
                     </div>
 
+                    <!-- Optional note input -->
                     <div class="mb-3">
                         <label for="note" class="form-label fw-semibold">
                             <i class="fas fa-sticky-note me-2 text-muted"></i>{label note /}
@@ -64,6 +80,7 @@
                         </span>
                     </div>
 
+                    <!-- Info alert for user guidance -->
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Informace
@@ -71,14 +88,17 @@
                         <small class="mb-0">Zadejte údaje úkonu a stiskněte potvrdit pro uložení.</small>
                     </div>
 
+                    <!-- Form action buttons -->
                     <div class="border-top pt-4">
                         <div class="row">
                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                            <!-- Cancel button, clears the form -->
                             <a class="btn btn-secondary w-100 fw-bold" n:href="clearForm!"  role="button">
                                 Zrušit
                             </a>
                             </div>
                             <div class="col-12 col-md-6">
+                                <!-- Submit button -->
                                 {input send}
                                 <span class="invalid-feedback">
                                     {inputError send}

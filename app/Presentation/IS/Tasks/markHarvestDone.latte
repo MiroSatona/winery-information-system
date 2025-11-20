@@ -1,6 +1,19 @@
+
+<!--
+//FILE:     markHarvestDone.latte
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Latte template for marking a harvest as completed in the IS Tasks module
+-->
+
+{* Use the IS layout for this page *}
 {layout '../isLayout.latte'}
 
+
 {block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current page *}
     <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
         <i class="fas fa-arrow-right me-2"></i>Úkony
     </a>
@@ -20,7 +33,7 @@
                 </div>
 
                 <div class="card-body p-4">
-                    {* Information about the harvest *}
+                    {* Display information about the current harvest *}
                     <div class="alert alert-info mb-4">
                         <h6 class="fw-bold mb-2">
                             <i class="fas fa-info-circle me-2"></i>Informace o sklizni
@@ -39,6 +52,7 @@
                         </div>
                     </div>
 
+                    {* Form for marking the harvest as done *}
                     {form markHarvestDoneForm}
                         <div class="mb-3">
                             <label for="quantity" class="form-label fw-semibold">
@@ -62,6 +76,7 @@
                             </span>
                         </div>
 
+                        {* Action buttons: back to tasks or submit the form *}
                         <div class="border-top pt-4">
                             <div class="row">
                                 <div class="col-12 col-md-6 mb-3 mb-md-0">
