@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     WinePresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for administration of wine 
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Wine;
@@ -26,6 +35,10 @@ use Nette\Http\FileUpload;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Presenter for administration of wine
+ * Handles wine management, searching, editing, production, and image operations
+ */
 final class WinePresenter extends BasePresenter
 {
     private string $patternWines = '';
@@ -33,6 +46,13 @@ final class WinePresenter extends BasePresenter
     private string $patternGrade = 'all';
     private string $patternState = 'all';
 
+    /**
+     * Constructor for WinePresenter
+     * @param WineRepository $wineRepository Repository for wines
+     * @param ImageRepository $imageRepository Repository for images
+     * @param HarvestRepository $harvestRepository Repository for harvests
+     * @param BottlingRepository $bottlingRepository Repository for bottling tasks
+     */
     public function __construct(
         private WineRepository $wineRepository,
         private ImageRepository $imageRepository,
@@ -42,6 +62,11 @@ final class WinePresenter extends BasePresenter
         parent::__construct();
     }
 
+    /**
+     * Startup method called before any action
+     * Checks user role
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -50,6 +75,10 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the search wine form component
+     * @return Form Form for searching wines
+     */
     public function createComponentSearchWineForm(): Form
     {
         $form = new Form();
@@ -103,6 +132,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful search wine form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Search values
+     * @return void
+     */
     public function searchWineFormSucceeded(Form $form, \stdClass $values): void
     {
         $this->patternWines = $values->search;
@@ -111,6 +146,10 @@ final class WinePresenter extends BasePresenter
         $this->patternState = $values->state;
     }
 
+    /**
+     * Renders the wine dashboard
+     * @return void
+     */
     public function renderDashboard(): void
     {
         /** @var Wine[] $wines */
@@ -125,6 +164,11 @@ final class WinePresenter extends BasePresenter
         $this->template->imageRepository = $this->imageRepository;
     }
 
+    /**
+     * Renders the wine detail view
+     * @param int $wineId ID of the wine to show
+     * @return void
+     */
     public function renderShow(int $wineId): void
     {
         $wine = $this->wineRepository->fetchWineById($wineId);
@@ -147,6 +191,11 @@ final class WinePresenter extends BasePresenter
         $this->template->WineState = WineState::class;
     }
 
+    /**
+     * Handles wine liquidation
+     * @param int $wineId ID of the wine to liquidate
+     * @return void
+     */
     public function handleLiquidate(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -175,11 +224,11 @@ final class WinePresenter extends BasePresenter
         }
     }
 
-    public function handleBottling(int $wineId): void
-    {
-        // todo
-    }
-
+    /**
+     * Renders the selling form for a wine
+     * @param int $wineId ID of the wine to sell
+     * @return void
+     */
     public function renderSelling(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -206,6 +255,11 @@ final class WinePresenter extends BasePresenter
     }
     
  
+    /**
+     * Renders the change price form for a wine
+     * @param int $wineId ID of the wine to change price
+     * @return void
+     */
     public function renderChangePrice(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -235,6 +289,10 @@ final class WinePresenter extends BasePresenter
         $this->template->wine = $wine;
     }
     
+    /**
+     * Creates the set wine price form component
+     * @return Form Form for setting wine price
+     */
     public function createComponentSetWinePriceForm(): Form
     {
         $form = new Form();
@@ -259,6 +317,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful set wine price form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function setWinePriceFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -296,6 +360,10 @@ final class WinePresenter extends BasePresenter
         $this->redirect('Wine:dashboard');
     }
 
+    /**
+     * Creates the edit wine form component
+     * @return Form Form for editing a wine
+     */
     public function createComponentEditWineForm(): Form
     {
         $form = new Form();
@@ -389,6 +457,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful edit wine form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function wineEditFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -441,6 +515,11 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Renders the edit wine form
+     * @param int $wineId ID of the wine to edit
+     * @return void
+     */
     public function renderEdit(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -472,6 +551,10 @@ final class WinePresenter extends BasePresenter
         $this->template->wine = $wine;
     }
 
+    /**
+     * Creates the change wine image form component
+     * @return Form Form for changing wine image
+     */
     public function createComponentChangeImageForm(): Form
     {
         $form = new Form();
@@ -494,6 +577,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Handles changing the wine image
+     * @param Button $button The button clicked
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function changeWineImage(Button $button, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -536,6 +625,12 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Handles removing the wine image
+     * @param Button $button The button clicked
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function removeWineImage(Button $button, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -571,6 +666,11 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Handles removing the wine image by wine ID
+     * @param int $wineId ID of the wine
+     * @return void
+     */
     public function handleRemoveWineImage(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -607,6 +707,11 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Renders the change image form for a wine
+     * @param int $wineId ID of the wine
+     * @return void
+     */
     public function renderChangeImage(int $wineId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -619,6 +724,10 @@ final class WinePresenter extends BasePresenter
         $this->template->wine = $this->wineRepository->fetchWineById($wineId);
     }
 
+    /**
+     * Renders the first step of wine production
+     * @return void
+     */
     public function renderProduceP1(): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -631,6 +740,10 @@ final class WinePresenter extends BasePresenter
         $this->template->harvestsInProduction = $harvests ?? [];
     }
 
+    /**
+     * Creates the harvest selection form component
+     * @return Form Form for selecting harvests for wine production
+     */
     public function createComponentHarvestSelectionForm(): Form
     {
         $form = new Form();
@@ -680,6 +793,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Handles returning to the dashboard from production
+     * @param Button $button The button clicked
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function backToDashboardProduce(Button $button, \stdClass $values): void
     {
         $this->getSession('wineIS')->set('harvestsInProduction', []);
@@ -687,6 +806,12 @@ final class WinePresenter extends BasePresenter
         $this->redirect('dashboard');
     }
 
+    /**
+     * Callback for successful harvest selection form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function harvestSelectionFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -723,6 +848,12 @@ final class WinePresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    /**
+     * Handles redirecting to the second step of wine production
+     * @param Button $button The button clicked
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function redirectToProduceP2(Button $button, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -741,6 +872,11 @@ final class WinePresenter extends BasePresenter
     }
 
 
+    /**
+     * Handles removing a harvest from wine production
+     * @param int $harvestId ID of the harvest to remove
+     * @return void
+     */
     public function handleRemoveHarvestFromProduction(int $harvestId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -775,6 +911,10 @@ final class WinePresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    /**
+     * Renders the second step of wine production
+     * @return void
+     */
     public function renderProduceP2(): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -802,6 +942,10 @@ final class WinePresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the produce wine form component
+     * @return Form Form for producing wine
+     */
     public function createComponentProduceWineForm(): Form
     {
         $form = new Form();
@@ -903,6 +1047,12 @@ final class WinePresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Handles returning to the first step of wine production
+     * @param Button $button The button clicked
+     * @param mixed $data Form data
+     * @return void
+     */
     public function backToProduceP1(Button $button, $data): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -928,6 +1078,12 @@ final class WinePresenter extends BasePresenter
         $this->redirect('produceP1');
     }
 
+    /**
+     * Callback for successful produce wine form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function produceWineFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {

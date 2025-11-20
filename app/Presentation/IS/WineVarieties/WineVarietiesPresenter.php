@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     WineVarietiesPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for administration of wine varieties
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\WineVarieties;
@@ -18,9 +27,19 @@ use Nette\Http\FileUpload;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Presenter for administration of wine varieties
+ * Handles wine variety management, searching, editing, and image operations
+ */
 final class WineVarietiesPresenter extends BasePresenter
 {
 
+    /**
+     * Constructor for WineVarietiesPresenter
+     * @param WineVarietyRepository $wineVarietyRepository Repository for wine varieties
+     * @param ImageRepository $imageRepository Repository for images
+     * @param ValidationDefinitions $validationDefinitions Validation rules
+     */
     public function __construct(
         private WineVarietyRepository $wineVarietyRepository,
         private ImageRepository $imageRepository,
@@ -29,6 +48,11 @@ final class WineVarietiesPresenter extends BasePresenter
         parent::__construct();
     }
 
+    /**
+     * Startup method called before any action
+     * Checks user role and sets template types
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -39,12 +63,20 @@ final class WineVarietiesPresenter extends BasePresenter
         $this->template->WineVarietyType = WineVarietyType::class;
     }
 
+    /**
+     * Renders the wine varieties dashboard
+     * @return void
+     */
     public function renderDashboard(): void
     {
         $this->template->wineVarieties = $this->wineVarietyRepository->fetchAll();
         $this->template->wineVarietyRepository = $this->wineVarietyRepository;
     }
 
+    /**
+     * Renders the add wine variety form
+     * @return void
+     */
     public function renderAdd(): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -53,6 +85,11 @@ final class WineVarietiesPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Renders the edit wine variety form
+     * @param int $id ID of the wine variety to edit
+     * @return void
+     */
     public function renderEdit(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -78,6 +115,10 @@ final class WineVarietiesPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the add wine variety form component
+     * @return Form Form for adding a new wine variety
+     */
     public function createComponentAddWineVariety(): Form
     {
         $form = new Form;
@@ -119,6 +160,12 @@ final class WineVarietiesPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful add wine variety form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Wine variety values
+     * @return void
+     */
     public function processAddWineVarietyForm(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -161,6 +208,11 @@ final class WineVarietiesPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Handles deletion of a wine variety
+     * @param int $id ID of the wine variety to delete
+     * @return void
+     */
     public function handleDelete(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -183,6 +235,10 @@ final class WineVarietiesPresenter extends BasePresenter
         $this->redirect('WineVarieties:dashboard');
     }
 
+    /**
+     * Creates the edit wine variety form component
+     * @return Form Form for editing a wine variety
+     */
     public function createComponentEditWineVariety(): Form
     {
         $form = new Form;
@@ -222,6 +278,12 @@ final class WineVarietiesPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful edit wine variety form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Wine variety values
+     * @return void
+     */
     public function processEditWineVarietyForm(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -279,6 +341,11 @@ final class WineVarietiesPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Handles removal of a wine variety image
+     * @param int $id ID of the wine variety
+     * @return void
+     */
     public function handleRemoveImage(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {

@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     UserPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for administration of users
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Users;
@@ -12,6 +21,10 @@ use App\Model\User\UserRepository;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\FlashMsgType;
 
+/**
+ * Presenter for administration of users
+ * Handles user listing, filtering, creation, editing, activation, and deactivation
+ */
 final class UsersPresenter extends BasePresenter
 {   
     /** @var UserRepository $userRepository Repository of all users in the system */
@@ -25,6 +38,11 @@ final class UsersPresenter extends BasePresenter
     /** @var string $state State for filtering users on the dashboard */
     private string $state = '';
 
+    /**
+     * Constructor for UsersPresenter
+     * @param UserRepository $userRepository Repository for managing users
+     * @param ValidationDefinitions $validationDefinitions Validation rules for user input
+     */
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions)
     {
         parent::__construct();
@@ -32,6 +50,11 @@ final class UsersPresenter extends BasePresenter
         $this->validationDefinitions = $validationDefinitions;
     }
 
+    /**
+     * Startup method called before any action
+     * Checks admin role and redirects if unauthorized
+     * @return void
+     */
     public function startup(): void
     {   
         parent::startup();
@@ -41,6 +64,10 @@ final class UsersPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the user filter form component
+     * @return Form Form for filtering users
+     */
     public function createComponentFilterForm(): Form
     {   
         /** @var Form  $form Form for filtering users */
@@ -96,6 +123,10 @@ final class UsersPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Creates the add user form component
+     * @return Form Form for adding a new user
+     */
     public function createComponentAddUserForm(): Form
     {   
         /** @var Form  $form Form for adding new user */
@@ -181,9 +212,7 @@ final class UsersPresenter extends BasePresenter
         return $form;
     }
     /**
-     * renderDashboard
-     * Method for rendering the user dashboard.
-     *
+     * Renders the user dashboard
      * @return void
      */
     public function renderDashboard(): void
@@ -192,10 +221,9 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * filterFormSucceeded
-     *
-     * @param Form $form Form where the filter details are submitted.
-     * @param \stdClass $values Filter values submitted by the user.
+     * Callback for successful user filter form submission
+     * @param Form $form The submitted filter form
+     * @param \stdClass $values Filter values submitted by the user
      * @return void
      */
     public function filterFormSucceeded(Form $form, \stdClass $values): void
@@ -207,11 +235,9 @@ final class UsersPresenter extends BasePresenter
 
     
     /**
-     * addFormSucceeded
-     * Method for handling successful addition of a user.
-     *
-     * @param Form $form Form where the user details are submitted.
-     * @param \stdClass $values User details submitted by the form.
+     * Callback for successful add user form submission
+     * @param Form $form The submitted add user form
+     * @param \stdClass $values User details submitted by the form
      * @return void
      */
     public function addFormSucceeded(Form $form, \stdClass $values): void
@@ -248,10 +274,8 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * handleDeactivateUser
-     * Method for handling deactivate user.
-     *
-     * @param integer $userId Id of the user to deactivate.
+     * Handles deactivation of a user
+     * @param int $userId Id of the user to deactivate
      * @return void
      */
     public function handleDeactivateUser(int $userId): void{
@@ -265,11 +289,10 @@ final class UsersPresenter extends BasePresenter
         }
 
     }
+
     /**
-     * handleActivateUser
-     * Method for handling activate user.
-     *
-     * @param integer $userId Id of the user to activate.
+     * Handles activation of a user
+     * @param int $userId Id of the user to activate
      * @return void
      */
     public function handleActivateUser(int $userId): void{
@@ -285,10 +308,8 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * renderEdit
-     * Method for rendering the user edit form.
-     *
-     * @param integer $id Id of the user to edit.
+     * Renders the user edit form
+     * @param int $id Id of the user to edit
      * @return void
      */
     public function renderEdit(int $id): void
@@ -324,10 +345,8 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * createComponentEditUserForm
-     * Method for handling the edit user form.
-     *
-     * @return Form Form with edited user data.
+     * Creates the edit user form component
+     * @return Form Form with edited user data
      */
     public function createComponentEditUserForm(): Form
     {
@@ -411,11 +430,9 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * editFormSucceeded
-     * Method for handling edit of a user from edit form from edit.latte.
-     * 
-     * @param Form $form Form where the user details are submitted.
-     * @param array $values User details submitted by the form.
+     * Callback for successful edit user form submission
+     * @param Form $form The submitted edit user form
+     * @param array $values User details submitted by the form
      * @return void
      */
     public function editFormSucceeded(Form $form, array $values): void{
@@ -486,9 +503,7 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * resetPassword
-     * Method for handle reset password from edit form from edit.latte.
-     * 
+     * Handles password reset for a user
      * @return void
      */
     public function resetPassword(): void{
@@ -508,14 +523,12 @@ final class UsersPresenter extends BasePresenter
         $this->redirect('Users:dashboard');
    }
 
-   /**
-    * formError
-    * Method for handling form errors.
-    *
-    * @param Form $form Form where the error was detected.
-    * @return void
-    */
-   public function formError(Form $form): void
+    /**
+     * Handles form errors by displaying them as flash messages
+     * @param Form $form Form where the error was detected
+     * @return void
+     */
+    public function formError(Form $form): void
    {
       $errors = $form->getErrors();
 

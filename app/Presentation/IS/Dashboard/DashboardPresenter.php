@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     DashBoardPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for the IS dashboard
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Dashboard;
@@ -15,9 +24,18 @@ use App\Model\Orders\OrderRepository;
 use App\Model\Orders\OrderState;
 use Nette\Utils\DateTime;
 
+/**
+ * Presenter for the IS dashboard
+ * Handles display of upcoming tasks and ready orders for internal staff
+ */
 final class DashboardPresenter extends BasePresenter
 {
 
+    /**
+     * Constructor for DashboardPresenter
+     * @param TaskRepository $taskRepository Repository for accessing task data
+     * @param OrderRepository $orderRepository Repository for accessing order data
+     */
     public function __construct(
         private TaskRepository $taskRepository,
         private OrderRepository $orderRepository
@@ -25,6 +43,11 @@ final class DashboardPresenter extends BasePresenter
         parent::__construct();
     }
 
+    /**
+     * Startup method called before any action
+     * Checks user role and sets template types
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -41,6 +64,11 @@ final class DashboardPresenter extends BasePresenter
         $this->template->currentDateTime = new DateTime('now');
     }
 
+    /**
+     * Renders the dashboard view
+     * Loads upcoming tasks and ready orders for display
+     * @return void
+     */
     public function renderView(): void
     {
         // Fetch upcoming tasks (limit 10, planned state, ordered by planned timestamp)
@@ -53,6 +81,10 @@ final class DashboardPresenter extends BasePresenter
         $this->template->readyOrders = $readyOrders;
     }
 
+    /**
+     * Gets the next 10 upcoming planned tasks with a planned timestamp
+     * @return array List of upcoming tasks
+     */
     private function getUpcomingTasks(): array
     {
         $allTasks = $this->taskRepository->fetchTasks('', '', TaskState::PLANNED->value);
@@ -78,6 +110,10 @@ final class DashboardPresenter extends BasePresenter
         return array_slice($tasksWithTimestamp, 0, 10);
     }
 
+    /**
+     * Gets the next 10 ready orders (paid state) sorted by timestamp
+     * @return array List of ready orders
+     */
     private function getReadyOrders(): array
     {
         $allOrders = $this->orderRepository->fetchAllOrders(true);

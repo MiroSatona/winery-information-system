@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     VineyardsPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Presenter for administration of vineyards
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Vineyards;
@@ -21,6 +30,10 @@ use Nette\Http\FileUpload;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Presenter for administration of vineyards
+ * Handles vineyard and wine row management, including add, edit, delete, and search operations
+ */
 final class VineyardsPresenter extends BasePresenter
 {
 
@@ -31,6 +44,13 @@ final class VineyardsPresenter extends BasePresenter
     private string $typeVineyards = 'active';
     private string $typeWineRows = 'active';
 
+    /**
+     * Constructor for VineyardsPresenter
+     * @param VineyardRepository $vineyardRepository Repository for vineyards
+     * @param ImageRepository $imageRepository Repository for images
+     * @param ValidationDefinitions $validationDefinitions Validation rules
+     * @param WineVarietyRepository $wineVarietyRepository Repository for wine varieties
+     */
     public function __construct(
         private VineyardRepository $vineyardRepository,
         private ImageRepository $imageRepository,
@@ -40,6 +60,11 @@ final class VineyardsPresenter extends BasePresenter
         parent::__construct();
     }
 
+    /**
+     * Startup method called before any action
+     * Checks user role and sets template types
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -50,6 +75,10 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->WineVarietyType = WineVarietyType::class;
     }
 
+    /**
+     * Creates the search vineyards form component
+     * @return Form Form for searching vineyards
+     */
     public function createComponentSearchVineyardsForm(): Form
     {
         $form = new Form();
@@ -75,12 +104,22 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful search vineyards form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Search values
+     * @return void
+     */
     public function searchVineyardsFormSucceeded(Form $form, \stdClass $values): void
     {
         $this->patternVineyards = $values->search;
         $this->typeVineyards = $values->type;
     }
 
+    /**
+     * Renders the vineyards dashboard
+     * @return void
+     */
     public function renderDashboard(): void
     {
         /** @var Vineyard[] $vineyards */
@@ -98,6 +137,11 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->imageRepository = $this->imageRepository;
     }
 
+    /**
+     * Handles deletion of a vineyard
+     * @param int $vineyardId ID of the vineyard to delete
+     * @return void
+     */
     public function handleDelete(int $vineyardId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -113,6 +157,11 @@ final class VineyardsPresenter extends BasePresenter
         
     }
 
+    /**
+     * Handles reactivation of a vineyard
+     * @param int $vineyardId ID of the vineyard to reactivate
+     * @return void
+     */
     public function handleReactivate(int $vineyardId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -128,6 +177,10 @@ final class VineyardsPresenter extends BasePresenter
         
     }
 
+    /**
+     * Renders the add vineyard form
+     * @return void
+     */
     public function renderAdd(): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -136,6 +189,10 @@ final class VineyardsPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the add vineyard form component
+     * @return Form Form for adding a new vineyard
+     */
     public function createComponentAddVineyardForm(): Form
     {
         $form = new Form();
@@ -178,6 +235,12 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful add vineyard form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Vineyard values
+     * @return void
+     */
     public function addVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -229,6 +292,11 @@ final class VineyardsPresenter extends BasePresenter
 
     
 
+    /**
+     * Renders the edit vineyard form
+     * @param int $vineyardId ID of the vineyard to edit
+     * @return void
+     */
     public function renderEdit(int $vineyardId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -259,6 +327,10 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->imageRepository = $this->imageRepository;
     }
 
+    /**
+     * Creates the edit vineyard form component
+     * @return Form Form for editing a vineyard
+     */
     public function createComponentEditVineyardForm(): Form
     {
         $form = new Form();
@@ -300,6 +372,12 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful edit vineyard form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Vineyard values
+     * @return void
+     */
     public function editVineyardFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -363,6 +441,11 @@ final class VineyardsPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Handles removal of a vineyard image
+     * @param int $id ID of the vineyard
+     * @return void
+     */
     public function handleRemoveImage(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -408,6 +491,11 @@ final class VineyardsPresenter extends BasePresenter
         $this->redirect('edit', $id);
     }
 
+    /**
+     * Renders the vineyard detail view
+     * @param int $vineyardId ID of the vineyard to show
+     * @return void
+     */
     public function renderShow(int $vineyardId): void
     {
         $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
@@ -455,6 +543,10 @@ final class VineyardsPresenter extends BasePresenter
     }
 
 
+    /**
+     * Creates the add wine row form component
+     * @return Form Form for adding a wine row
+     */
     public function createComponentAddWineRowForm(): Form
     {
         $form = new Form;
@@ -499,6 +591,12 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful add wine row form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Wine row values
+     * @return void
+     */
     public function addWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -543,6 +641,10 @@ final class VineyardsPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the edit wine row form component
+     * @return Form Form for editing a wine row
+     */
     public function createComponentEditWineRowForm(): Form
     {
         $form = new Form;
@@ -585,6 +687,12 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful edit wine row form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Wine row values
+     * @return void
+     */
     public function editWineRowFormSucceeded(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -631,6 +739,12 @@ final class VineyardsPresenter extends BasePresenter
     }
 
 
+    /**
+     * Renders the edit wine row form
+     * @param int $vineyardId ID of the vineyard
+     * @param int $rowId ID of the wine row to edit
+     * @return void
+     */
     public function renderEditWineRow(int $vineyardId, int $rowId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -664,6 +778,11 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->wineRow = $wineRow;
     }
 
+    /**
+     * Renders the add wine row form
+     * @param int $vineyardId ID of the vineyard
+     * @return void
+     */
     public function renderAddWineRow(int $vineyardId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -703,6 +822,11 @@ final class VineyardsPresenter extends BasePresenter
         $this->template->firstAvailableRowNumber = $firstAvailableRowNumber;
     }
 
+    /**
+     * Handles deletion of a wine row
+     * @param int $rowId ID of the wine row to delete
+     * @return void
+     */
     public function handleDeleteWineRow(int $rowId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -721,6 +845,11 @@ final class VineyardsPresenter extends BasePresenter
         $this->redirect('show', $vineyardId);
     }
 
+    /**
+     * Handles reactivation of a wine row
+     * @param int $rowId ID of the wine row to reactivate
+     * @return void
+     */
     public function handleReactivateWineRow(int $rowId): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -739,6 +868,10 @@ final class VineyardsPresenter extends BasePresenter
         $this->redirect('show', $vineyardId);
     }
 
+    /**
+     * Creates the search wine rows form component
+     * @return Form Form for searching wine rows
+     */
     public function createComponentSearchWineRowsForm(): Form
     {
         $form = new Form();
@@ -764,6 +897,12 @@ final class VineyardsPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Callback for successful search wine rows form submission
+     * @param Form $form The submitted form
+     * @param \stdClass $values Search values
+     * @return void
+     */
     public function searchWineRowsFormSucceeded(Form $form, \stdClass $values): void
     {
         $this->patternWineRows = $values->search;
