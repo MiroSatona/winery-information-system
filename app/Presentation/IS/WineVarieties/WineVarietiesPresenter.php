@@ -5,10 +5,6 @@
 //          Martin Mendl
 //YEAR:     2025
 //DESC:    	Presenter for administration of wine varieties
-/**
- * This file is part of the Nette Framework (https://nette.org)
- * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
- */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\WineVarieties;
