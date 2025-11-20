@@ -103,9 +103,9 @@
                                                             {/if}
                                                                 <tbody>
                                                                     {foreach $wineRows as $wineRow}
-                                                                        <tr class="{if $task->isInConflict()} 
-                                                                                        table-danger text-white
-                                                                                    {else}
+                                                                        <tr class="{if $wineRow->isInConflict()} 
+                                                                                        table-danger text-white 
+                                                                                    {else} 
                                                                                         table-light text-dark 
                                                                                     {/if}">
                                                                             <td><strong>{$wineRow->getId()}</strong></td>
