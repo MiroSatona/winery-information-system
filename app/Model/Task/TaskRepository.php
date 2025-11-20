@@ -888,6 +888,13 @@ class TaskRepository{
             $unit = $data->getUnit();
             if ($unit !== null) {
                 $unit = trim($unit);
+                if ($unit === '' || strlen($unit) > ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX) {
+                    throw new \Exception('Invalid unit');
+                }
+            }
+
+            if( ($amount === null && $unit !== null) || ($amount !== null && $unit === null) ) {
+                throw new \Exception('Musite pridat jak mnozvtvi tak jednotku nebo ani jedno z nich!');
             }
                 
             // Validate each row: exists, belongs to vineyard, is active
