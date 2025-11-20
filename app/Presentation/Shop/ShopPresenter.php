@@ -5,7 +5,7 @@ namespace App\Presentation\Shop;
 use App\Model\FlashMsgType;
 use App\Model\Image\ImageRepository;
 use Nette;
-use App\Model\ProductRepository;
+use App\Model\Shop\ProductRepository;
 use App\Model\Wine\WineColor;
 use App\Presentation\BasePresenter;
 use App\Model\Orders\OrderRepository;

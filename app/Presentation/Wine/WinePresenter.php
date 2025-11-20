@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Presentation\Wine;
 
 use Nette;
-use App\Model\ProductRepository;
+use App\Model\Shop\ProductRepository;
 use App\Model\Security\Role;
 use App\Presentation\BasePresenter;
 use App\Model\Image\ImageRepository;

@@ -1,4 +1,10 @@
 <?php
+//FILE:     WineVarietyRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository for tasks related to wine varieties (DB operations)
 
 declare(strict_types=1);
 
@@ -11,8 +17,21 @@ use App\Model\Image\ImageRepository;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Repository for tasks related to wine varieties
+ * 
+ * Handles CRUD operations on the DB for wine varieties, as well as other operations.
+ */
 final class WineVarietyRepository
 {
+    /**
+     * Repository constructor
+     * 
+     * Arguments provided by Nette DI container
+     *
+     * @param Explorer $database
+     * @param ImageRepository $imageRepository
+     */
     public function __construct(
         private Explorer $database,
         private ImageRepository $imageRepository
@@ -20,6 +39,8 @@ final class WineVarietyRepository
     }
 
     /**
+     * Fetch all wine varieties from the database
+     * 
      * @return WineVariety[]
      */
     public function fetchAll(): array
@@ -27,9 +48,10 @@ final class WineVarietyRepository
         /** @var WineVariety[] $wineVarieties */
         $wineVarieties = [];
         $rows = $this->database->table('WINE_VARIETY')->fetchAll();
-            
+        
+        // assemble WineVariety objects one by one
         foreach ($rows as $row) {
-            // Access PICTURE data by left join
+            // access PICTURE data by left join
             $picture = $row->ref('PICTURE', 'ID_PICTURE');
             $image = null;
             if ($picture) {
@@ -52,6 +74,12 @@ final class WineVarietyRepository
         return $wineVarieties;
     }
     
+    /**
+     * Fetch single wine variety by its ID
+     * 
+     * @param int $id
+     * @return WineVariety|null
+     */
     public function fetchById(int $id): ?WineVariety
     {
         $row = $this->database->table('WINE_VARIETY')->get($id);
@@ -59,7 +87,7 @@ final class WineVarietyRepository
             return null;
         }
 
-        // Access PICTURE data by left join
+        // access PICTURE data by left join
         $picture = $row->ref('PICTURE', 'ID_PICTURE');
         $image = null;
         if ($picture) {
@@ -80,6 +108,12 @@ final class WineVarietyRepository
         );
     }
 
+    /**
+     * Check whether Wine Variety with given id has been used or not
+     *
+     * @param integer $id
+     * @return boolean
+     */
     public function checkWineVarietyUsed(int $id): bool
     {
         $count = $this->database->table('WINE_ROW')
@@ -93,11 +127,19 @@ final class WineVarietyRepository
         return $count > 0;
     }
 
+    /**
+     * Add given Wine Variety to the database
+     *
+     * Return value indicates success or failure
+     * 
+     * @param WineVariety $wineVariety
+     * @return boolean
+     */
     public function addWineVariety(WineVariety $wineVariety): bool
     {
-        try {
+        try { // run everything in transaction
             return $this->database->transaction(function () use ($wineVariety) {
-                // Handle picture insertion
+                // handle picture insertion
                 $pictureId = null;
                 $image = $wineVariety->getImage();
                 if ($image !== null) {
@@ -109,7 +151,7 @@ final class WineVarietyRepository
                     $picture = $this->database->table('PICTURE')->insert($pictureData);
                     $pictureId = $picture->ID;
                 }
-                // Insert wine variety
+                // insert wine variety
                 $data = [
                     'NAME' => $wineVariety->getName(),
                     'COLOR' => $wineVariety->getColor()->value,
@@ -125,29 +167,37 @@ final class WineVarietyRepository
         }
     }
 
+    /**
+     * Update given Wine Variety in the database
+     *
+     * Return value indicates success or failure
+     * 
+     * @param WineVariety $wineVariety
+     * @return boolean
+     */
     public function updateWineVariety(WineVariety $wineVariety): bool
     {
-        try {
+        try { // run everything in transaction
             return $this->database->transaction(function () use ($wineVariety) {
                 $row = $this->database->table('WINE_VARIETY')->get($wineVariety->getId());
                 if ($row === null) {
                     throw new \Exception('Wine variety not found with ID ' . $wineVariety->getId());
                 }
 
-                // Handle picture update
+                // handle picture update
                 $pictureId = $row->ID_PICTURE;
                 $image = $wineVariety->getImage();
                 
                 if ($image !== null) {
                     if ($pictureId !== null) {
-                        // Update existing picture
+                        // update existing picture
                         $this->database->table('PICTURE')->get($pictureId)->update([
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
                             'DESCRIPTION' => $image->description
                         ]);
                     } else {
-                        // Create new picture
+                        // create new picture
                         $pictureData = [
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
@@ -157,13 +207,14 @@ final class WineVarietyRepository
                         $pictureId = $picture->ID;
                     }
                 } else {
-                    // Remove reference and delete from database
+                    // remove reference and delete from database
                     if ($pictureId !== null) {
                         $this->imageRepository->removeImage($pictureId);
                     }
                     $pictureId = null;
                 }
 
+                // handle wine variety update
                 $data = [
                     'NAME' => $wineVariety->getName(),
                     'COLOR' => $wineVariety->getColor()->value,
@@ -180,9 +231,17 @@ final class WineVarietyRepository
         }
     }
 
+    /**
+     * Delete wine variety with given ID from the database
+     *
+     * Return value indicates success or failure
+     * 
+     * @param int $id
+     * @return boolean
+     */
     public function deleteWineVariety(int $id): bool
     {
-        try {
+        try { // run everything in transaction
             return $this->database->transaction(function () use ($id) {
                 $row = $this->database->table('WINE_VARIETY')->get($id);
                 if ($row === null) {
@@ -191,10 +250,10 @@ final class WineVarietyRepository
 
                 $pictureId = $row->ID_PICTURE;
                 
-                // Delete wine variety record
+                // delete wine variety record
                 $row->delete();
                 
-                // Delete picture as well
+                // delete picture as well
                 if ($pictureId !== null) {
                     $this->imageRepository->removeImage($pictureId);
 
