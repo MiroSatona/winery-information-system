@@ -17,7 +17,11 @@ final class ShopPresenter extends  BasePresenter
     {
         parent::__construct();
     }
-
+    /**
+     * startup method 
+     *
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();

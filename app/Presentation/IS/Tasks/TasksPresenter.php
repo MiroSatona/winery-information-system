@@ -1,5 +1,14 @@
 <?php
-
+//FILE:     TaskPresenter.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	A presenter for the IS, designed to present information about tasks int the IS as well as allow for edit, creation and deletion of tasks.
+/**
+ * This file is part of the Nette Framework (https://nette.org)
+ * Copyright (c) 2004 David Grudl (https://davidgrudl.com)
+ */
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Tasks;
@@ -48,6 +57,11 @@ final class TasksPresenter extends BasePresenter
         parent::__construct();
     }
 
+    /**
+     * Method for initializing the presenter
+     * 
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();
@@ -61,6 +75,10 @@ final class TasksPresenter extends BasePresenter
         $this->template->BottlingType = Bottling::class;
     }
 
+    /**
+     * Method for rendering the DashBoard
+     * @return void
+     */
     public function renderDashboard(): void
     {
         $pattern = $this->getParameter('pattern') ?? '';
@@ -71,7 +89,12 @@ final class TasksPresenter extends BasePresenter
         $this->template->roleType = TaskState::class;
         $this->template->currentDateTime = new DateTime('now');
     }
-    
+   
+    /**
+     * Method for creating a new task
+     * 
+     * @return void
+     */
     public function handleCreateNonExistentTask() 
     {
         $this->handleClearForm(false);
@@ -79,7 +102,12 @@ final class TasksPresenter extends BasePresenter
         $task->markAsDone();
         $this->redirect("AddTask1");
     }
-    
+   
+    /**
+     * Method to create part 1 of an N part formular for creating tasks
+     * 
+     * @return void
+     */
     public function renderAddTask1(): void 
     {
         $form = $this->getComponent("addTaskForm");
@@ -93,6 +121,11 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Method for creating a form for adding 
+     * 
+     * @return Form
+     */
     public function createComponentAddTaskForm(): Form
     {
         $form = new Form();
@@ -136,7 +169,13 @@ final class TasksPresenter extends BasePresenter
 
         return $form;
     }
-    
+  
+    /**
+     * Method for clearing the current form 
+     *
+     * @param boolean $redirect
+     * @return void
+     */
     public function handleClearForm($redirect = true): void
     {
         $section = $this->session->getSection("TaskCreation");
@@ -146,7 +185,12 @@ final class TasksPresenter extends BasePresenter
             $this->redirect('dashboard');
         }
     }
-    
+   
+    /**
+     * Method for creating a form for assigning workers to the task
+     * 
+     * @return Form
+     */
     public function createComponentTaskWorkersForm(): Form
     {
         $form = new Form();
@@ -192,11 +236,22 @@ final class TasksPresenter extends BasePresenter
 
         return $form;
     }
-    
+   
+    /**
+     * Method for going to the first part of the adding component workflow
+     *
+     * @return void
+     */
     public function goBackTo1() {
         $this->redirect("addTask1");
     }
     
+    
+    /**
+     * Method for going to the next form
+     *
+     * @return void
+     */
     public function goToNextForm() 
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -223,6 +278,11 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Method for fetching the current new task 
+     *
+     * @return TaskData
+     */
     private function fetchCurrentNewTask(): TaskData {
         $section = $this->session->getSection("TaskCreation");
 
@@ -235,6 +295,13 @@ final class TasksPresenter extends BasePresenter
         return $newTask;
     }
     
+    
+    /**
+     * Method for moving to the next form 
+     * @param Form $form
+     * @param \stdClass $values
+     * @return void
+     */
     public function addTaskFromSucceeded(Form $form, \stdClass $values): void 
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -271,11 +338,24 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('selectWorkers');
     }
     
+    /**
+     * Method for handling back functionality when creating a task
+     * @param Button $button
+     * @param \stdClass $values
+     * @return void
+     */
     public function backToDashboardTaskCreation(Button $button, \stdClass $values): void
     {
         $this->redirect('addTask1');
     }
 
+    /**
+     * Method for handling adding a worker to a task
+     *
+     * @param Button $button
+     * @param \stdClass $values
+     * @return void
+     */
     public function taskWorkersFormSucceeded(Button $button, \stdClass $values): void
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -283,6 +363,13 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    /**
+     * Method for clearing all workers form a task (when creating a task)
+     *
+     * @param Button $button
+     * @param \stdClass $values
+     * @return void
+     */
     public function clearWorkers(Button $button, \stdClass $values): void
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -293,6 +380,13 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    /**
+     * Method for adding selected workers to the task currently being created 
+     *
+     * @param Button $button
+     * @param \stdClass $values
+     * @return void
+     */
     public function workerSelectionFormSucceeded(Button $button, \stdClass $values): void
     {
         // add single selected worker to session TaskData
@@ -316,6 +410,12 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this');
     }
 
+    /**
+     * Method for handling removing a worker from the current task, being created
+     *
+     * @param integer $workerId
+     * @return void
+     */
     public function handleRemoveWorkerFromSelection(int $workerId): void
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -326,7 +426,12 @@ final class TasksPresenter extends BasePresenter
         $this->flashMessage('Pracovník odebrán.', FlashMsgType::SUCCESS->value);
         $this->redirect('this');
     }
-    
+   
+    /**
+     * Method for rendering the Select workers part of the create new task process
+     * 
+     * @return void
+     */
     public function renderSelectWorkers(): void
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -474,11 +579,20 @@ final class TasksPresenter extends BasePresenter
 
     }
 
+    /**
+     * Method for handling detail button click 
+     * @param integer $taskId
+     * @return void
+     */
     public function actionDetails(int $taskId): void
     {
         $this->handleDetails($taskId);
     }
 
+    /**
+     * Method for logging a task, that was done, but was not initialized
+     * @return void
+     */
     public function actionCreateNonExistentTask(): void
     {
         $this->handleCreateNonExistentTask();
@@ -620,6 +734,12 @@ final class TasksPresenter extends BasePresenter
 //                       Bottling Task 
 // ----------------------------------------------------------
 
+    /**
+     * Method for staring the bottling task
+     * 
+     * @param integer $wineId
+     * @return void
+     */
     public function actionStartBottling(int $wineId) {
         // check if bottling is planned
         $bottling = $this->bottlingRepository->getUnfinishedBottlingTaskForWine($wineId);
@@ -633,6 +753,11 @@ final class TasksPresenter extends BasePresenter
         $this->redirect("addTask1");
     }
 
+    /**
+     * Method for c
+     *
+     * @return void
+     */
     public function createComponentWineSelectForm() 
     {
         $availableWines = $this->wineRep->fetchAllProductionWines();
@@ -669,6 +794,13 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
+    /**
+     * Renders the bottling task creation view.
+     * Pre-fills the wine selection form with current task data.
+     * Redirects to dashboard on error.
+     * 
+     * @return void
+     */
     public function renderBottling() {
         $task = $this->fetchCurrentNewTask();
         $form = $this->getComponent("wineSelectForm");
@@ -684,6 +816,15 @@ final class TasksPresenter extends BasePresenter
         $form["volume"]->setValue($task->getBottleVolume());
     }
     
+    /**
+     * Processes the bottling form submission.
+     * Handles wine selection, image upload, and bottle volume.
+     * Finalizes the bottling task creation.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function processBottlingForm(Form $form, \stdClass $values) {
         
         $task = $this->fetchCurrentNewTask();
@@ -720,6 +861,13 @@ final class TasksPresenter extends BasePresenter
 // ----------------------------------------------------------
 //                      Treatment Task 
 // ----------------------------------------------------------
+    /**
+     * Renders the treatment task creation view.
+     * Displays vineyard selection and selected wine rows.
+     * Pre-fills forms with current task data.
+     * 
+     * @return void
+     */
     public function renderTreatment() {
         /** @var TaskData $task */
         $task = $this->fetchCurrentNewTask();
@@ -743,6 +891,15 @@ final class TasksPresenter extends BasePresenter
         $this->template->selectedRows = $selectedRows;
     }
 
+    /**
+     * Handles submission of treatment row selection.
+     * Validates that vineyard and at least one row are selected.
+     * Redirects to treatment details page.
+     * 
+     * @param Button $button The submit button
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function submitTreatmentRows(Button $button, \stdClass $values) {
         $task = $this->fetchCurrentNewTask();
 
@@ -755,6 +912,13 @@ final class TasksPresenter extends BasePresenter
     }
 
 
+    /**
+     * Creates the treatment details form component.
+     * Includes treatment type, name, amount, and unit fields.
+     * Provides submit, cancel, and back navigation buttons.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentTreatmentDetailsForm(): Form 
     {
         $form = new Form();
@@ -806,6 +970,13 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Extracts and validates treatment details from form values.
+     * Updates the current task with treatment type, name, amount, and unit.
+     * 
+     * @param \stdClass $values Form values to process
+     * @return TaskData|null The updated task or null on error
+     */
     public function obtainDataFromTreatmentDetailsForm(\stdClass $values): ?TaskData 
     {
         $task = $this->fetchCurrentNewTask();
@@ -834,12 +1005,28 @@ final class TasksPresenter extends BasePresenter
         return $task;
     }
 
+    /**
+     * Handles navigation back to row selection from treatment details.
+     * Saves current form data before redirecting.
+     * 
+     * @param Button $button The back button
+     * @param \stdClass $values Current form values
+     * @return void
+     */
     public function treatmentGoBackToRowsSelection(Button $button, \stdClass $values) 
     {
         $this->obtainDataFromTreatmentDetailsForm($values);
         $this->redirect("treatment");
     }
 
+    /**
+     * Finalizes the treatment task creation.
+     * Validates and saves treatment details, then completes the task.
+     * 
+     * @param Button $button The finish button
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function treatmentDetailsFinalize(Button $button, \stdClass $values) 
     {
         $task = $this->obtainDataFromTreatmentDetailsForm($values);
@@ -850,6 +1037,12 @@ final class TasksPresenter extends BasePresenter
         $this->finalizeTask();
     }
 
+    /**
+     * Renders the final treatment details view.
+     * Pre-fills form with current task data and displays vineyard information.
+     * 
+     * @return void
+     */
     public function renderTreatmentFinal() 
     {
         /** @var TaskData $task */
@@ -876,6 +1069,13 @@ final class TasksPresenter extends BasePresenter
 //                       Harvest Task 
 // ----------------------------------------------------------
 
+    /**
+     * Renders the harvest task creation view.
+     * Displays vineyard, wine variety, and row selection forms.
+     * Shows selected rows for the harvest task.
+     * 
+     * @return void
+     */
     public function renderHarvest() {
         $task = $this->fetchCurrentNewTask();
 
@@ -903,6 +1103,12 @@ final class TasksPresenter extends BasePresenter
        
     }
     
+    /**
+     * Creates the vineyard selection form component.
+     * Lists all active vineyards for selection.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentSelectVineyard() {
         $form = new Form();
         
@@ -929,6 +1135,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
+    /**
+     * Handles vineyard selection form submission.
+     * Updates task with selected vineyard and resets variety and rows.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function selectVineYard(Form $form, \stdClass $values) {
         $task = $this->fetchCurrentNewTask();
         
@@ -940,6 +1154,12 @@ final class TasksPresenter extends BasePresenter
         $this->redirect("this");
     }
     
+    /**
+     * Creates the wine variety selection form component.
+     * Lists wine varieties available in the selected vineyard.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentSelectWineVariety() {
         
         $task = $this->fetchCurrentNewTask();
@@ -965,6 +1185,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
+    /**
+     * Handles wine variety selection form submission.
+     * Updates task with selected variety and resets row selection.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function selectVineVariety(Form $form, \stdClass $values) {
         $task = $this->fetchCurrentNewTask();
        
@@ -975,6 +1203,13 @@ final class TasksPresenter extends BasePresenter
         $this->redirect("this");
     }
     
+    /**
+     * Creates the wine rows selection form component.
+     * Dynamically generates row options based on task type (harvest/treatment).
+     * Excludes already selected rows and inactive rows.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentSelectRowsForm() {
         $task = $this->fetchCurrentNewTask();
         $wineYardId = $task->getIdWineYard();
@@ -1060,6 +1295,15 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Handles harvest details submission and finalization.
+     * Validates that vineyard, variety, and rows are selected.
+     * Finalizes the harvest task creation.
+     * 
+     * @param Button $button The submit button
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function submitHarvestDetails(Button $button, \stdClass $values) {
         
         $task = $this->fetchCurrentNewTask();
@@ -1073,10 +1317,23 @@ final class TasksPresenter extends BasePresenter
         $this->finalizeTask($task);
     }
     
+    /**
+     * Handles navigation back to worker selection.
+     * 
+     * @param Button $button The back button
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function goBackToWorkers(Button $button, \stdClass $values) {
         $this->redirect("selectWorkers");
     }
     
+    /**
+     * Clears all selected rows from the current task.
+     * Resets the row selection and displays success message.
+     * 
+     * @return void
+     */
     public function clearRows() {
        $task = $this->fetchCurrentNewTask(); 
        $task->setIdRows([]);
@@ -1085,6 +1342,15 @@ final class TasksPresenter extends BasePresenter
        $this->redirect('this');
     }
     
+    /**
+     * Handles wine row selection and addition to task.
+     * Adds selected row to task if not already included.
+     * Validates row selection and displays appropriate messages.
+     * 
+     * @param Button $button The add button
+     * @param \stdClass $values Form values containing row selection
+     * @return void
+     */
     public function wineRowSelection(Button $button, \stdClass $values): void {
 
         // add the row to the array 
@@ -1109,6 +1375,13 @@ final class TasksPresenter extends BasePresenter
         $this->redirect("this");
     }
 
+    /**
+     * Handles removal of a row from the task selection.
+     * Filters out the specified row and updates the task.
+     * 
+     * @param int $rowCode The ID of the row to remove
+     * @return void
+     */
     public function handleRemoveRowFromSelection(int $rowCode): void
     {
         $newTask = $this->fetchCurrentNewTask();
@@ -1122,6 +1395,12 @@ final class TasksPresenter extends BasePresenter
     
 
     // HARVEST MARKING
+    /**
+     * Creates the form for marking a harvest as completed.
+     * Includes fields for harvest quantity and sugar content.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentMarkHarvestDoneForm(): Form
     {
         $form = new Form();
@@ -1148,6 +1427,15 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Processes harvest completion form submission.
+     * Validates user permissions and marks harvest as done with quantity and sugar content.
+     * Only vintners can mark harvests as completed.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing quantity and sugar content
+     * @return void
+     */
     public function onSuccessMarkHarvestDoneForm(Form $form, \stdClass $values): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -1181,6 +1469,13 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Renders the mark harvest done view.
+     * Validates user permissions (vintner only) and harvest existence.
+     * 
+     * @param int $id The harvest ID
+     * @return void
+     */
     public function renderMarkHarvestDone(int $id): void
     {
         if (!$this->user->isInRole(Role::VINTNER->name)) {
@@ -1200,6 +1495,12 @@ final class TasksPresenter extends BasePresenter
         $this->template->harvest = $harvest;
     }
 
+    /**
+     * Creates the form for marking a task as completed.
+     * Includes execution date field.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentMarkTaskDoneForm(): Form
     {
         $form = new Form();
@@ -1217,6 +1518,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Processes task completion form submission.
+     * Marks the task as done with the specified execution date.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing execution date
+     * @return void
+     */
     public function onSuccessMarkTaskDoneForm(Form $form, \stdClass $values): void
     {
         $id = (int)$this->getParameter('id');
@@ -1244,6 +1553,13 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Renders the mark task done view.
+     * Validates user permissions - vintners can mark any task, workers only assigned tasks.
+     * 
+     * @param int $id The task ID
+     * @return void
+     */
     public function renderMarkTaskDone(int $id): void
     {
         // all vintners can mark tasks as done
@@ -1272,6 +1588,14 @@ final class TasksPresenter extends BasePresenter
 //                      Finalization 
 // ----------------------------------------------------------
     
+    /**
+     * Finalizes the task creation process.
+     * Saves the task based on its type (bottling, harvest, or treatment).
+     * Handles conflict warnings for harvest/treatment timing.
+     * Clears the session and redirects to dashboard.
+     * 
+     * @return void
+     */
     public function finalizeTask() 
     {
         $task = $this->fetchCurrentNewTask();
@@ -1308,6 +1632,12 @@ final class TasksPresenter extends BasePresenter
         $this->redirect("dashboard");
     }
 
+   /**
+     * Creates the form for adding workers to a task.
+     * Lists all workers not currently assigned to the task.
+     * 
+     * @return Form The configured form component
+     */
    public function createComponentAddWorkersForm(): Form
     {
         $form = new Form;
@@ -1336,15 +1666,14 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
+     * Handles adding a worker to a task.
+     * Validates worker selection and adds them to the task.
+     * Displays success or error messages accordingly.
      * 
-     * 
-     * Details add and delete users and wine rows
-     * 
-     * TODO: Redirect if error is reached
-     * TODO: How to solve issues
-     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing worker ID
+     * @return void
      */
-    
     public function addWorkerFormSucceeded(Form $form, \stdClass $values): void
     {
         $taskId = (int)$this->getParameter('id');
@@ -1367,6 +1696,13 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this');
     }
     
+    /**
+     * Handles removal of a worker from a task.
+     * Removes the specified worker and displays appropriate message.
+     * 
+     * @param int $workerId The ID of the worker to remove
+     * @return void
+     */
     public function handleDeleteUserFromTask(int $workerId):void
     {
         $taskId = (int)$this->getParameter('id');
@@ -1380,6 +1716,14 @@ final class TasksPresenter extends BasePresenter
         }
     }
     
+    /**
+     * Renders the task edit view.
+     * Validates task exists and is in PLANNED state.
+     * Pre-fills forms based on task type (bottling, treatment, or base task).
+     * 
+     * @param int $taskId The ID of the task to edit
+     * @return void
+     */
     public function renderTaskEdit(int $taskId) {
         $task = $this->taskRepository->fetchById($taskId);
         if (!$task) {
@@ -1424,6 +1768,12 @@ final class TasksPresenter extends BasePresenter
 
     }
     
+    /**
+     * Creates the basic task edit form component.
+     * Includes name, note, and planned date fields.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentBasicTaskEdit() {
         $form = new Form();
 
@@ -1451,6 +1801,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
+    /**
+     * Processes basic task edit form submission.
+     * Updates task name, note, and planned date.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function submitBasicTaskEdit(Form $form, \stdClass $values) {
         $taskId = (int)$this->getParameter("taskId");
         
@@ -1462,6 +1820,12 @@ final class TasksPresenter extends BasePresenter
         }
     }
     
+    /**
+     * Creates the bottling task edit form component.
+     * Includes bottle volume and wine image upload fields.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentEditBottling() {
         $form = new Form();
         
@@ -1484,6 +1848,14 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
     
+    /**
+     * Processes bottling task edit form submission.
+     * Updates bottle volume and optionally uploads new wine image.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function submitBottlingTaskEdit(Form $form, \stdClass $values) {
         
         $taskId = (int)$this->getParameter("taskId");
@@ -1516,6 +1888,12 @@ final class TasksPresenter extends BasePresenter
         }
     }
     
+    /**
+     * Creates the treatment task edit form component.
+     * Includes treatment type, name, amount, and unit fields.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentEditTreatment() {
         $form = new Form();
         $form->addSelect("type", "Typ ošetření", [
@@ -1554,6 +1932,14 @@ final class TasksPresenter extends BasePresenter
             return $form;
     }
     
+    /**
+     * Processes treatment task edit form submission.
+     * Updates treatment type, name, amount, and unit.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values
+     * @return void
+     */
     public function submitTreatmentTaskEdit(Form $form, \stdClass $values) {
 
         $taskId = (int)$this->getParameter("taskId");
@@ -1566,6 +1952,13 @@ final class TasksPresenter extends BasePresenter
         }
     }
 
+    /**
+     * Creates the form for adding wine rows to a task.
+     * Lists available rows based on task type (harvest or treatment).
+     * Excludes already assigned rows.
+     * 
+     * @return Form The configured form component
+     */
     public function createComponentAddRowForm(): Form
     {
         $form = new Form;
@@ -1624,6 +2017,15 @@ final class TasksPresenter extends BasePresenter
         return $form;
     }
 
+    /**
+     * Handles adding a wine row to a task.
+     * Validates task type and adds the selected row.
+     * Only works for harvest and treatment tasks.
+     * 
+     * @param Form $form The submitted form
+     * @param \stdClass $values Form values containing row code
+     * @return void
+     */
     public function addRowsFormSucceeded(Form $form, \stdClass $values): void
     {
         $taskId = (int)$this->getParameter('id');
@@ -1656,6 +2058,14 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this'); 
     }
 
+    /**
+     * Handles removal of a wine row from a task.
+     * Validates task type and removes the specified row.
+     * Only works for harvest and treatment tasks.
+     * 
+     * @param int $rowId The ID of the row to remove
+     * @return void
+     */
     public function handleDeleteTaskRows(int $rowId): void
     { 
 
