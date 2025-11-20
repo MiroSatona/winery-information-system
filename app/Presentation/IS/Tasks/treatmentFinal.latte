@@ -70,7 +70,6 @@
                             <div class="col-12 col-md-6">
                                 <label for="amount" class="form-label fw-semibold">
                                     <i class="fas fa-tint me-2 text-muted"></i>{label amount /}
-                                    <span class="text-danger">*</span>
                                 </label>
                                 {input amount}
                                 <span class="invalid-feedback">
@@ -81,12 +80,18 @@
                             <div class="col-12 col-md-6">
                                 <label for="unit" class="form-label fw-semibold">
                                     <i class="fas fa-ruler me-2 text-muted"></i>{label unit /}
-                                    <span class="text-danger">*</span>
                                 </label>
                                 {input unit}
                                 <span class="invalid-feedback">
                                     {inputError unit}
                                 </span>
+                            </div>
+
+                            <div class="alert alert-info mb-4">
+                                <h6 class="fw-bold mb-2">
+                                    <i class="fas fa-info-circle me-2"></i>Informace
+                                </h6>
+                                <small class="mb-0">Zadání množství a jednotky je volitelné. K jejich uložení dojde pouze při zadání obou hodnot.</small>
                             </div>
                         </div>
 

@@ -43,15 +43,16 @@
                                             <p class="fs-6 text-dark mb-2">{$task->getNameTreatment()}</p>
                                         </div>
                                     </div>
-
-                                    <div class="row mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold text-muted">
-                                                <i class="fas fa-tint me-2"></i>Množství
-                                            </label>
-                                            <p class="fs-6 text-dark mb-2">{$task->getQuantity()} {$task->getUnit()}</p>
-                                        </div>
-                                    </div>
+                                    {if $task->getQuantity() !== null && $task->getUnit() !== null}
+                                        <div class="row mb-3">
+                                            <div class="col-md-6">
+                                                <label class="form-label fw-semibold text-muted">
+                                                    <i class="fas fa-tint me-2"></i>Množství
+                                                </label>
+                                                <p class="fs-6 text-dark mb-2">{$task->getQuantity()} {$task->getUnit()}</p>
+                                            </div>
+                                        </div>  
+                                    {/if}
 
                                     <hr>
 

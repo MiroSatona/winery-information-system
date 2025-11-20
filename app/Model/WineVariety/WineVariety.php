@@ -1,4 +1,11 @@
 <?php
+//FILE:     WineVariety.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Internal representation of a wine variety.
+
 
 declare(strict_types=1);
 
