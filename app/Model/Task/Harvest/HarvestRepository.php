@@ -1,9 +1,14 @@
 <?php
+//FILE:     HarvestRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Repository for Harvest tasks.
 
 declare(strict_types=1);
 
 namespace App\Model\Task\Harvest;
-
 
 use App\Model\Task\Harvest\Harvest;
 use App\Model\Vineyard\VineyardRepository;
@@ -13,8 +18,18 @@ use Nette\Database\Explorer;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Repository class for Harvest tasks
+ */
 final class HarvestRepository
 {
+    /**
+     * HarvestRepository constructor
+     *
+     * @param Explorer $database
+     * @param VineyardRepository $vineyardRepository
+     * @param WineVarietyRepository $wineVarietyRepository
+     */
     public function __construct(
         private Explorer $database,
         private VineyardRepository $vineyardRepository,
@@ -22,8 +37,15 @@ final class HarvestRepository
     ) {
     }
 
+    /**
+     * Fetch a Harvest by its ID
+     *
+     * @param int $id
+     * @return Harvest|null
+     */
     public function fetchById(int $id): ?Harvest
     {
+        // fetch joined table of tasks and harvests
         $row = $this->database->table('HARVEST')
             ->where('ID', $id)
             ->joinWhere('TASK', 'TASK.ID = ID_TASK')
@@ -33,7 +55,7 @@ final class HarvestRepository
         if ($row === null) {
             return null;
         }
-
+        // also fetch its associated Vineyard and WineVariety
         $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
         $wineVariety = $this->wineVarietyRepository->fetchById((int)$row->ID_WINE_VARIETY);
         if ($vineyard === null || $wineVariety === null) {
@@ -65,7 +87,7 @@ final class HarvestRepository
     }
 
     /**
-     * Undocumented function
+     * Fetch all Harvests that are ready for production
      *
      * @return Harvest[]
      */
@@ -80,16 +102,11 @@ final class HarvestRepository
             ->select('HARVEST.*, TASK.*')
             ->fetchAll();
 
-        /**$result = $this->db->table('TASK')
-            ->where('STATE', 'FINISHED')
-            ->joinWhere('HARVEST', 'HARVEST.ID = TASK.ID')
-            ->where('HARVEST.ID_WINE IS NULL')
-            ->where('HARVEST.ID_WINEGROWER IS NOT NULL')
-            ->fetchAll();**/
-        
         /** @var Harvest[] $harvests */
         $harvests = [];
+        // construct Harvest objects one by one
         foreach ($result as $row) {
+            // fetch its Vineyard and WineVariety
             $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
             $wineVariety = $this->wineVarietyRepository->fetchById((int)$row->ID_WINE_VARIETY);
             if ($vineyard === null || $wineVariety === null) {
@@ -130,7 +147,7 @@ final class HarvestRepository
      */
     public function fetchHarvests(string $pattern, string $state): array
     {
-        // Fetch joined teble of tasks and harvests
+        // Fetch joined table of tasks and harvests
         $mainQuery = $this->database->table('HARVEST')
                         ->joinWhere('TASK', 'TASK.ID = ID_TASK')
                         ->select('TASK.*, HARVEST.*');
@@ -150,6 +167,7 @@ final class HarvestRepository
         /** @var Harvest[] */
         $harvests = [];
         
+        // Construct Harvest objects one by one
         foreach ($mainQuery as $row) {
             $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
             $wineVariety = $this->wineVarietyRepository->fetchById((int)$row->ID_WINE_VARIETY);
@@ -180,10 +198,20 @@ final class HarvestRepository
         return $harvests;
     }
 
+    /**
+     * Mark a harvest as done by updating its weight, sugar content, and confirmer ID.
+     *
+     * @param int $idHarvest ID of the harvest task.
+     * @param float $weight Weight of the harvested grapes.
+     * @param float $sugarContent Sugar content of the harvested grapes.
+     * @param int $idUser ID of the user confirming the harvest.
+     * @return bool True on success, false on failure.
+     */
     public function markHarvestDone(int $idHarvest, float $weight, float $sugarContent, int $idUser): bool
     {
-        try {
+        try { // run within transaction
             return $this->database->transaction(function () use ($idHarvest, $weight, $sugarContent, $idUser): bool {
+                // update HARVEST table
                 $this->database->table('HARVEST')
                     ->where('ID_TASK', $idHarvest)
                     ->update([
@@ -192,6 +220,7 @@ final class HarvestRepository
                         'ID_HARVEST_CONFIRMER' => $idUser
                     ]);
 
+                // update TASK table - LAST_CHANGE_TIMESTAMP
                 $this->database->table('TASK')
                     ->where('ID', $idHarvest)
                     ->update([
@@ -205,4 +234,4 @@ final class HarvestRepository
             return false;
         }
     }
-}   
+}

@@ -4,7 +4,8 @@
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	An interface between user actions and db Actions involving Tasks.
+//DESC:    	An interface between user actions and DB Actions involving Tasks.
+
 declare(strict_types=1);
 
 
@@ -608,7 +609,6 @@ class TaskRepository{
             bdump('Failed to create bottling task: ' . $e->getMessage());
             throw $e;
         }
-
     }
 
     /**
@@ -813,7 +813,6 @@ class TaskRepository{
      */
     public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
     {   
-
         bdump($taskId,);
         bdump($vineyardId);
         bdump($wineVarietyId);
@@ -890,10 +889,8 @@ class TaskRepository{
         }
 
         return $error;
-        
     }
 
-   
     /**
      * Method for removing a Row form a task 
      * 
@@ -926,7 +923,6 @@ class TaskRepository{
 
         return $error;
     }
-
 
     /**
      * Method for creating a treatment Task
@@ -984,7 +980,7 @@ class TaskRepository{
             }
 
             if( ($amount === null && $unit !== null) || ($amount !== null && $unit === null) ) {
-                throw new \Exception('Musite pridat jak mnozvtvi tak jednotku nebo ani jedno z nich!');
+                throw new \Exception('Musíte přidat jak množství tak jednotku nebo ani jedno z nich!');
             }
                 
             // Validate each row: exists, belongs to vineyard, is active
@@ -1042,7 +1038,6 @@ class TaskRepository{
                 }
             }
 
-            
             // Insert task row
             $now = new DateTime();
 
@@ -1064,7 +1059,6 @@ class TaskRepository{
 
             $taskId = (int) $taskRow->ID;
 
-            
             // Insert treatment row
             $treatmentRow = $this->database->table('TREATMENT')->insert([
                 'ID_TASK' => $taskId,
@@ -1074,8 +1068,6 @@ class TaskRepository{
                 'QUANTITY'   => $amount,
                 'UNIT' => $unit,
             ]);
-
-
 
             if ($treatmentRow === null) {
                 throw new \Exception('Nepodařilo se vložit ošetření');
@@ -1329,6 +1321,3 @@ class TaskRepository{
         }
     }
 }
-    
-
-

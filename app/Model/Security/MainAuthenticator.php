@@ -1,4 +1,10 @@
 <?php
+//FILE:     MainAuthenticator.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Main authenticator for user login and identity handling.
 
 declare(strict_types=1);
 
@@ -13,16 +19,34 @@ use Nette\Security\IIdentity;
 use App\Model\Security\Role;
 use Nette\Security\IdentityHandler;
 
+/**
+ * Main authenticator class, that handles user authentication and identity management.
+ */
 class MainAuthenticator implements Authenticator, IdentityHandler
 {
+    /**
+     * MainAuthenticator constructor
+     *
+     * @param Explorer $database
+     * @param Passwords $passwords
+     */
 	public function __construct(
 		private Explorer $database,
 		private Passwords $passwords,
 	) {
 	}
 
+    /**
+     * Authenticate user with given username and password
+     *
+     * @param string $username
+     * @param string $password
+     * @return SimpleIdentity of the authenticated user
+     * @throws AuthenticationException when authentication fails
+     */
 	public function authenticate(string $username, string $password): SimpleIdentity
 	{
+        // fetch user row from db
 		$row = $this->database->table('USER')
 			->where('username', $username)
 			->fetch();
@@ -37,6 +61,7 @@ class MainAuthenticator implements Authenticator, IdentityHandler
 
         $saltedPassword = $password . $row->PSWD_SALT;
 
+        // verify password
 		if (!$this->passwords->verify($saltedPassword, $row->PSWD_HASH)) {
 			throw new AuthenticationException('Invalid password.');
 		}
@@ -136,6 +161,4 @@ class MainAuthenticator implements Authenticator, IdentityHandler
 			$userData,
 		);
     }
-
-
 }
