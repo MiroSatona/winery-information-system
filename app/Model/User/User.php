@@ -12,7 +12,7 @@ use DateTimeInterface;
 
 /**
  * Class User
- * Class for internal represetation of User for database.
+ * Class for internal representation of User for database.
  */
 class User{
     /** @var int $id ID of user in the database. */

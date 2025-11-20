@@ -316,24 +316,23 @@ class UserRepository
         $this->database->beginTransaction();
         try 
         {
-        
-        /** @var T[] $adminUsers Array of all admins in the sytem. */
-        $adminUsers = $this->database->table('USER')->where('ROLE_ADMIN', true)->fetchAll();
-        /** @var T|null $deletedUser User to be deactivated. */
-        $deletedUser = $this->database->table('USER')->where('ID', $userId)->where('ROLE_ADMIN', true)->fetch();
-        
-        // Check if the deactivated user is not last admin. If yes, return error.
-        if (count($adminUsers) === 1 && $deletedUser) {
-            $error = 'Nelze deaktivovat jediného administrátora.';
-            $this->database->rollBack();
+            
+            /** @var T[] $adminUsers Array of all admins in the sytem. */
+            $adminUsers = $this->database->table('USER')->where('ROLE_ADMIN', true)->fetchAll();
+            /** @var T|null $deletedUser User to be deactivated. */
+            $deletedUser = $this->database->table('USER')->where('ID', $userId)->where('ROLE_ADMIN', true)->fetch();
+            
+            // Check if the deactivated user is not last admin. If yes, return error.
+            if (count($adminUsers) === 1 && $deletedUser) {
+                $error = 'Nelze deaktivovat jediného administrátora.';
+                $this->database->rollBack();
+                return $error;
+            }
+
+            // Deactivate user 
+            $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => false]);
+            $this->database->commit();
             return $error;
-        }
-
-        // Deactivate user 
-        $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => false]);
-        $this->database->commit();
-        return $error;
-
         }
         catch (\Exception $exception) {
             $this->database->rollBack();
@@ -358,11 +357,10 @@ class UserRepository
 
         try 
         {
-        // Activate user 
-        $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
-        $this->database->commit();
-        return $error;
-
+            // Activate user 
+            $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
+            $this->database->commit();
+            return $error;
         }
         catch (\Exception $exception) {
             $this->database->rollBack();
