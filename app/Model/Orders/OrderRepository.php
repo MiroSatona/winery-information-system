@@ -1,4 +1,10 @@
 <?php
+//FILE:     OrderRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository for handling customer orders in the database.
 
 namespace App\Model\Orders;
 
@@ -9,14 +15,31 @@ use App\Model\User\UserRepository;
 use Exception;
 use Nette\Database\Explorer;
 
+/**
+ * Handles customer orders, including fetching, creating, and updating orders in the database.
+ */
 final class OrderRepository
 {
+    /**
+     * OrderRepository constructor
+     *
+     * @param Explorer $db
+     * @param OrderItemRepository $orderItemRepository
+     * @param UserRepository $usrRep
+     */
     public function __construct(
         private Explorer $db,
         private OrderItemRepository $orderItemRepository,
         private UserRepository $usrRep
     ) {}
     
+    /**
+     * Fetch a single order by its ID
+     *
+     * @param int $orderId
+     * @param bool $includeItems Whether to include associated order items
+     * @return CustomerOrder|null
+     */
     public function fetchOrderById(int $orderId, bool $includeItems = false): ?CustomerOrder
     {
         $row = $this->db->table('CUSTOMER_ORDER')->where('ID', $orderId)->fetch();
@@ -34,15 +57,22 @@ final class OrderRepository
         return $order;
     }
 
+    /**
+     * Fetch all orders, optionally including items and filtering by a search term
+     *
+     * @param bool $includeItems Whether to include associated order items
+     * @param string $searchTerm Search term to filter orders
+     * @return CustomerOrder[]
+     */
     public function fetchAllOrders(bool $includeItems = false, string $searchTerm = ""): array
     {
         $like = '%' . $searchTerm . '%';
-        $orders = $this->db->table('CUSTOMER_ORDER')
+        $orders = $this->db->table('CUSTOMER_ORDER') // fetch filtered orders
             ->where('CUSTOMER_ORDER.ID LIKE ? OR NAME LIKE ? OR ID_CUSTOMER.SURNAME LIKE ?', $like, $like, $like)
             ->fetchAll();
 
         $result = [];
-        foreach ($orders as $row) {
+        foreach ($orders as $row) { // create CustomerOrder objects one by one
             $order = $this->createOrderFromRow($row);
 
             if ($includeItems) {
@@ -57,6 +87,12 @@ final class OrderRepository
         return $result;
     }
     
+    /**
+     * Fetch all orders for a specific customer
+     *
+     * @param int $userId
+     * @return CustomerOrder[]
+     */
     public function fetchCustomerOrders(int $userId) 
     {
         $rows = $this->db->table("CUSTOMER_ORDER")->where("ID_CUSTOMER", $userId);
@@ -70,6 +106,12 @@ final class OrderRepository
         return $returnItems;
     }
 
+    /**
+     * Create a CustomerOrder object from a database row
+     *
+     * @param mixed $row
+     * @return CustomerOrder
+     */
     private function createOrderFromRow($row): CustomerOrder
     {
         if ($row == null) {
@@ -86,6 +128,13 @@ final class OrderRepository
         );
     }
     
+    /**
+     * Fetch the current reserved order for a customer, creating one if it doesn't exist
+     *
+     * @param int $userId
+     * @param bool $createIfNotfound Whether to create a new order if none is found
+     * @return CustomerOrder|null
+     */
     public function fetchCustomerOrder(int $userId, bool $createIfNotfound = false) {
         $row = $this->db->table("CUSTOMER_ORDER")
         ->where("ID_CUSTOMER", $userId)
@@ -124,6 +173,13 @@ final class OrderRepository
         return $this->createOrderFromRow($newRow);
     }
 
+    /**
+     * Remove an item from a customer's order
+     *
+     * @param int $userId
+     * @param int $wineId
+     * @return bool True on success, false on failure
+     */
     public function removeItemFromOrder(int $userId, int $wineId): bool
     {
         $order = $this->fetchCustomerOrder($userId);
@@ -153,6 +209,15 @@ final class OrderRepository
         }
     }
 
+    /**
+     * Edit the amount of an item in a customer's order, or add/remove the item
+     *
+     * @param int $userId
+     * @param int $wineId
+     * @param int $diff
+     * @param bool $add
+     * @return bool True on success, false on failure
+     */
     public function editAmountOrItemInOrder(int $userId, int $wineId, int $diff, bool $add): bool 
     {
         $order = $this->fetchCustomerOrder($userId);
@@ -181,6 +246,14 @@ final class OrderRepository
         }
     }
     
+    /**
+     * Add an item to a customer's order
+     *
+     * @param int $userId
+     * @param int $wineId
+     * @param int $amount
+     * @return bool True on success, false on failure
+     */
     public function addToCart(int $userId, int $wineId, int $amount): bool {
         $order = $this->fetchCustomerOrder($userId, true);
         if ($order == null) {
@@ -202,6 +275,12 @@ final class OrderRepository
         }
     }
     
+    /**
+     * Update the total price of an order based on its items
+     *
+     * @param int $orderId
+     * @param bool $doTransaction Whether to wrap the update in a transaction
+     */
     public function updateOrderPrice(int $orderId, bool $doTransaction = false) {
         $order = $this->fetchOrderById($orderId, true);
         
@@ -229,7 +308,7 @@ final class OrderRepository
         ]);
     }
 
-    public function updateDeliveryAdress(int $userId, string $type, ?string $addres): bool 
+    public function updateDeliveryAddress(int $userId, string $type, ?string $address): bool 
     {
         $this->db->beginTransaction();
         try {
@@ -254,7 +333,7 @@ final class OrderRepository
                 ["DELIVERY_TYPE" => $type]
             );
             
-            if (!$addres) {
+            if (!$address) {
                 $row->update([
                     "DELIVERY_DATA" => ""
                 ]);
@@ -263,7 +342,7 @@ final class OrderRepository
             }
             
             $row->update([
-                "DELIVERY_DATA" => $addres
+                "DELIVERY_DATA" => $address
             ]);
             $this->db->commit();
             return true;

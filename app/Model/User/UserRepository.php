@@ -5,7 +5,7 @@
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Repository class for managing operations related on the internal represetation of User in the system.
+//DESC:     Repository class for managing operations related on the internal representation of User in the system.
 
 namespace App\Model\User;
 

@@ -165,7 +165,7 @@ final class CartPresenter extends BasePresenter
             $address = null;
         }
 
-        $result = $this->orderRepository->updateDeliveryAdress($userId, $type, $address);
+        $result = $this->orderRepository->updateDeliveryAddress($userId, $type, $address);
         if ($result) {
             $this->flashMessage("Způsob doručení byl uložen", FlashMsgType::SUCCESS->value);
         } else {
