@@ -30,6 +30,13 @@ use App\Model\Task\Treatment\TreatmentType;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * TaskRepository
+ * 
+ * An interface between user actions and database operations involving Tasks.
+ * Handles creation, retrieval, updating, and management of tasks (Harvests, Treatments, Bottlings),
+ * including worker assignments, vineyard rows, and conflict detection.
+ */
 class TaskRepository{
     private Explorer $database;
     private TreatmentRepository $treatmentRepository;
@@ -37,6 +44,18 @@ class TaskRepository{
     private HarvestRepository $harvestRepository;
     private VineyardRepository $vineyardRepository;
 
+    /**
+     * TaskRepository constructor
+     * 
+     * Initializes the TaskRepository with database connection and sub-repositories
+     * for handling different task types (Harvest, Treatment, Bottling) and vineyard operations.
+     * 
+     * @param Explorer $database Database explorer instance for database operations
+     * @param TreatmentRepository $treatmentRepository Repository for treatment-related operations
+     * @param BottlingRepository $bottlingRepository Repository for bottling-related operations
+     * @param HarvestRepository $harvestRepository Repository for harvest-related operations
+     * @param VineyardRepository $vineyardRepository Repository for vineyard-related operations
+     */
     public function __construct(
         Explorer $database,
         TreatmentRepository $treatmentRepository,
@@ -52,13 +71,15 @@ class TaskRepository{
     }
 
     /**
-     * fetchTasks
-     * Method to fetch tasks.
-     *
-     * @param string $pattern Pattern to match task names.
-     * @param string $type Task type to filter by.
-     * @param string $state Task state to filter by.
-     * @return array
+     * Fetch tasks based on filters
+     * 
+     * Retrieves tasks from the database filtered by name pattern, type, and state.
+     * Updates conflict information for retrieved tasks.
+     * 
+     * @param string $pattern Pattern to match task names
+     * @param string $type Task type to filter by (HARVEST, TREATMENT, BOTTLING, or empty for all)
+     * @param string $state Task state to filter by (PLANNED, FINISHED, or empty for all)
+     * @return Task[] Array of Task objects
      */
     public function fetchTasks(string $pattern, string $type, string $state): array
     {
@@ -90,12 +111,14 @@ class TaskRepository{
     }
 
     /**
-     * fetchById
-     * Method for fetch a task joined with its specific table (bottling, harvest, or treatment).
-     *
-     * @param int $id ID of the task.
-     * @param bool $updateConflicts Whether to check and update conflict status
-     * @return Task|null Returns the corresponding Task object, or null if not found.
+     * Fetch a task by its ID
+     * 
+     * Retrieves a task joined with its specific table (Bottling, Harvest, or Treatment).
+     * Optionally checks and updates conflict status.
+     * 
+     * @param int $id ID of the task
+     * @param bool $updateConflicts Whether to check and update conflict status (default: true)
+     * @return Task|null Returns the corresponding Task object, or null if not found
      */
     public function fetchById(int $id, bool $updateConflicts = true): ?Task
     {
@@ -124,9 +147,12 @@ class TaskRepository{
     }
    
     /**
-     * Method to add information about task conflicts
-     *
-     * @param Task $oneTask
+     * Update conflict information for a single task
+     * 
+     * Checks if any vineyard rows associated with the task are in conflict
+     * and marks the task accordingly.
+     * 
+     * @param Task $oneTask The task to check for conflicts
      * @return void
      */
     private function updateTaskConflicts(Task $oneTask) {
@@ -145,9 +171,11 @@ class TaskRepository{
     }
 
     /**
-     * Method to add information about task conflicts
-     *
-     * @param Task[] $oneTask
+     * Update conflict information for multiple tasks
+     * 
+     * Iterates through an array of tasks and updates conflict information for each one.
+     * 
+     * @param Task[] $tasks Array of tasks to check for conflicts
      * @return void
      */
     private function updateTasksConflicts(array $tasks) {
@@ -157,12 +185,15 @@ class TaskRepository{
     }
 
     /**
-     * method for marking task as complete
+     * Mark a task as complete
      * 
-     * @param Task $task
-     * @param integer $confirmerId
-     * @param DateTime $executionDate
-     * @return boolean
+     * Updates the task state to FINISHED, sets the confirmer and execution timestamp.
+     * For Bottling tasks, also updates the wine state to BOTTLED.
+     * 
+     * @param Task $task The task to mark as done
+     * @param int $confirmerId ID of the user confirming the task completion
+     * @param DateTime $executionDate Date when the task was executed
+     * @return bool True on success, false on failure
      */
     public function markTaskDone(Task $task, int $confirmerId, DateTime $executionDate): bool
     {
@@ -197,11 +228,13 @@ class TaskRepository{
     }
 
     /**
-     * method for finding out, if a user is assigned to a task
-     *
-     * @param integer $userId
-     * @param integer $taskId
-     * @return boolean
+     * Check if a user is assigned to a task
+     * 
+     * Verifies if a user is listed as a worker for the specified task.
+     * 
+     * @param int $userId ID of the user
+     * @param int $taskId ID of the task
+     * @return bool True if user is assigned to the task, false otherwise
      */
     public function isUserAssignedToTask(int $userId, int $taskId): bool
     {
@@ -213,29 +246,30 @@ class TaskRepository{
         return $workerRow !== null;
     }
 
-    
     /**
-     * rowIsSafeForHarvest
-     * Check if a vineyard row is safe for harvest (no spraying treatment within 14 days before harvest).
-     *
+     * Check if a vineyard row is safe for harvest
+     * 
+     * Verifies that no spraying treatment has been applied within 14 days before harvest.
+     * This ensures compliance with safety regulations for pesticide application.
+     * 
      * @param int $vineyardId Vineyard ID
      * @param int $rowCode Row code
      * @param DateTime $harvestDate Planned harvest date
-     * @return bool True if safe, false if there's a conflict
+     * @return bool True if safe (no conflicts), false if there's a spraying conflict
      */
     private function rowIsSafeForHarvest(int $vineyardId, int $rowCode, DateTime $harvestDate): bool
     {
-        // Step 1: Find all task rows for this specific row in the vineyard
+        // Find all task rows for this specific row in the vineyard
         $taskRowsForThisRow = $this->database->table('TASK_ROW')
             ->where('CODE_ROW', $rowCode)
             ->where('ID_VINEYARD', $vineyardId)
             ->fetchAll();
         
-        // Step 2: For each task row, check if it's a SPRAYING treatment
+        // For each task row, check if it's a SPRAYING treatment
         foreach ($taskRowsForThisRow as $taskRow) {
             $taskId = $taskRow->ID_TASK;
             
-            // Step 3: Check if this task is a SPRAYING treatment
+            // Check if this task is a SPRAYING treatment
             $treatment = $this->database->table('TREATMENT')
                 ->where('ID_TASK', $taskId)
                 ->where('TYPE', 'SPRAYING')
@@ -243,7 +277,7 @@ class TaskRepository{
                 ->fetch();
             
             if ($treatment) {
-                // Step 4: Get the task details (dates)
+                // Get the task details (dates)
                 $task = $this->database->table('TASK')
                     ->where('ID', $taskId)
                     ->fetch();
@@ -256,44 +290,46 @@ class TaskRepository{
                     $daysDifference = $sprayingDate->diff($harvestDate)->days;
                     
                     if ($daysDifference < 14) {
-                        return false; // Not safe - conflict detected
+                        return false; 
                     }
                 }
             }
         }
         
-        return true; // Safe - no conflicts found
+        return true; 
     }
 
     /**
-     * rowIsSafeForSprayingTreatment
-     * Check if a vineyard row is safe for spraying treatment (no harvest within 14 days before or after treatment).
-     *
+     * Check if a vineyard row is safe for spraying treatment
+     * 
+     * Verifies that no harvest is planned within 14 days before or after the treatment.
+     * This ensures compliance with safety regulations for pesticide application.
+     * 
      * @param int $vineyardId Vineyard ID
      * @param int $rowCode Row code
      * @param DateTime $treatmentDate Planned treatment date
-     * @return bool True if safe, false if there's a conflict
+     * @return bool True if safe (no conflicts), false if there's a harvest conflict
      */
     private function rowIsSafeForSprayingTreatment(int $vineyardId, int $rowCode, DateTime $treatmentDate): bool
     {
-        // Step 1: Find all task rows for this specific row in the vineyard
+        // Find all task rows for this specific row in the vineyard
         $taskRowsForThisRow = $this->database->table('TASK_ROW')
             ->where('CODE_ROW', $rowCode)
             ->where('ID_VINEYARD', $vineyardId)
             ->fetchAll();
         
-        // Step 2: For each task row, check if it's a harvest
+        // For each task row, check if it's a harvest
         foreach ($taskRowsForThisRow as $taskRow) {
             $taskId = $taskRow->ID_TASK;
             
-            // Step 3: Check if this task is a harvest
+            // Check if this task is a harvest
             $harvest = $this->database->table('HARVEST')
                 ->where('ID_TASK', $taskId)
                 ->where('ID_VINEYARD', $vineyardId)
                 ->fetch();
             
             if ($harvest) {
-                // Step 4: Get the task details (dates)
+                // Get the task details (dates)
                 $task = $this->database->table('TASK')
                     ->where('ID', $taskId)
                     ->fetch();
@@ -307,21 +343,25 @@ class TaskRepository{
                     $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
                     
                     if ($daysDifference < 14) {
-                        return false; // Not safe - conflict detected
+                        return false; 
                     }
                 }
             }
         }
         
-        return true; // Safe - no conflicts found
+        return true; 
     }
 
     /**
-     * method for creating a bottling task
+     * Create a new bottling task
      * 
-     * @param TaskData $data
-     * @param integer $userId
-     * @return void 
+     * Creates a task for bottling wine, including validation of wine, bottle volume,
+     * worker assignments, and optional image upload.
+     * 
+     * @param TaskData $data Task data containing all necessary information
+     * @param int $userId ID of the user creating the task
+     * @return void
+     * @throws \Exception If validation fails or database operation fails
      */
     public function createBottlingTask(TaskData $data, int $userId): void {
 
@@ -466,11 +506,15 @@ class TaskRepository{
     }
     
     /**
-     * Method for creating a Harvest task
-     *
-     * @param TaskData $data
-     * @param integer $userId
-     * @return TaskOperationStatus
+     * Create a new harvest task
+     * 
+     * Creates a task for harvesting grapes from vineyard rows, with validation
+     * and conflict detection for spraying treatments.
+     * 
+     * @param TaskData $data Task data containing vineyard, rows, variety, and other information
+     * @param int $userId ID of the user creating the task
+     * @return TaskOperationStatus Operation status (SUCCESS or CONFLICT_WITH_TREATMENT)
+     * @throws \Exception If validation fails or database operation fails
      */
     public function createHarvestTask(TaskData $data, int $userId): TaskOperationStatus {
         
@@ -612,11 +656,12 @@ class TaskRepository{
     }
 
     /**
-     * fetchTaskWorkers
-     * Fetch all workers of the specific task.
-     *
-     * @param int $id Task ID.
-     * @return User[] Array of User objects <=> workers  of the task.
+     * Fetch all workers assigned to a task
+     * 
+     * Retrieves all users assigned as workers to the specified task.
+     * 
+     * @param int $id Task ID
+     * @return User[] Array of User objects representing workers of the task
      */
     public function fetchTaskWorkers(int $id): array
     {
@@ -648,6 +693,14 @@ class TaskRepository{
         return $usersObjects;
     }
 
+    /**
+     * Fetch all workers not assigned to a task
+     * 
+     * Retrieves all active users with worker role who are not currently assigned to the specified task.
+     * 
+     * @param int $id Task ID
+     * @return User[] Array of User objects representing available workers
+     */
     public function fetchAllNotSetWorkers(int $id): array{
         $assignedWorkerIds = $this->database->table('WORKER')
             ->where('ID_TASK', $id)
@@ -688,13 +741,14 @@ class TaskRepository{
         return $usersObjects; 
     }
 
-    
     /**
-     * Method for adding workers to a task
+     * Add a worker to a task
      * 
-     * @param integer $taskId
-     * @param integer $workerId
-     * @return string
+     * Assigns a worker to the specified task by creating a WORKER record.
+     * 
+     * @param int $taskId Task ID
+     * @param int $workerId Worker ID
+     * @return string Empty string on success, error message on failure
      */
     public function addWorkerToTask(int $taskId, int $workerId): string
     {   
@@ -723,11 +777,13 @@ class TaskRepository{
     }
 
     /**
-     * Method for removing worker form a task
+     * Remove a worker from a task
      * 
-     * @param integer $taskId
-     * @param integer $workerId
-     * @return string
+     * Unassigns a worker from the specified task by deleting the WORKER record.
+     * 
+     * @param int $taskId Task ID
+     * @param int $workerId Worker ID
+     * @return string Empty string on success, error message on failure
      */
     public function removeWorkerFromTask(int $taskId, int $workerId): string
     {
@@ -748,10 +804,12 @@ class TaskRepository{
     }
 
     /**
-     * Method for fetching task Rows
+     * Fetch vineyard rows associated with a task
      * 
-     * @param integer $taskId
-     * @return array
+     * Retrieves all vineyard rows linked to the specified task and checks for conflicts.
+     * 
+     * @param int $taskId Task ID
+     * @return WineRow[] Array of WineRow objects associated with the task
      */
     public function fetchTaskRows(int $taskId): array
     {
@@ -804,12 +862,15 @@ class TaskRepository{
     }
 
     /**
-     * Method for fetching all not set workers
+     * Fetch vineyard rows not assigned to a task
      * 
-     * @param integer $taskId
-     * @param integer $vineyardId
-     * @param integer|null $wineVarietyId
-     * @return array
+     * Retrieves all vineyard rows that are not currently assigned to the specified task.
+     * Can be filtered by wine variety if provided.
+     * 
+     * @param int $taskId Task ID
+     * @param int $vineyardId Vineyard ID
+     * @param int|null $wineVarietyId Optional wine variety ID for filtering
+     * @return WineRow[] Array of WineRow objects not assigned to the task
      */
     public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
     {   
@@ -851,12 +912,14 @@ class TaskRepository{
 
 
     /**
-     * Method for adding a row to a task
+     * Add a vineyard row to a task
      * 
-     * @param integer $taskId
-     * @param integer $vineyardId
-     * @param integer $codeRow
-     * @return string
+     * Links a vineyard row to the specified task by creating a TASK_ROW record.
+     * 
+     * @param int $taskId Task ID
+     * @param int $vineyardId Vineyard ID
+     * @param int $codeRow Row code
+     * @return string Empty string on success, error message on failure
      */
     public function addTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {   
@@ -893,14 +956,15 @@ class TaskRepository{
         
     }
 
-   
     /**
-     * Method for removing a Row form a task 
+     * Remove a vineyard row from a task
      * 
-     * @param integer $taskId
-     * @param integer $vineyardId
-     * @param integer $codeRow
-     * @return string
+     * Unlinks a vineyard row from the specified task by deleting the TASK_ROW record.
+     * 
+     * @param int $taskId Task ID
+     * @param int $vineyardId Vineyard ID
+     * @param int $codeRow Row code
+     * @return string Empty string on success, error message on failure
      */
     public function removeTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {
@@ -929,12 +993,15 @@ class TaskRepository{
 
 
     /**
-     * Method for creating a treatment Task
-     *
-     * @param TaskData $data
-     * @param integer $userId
-     * @return TaskOperationStatus
-     * @throws Exception
+     * Create a new treatment task
+     * 
+     * Creates a task for treating vineyard rows (e.g., spraying), with validation
+     * and conflict detection for harvest tasks.
+     * 
+     * @param TaskData $data Task data containing vineyard, rows, treatment details
+     * @param int $userId ID of the user creating the task
+     * @return TaskOperationStatus Operation status (SUCCESS or CONFLICT_WITH_HARVEST)
+     * @throws \Exception If validation fails or database operation fails
      */
     public function createTreatmentTask(TaskData $data, int $userId): TaskOperationStatus
     {
@@ -1116,12 +1183,14 @@ class TaskRepository{
     }
    
     /**
-     * Method for updating Base Task
+     * Update base task information
      * 
-     * @param integer $taskId
-     * @param \stdClass $values
+     * Updates common task fields such as name, note, and planned execution date.
+     * 
+     * @param int $taskId Task ID
+     * @param \stdClass $values Object containing fields to update
      * @return void
-     * @throws Exception
+     * @throws \Exception If task not found or validation fails
      */
     public function updateBaseTask(int $taskId, \stdClass $values): void
     {
@@ -1171,12 +1240,15 @@ class TaskRepository{
     }
    
     /**
-     * Method for updating Bottling task
+     * Update bottling task information
      * 
-     * @param integer $taskId
-     * @param \stdClass $values
-     * @param ImageEntity|null $img
-     * @return boolean
+     * Updates bottling-specific fields such as bottle volume and wine picture.
+     * 
+     * @param int $taskId Task ID
+     * @param \stdClass $values Object containing fields to update
+     * @param ImageEntity|null $img Optional new image for the wine
+     * @return void
+     * @throws \Exception If task not found or validation fails
      */
     public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): void
     {
@@ -1257,12 +1329,14 @@ class TaskRepository{
     }
     
     /**
-     * Method for updating treatment task
+     * Update treatment task information
      * 
-     * @param integer $taskId
-     * @param \stdClass $values
+     * Updates treatment-specific fields such as type, name, quantity, and unit.
+     * 
+     * @param int $taskId Task ID
+     * @param \stdClass $values Object containing fields to update
      * @return void
-     * @throws Exception
+     * @throws \Exception If task not found or validation fails
      */
     public function updateTreatmentTask(int $taskId, \stdClass $values): void
     {
