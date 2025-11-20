@@ -71,7 +71,9 @@ final class OrdersPresenter extends BasePresenter
      * @return void
      */
     public function handleChangeOrderState(int $orderId, string $newState) {
+        /** @var bool $result Flag indicating success of state change */
         $result = $this->ordRepository->changeClientOrderStatus($orderId, $newState);
+        // Provide feedback to the user based on the result of the state change
         if (!$result) {
             $this->flashMessage("Nepovedlo se upravit stav objednávky", FlashMsgType::ERROR->value);
         } else {
