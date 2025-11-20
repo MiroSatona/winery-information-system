@@ -62,6 +62,7 @@ final class HomePresenter extends BasePresenter
      */
     public function renderDefault(): void
     {   
+        // Prepare data for the homepage template
         $this->template->homeImage = $this->homeImage;
         $this->template->vineYardsData = $this->vineyardRepository->joinWithVarieties();
         $this->template->wineVarietiesData = $this->wineVarietyRepository->fetchAll();
