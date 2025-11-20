@@ -22,21 +22,12 @@ final class ShopPresenter extends  BasePresenter
     {
         parent::startup();
     }
-    
-    private function convertWineTypeToInternal(?string $type): ?WineColor 
-    {
-        switch ($type) {
-            case 'RED':
-                return WineColor::RED;
-            case 'WHITE':
-                return WineColor::WHITE;
-            case 'ROSE':
-                return WineColor::ROSE;
-            default:
-                return null;
-        }
-    }
-    
+   
+   /**
+    * method to render the shop 
+    *
+    * @return void
+    */ 
     public function renderDefault(): void
     {
             // Get filter params from GET query
@@ -49,7 +40,8 @@ final class ShopPresenter extends  BasePresenter
         // do a simple search if applicable 
         $wines = $this->wineRepository->getAllProducts($search ?? "");
         /** @var WineColor|null $color */
-        $color = $this->convertWineTypeToInternal($type);
+
+        $color = $type->value ?? null;
         // only allow certain types
         if ($color !== null) {
             $wines = array_filter($wines, fn($w) => $w->color === $color);
@@ -68,7 +60,14 @@ final class ShopPresenter extends  BasePresenter
         $this->template->sort = $sort;
         $this->template->wines = $wines;
     }
-    
+   
+    /**
+     * Method to handle adding to cart
+     *
+     * @param integer $wineId
+     * @param integer $count
+     * @return void
+     */
     public function handleAddToCart(int $wineId, int $count = 1): void
     {
         Debugger::log("got this much in the form: $count");
@@ -84,6 +83,11 @@ final class ShopPresenter extends  BasePresenter
         $this->redirect('this');
     }
     
+    /**
+     * method to create add to cart form  
+     *
+     * @return \Nette\Application\UI\Form
+     */
     protected function createComponentAddToCartForm(): \Nette\Application\UI\Form
     {
         $form = new \Nette\Application\UI\Form;
@@ -97,6 +101,13 @@ final class ShopPresenter extends  BasePresenter
         return $form;
     }
 
+    /**
+     * method for handling add to card functino 
+     *
+     * @param \Nette\Application\UI\Form $form
+     * @param \stdClass $values
+     * @return void
+     */
     public function addToCartFormSucceeded(\Nette\Application\UI\Form $form, \stdClass $values): void
     {
         $this->handleAddToCart((int)$values->wineId, (int)$values->count);
