@@ -19,7 +19,9 @@ use App\Model\Wine\WineState;
  */
 class Wine
 {
+    // total number of bottles (set separately)
     private int $bottlesTotal;
+    // volume of a single bottle (set separately)
     private float $bottleVolume;
       
     /**

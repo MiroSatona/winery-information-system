@@ -48,6 +48,6 @@ final class ProductRepository
 
     public function findById(int $id): ?Wine 
     {
-        return $this->wineRep->fetchWineById($id);
+        return $this->wineRep->fetchById($id);
     }
 }

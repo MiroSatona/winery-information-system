@@ -46,7 +46,7 @@ final class WineRepository
      * @param int $wineId
      * @return Wine|null The Wine object if found, null otherwise.
      */
-    public function fetchWineById(int $wineId): ?Wine
+    public function fetchById(int $wineId): ?Wine
     {
         $wineRow = $this->db->table('WINE')->where('ID', $wineId)->fetch();
         return $wineRow ? $this->createWineFromRow($wineRow) : null;
@@ -57,7 +57,7 @@ final class WineRepository
      *
      * @return Wine[] Array of Wine objects
      */
-    public function fetchAllWines(): array
+    public function fetchAll(): array
     {
         $rows = $this->db->table('WINE');
         $wines = [];
@@ -290,7 +290,7 @@ final class WineRepository
      */
     public function updateWineFreeBottles(int $idWine, int $amount, bool $add): bool {
 
-        $wine = $this->fetchWineById($idWine);        
+        $wine = $this->fetchById($idWine);        
         if ($wine == null) {
             Debugger::log('Failed to find specified wine');
             return false;
@@ -336,7 +336,7 @@ final class WineRepository
         
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
         
-        if (!$this->fetchWineById($idWine)) {
+        if (!$this->fetchById($idWine)) {
             return false;
         }
         $this->db->beginTransaction();
@@ -363,7 +363,7 @@ final class WineRepository
      */
     public function setWineState(int $idWine, string $newState): bool {
 
-        $wine = $this->fetchWineById($idWine);
+        $wine = $this->fetchById($idWine);
         if (!$wine) {
             return false;
         }
@@ -392,7 +392,7 @@ final class WineRepository
      */
     public function setWineDescription(int $idWine, string $newDescription): bool {
 
-        $wine = $this->fetchWineById($idWine);
+        $wine = $this->fetchById($idWine);
         if (!$wine) {
             return false;
         }

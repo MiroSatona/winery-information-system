@@ -171,7 +171,7 @@ final class WinePresenter extends BasePresenter
      */
     public function renderShow(int $wineId): void
     {
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
@@ -204,7 +204,7 @@ final class WinePresenter extends BasePresenter
         }
 
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('this');
@@ -237,7 +237,7 @@ final class WinePresenter extends BasePresenter
             return;
         }
 
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
            $this->redirect(":IS:Wine:dashboard");
@@ -268,7 +268,7 @@ final class WinePresenter extends BasePresenter
             return;
         }
         
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
            $this->redirect(":IS:Wine:dashboard");
@@ -335,7 +335,7 @@ final class WinePresenter extends BasePresenter
         $price = (float) $values->price;
         $description = (string) $values->popis;
         
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         
         if (!$wine) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);            
@@ -473,7 +473,7 @@ final class WinePresenter extends BasePresenter
 
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
@@ -529,7 +529,7 @@ final class WinePresenter extends BasePresenter
         }
 
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
@@ -593,7 +593,7 @@ final class WinePresenter extends BasePresenter
 
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
@@ -641,7 +641,7 @@ final class WinePresenter extends BasePresenter
 
         $wineId = (int) $this->getParameter('wineId');
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
@@ -680,7 +680,7 @@ final class WinePresenter extends BasePresenter
         }
 
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
@@ -721,7 +721,7 @@ final class WinePresenter extends BasePresenter
         }
 
         $this->template->imageRepository = $this->imageRepository;
-        $this->template->wine = $this->wineRepository->fetchWineById($wineId);
+        $this->template->wine = $this->wineRepository->fetchById($wineId);
     }
 
     /**

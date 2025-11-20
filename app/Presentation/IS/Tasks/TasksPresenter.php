@@ -634,7 +634,7 @@ final class TasksPresenter extends BasePresenter
 
         // Get wine to latte template
         $this->template->wine = ($harvest->getIdWine() !== null)
-            ? $this->wineRep->fetchWineById($harvest->getIdWine())
+            ? $this->wineRep->fetchById($harvest->getIdWine())
             : null;
         
         $this->template->wineRows = $this->taskRepository->fetchTaskRows($harvest->getId());
@@ -842,7 +842,7 @@ final class TasksPresenter extends BasePresenter
                 $form->addError('Obrázek se nepodařilo nahrát.');
                 return;
             }
-            $wine = $this->wineRep->fetchWineById($task->getIdWine());
+            $wine = $this->wineRep->fetchById($task->getIdWine());
             $imageEntity = new Image(null, $imagePath, $wine->name, 'Obrázek vína ' . $wine->name);
             $task->setImg($imageEntity);
         }

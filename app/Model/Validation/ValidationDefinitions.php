@@ -1,10 +1,18 @@
 <?php
+//FILE:     ValidationDefinitions.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Validation definitions mostly for form inputs.
 
 declare(strict_types=1);
 
 namespace App\Model\Validation;
 
-
+/**
+ * This class encapsulates all validation rules for input forms
+ */
 final class ValidationDefinitions
 {
     public const USERNAME_PATTERN = '^[a-zA-Z0-9_]{4,30}$';
@@ -12,7 +20,6 @@ final class ValidationDefinitions
     public const POSTAL_CODE_PATTERN = '^[0-9]{5}$';
     public const PHONE_NUMBER_PATTERN = '\+?[0-9]{9}';
     
-
     public const NAME_LENGTH_MIN = 1;
     public const NAME_LENGTH_MAX = 30;
     public const SURNAME_LENGTH_MIN = 1;
@@ -67,5 +74,4 @@ final class ValidationDefinitions
     public const ACID_CONTENTS_MAX = 999.99;
     public const BOTTLE_VOLUME_MIN = 0.0;
     public const BOTTLE_VOLUME_MAX = 9999.99;
-
 }
