@@ -21,76 +21,327 @@ SET time_zone = "+00:00";
 -- Database: `iis_winery`
 --
 
--- --------------------------------------------------------
+CREATE TABLE USER (
+    ID INTEGER AUTO_INCREMENT,
+    NAME VARCHAR(30) NOT NULL,
+    ACTIVE BOOLEAN NOT NULL DEFAULT(1),
+    SURNAME VARCHAR(30) NOT NULL,
+    USERNAME VARCHAR(30) NOT NULL UNIQUE,
+    EMAIL VARCHAR(255) NOT NULL UNIQUE,
+    PSWD_HASH VARCHAR(256) NOT NULL UNIQUE,
+    PSWD_SALT VARCHAR(256) NOT NULL UNIQUE,
+    PHONE_NUMBER VARCHAR(9),
+    CITY VARCHAR(30),
+    POST_CODE VARCHAR(5),
+    STREET VARCHAR(30),
+    HOUSE_NUMBER VARCHAR(10),
+    REGISTRATION_TIMESTAMP TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    ROLE_USER BOOLEAN NOT NULL DEFAULT(0) ,
+    ROLE_WORKER BOOLEAN NOT NULL DEFAULT(0) ,
+    ROLE_VINTNER BOOLEAN NOT NULL DEFAULT(0) ,
+    ROLE_ADMIN BOOLEAN NOT NULL DEFAULT(0) ,
+    CONSTRAINT PK_USER PRIMARY KEY (ID),
+    CONSTRAINT CHECK_USER_PHONE_NUMBER
+        CHECK (
+            PHONE_NUMBER IS NULL OR REGEXP_LIKE(PHONE_NUMBER, '^[0-9]{9}$')
+        ),
+    CONSTRAINT CHECK_USER_EMAIL
+        CHECK (
+            REGEXP_LIKE(EMAIL, '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        ),
+    CONSTRAINT CHECK_USER_POST_CODE
+        CHECK (
+            POST_CODE IS NULL OR REGEXP_LIKE(POST_CODE, '^[0-9]{5}$')
+        )
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
---
--- Table structure for table `BOTTLING`
---
+CREATE TABLE TASK (
+    ID INTEGER AUTO_INCREMENT,
+    NAME VARCHAR(30) NOT NULL,
+    STATE ENUM('PLANNED', 'FINISHED', 'CANCELED') NOT NULL DEFAULT('PLANNED'),
+    CREATION_TIMESTAMP TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    LAST_CHANGE_TIMESTAMP TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PLANNED_EXECUTION_TIMESTAMP TIMESTAMP,
+    EXECUTION_TIMESTAMP TIMESTAMP,
+    NOTE TEXT,
+    ID_TASK_ISSUER INTEGER,
+    ID_TASK_CONFIRMER INTEGER,
+    CONSTRAINT PK_TASK PRIMARY KEY (ID),
+    CONSTRAINT
+        FK_ID_TASK_ISSUER
+        FOREIGN KEY (ID_TASK_ISSUER)
+        REFERENCES USER (ID)
+        ON DELETE SET NULL,
+    CONSTRAINT
+        FK_ID_TASK_CONFIRMER
+        FOREIGN KEY (ID_TASK_CONFIRMER)
+        REFERENCES USER (ID)
+        ON DELETE SET NULL,
+    CONSTRAINT CHECK_LAST_CHANGE_TIMESTAMP
+        CHECK (
+            LAST_CHANGE_TIMESTAMP >= CREATION_TIMESTAMP
+        ),
+    CONSTRAINT CHECK_EXECUTION_TIMESTAMP
+        CHECK (
+            (EXECUTION_TIMESTAMP IS NULL AND STATE IN ('PLANNED', 'CANCELED'))
+            OR 
+            EXECUTION_TIMESTAMP IS NOT NULL
+        )
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
-CREATE TABLE `BOTTLING` (
-  `ID_TASK` int NOT NULL,
-  `ID_WINE` int DEFAULT NULL,
-  `BOTTLES_COUNT` int NOT NULL,
-  `BOTTLE_VOLUME` decimal(6,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+CREATE TABLE PICTURE (
+    ID INTEGER AUTO_INCREMENT,
+    IMAGE_NAME VARCHAR(30) NOT NULL,
+    LINK TEXT NOT NULL,
+    DESCRIPTION TEXT NOT NULL,
+    CONSTRAINT PK_PICTURE PRIMARY KEY (ID)
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
--- --------------------------------------------------------
+CREATE TABLE WINE (
+    ID INTEGER AUTO_INCREMENT,
+    WINE_NAME VARCHAR(30) NOT NULL,
+    ID_LIQUIDATOR INTEGER,
+    ID_SELL_APPROVER INTEGER,
+    ID_PICTURE INTEGER,
+    YEAR SMALLINT NOT NULL,
+    ALCOHOL_PERCENTAGE DECIMAL(5,2) NOT NULL DEFAULT(13.0),
+    TYPE ENUM('DRY', 'HALF_DRY', 'HALF_SWEET', 'SWEET') NOT NULL DEFAULT('DRY'),
+    COLOR ENUM('WHITE', 'RED', 'ROSE') NOT NULL DEFAULT('WHITE'),
+    GRADE ENUM('NONE', 'CABINET', 'LATE', 'GRAPE_SELECTION', 'BERRY_SELECTION', 'ICE', 'STRAW') NOT NULL DEFAULT('NONE'),
+    STATE ENUM('PRODUCTION', 'LIQUIDATED', 'BOTTLED', 'SALE', 'SOLD') NOT NULL DEFAULT ('PRODUCTION'),
+    VOLUME SMALLINT NOT NULL,
+    BOTTLE_PRICE DECIMAL(10,2),
+    CURRENT_PRICE DECIMAL(10,2),
+    BOTTLES_LEFT SMALLINT,
+    LEFT_SUGAR DECIMAL(5,2),
+    ACID_CONTENTS DECIMAL(5,2),
+    SALES_DESCRIPTION TEXT,
+    PRODUCTION_NOTE TEXT,
+    CONSTRAINT PK_WINE PRIMARY KEY (ID),
+    CONSTRAINT
+        FK_ID_LIQUIDATOR
+        FOREIGN KEY (ID_LIQUIDATOR)
+        REFERENCES USER (ID)
+        ON DELETE SET NULL,
+    CONSTRAINT
+        FK_ID_SELL_APPROVER
+        FOREIGN KEY (ID_SELL_APPROVER)
+        REFERENCES USER (ID)
+        ON DELETE SET NULL,
+    CONSTRAINT
+        FK_ID_PICTURE
+        FOREIGN KEY (ID_PICTURE)
+        REFERENCES PICTURE (ID)
+        ON DELETE SET NULL,
+    CONSTRAINT CHECK_ALCOHOL_PERCENTAGE
+        CHECK (ALCOHOL_PERCENTAGE >= 0.0 AND ALCOHOL_PERCENTAGE <= 100.0),
+    CONSTRAINT CHECK_VOLUME
+        CHECK (VOLUME > 0)
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
---
--- Table structure for table `CUSTOMER_ORDER`
---
+CREATE TABLE VINEYARD(
+    ID INTEGER AUTO_INCREMENT,
+    ACTIVE BOOLEAN NOT NULL DEFAULT(1),
+    ID_PICTURE INTEGER,
+    NAME VARCHAR(30) NOT NULL UNIQUE,
+    LOCATION TEXT NOT NULL,
+    DESCRIPTION TEXT NOT NULL,
+    YEAR SMALLINT NOT NULL,
+    CONSTRAINT PK_VINEYARD PRIMARY KEY (ID),
+    CONSTRAINT
+        FK_ID_VINEYARD_PICTURE
+        FOREIGN KEY (ID_PICTURE)
+        REFERENCES PICTURE (ID)
+        ON DELETE SET NULL
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
-CREATE TABLE `CUSTOMER_ORDER` (
-  `ID` int NOT NULL,
-  `ID_CUSTOMER` int DEFAULT NULL,
-  `TOTAL_PRICE` decimal(10,2) NOT NULL,
-  `STATE` enum('RESERVED','PAID','CANCELLED','DELIVERED') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT 'RESERVED',
-  `DELIVERY_TYPE` enum('PICKUP','COURIER','POST') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `ORDER_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `DELIVERY_DATA` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'')
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+CREATE TABLE WINE_VARIETY(
+    ID INTEGER AUTO_INCREMENT,
+    ID_PICTURE INTEGER,
+    NAME VARCHAR(20) NOT NULL UNIQUE,
+    COLOR ENUM('WHITE', 'RED', 'PINK', 'GREY', 'BLUE') NOT NULL DEFAULT('WHITE'),
+    DESCRIPTION TEXT NOT NULL,
+    CONSTRAINT PK_WINE_VARIETY PRIMARY KEY (ID),
+    CONSTRAINT
+        FK_ID_WINE_VARIETY_PICTURE
+        FOREIGN KEY (ID_PICTURE)
+        REFERENCES PICTURE (ID)
+        ON DELETE SET NULL
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
--- --------------------------------------------------------
+CREATE TABLE WINE_ROW (
+    CODE INTEGER,
+    ACTIVE BOOLEAN NOT NULL DEFAULT(1),
+    ID_VINEYARD INTEGER,
+    ID_WINE_VARIETY INTEGER,
+    HEAD_COUNT SMALLINT NOT NULL,
+    PLANTING_YEAR SMALLINT NOT NULL,
+    CONSTRAINT PK_WINE_ROW PRIMARY KEY (ID_VINEYARD, CODE),
+    CONSTRAINT FK_WINE_ROW_VINEYARD
+        FOREIGN KEY (ID_VINEYARD)
+        REFERENCES VINEYARD (ID)
+        ON DELETE CASCADE,
 
---
--- Table structure for table `HARVEST`
---
+    CONSTRAINT FK_WINE_ROW_WINE_VARIETY
+        FOREIGN KEY (ID_WINE_VARIETY)
+        REFERENCES WINE_VARIETY (ID)
+        ON DELETE CASCADE,
 
-CREATE TABLE `HARVEST` (
-  `ID_TASK` int NOT NULL,
-  `ID_VINEYARD` int NOT NULL,
-  `ID_WINE_VARIETY` int NOT NULL,
-  `ID_HARVEST_CONFIRMER` int DEFAULT NULL,
-  `ID_WINE` int DEFAULT NULL,
-  `WEIGHT` decimal(10,2) DEFAULT NULL,
-  `SUGAR_CONTENT` decimal(5,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+    CONSTRAINT CHK_WINE_ROW_HEAD_COUNT
+        CHECK (HEAD_COUNT > 0)
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
--- --------------------------------------------------------
+CREATE TABLE TREATMENT(
+    ID_TASK INT PRIMARY KEY,
+    ID_VINEYARD INTEGER NOT NULL,
+    TYPE ENUM('SPRAYING', 'FERTILIZING', 'CUTTING', 'WEEDING', 'OTHER') NOT NULL DEFAULT('SPRAYING'),
+    TREAT_NAME VARCHAR(20) NOT NULL,
+    QUANTITY DECIMAL(10,2),
+    UNIT VARCHAR(10),
+    CONSTRAINT FK_TREATMENT_TASK
+        FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT FK_TREATMENT_VINEYARD
+        FOREIGN KEY (ID_VINEYARD) REFERENCES VINEYARD(ID)
+        ON DELETE CASCADE,
+    CONSTRAINT CHECK_TREATMENT_QUANTITY
+        CHECK (QUANTITY > 0)
+    
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
---
--- Table structure for table `ORDER_ITEM`
---
+CREATE TABLE HARVEST(
+    ID_TASK INT PRIMARY KEY,
+    ID_VINEYARD INTEGER NOT NULL,
+    ID_WINE_VARIETY INTEGER NOT NULL,
+    ID_HARVEST_CONFIRMER INTEGER,
+    ID_WINE INTEGER,
+    WEIGHT DECIMAL(10,2),
+    SUGAR_CONTENT DECIMAL(5,2),
+    CONSTRAINT FK_HARVEST_TASK
+        FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT FK_HARVEST_VINEYARD
+        FOREIGN KEY (ID_VINEYARD) REFERENCES VINEYARD(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT FK_HARVEST_WINE_VARIETY
+        FOREIGN KEY (ID_WINE_VARIETY) REFERENCES WINE_VARIETY(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT FK_HARVEST_WINE_CONFIRMER
+        FOREIGN KEY (ID_HARVEST_CONFIRMER) REFERENCES USER(ID) 
+        ON DELETE SET NULL,
+    CONSTRAINT FK_HARVEST_WINE
+        FOREIGN KEY (ID_WINE) REFERENCES WINE(ID) 
+        ON DELETE SET NULL
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
-CREATE TABLE `ORDER_ITEM` (
-  `ID_ORDER` int NOT NULL,
-  `ID_WINE` int NOT NULL,
-  `BOTTLES_COUNT` int NOT NULL,
-  `PRICE_PER_BOTTLE` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+CREATE TABLE BOTTLING(
+    ID_TASK INT PRIMARY KEY,
+    ID_WINE INTEGER,
+    BOTTLES_COUNT INT NOT NULL,
+    BOTTLE_VOLUME DECIMAL(6,2) NOT NULL,
+    CONSTRAINT FK_BOTTLING_TASK
+        FOREIGN KEY (ID_TASK) REFERENCES TASK(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT FK_BOTTLING_WINE
+        FOREIGN KEY (ID_WINE) REFERENCES WINE(ID) 
+        ON DELETE CASCADE,
+    CONSTRAINT CHK_BOTTLING_BOTTLES_COUNT
+        CHECK (BOTTLES_COUNT > 0),
+    CONSTRAINT CHK_BOTTLING_BOTTLE_VOLUME
+        CHECK (BOTTLE_VOLUME > 0)
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
--- --------------------------------------------------------
 
---
--- Table structure for table `PICTURE`
---
+CREATE TABLE TASK_ROW (
+    ID_VINEYARD INTEGER NOT NULL,
+    CODE_ROW    INTEGER NOT NULL,  
+    ID_TASK      INTEGER NOT NULL,
 
-CREATE TABLE `PICTURE` (
-  `ID` int NOT NULL,
-  `IMAGE_NAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `LINK` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `DESCRIPTION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
+    CONSTRAINT PK_TASK_ROW
+        PRIMARY KEY (ID_VINEYARD, CODE_ROW, ID_TASK),
+
+    CONSTRAINT FK_TASK_ROW_TASK
+        FOREIGN KEY (ID_TASK)
+        REFERENCES TASK (ID)
+        ON DELETE CASCADE,
+
+    CONSTRAINT FK_TASK_ROW_WINE_ROW
+        FOREIGN KEY (ID_VINEYARD, CODE_ROW)
+        REFERENCES WINE_ROW (ID_VINEYARD, CODE)
+        ON DELETE CASCADE
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
+
+CREATE TABLE WORKER(
+    ID_USER INTEGER,
+    ID_TASK INTEGER,
+    CONSTRAINT PK_WORKER PRIMARY KEY (ID_USER, ID_TASK),
+    CONSTRAINT FK_WORKER_USER
+        FOREIGN KEY (ID_USER)
+        REFERENCES USER (ID)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_WORKER_TASK
+        FOREIGN KEY (ID_TASK)
+        REFERENCES TASK (ID)
+        ON DELETE CASCADE
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
+
+
+CREATE TABLE CUSTOMER_ORDER (
+    ID            INTEGER AUTO_INCREMENT,
+    ID_CUSTOMER   INTEGER,
+    TOTAL_PRICE   DECIMAL(10,2) NOT NULL CHECK (TOTAL_PRICE >= 0),
+    STATE         ENUM('RESERVED','PAID','CANCELLED', 'DELIVERED') NOT NULL DEFAULT 'RESERVED',
+    DELIVERY_TYPE ENUM('PICKUP','COURIER','POST') NOT NULL,
+    ORDER_TIMESTAMP TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    DELIVERY_DATA TEXT NOT NULL DEFAULT(''),
+    CONSTRAINT PK_CUSTOMER_ORDER PRIMARY KEY (ID),
+    CONSTRAINT FK_ORDER_CUSTOMER
+        FOREIGN KEY (ID_CUSTOMER) REFERENCES USER(ID)
+        ON DELETE CASCADE
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
+
+CREATE TABLE ORDER_ITEM (
+    ID_ORDER         INTEGER NOT NULL,
+    ID_WINE          INTEGER NOT NULL,
+    BOTTLES_COUNT    INT NOT NULL,
+    PRICE_PER_BOTTLE DECIMAL(10,2) NOT NULL,
+    CONSTRAINT PK_ORDER_ITEM PRIMARY KEY (ID_ORDER, ID_WINE),
+    CONSTRAINT FK_ORDER_ITEM_ORDER
+        FOREIGN KEY (ID_ORDER) REFERENCES CUSTOMER_ORDER(ID)
+        ON DELETE CASCADE,
+    CONSTRAINT FK_ORDER_ITEM_WINE
+        FOREIGN KEY (ID_WINE)  REFERENCES WINE(ID)
+        ON DELETE CASCADE
+        
+)
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_czech_ci;
 
 --
 -- Dumping data for table `PICTURE`
@@ -111,76 +362,16 @@ INSERT INTO `PICTURE` (`ID`, `IMAGE_NAME`, `LINK`, `DESCRIPTION`) VALUES
 
 -- --------------------------------------------------------
 
---
--- Table structure for table `TASK`
---
+INSERT INTO `WINE_VARIETY` (`ID`, `ID_PICTURE`, `NAME`, `COLOR`, `DESCRIPTION`) VALUES
+(1, 2, 'Irsai Oliver', 'WHITE', 'Irsai Oliver je aromatická bílá odrůda vína původem z Maďarska, vzniklá křížením odrůd Pozsonyi Fehér (Bratislavské bílé) a Pearl of Csaba v roce 1930. Vyznačuje se intenzivní květinovo-muškátovou vůní, často připomínající bezový květ, muškátový hrozen či citrusové plody. Chuť je lehčí, svěží a harmonická, s příjemnou kyselinkou, která podtrhuje její ovocný charakter. Tato odrůda se nejčastěji používá pro výrobu suchých nebo polosuchých vín, která jsou oblíbená pro svou pitelnost a aromatickou přitažlivost už jako mladá vína. Irsai Oliver se dobře pije za tepla letního dne nebo jako aperitiv, často bývá i základem pro letní cuvée.'),
+(2, 3, 'Modrý Portugal', 'BLUE', 'Modrý Portugal je tradiční červená odrůda původu střední Evropy, rozšířená především v Rakousku, České republice a na Slovensku. Je známá svou jemností, lehkostí a ovocným charakterem, díky čemuž si získala oblibu jako víno pro každodenní pití. Víno z Modrého Portugalu má světle rubínovou až granátovou barvu a vůni po červeném ovoci, zejména třešních, malinách či ostružinách. Chuť bývá měkká, vyvážená a sametová, s nižším obsahem tříslovin i kyselin, což z něj činí příjemně hladké a snadno pitelné víno.'),
+(3, 4, 'Tramín Červený', 'GREY', 'Tramín červený je stará aromatická odrůda révy vinné, jejíž původ sahá až do středověku a bývá spojován s oblastí okolo jihotyrolského města Tramin (Termeno). Patří mezi nejvýraznější bílé odrůdy, i když její hrozny mají nažloutle růžové až červené slupky. Víno z Tramínu červeného je typické svou intenzivní vůní růží, koření, medu a exotického ovoce. Chuť bývá plná, bohatá a výrazně aromatická, často s nižší kyselinkou, což mu dodává hebkost a sametový dojem. Nejčastěji se vyrábí jako suché nebo polosladké víno, které vyniká svou výraznou osobitostí.'),
+(4, 5, 'Ryzlink Vlašský', 'WHITE', 'Ryzlink vlašský je tradiční bílá odrůda rozšířená především na jižní Moravě, zejména v oblasti Pálavy. Vyznačuje se výraznou minerální chutí a svěží kyselinkou, která odráží vápenité podloží místních vinic. Víno má jemné aroma květin, jablek a lískových oříšků, s lehkým nádechem medu při delším zrání. Díky své vyváženosti a eleganci je oblíbené jak k okamžité konzumaci, tak pro archivaci. Ryzlink vlašský je ideální společník k rybám, lehkým sýrům a pokrmům z bílého masa.'),
+(5, 6, 'Pálava', 'WHITE', 'Pálava je ušlechtilá aromatická odrůda vzniklá na Moravě křížením Tramínu červeného a Mülleru Thurgau. Je typická svou bohatou vůní muškátu, růží a tropického ovoce. Chuť bývá plná, kulatá a jemně nasládlá, s harmonickou kyselinkou. Pálava je často vyráběna jako polosuché nebo polosladké víno, které vyniká svou svůdnou vůní a dlouhou dochutí. Je to víno vhodné k dezertům, aromatickým sýrům nebo k samostatnému vychutnání při zvláštních příležitostech.'),
+(6, 7, 'Müller Thurgau', 'WHITE', 'Müller Thurgau je lehká a svěží bílá odrůda, vyšlechtěná ve Švýcarsku křížením Ryzlinku rýnského a Madeleine Royale. Na Moravě je velmi rozšířená díky své ranosti a spolehlivému výnosu. Vína z této odrůdy mají jemné aroma květin a muškátu s tóny broskví či citrusů. Chuť je měkká, harmonická a příjemně ovocná, často s nižším obsahem kyselin. Je ideálním vínem pro každodenní pití, obzvláště v mladém stavu, kdy vyniká svou svěžestí a lehkostí.'),
+(7, 8, 'Sauvignon', 'WHITE', 'Sauvignon je celosvětově uznávaná aromatická bílá odrůda, která se na Moravě těší velké oblibě. Je charakteristická výraznou vůní po černém rybízu, angreštu, broskví či kopřivách. Chuť bývá svěží, plná života a doprovázená výraznou kyselinkou, která vínu dodává energii a eleganci. Podle polohy vinohradu může být Sauvignon jemný a květinový, nebo naopak zemitější a minerální. Výborně se hodí k rybám, kozím sýrům i lehkým zeleninovým pokrmům.'),
+(8, 9, 'Ryzlink Rýnský', 'WHITE', 'Ryzlink rýnský patří mezi nejvšestrannější a nejuznávanější bílé odrůdy světa. Na severu Čech i na Moravě poskytuje vína s výraznou kyselinkou, dlouhověkostí a komplexní aromatikou. Typické jsou tóny limetky, meruněk, lipového květu a minerality. S věkem víno získává na hloubce a rozvíjí medové a petrolejové tóny. Ryzlink rýnský je ideálním vínem k archivaci i gurmánským pokrmům – od ryb po kořeněná jídla. Každý ročník dokáže překvapit svou jedinečnou harmonií a elegancí.');
 
-CREATE TABLE `TASK` (
-  `ID` int NOT NULL,
-  `NAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `STATE` enum('PLANNED','FINISHED','CANCELED') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'PLANNED'),
-  `CREATION_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `LAST_CHANGE_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `PLANNED_EXECUTION_TIMESTAMP` timestamp NULL DEFAULT NULL,
-  `EXECUTION_TIMESTAMP` timestamp NULL DEFAULT NULL,
-  `NOTE` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci,
-  `ID_TASK_ISSUER` int DEFAULT NULL,
-  `ID_TASK_CONFIRMER` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `TASK_ROW`
---
-
-CREATE TABLE `TASK_ROW` (
-  `ID_VINEYARD` int NOT NULL,
-  `CODE_ROW` int NOT NULL,
-  `ID_TASK` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `TREATMENT`
---
-
-CREATE TABLE `TREATMENT` (
-  `ID_TASK` int NOT NULL,
-  `ID_VINEYARD` int NOT NULL,
-  `TYPE` enum('SPRAYING','FERTILIZING','CUTTING','WEEDING','OTHER') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'SPRAYING'),
-  `TREAT_NAME` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `QUANTITY` decimal(10,2),
-  `UNIT` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `USER`
---
-
-CREATE TABLE `USER` (
-  `ID` int NOT NULL,
-  `NAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `ACTIVE` tinyint(1) NOT NULL DEFAULT (1),
-  `SURNAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `USERNAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `EMAIL` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `PSWD_HASH` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `PSWD_SALT` varchar(256) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `PHONE_NUMBER` varchar(9) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
-  `CITY` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
-  `POST_CODE` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
-  `STREET` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
-  `HOUSE_NUMBER` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci DEFAULT NULL,
-  `REGISTRATION_TIMESTAMP` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `ROLE_USER` tinyint(1) NOT NULL DEFAULT (0),
-  `ROLE_WORKER` tinyint(1) NOT NULL DEFAULT (0),
-  `ROLE_VINTNER` tinyint(1) NOT NULL DEFAULT (0),
-  `ROLE_ADMIN` tinyint(1) NOT NULL DEFAULT (0)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 --
 -- Dumping data for table `USER`
@@ -194,21 +385,6 @@ INSERT INTO `USER` (`ID`, `NAME`, `ACTIVE`, `SURNAME`, `USERNAME`, `EMAIL`, `PSW
 (5, 'Lukáš', 1, 'Vácha', 'vacha', 'vacha@gmail.com', '$argon2id$v=19$m=65536,t=4,p=3$T1BPRzZ5eUJyRk5RTzVJTA$krBo/GCAq1j1Y98PUhN7pmm5lfYPxV+ozUYSJil2QfY', '3741f21a6f815649f65d757bec5f8c17', NULL, NULL, NULL, NULL, NULL, '2025-11-19 15:13:00', 1, 0, 0, 0);
 
 -- --------------------------------------------------------
-
---
--- Table structure for table `VINEYARD`
---
-
-CREATE TABLE `VINEYARD` (
-  `ID` int NOT NULL,
-  `ACTIVE` tinyint(1) NOT NULL DEFAULT (1),
-  `ID_PICTURE` int DEFAULT NULL,
-  `NAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `LOCATION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `DESCRIPTION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci,
-  `YEAR` smallint NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
 --
 -- Dumping data for table `VINEYARD`
 --
@@ -219,47 +395,6 @@ INSERT INTO `VINEYARD` (`ID`, `ACTIVE`, `ID_PICTURE`, `NAME`, `LOCATION`, `DESCR
 (3, 1, 12, 'Vinohrad Na Stráni', 'Velké Žernoseky, Česká republika', 'Vinohrad Na Stráni se nachází na úbočí Českého středohoří, kde sopečné podloží a chladnější klima dávají vínům zcela odlišný charakter než na Moravě. Hrozny dozrávají pomaleji, díky čemuž si zachovávají intenzivní aroma a svěží kyselinu. Dominantními odrůdami jsou Ryzlink rýnský a Modrý Portugal, které se vyznačují čistotou, elegancí a minerálním závěrem. Vinohrad hospodaří s respektem k tradici i moderním postupům, s důrazem na ruční sklizeň a precizní zpracování. Výsledkem jsou vína s charakterem, která dokonale vystihují severní terroir Čech.', 1998);
 
 -- --------------------------------------------------------
-
---
--- Table structure for table `WINE`
---
-
-CREATE TABLE `WINE` (
-  `ID` int NOT NULL,
-  `WINE_NAME` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `ID_LIQUIDATOR` int DEFAULT NULL,
-  `ID_SELL_APPROVER` int DEFAULT NULL,
-  `ID_PICTURE` int DEFAULT NULL,
-  `YEAR` smallint NOT NULL,
-  `ALCOHOL_PERCENTAGE` decimal(5,2) NOT NULL DEFAULT (13.0),
-  `TYPE` enum('DRY','HALF_DRY','HALF_SWEET','SWEET') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'DRY'),
-  `COLOR` enum('WHITE','RED','ROSE') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'WHITE'),
-  `GRADE` enum('NONE','CABINET','LATE','GRAPE_SELECTION','BERRY_SELECTION','ICE','STRAW') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'NONE'),
-  `STATE` enum('PRODUCTION','LIQUIDATED','BOTTLED','SALE','SOLD') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'PRODUCTION'),
-  `VOLUME` smallint NOT NULL,
-  `BOTTLE_PRICE` decimal(10,2) DEFAULT NULL,
-  `CURRENT_PRICE` decimal(10,2) DEFAULT NULL,
-  `BOTTLES_LEFT` smallint DEFAULT NULL,
-  `LEFT_SUGAR` decimal(5,2) DEFAULT NULL,
-  `ACID_CONTENTS` decimal(5,2) DEFAULT NULL,
-  `SALES_DESCRIPTION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci,
-  `PRODUCTION_NOTE` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `WINE_ROW`
---
-
-CREATE TABLE `WINE_ROW` (
-  `CODE` int NOT NULL,
-  `ACTIVE` tinyint(1) NOT NULL DEFAULT (1),
-  `ID_VINEYARD` int NOT NULL,
-  `ID_WINE_VARIETY` int DEFAULT NULL,
-  `HEAD_COUNT` smallint NOT NULL,
-  `PLANTING_YEAR` smallint NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
 
 --
 -- Dumping data for table `WINE_ROW`
@@ -285,289 +420,10 @@ INSERT INTO `WINE_ROW` (`CODE`, `ACTIVE`, `ID_VINEYARD`, `ID_WINE_VARIETY`, `HEA
 -- --------------------------------------------------------
 
 --
--- Table structure for table `WINE_VARIETY`
---
-
-CREATE TABLE `WINE_VARIETY` (
-  `ID` int NOT NULL,
-  `ID_PICTURE` int DEFAULT NULL,
-  `NAME` varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL,
-  `COLOR` enum('WHITE','RED','PINK','GREY','BLUE') CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL DEFAULT (_utf8mb4'WHITE'),
-  `DESCRIPTION` text CHARACTER SET utf8mb4 COLLATE utf8mb4_czech_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
---
 -- Dumping data for table `WINE_VARIETY`
 --
 
-INSERT INTO `WINE_VARIETY` (`ID`, `ID_PICTURE`, `NAME`, `COLOR`, `DESCRIPTION`) VALUES
-(1, 2, 'Irsai Oliver', 'WHITE', 'Irsai Oliver je aromatická bílá odrůda vína původem z Maďarska, vzniklá křížením odrůd Pozsonyi Fehér (Bratislavské bílé) a Pearl of Csaba v roce 1930. Vyznačuje se intenzivní květinovo-muškátovou vůní, často připomínající bezový květ, muškátový hrozen či citrusové plody. Chuť je lehčí, svěží a harmonická, s příjemnou kyselinkou, která podtrhuje její ovocný charakter. Tato odrůda se nejčastěji používá pro výrobu suchých nebo polosuchých vín, která jsou oblíbená pro svou pitelnost a aromatickou přitažlivost už jako mladá vína. Irsai Oliver se dobře pije za tepla letního dne nebo jako aperitiv, často bývá i základem pro letní cuvée.'),
-(2, 3, 'Modrý Portugal', 'BLUE', 'Modrý Portugal je tradiční červená odrůda původu střední Evropy, rozšířená především v Rakousku, České republice a na Slovensku. Je známá svou jemností, lehkostí a ovocným charakterem, díky čemuž si získala oblibu jako víno pro každodenní pití. Víno z Modrého Portugalu má světle rubínovou až granátovou barvu a vůni po červeném ovoci, zejména třešních, malinách či ostružinách. Chuť bývá měkká, vyvážená a sametová, s nižším obsahem tříslovin i kyselin, což z něj činí příjemně hladké a snadno pitelné víno.'),
-(3, 4, 'Tramín Červený', 'GREY', 'Tramín červený je stará aromatická odrůda révy vinné, jejíž původ sahá až do středověku a bývá spojován s oblastí okolo jihotyrolského města Tramin (Termeno). Patří mezi nejvýraznější bílé odrůdy, i když její hrozny mají nažloutle růžové až červené slupky. Víno z Tramínu červeného je typické svou intenzivní vůní růží, koření, medu a exotického ovoce. Chuť bývá plná, bohatá a výrazně aromatická, často s nižší kyselinkou, což mu dodává hebkost a sametový dojem. Nejčastěji se vyrábí jako suché nebo polosladké víno, které vyniká svou výraznou osobitostí.'),
-(4, 5, 'Ryzlink Vlašský', 'WHITE', 'Ryzlink vlašský je tradiční bílá odrůda rozšířená především na jižní Moravě, zejména v oblasti Pálavy. Vyznačuje se výraznou minerální chutí a svěží kyselinkou, která odráží vápenité podloží místních vinic. Víno má jemné aroma květin, jablek a lískových oříšků, s lehkým nádechem medu při delším zrání. Díky své vyváženosti a eleganci je oblíbené jak k okamžité konzumaci, tak pro archivaci. Ryzlink vlašský je ideální společník k rybám, lehkým sýrům a pokrmům z bílého masa.'),
-(5, 6, 'Pálava', 'WHITE', 'Pálava je ušlechtilá aromatická odrůda vzniklá na Moravě křížením Tramínu červeného a Mülleru Thurgau. Je typická svou bohatou vůní muškátu, růží a tropického ovoce. Chuť bývá plná, kulatá a jemně nasládlá, s harmonickou kyselinkou. Pálava je často vyráběna jako polosuché nebo polosladké víno, které vyniká svou svůdnou vůní a dlouhou dochutí. Je to víno vhodné k dezertům, aromatickým sýrům nebo k samostatnému vychutnání při zvláštních příležitostech.'),
-(6, 7, 'Müller Thurgau', 'WHITE', 'Müller Thurgau je lehká a svěží bílá odrůda, vyšlechtěná ve Švýcarsku křížením Ryzlinku rýnského a Madeleine Royale. Na Moravě je velmi rozšířená díky své ranosti a spolehlivému výnosu. Vína z této odrůdy mají jemné aroma květin a muškátu s tóny broskví či citrusů. Chuť je měkká, harmonická a příjemně ovocná, často s nižším obsahem kyselin. Je ideálním vínem pro každodenní pití, obzvláště v mladém stavu, kdy vyniká svou svěžestí a lehkostí.'),
-(7, 8, 'Sauvignon', 'WHITE', 'Sauvignon je celosvětově uznávaná aromatická bílá odrůda, která se na Moravě těší velké oblibě. Je charakteristická výraznou vůní po černém rybízu, angreštu, broskví či kopřivách. Chuť bývá svěží, plná života a doprovázená výraznou kyselinkou, která vínu dodává energii a eleganci. Podle polohy vinohradu může být Sauvignon jemný a květinový, nebo naopak zemitější a minerální. Výborně se hodí k rybám, kozím sýrům i lehkým zeleninovým pokrmům.'),
-(8, 9, 'Ryzlink Rýnský', 'WHITE', 'Ryzlink rýnský patří mezi nejvšestrannější a nejuznávanější bílé odrůdy světa. Na severu Čech i na Moravě poskytuje vína s výraznou kyselinkou, dlouhověkostí a komplexní aromatikou. Typické jsou tóny limetky, meruněk, lipového květu a minerality. S věkem víno získává na hloubce a rozvíjí medové a petrolejové tóny. Ryzlink rýnský je ideálním vínem k archivaci i gurmánským pokrmům – od ryb po kořeněná jídla. Každý ročník dokáže překvapit svou jedinečnou harmonií a elegancí.');
 
--- --------------------------------------------------------
-
---
--- Table structure for table `WORKER`
---
-
-CREATE TABLE `WORKER` (
-  `ID_USER` int NOT NULL,
-  `ID_TASK` int NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_czech_ci;
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `BOTTLING`
---
-ALTER TABLE `BOTTLING`
-  ADD PRIMARY KEY (`ID_TASK`),
-  ADD KEY `FK_BOTTLING_WINE` (`ID_WINE`);
-
---
--- Indexes for table `CUSTOMER_ORDER`
---
-ALTER TABLE `CUSTOMER_ORDER`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_ORDER_CUSTOMER` (`ID_CUSTOMER`);
-
---
--- Indexes for table `HARVEST`
---
-ALTER TABLE `HARVEST`
-  ADD PRIMARY KEY (`ID_TASK`),
-  ADD KEY `FK_HARVEST_VINEYARD` (`ID_VINEYARD`),
-  ADD KEY `FK_HARVEST_WINE_VARIETY` (`ID_WINE_VARIETY`),
-  ADD KEY `FK_HARVEST_WINE_CONFIRMER` (`ID_HARVEST_CONFIRMER`),
-  ADD KEY `FK_HARVEST_WINE` (`ID_WINE`);
-
---
--- Indexes for table `ORDER_ITEM`
---
-ALTER TABLE `ORDER_ITEM`
-  ADD PRIMARY KEY (`ID_ORDER`,`ID_WINE`),
-  ADD KEY `FK_ORDER_ITEM_WINE` (`ID_WINE`);
-
---
--- Indexes for table `PICTURE`
---
-ALTER TABLE `PICTURE`
-  ADD PRIMARY KEY (`ID`);
-
---
--- Indexes for table `TASK`
---
-ALTER TABLE `TASK`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_ID_TASK_ISSUER` (`ID_TASK_ISSUER`),
-  ADD KEY `FK_ID_TASK_CONFIRMER` (`ID_TASK_CONFIRMER`);
-
---
--- Indexes for table `TASK_ROW`
---
-ALTER TABLE `TASK_ROW`
-  ADD PRIMARY KEY (`ID_VINEYARD`,`CODE_ROW`,`ID_TASK`),
-  ADD KEY `FK_TASK_ROW_TASK` (`ID_TASK`);
-
---
--- Indexes for table `TREATMENT`
---
-ALTER TABLE `TREATMENT`
-  ADD PRIMARY KEY (`ID_TASK`),
-  ADD KEY `FK_TREATMENT_VINEYARD` (`ID_VINEYARD`);
-
---
--- Indexes for table `USER`
---
-ALTER TABLE `USER`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `USERNAME` (`USERNAME`),
-  ADD UNIQUE KEY `EMAIL` (`EMAIL`),
-  ADD UNIQUE KEY `PSWD_HASH` (`PSWD_HASH`),
-  ADD UNIQUE KEY `PSWD_SALT` (`PSWD_SALT`);
-
---
--- Indexes for table `VINEYARD`
---
-ALTER TABLE `VINEYARD`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `NAME` (`NAME`),
-  ADD KEY `FK_ID_VINEYARD_PICTURE` (`ID_PICTURE`);
-
---
--- Indexes for table `WINE`
---
-ALTER TABLE `WINE`
-  ADD PRIMARY KEY (`ID`),
-  ADD KEY `FK_ID_LIQUIDATOR` (`ID_LIQUIDATOR`),
-  ADD KEY `FK_ID_SELL_APPROVER` (`ID_SELL_APPROVER`),
-  ADD KEY `FK_ID_PICTURE` (`ID_PICTURE`);
-
---
--- Indexes for table `WINE_ROW`
---
-ALTER TABLE `WINE_ROW`
-  ADD PRIMARY KEY (`ID_VINEYARD`,`CODE`),
-  ADD KEY `FK_WINE_ROW_WINE_VARIETY` (`ID_WINE_VARIETY`);
-
---
--- Indexes for table `WINE_VARIETY`
---
-ALTER TABLE `WINE_VARIETY`
-  ADD PRIMARY KEY (`ID`),
-  ADD UNIQUE KEY `NAME` (`NAME`),
-  ADD KEY `FK_ID_WINE_VARIETY_PICTURE` (`ID_PICTURE`);
-
---
--- Indexes for table `WORKER`
---
-ALTER TABLE `WORKER`
-  ADD PRIMARY KEY (`ID_USER`,`ID_TASK`),
-  ADD KEY `FK_WORKER_TASK` (`ID_TASK`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `CUSTOMER_ORDER`
---
-ALTER TABLE `CUSTOMER_ORDER`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `PICTURE`
---
-ALTER TABLE `PICTURE`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
-
---
--- AUTO_INCREMENT for table `TASK`
---
-ALTER TABLE `TASK`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `USER`
---
-ALTER TABLE `USER`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
-
---
--- AUTO_INCREMENT for table `VINEYARD`
---
-ALTER TABLE `VINEYARD`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-
---
--- AUTO_INCREMENT for table `WINE`
---
-ALTER TABLE `WINE`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `WINE_VARIETY`
---
-ALTER TABLE `WINE_VARIETY`
-  MODIFY `ID` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `BOTTLING`
---
-ALTER TABLE `BOTTLING`
-  ADD CONSTRAINT `FK_BOTTLING_TASK` FOREIGN KEY (`ID_TASK`) REFERENCES `TASK` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_BOTTLING_WINE` FOREIGN KEY (`ID_WINE`) REFERENCES `WINE` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `CUSTOMER_ORDER`
---
-ALTER TABLE `CUSTOMER_ORDER`
-  ADD CONSTRAINT `FK_ORDER_CUSTOMER` FOREIGN KEY (`ID_CUSTOMER`) REFERENCES `USER` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `HARVEST`
---
-ALTER TABLE `HARVEST`
-  ADD CONSTRAINT `FK_HARVEST_TASK` FOREIGN KEY (`ID_TASK`) REFERENCES `TASK` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_HARVEST_VINEYARD` FOREIGN KEY (`ID_VINEYARD`) REFERENCES `VINEYARD` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_HARVEST_WINE` FOREIGN KEY (`ID_WINE`) REFERENCES `WINE` (`ID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_HARVEST_WINE_CONFIRMER` FOREIGN KEY (`ID_HARVEST_CONFIRMER`) REFERENCES `USER` (`ID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_HARVEST_WINE_VARIETY` FOREIGN KEY (`ID_WINE_VARIETY`) REFERENCES `WINE_VARIETY` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `ORDER_ITEM`
---
-ALTER TABLE `ORDER_ITEM`
-  ADD CONSTRAINT `FK_ORDER_ITEM_ORDER` FOREIGN KEY (`ID_ORDER`) REFERENCES `CUSTOMER_ORDER` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_ORDER_ITEM_WINE` FOREIGN KEY (`ID_WINE`) REFERENCES `WINE` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `TASK`
---
-ALTER TABLE `TASK`
-  ADD CONSTRAINT `FK_ID_TASK_CONFIRMER` FOREIGN KEY (`ID_TASK_CONFIRMER`) REFERENCES `USER` (`ID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_ID_TASK_ISSUER` FOREIGN KEY (`ID_TASK_ISSUER`) REFERENCES `USER` (`ID`) ON DELETE SET NULL;
-
---
--- Constraints for table `TASK_ROW`
---
-ALTER TABLE `TASK_ROW`
-  ADD CONSTRAINT `FK_TASK_ROW_TASK` FOREIGN KEY (`ID_TASK`) REFERENCES `TASK` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_TASK_ROW_WINE_ROW` FOREIGN KEY (`ID_VINEYARD`,`CODE_ROW`) REFERENCES `WINE_ROW` (`ID_VINEYARD`, `CODE`) ON DELETE CASCADE;
-
---
--- Constraints for table `TREATMENT`
---
-ALTER TABLE `TREATMENT`
-  ADD CONSTRAINT `FK_TREATMENT_TASK` FOREIGN KEY (`ID_TASK`) REFERENCES `TASK` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_TREATMENT_VINEYARD` FOREIGN KEY (`ID_VINEYARD`) REFERENCES `VINEYARD` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `VINEYARD`
---
-ALTER TABLE `VINEYARD`
-  ADD CONSTRAINT `FK_ID_VINEYARD_PICTURE` FOREIGN KEY (`ID_PICTURE`) REFERENCES `PICTURE` (`ID`) ON DELETE SET NULL;
-
---
--- Constraints for table `WINE`
---
-ALTER TABLE `WINE`
-  ADD CONSTRAINT `FK_ID_LIQUIDATOR` FOREIGN KEY (`ID_LIQUIDATOR`) REFERENCES `USER` (`ID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_ID_PICTURE` FOREIGN KEY (`ID_PICTURE`) REFERENCES `PICTURE` (`ID`) ON DELETE SET NULL,
-  ADD CONSTRAINT `FK_ID_SELL_APPROVER` FOREIGN KEY (`ID_SELL_APPROVER`) REFERENCES `USER` (`ID`) ON DELETE SET NULL;
-
---
--- Constraints for table `WINE_ROW`
---
-ALTER TABLE `WINE_ROW`
-  ADD CONSTRAINT `FK_WINE_ROW_VINEYARD` FOREIGN KEY (`ID_VINEYARD`) REFERENCES `VINEYARD` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_WINE_ROW_WINE_VARIETY` FOREIGN KEY (`ID_WINE_VARIETY`) REFERENCES `WINE_VARIETY` (`ID`) ON DELETE CASCADE;
-
---
--- Constraints for table `WINE_VARIETY`
---
-ALTER TABLE `WINE_VARIETY`
-  ADD CONSTRAINT `FK_ID_WINE_VARIETY_PICTURE` FOREIGN KEY (`ID_PICTURE`) REFERENCES `PICTURE` (`ID`) ON DELETE SET NULL;
-
---
--- Constraints for table `WORKER`
---
-ALTER TABLE `WORKER`
-  ADD CONSTRAINT `FK_WORKER_TASK` FOREIGN KEY (`ID_TASK`) REFERENCES `TASK` (`ID`) ON DELETE CASCADE,
-  ADD CONSTRAINT `FK_WORKER_USER` FOREIGN KEY (`ID_USER`) REFERENCES `USER` (`ID`) ON DELETE CASCADE;
-COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;

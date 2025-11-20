@@ -57,7 +57,7 @@ final class ValidationDefinitions
     public const PRICE_MAX = 99999999.99;
     public const VOLUME_MIN = 0;
     public const VOLUME_MAX = 32767;
-    public const TREATMENT_QUANTITY_MIN = 0.01;
+    public const TREATMENT_QUANTITY_MIN = 0.0;
     public const TREATMENT_QUANTITY_MAX = 99999999.99;
     public const HARVEST_WEIGHT_MIN = 0.0;
     public const HARVEST_WEIGHT_MAX = 99999999.99;
