@@ -1,4 +1,10 @@
 <?php
+//FILE:     VineyardRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository for managing Vineyard entities
 
 declare(strict_types=1);
 
@@ -12,9 +18,17 @@ use Tracy\Debugger;
 use Tracy\ILogger;
 use Nette\Database\Explorer;
 
-
+/**
+ * Handles Vineyard related operations with the database
+ */
 final class VineyardRepository
 {
+    /**
+     * VineyardRepository constructor
+     *
+     * @param Explorer $database
+     * @param WineVarietyRepository $wineVarietyRepository
+     */
     public function __construct(
         private Explorer $database,
         private WineVarietyRepository $wineVarietyRepository
@@ -22,6 +36,8 @@ final class VineyardRepository
     }
 
     /**
+     * Fetch all vineyards from the database
+     * 
      * @return Vineyard[]
      */
     public function fetchAll(): array
@@ -30,8 +46,9 @@ final class VineyardRepository
         $vineyards = [];
         $rows = $this->database->table('VINEYARD')->fetchAll();
 
+        // build Vineyard objects
         foreach ($rows as $row) {
-            // Access PICTURE data by left join
+            // access PICTURE data by left join
             $picture = $row->ref('PICTURE', 'ID_PICTURE');
             $image = null;
             if ($picture) {
@@ -56,6 +73,12 @@ final class VineyardRepository
         return $vineyards;
     }
 
+    /**
+     * Fetch a vineyard by its ID
+     *
+     * @param int $id
+     * @return Vineyard|null
+     */
     public function fetchById(int $id): ?Vineyard
     {
         $row = $this->database->table('VINEYARD')->get($id);
@@ -63,7 +86,7 @@ final class VineyardRepository
             return null;
         }
 
-        // Access PICTURE data by left join
+        // access PICTURE data by left join
         $picture = $row->ref('PICTURE', 'ID_PICTURE');
         $image = null;
         if ($picture) {
@@ -87,15 +110,21 @@ final class VineyardRepository
     }
 
     /**
+     * Fetch all vineyards matching a pattern in name or location
+     *
+     * @param string $pattern
+     * @param string $type 'all', 'active', 'inactive'
      * @return Vineyard[]
      */
     public function fetchAllWithPattern(string $pattern, string $type): array
     {
         /** @var Vineyard[] $vineyards */
         $vineyards = [];
+        // filter by pattern (name, location)
         $rowsSelection = $this->database->table('VINEYARD')
             ->where('NAME LIKE ? OR LOCATION LIKE ?', "%$pattern%", "%$pattern%");
 
+        // filter by type
         if ($type === 'active') {
             $rowsSelection = $rowsSelection->where('ACTIVE', true);
         } elseif ($type === 'inactive') {
@@ -104,8 +133,9 @@ final class VineyardRepository
 
         $rows = $rowsSelection->fetchAll();
 
+        // build Vineyard objects
         foreach ($rows as $row) {
-            // Access PICTURE data by left join
+            // access PICTURE data by left join
             $picture = $row->ref('PICTURE', 'ID_PICTURE');
             $image = null;
             if ($picture) {
@@ -130,42 +160,17 @@ final class VineyardRepository
         return $vineyards;
     }
 
-    public function getVineyardById(int $id): ?Vineyard
-    {
-        $row = $this->database->table('VINEYARD')->get($id);
-        if ($row === null) {
-            return null;
-        }
-
-        // Access PICTURE data by left join
-        $picture = $row->ref('PICTURE', 'ID_PICTURE');
-        $image = null;
-        if ($picture) {
-            $image = new Image(
-                $picture->ID,
-                $picture->LINK,
-                $picture->IMAGE_NAME,
-                $picture->DESCRIPTION
-            );
-        }
-
-        return new Vineyard(
-            $row->ID,
-            (bool)$row->ACTIVE,
-            $row->NAME,
-            $row->LOCATION,
-            $image,
-            $row->DESCRIPTION,
-            $row->YEAR
-        );
-    }
-
-
+    /**
+     * Add a new vineyard to the database
+     *
+     * @param Vineyard $vineyard
+     * @return bool True on success, false on failure
+     */
     public function addVineyard(Vineyard $vineyard): bool
     {
-        try {
+        try { // run within transaction
             return $this->database->transaction(function () use ($vineyard) {
-                // Handle picture insertion
+                // handle picture insertion
                 $pictureId = null;
                 $image = $vineyard->getImage();
                 if ($image !== null) {
@@ -177,6 +182,7 @@ final class VineyardRepository
                     $picture = $this->database->table('PICTURE')->insert($pictureData);
                     $pictureId = $picture->ID;
                 }
+                // insert vineyard record
                 $data = [
                     'NAME' => $vineyard->getName(),
                     'LOCATION' => $vineyard->getLocation(),
@@ -193,27 +199,33 @@ final class VineyardRepository
         }
     }
 
+    /**
+     * Update an existing vineyard in the database
+     *
+     * @param Vineyard $vineyard
+     * @return bool True on success, false on failure
+     */
     public function updateVineyard(Vineyard $vineyard): bool
     {
-        try {
+        try { // run within transaction
             return $this->database->transaction(function () use ($vineyard) {
                 $row = $this->database->table('VINEYARD')->get($vineyard->getId());
                 if ($row === null) {
                     throw new \Exception('Vineyard not found with ID ' . $vineyard->getId());
                 }
-                // Handle picture update or insertion
+                // handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;
                 $image = $vineyard->getImage();
                 if ($image !== null) {
                     if ($pictureId !== null) {
-                        // Update existing picture
+                        // update existing picture
                         $this->database->table('PICTURE')->where('ID', $pictureId)->update([
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
                             'DESCRIPTION' => $image->description
                         ]);
                     } else {
-                        // Insert new picture
+                        // or insert new picture
                         $pictureData = [
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
@@ -223,13 +235,13 @@ final class VineyardRepository
                         $pictureId = $picture->ID;
                     }
                 } else {
-                    // If no image provided, remove existing picture reference
+                    // if no image provided, remove existing picture reference
                     if ($pictureId !== null) {
                         $this->database->table('PICTURE')->where('ID', $pictureId)->delete();
                         $pictureId = null;
                     }
                 }
-                // Update vineyard record
+                // update vineyard record
                 $row->update([
                     'NAME' => $vineyard->getName(),
                     'LOCATION' => $vineyard->getLocation(),
@@ -244,55 +256,41 @@ final class VineyardRepository
             return false;
         }
     }
-
-    public function deactivateVineyard(int $id): bool
+    
+    /**
+     * Set the active status of a vineyard
+     *
+     * @param int $id
+     * @param bool $status
+     * @return bool True on success, false on failure
+     */
+    public function setVineyardActiveStatus(int $id, bool $status): bool
     {
-        try {
-            return $this->database->transaction(function () use ($id) {
+        try { // run within transaction
+            return $this->database->transaction(function () use ($id, $status) {
                 $row = $this->database->table('VINEYARD')->get($id);
                 if ($row === null) {
                     throw new \Exception('Vineyard not found with ID ' . $id);
                 }
-                $row->update(['ACTIVE' => false]);
+                $row->update(['ACTIVE' => $status]);
 
-                // also set all associated wine rows to inactive
+                // also set all associated wine rows
                 $this->database->table('WINE_ROW')
                     ->where('ID_VINEYARD', $id)
-                    ->update(['ACTIVE' => false]);
+                    ->update(['ACTIVE' => $status]);
 
                 return true;
             });
         } catch (\Exception $e) {
-            Debugger::log('Failed to deactivate vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
-            return false;
-        }
-    }
-
-    public function reactivateVineyard(int $id): bool
-    {
-        try {
-            return $this->database->transaction(function () use ($id) {
-                $row = $this->database->table('VINEYARD')->get($id);
-                if ($row === null) {
-                    throw new \Exception('Vineyard not found with ID ' . $id);
-                }
-                $row->update(['ACTIVE' => true]);
-
-                // also set all associated wine rows to active
-                $this->database->table('WINE_ROW')
-                    ->where('ID_VINEYARD', $id)
-                    ->update(['ACTIVE' => true]);
-                
-                return true;
-            });
-        } catch (\Exception $e) {
-            Debugger::log('Failed to activate vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
+            Debugger::log('Failed to set vineyard active status: ' . $e->getMessage() . ' | Vineyard ID: ' . $id, ILogger::ERROR);
             return false;
         }
     }
 
     /**
-     * @return array
+     * Join vineyards with their wine varieties
+     * 
+     * @return array Array of vineyards with their associated wine varieties
      */
     public function joinWithVarieties(): array{
 
@@ -326,6 +324,12 @@ final class VineyardRepository
         return $joinedData;
     }
 
+    /**
+     * Get all wine rows on a given vineyard
+     *
+     * @param int $vineyardId
+     * @return WineRow[]
+     */
     public function getWineRowsOnVineyard(int $vineyardId): array
     {
         /** @var WineRow[] $wineRows Array of wine rows on the given vineyard */
@@ -334,6 +338,7 @@ final class VineyardRepository
             ->where('ID_VINEYARD', $vineyardId)
             ->fetchAll();
 
+        // build WineRow objects
         foreach ($rows as $row) {
             $wineRows[] = new WineRow(
                 $row->CODE,
@@ -348,6 +353,14 @@ final class VineyardRepository
         return $wineRows;
     }
 
+    /**
+     * Get wine rows on a given vineyard matching a pattern
+     *
+     * @param int $vineyardId
+     * @param string $pattern
+     * @param string $type 'all', 'active', 'inactive'
+     * @return WineRow[]
+     */
     public function getWineRowsOnVineyardWithPattern(int $vineyardId, string $pattern, string $type): array
     {
         /** @var WineRow[] $wineRows Array of wine rows on the given vineyard */
@@ -357,6 +370,7 @@ final class VineyardRepository
             ->where('ID_VINEYARD', $vineyardId)
             ->where('CODE LIKE ? OR PLANTING_YEAR LIKE ? OR ID_WINE_VARIETY IN ?', "%$pattern%", "%$pattern%", $this->database->table('WINE_VARIETY')->where('NAME LIKE ?', "%$pattern%")->select('ID'));
         
+        // filter by type
         if ($type === 'active') {
             $rowsSelection = $rowsSelection->where('ACTIVE', true);
         } elseif ($type === 'inactive') {
@@ -365,6 +379,7 @@ final class VineyardRepository
 
         $rows = $rowsSelection->fetchAll();
 
+        // build WineRow objects
         foreach ($rows as $row) {
             $wineRows[] = new WineRow(
                 $row->CODE,
@@ -379,6 +394,13 @@ final class VineyardRepository
         return $wineRows;
     }
 
+    /**
+     * Get a specific wine row on a vineyard by its code
+     *
+     * @param int $vineyardId
+     * @param int $wineRowCode
+     * @return WineRow|null
+     */
     public function getWineRowById(int $vineyardId, int $wineRowCode): ?WineRow
     {
         $row = $this->database->table('WINE_ROW')
@@ -400,6 +422,12 @@ final class VineyardRepository
         );
     }
 
+    /**
+     * Get unique wine varieties planted on a given vineyard
+     *
+     * @param int $vineyardId
+     * @return WineVariety[]
+     */
     public function getUniqueWineVarietiesOnVineyard(int $vineyardId): array
     {
         /** @var WineVariety[] $wineVarieties */
@@ -410,6 +438,7 @@ final class VineyardRepository
             ->select('DISTINCT ID_WINE_VARIETY')
             ->fetchAll();
 
+        // fetch each unique variety
         foreach ($rows as $row) {
             $variety = $this->wineVarietyRepository->fetchById($row->ID_WINE_VARIETY);
             if ($variety) {
@@ -420,6 +449,12 @@ final class VineyardRepository
         return $wineVarieties;
     }
 
+    /**
+     * Get count of unique wine varieties on a vineyard
+     *
+     * @param int $vineyardId
+     * @return int
+     */
     public function getWineVarietiesCountOnVineyard(int $vineyardId): int
     {
        return $this->database->table('WINE_ROW')
@@ -428,10 +463,18 @@ final class VineyardRepository
             ->count();
     }
 
-    public function deactivateWineRow(int $vineyardId, int $wineRowCode): bool
+    /**
+     * Set active status of a given wine row
+     *
+     * @param int $vineyardId
+     * @param int $wineRowCode
+     * @param bool $active
+     * @return bool True on success, false on failure
+     */
+    public function setWineRowActiveStatus(int $vineyardId, int $wineRowCode, bool $active): bool
     {
-        try {
-            return $this->database->transaction(function () use ($vineyardId, $wineRowCode) {
+        try { // run within transaction
+            return $this->database->transaction(function () use ($vineyardId, $wineRowCode, $active) {
                 $row = $this->database->table('WINE_ROW')
                     ->where('ID_VINEYARD', $vineyardId)
                     ->where('CODE', $wineRowCode)
@@ -439,39 +482,24 @@ final class VineyardRepository
                 if ($row === null) {
                     throw new \Exception('Wine row not found on vineyard: ' . $vineyardId . ' with code: ' . $wineRowCode);
                 }
-                $row->update(['ACTIVE' => false]);
+                $row->update(['ACTIVE' => $active]);
                 return true;
             });
         } catch (\Exception $e) {
-            Debugger::log('Failed to deactivate wine row from vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
+            Debugger::log('Failed to set wine row active status on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
             return false;
         }
     }
 
-    public function reactivateWineRow(int $vineyardId, int $wineRowCode): bool
-    {
-        try {
-            return $this->database->transaction(function () use ($vineyardId, $wineRowCode) {
-                $row = $this->database->table('WINE_ROW')
-                    ->where('ID_VINEYARD', $vineyardId)
-                    ->where('CODE', $wineRowCode)
-                    ->fetch();
-                if ($row === null) {
-                    throw new \Exception('Wine row not found on vineyard: ' . $vineyardId . ' with code: ' . $wineRowCode);
-                }
-                $row->update(['ACTIVE' => true]);
-
-                return true;
-            });
-        } catch (\Exception $e) {
-            Debugger::log('Failed to reactivate wine row on vineyard: ' . $e->getMessage() . ' | Vineyard ID: ' . $vineyardId . ' | Wine Row Code: ' . $wineRowCode, ILogger::ERROR);
-            return false;
-        }
-    }
-
+    /**
+     * Get the wine variety of a specific wine row on a vineyard
+     *
+     * @param int $vineyardId
+     * @param int $wineRowCode
+     * @return WineVariety|null
+     */
     public function getWineVarietyForWineRow(int $vineyardId, int $wineRowCode): ?WineVariety
     {
-        // For composite primary keys, use where() with both key parts
         $row = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
             ->where('CODE', $wineRowCode)
@@ -484,9 +512,15 @@ final class VineyardRepository
         return $this->wineVarietyRepository->fetchById($row->ID_WINE_VARIETY);
     }
 
+    /**
+     * Add a new wine row to a vineyard
+     *
+     * @param WineRow $wineRow
+     * @return bool True on success, false on failure
+     */
     public function addWineRowToVineyard(WineRow $wineRow): bool
     {
-        try {
+        try { // run within transaction
             return $this->database->transaction(function () use ($wineRow) {
                 $data = [
                     'CODE' => $wineRow->getId(),
@@ -504,9 +538,15 @@ final class VineyardRepository
         }
     }
 
+    /**
+     * Update an existing wine row on a vineyard
+     *
+     * @param WineRow $wineRow
+     * @return bool True on success, false on failure
+     */
     public function updateWineRowOnVineyard(WineRow $wineRow): bool
     {
-        try {
+        try { // run within transaction
             return $this->database->transaction(function () use ($wineRow) {
                 $row = $this->database->table('WINE_ROW')
                     ->where('ID_VINEYARD', $wineRow->getVineyardId())
@@ -529,6 +569,13 @@ final class VineyardRepository
         }
     }
 
+    /**
+     * Get total head count of a specific wine variety on a vineyard
+     *
+     * @param int $vineyardId
+     * @param int $wineVarietyId
+     * @return int
+     */
     public function getWineVarietyTotalHeadCountOnVineyard(int $vineyardId, int $wineVarietyId): int
     {
         $totalHeadCount = $this->database->table('WINE_ROW')
@@ -539,6 +586,13 @@ final class VineyardRepository
         return (int)$totalHeadCount;
     }
     
+    /**
+     * Get all wine rows of a specific wine variety on a vineyard
+     *
+     * @param int $vineyardId
+     * @param int $wineVarietyId
+     * @return WineRow[]
+     */
     public function getRowsAtVineyardWithWineVariety(int $vineyardId, int $wineVarietyId) {
         /** @var WineRow[] $wineRows Array of wine rows matching given variety on the given vineyard */
         $wineRows = [];
@@ -548,6 +602,7 @@ final class VineyardRepository
             ->where('ACTIVE', true)
             ->fetchAll();
 
+        // build WineRow objects
         foreach ($rows as $row) {
             $wineRows[] = new WineRow(
                 $row->CODE,

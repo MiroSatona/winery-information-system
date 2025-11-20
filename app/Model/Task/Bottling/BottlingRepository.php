@@ -45,7 +45,7 @@ class BottlingRepository
         }
 
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+        $wine = $this->wineRepository->fetchById((int)$row->ID_WINE);
         if ($wine === null) {
             return null;
         }
@@ -102,7 +102,7 @@ class BottlingRepository
         $bottlings = [];
         foreach ($mainQuery as $row) {
             /** @var Wine $wine */
-            $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+            $wine = $this->wineRepository->fetchById((int)$row->ID_WINE);
             if ($wine === null) {
                 continue;
             }
@@ -141,7 +141,7 @@ class BottlingRepository
         }
 
         /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchWineById((int)$row->ID_WINE);
+        $wine = $this->wineRepository->fetchById((int)$row->ID_WINE);
         if ($wine === null) {
             return null;
         }

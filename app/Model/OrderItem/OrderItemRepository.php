@@ -43,7 +43,7 @@ final class OrderItemRepository
 
     private function createOrderItemFromRow($row): OrderItem
     {
-        $wine = $this->wineRepository->fetchWineById((int) $row->ID_WINE);
+        $wine = $this->wineRepository->fetchById((int) $row->ID_WINE);
 
         return new OrderItem(
             idOrder: (int) $row->ID_ORDER,
@@ -107,7 +107,7 @@ final class OrderItemRepository
 
     public function addItem(int $orderId, int $wineId, int $amount): bool {
         // get all the items in the order 
-        $wine = $this->wineRepository->fetchWineById($wineId);
+        $wine = $this->wineRepository->fetchById($wineId);
         if ($wine == null) {
             return false;
         }

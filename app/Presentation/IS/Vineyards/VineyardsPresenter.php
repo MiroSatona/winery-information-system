@@ -145,7 +145,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('dashboard');
         }
         
-        if ($this->vineyardRepository->deactivateVineyard($vineyardId)) {
+        if ($this->vineyardRepository->setVineyardActiveStatus($vineyardId, false)) {
             $this->flashMessage('Vinohrad byl úspěšně smazán.', FlashMsgType::SUCCESS->value);
         } else {
             $this->flashMessage('Vinohrad se nepodařilo smazat.', FlashMsgType::ERROR->value);
@@ -165,7 +165,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('dashboard');
         }
         
-        if ($this->vineyardRepository->reactivateVineyard($vineyardId)) {
+        if ($this->vineyardRepository->setVineyardActiveStatus($vineyardId, true)) {
             $this->flashMessage('Vinohrad byl úspěšně obnoven.', FlashMsgType::SUCCESS->value);
         } else {
             $this->flashMessage('Vinohrad se nepodařilo obnovit.', FlashMsgType::ERROR->value);
@@ -300,7 +300,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('show', $vineyardId);
         }
 
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Požadovaný vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -383,7 +383,7 @@ final class VineyardsPresenter extends BasePresenter
 
         $vineyardId = (int)$this->getParameter('vineyardId');
         
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Požadovaný vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -449,7 +449,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('show', $id);
         }
 
-        $vineyard = $this->vineyardRepository->getVineyardById($id);
+        $vineyard = $this->vineyardRepository->fetchById($id);
         if ($vineyard === null) {
             $this->flashMessage('Vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
@@ -494,7 +494,7 @@ final class VineyardsPresenter extends BasePresenter
      */
     public function renderShow(int $vineyardId): void
     {
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Požadovaný vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -602,7 +602,7 @@ final class VineyardsPresenter extends BasePresenter
 
         $vineyardId = (int)$this->getParameter('vineyardId');
 
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Vinohrad pro řádek nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -699,7 +699,7 @@ final class VineyardsPresenter extends BasePresenter
         $vineyardId = (int)$this->getParameter('vineyardId');
         $rowId = (int)$this->getParameter('rowId');
 
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Vinohrad pro řádek nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -748,7 +748,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('show', $vineyardId);
         }
 
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Požadovaný vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -786,7 +786,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->redirect('show', $vineyardId);
         }
 
-        $vineyard = $this->vineyardRepository->getVineyardById($vineyardId);
+        $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
             Debugger::log("Vineyard with ID $vineyardId not found", ILogger::ERROR);
             $this->flashMessage('Požadovaný vinohrad nebyl nalezen.', FlashMsgType::ERROR->value);
@@ -832,7 +832,7 @@ final class VineyardsPresenter extends BasePresenter
 
         $vineyardId = (int)$this->getParameter('vineyardId');
 
-        if ($this->vineyardRepository->deactivateWineRow($vineyardId, $rowId)) {
+        if ($this->vineyardRepository->setWineRowActiveStatus($vineyardId, $rowId, false)) {
             $this->flashMessage('Řádek byl úspěšně smazán.', FlashMsgType::SUCCESS->value);
         } else {
             $this->flashMessage('Řádek se nepodařilo smazat.', FlashMsgType::ERROR->value);
@@ -855,7 +855,7 @@ final class VineyardsPresenter extends BasePresenter
 
         $vineyardId = (int)$this->getParameter('vineyardId');
 
-        if ($this->vineyardRepository->reactivateWineRow($vineyardId, $rowId)) {
+        if ($this->vineyardRepository->setWineRowActiveStatus($vineyardId, $rowId, true)) {
             $this->flashMessage('Řádek byl úspěšně obnoven.', FlashMsgType::SUCCESS->value);
         } else {
             $this->flashMessage('Řádek se nepodařilo obnovit.', FlashMsgType::ERROR->value);
