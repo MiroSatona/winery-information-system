@@ -226,7 +226,7 @@ final class TasksPresenter extends BasePresenter
             $options[$w->getId()] = $w->getFullName() . ' (' . $w->getUsername() . ')';
         }
 
-        // Use a select to add a single worker at once (server-driven flow)
+        // Use a select to add a single worker at once 
         $form->addSelect('worker', 'Pracovník', ['' => 'Vyberte pracovníka ...'] + $options)
             ->setHtmlAttribute('class', 'form-select')
             ->setDefaultValue('');

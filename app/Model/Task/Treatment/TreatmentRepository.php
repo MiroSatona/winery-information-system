@@ -1,4 +1,10 @@
 <?php
+//FILE:     TreatmentRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:    	Repository for Treatment tasks.
 
 declare(strict_types=1);
 
@@ -11,6 +17,9 @@ use App\Model\Task\Treatment\TreatmentType;
 use App\Model\Vineyard\Vineyard;
 use App\Model\Vineyard\VineyardRepository;
 
+/**
+ * Handles treatment related DB operations
+ */
 class TreatmentRepository
 {   /** @var Explorer $database Database explorer. */
     private Explorer $database;
@@ -20,13 +29,13 @@ class TreatmentRepository
      * Constructor of the TreatmentRepository.
      *
      * @param Explorer $database Database explorer.
-     * @param VineyardRepository $vineyardRepository
+     * @param VineyardRepository $vineyardRepository Vineyard repository.
      */
     public function __construct(Explorer $database, VineyardRepository $vineyardRepository)
     {
         $this->database = $database;
         $this->vineyardRepository = $vineyardRepository;
-    }
+    }   
 
     /**
      * fetchById
@@ -74,7 +83,6 @@ class TreatmentRepository
         return $treatment;
     }
     
-
     /**
      * fetchTreatments
      * Method to fetch treatments based on pattern and state.
@@ -85,7 +93,7 @@ class TreatmentRepository
      */
     public function fetchTreatments(string $pattern, string $state): array{
 
-        // Fetch joined teble of tasks and treatments
+        // Fetch joined table of tasks and treatments
         $mainQuery = $this->database->table('TREATMENT')
                         ->joinWhere('TASK', 'TASK.ID = ID_TASK')
                         ->select('TASK.*, TREATMENT.*');
@@ -101,8 +109,6 @@ class TreatmentRepository
 
         // Fetch all filtered data
         $mainQuery->fetchAll();
-
-        
 
         // Create treatment objects and return them
         $treatments = [];
@@ -135,5 +141,4 @@ class TreatmentRepository
 
         return $treatments;
     }
-
 }
