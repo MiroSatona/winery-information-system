@@ -9,16 +9,15 @@
 
 namespace App\Model\Profile;
 
-use APP\Model\User\User;
-use App\Model\User\UserRepository;
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
 
 
+/**
+ * Repository for handling user profiles
+ */
 class ProfileModel
-{   
-    /** @var UserRepository $userRepository Repository used for representing user data and generating user new password*/
-    private UserRepository $userRepository;
+{
     /** @var Explorer $database Database of the system */
     private Explorer $database;
     /** @var Passwords $password Passwords service for hashing and verifying passwords */
@@ -27,13 +26,11 @@ class ProfileModel
     /**
      * Constructor for the ProfileModel
      *
-     * @param UserRepository $userRepository Repository used for representing user data and generating user new password.
      * @param Explorer $database Database of the system.
      * @param integer $id Id of profile which will be edited.
      */
-    public function __construct(UserRepository $userRepository, Explorer $database, Passwords $passwords)
+    public function __construct(Explorer $database, Passwords $passwords)
     {
-        $this->userRepository = $userRepository;
         $this->database = $database;
         $this->password = $passwords;
     }
