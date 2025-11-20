@@ -1,4 +1,10 @@
 <?php
+//FILE:     WineRepository.php
+//AUTHORS:  Martin Zůbek [C]
+//          Otakar Kočí
+//          Martin Mendl
+//YEAR:     2025
+//DESC:     Repository for handling Wine related database operations
 
 namespace App\Model\Wine;
 
@@ -10,22 +16,36 @@ use App\Model\Image\Image;
 use App\Model\Task\Harvest\Harvest;
 use App\Model\Task\TaskState;
 use App\Model\WineVariety\WineVarietyType;
-use App\Model\Vineyard\VineyardRepository;
-use App\Model\WineVariety\WineVarietyRepository;
 use Nette\Database\Explorer;
 use Tracy\Debugger;
 use Tracy\ILogger;
 
+/**
+ * Handles wine related tasks and DB operations
+ */
 final class WineRepository
 {
+    /**
+     * Repository constructor
+     * 
+     * Arguments provided by Nette DI container
+     *
+     * @param Explorer $db
+     * @param ImageRepository $imageRepository
+     * @param BottleRepository $btlRep
+     */
     public function __construct(
         private Explorer $db,
         private ImageRepository $imageRepository,
-        private BottleRepository $btlRep,
-        private VineyardRepository $vineyardRepository,
-        private WineVarietyRepository $wineVarietyRepository
+        private BottleRepository $btlRep
     ) {}
 
+    /**
+     * Fetch a wine by its ID.
+     *
+     * @param int $wineId
+     * @return Wine|null The Wine object if found, null otherwise.
+     */
     public function fetchWineById(int $wineId): ?Wine
     {
         $wineRow = $this->db->table('WINE')->where('ID', $wineId)->fetch();
@@ -49,6 +69,11 @@ final class WineRepository
         return $wines;
     }
     
+    /**
+     * Fetch all wines that are in PRODUCTION state and not yet assigned to any bottling task.
+     *
+     * @return Wine[] Array of Wine objects
+     */
     public function fetchAllProductionWines(): array
     {
         // exclude wines that already have a bottling record (i.e. already assigned to a bottling task)
@@ -66,11 +91,20 @@ final class WineRepository
         return $wines;
     }
 
+    /**
+     * Fetch all wines matching the given patterns.
+     *
+     * @param string $patternWines Search pattern for wine name, year, or variety
+     * @param string $patternType Type filter
+     * @param string $patternGrade Grade filter
+     * @param string $patternState State filter
+     * @return Wine[] Array of Wine objects
+     */
     public function fetchAllWinesWithPattern(string $patternWines, string $patternType, string $patternGrade, string $patternState): array
     {
         $query = $this->db->table('WINE');
 
-        // Search through wine names, years, and wine varieties (through HARVEST table)
+        // search through wine names, years, and wine varieties (through HARVEST table)
         if ($patternWines !== '') {
             $like = '%' . $patternWines . '%';
 
@@ -90,7 +124,7 @@ final class WineRepository
             );
         }
 
-        // Rest of filters (type, grade, state)
+        // rest of filters (type, grade, state)
         if ($patternType !== 'all') {
             $query = $query->where('TYPE', $patternType);
         }
@@ -113,6 +147,12 @@ final class WineRepository
         return $wines;
     }
 
+    /**
+     * Fetch bottling info for a given wine and set it in the wine object.
+     *
+     * @param Wine $wine
+     * @return bool True if bottling info was found and set, false otherwise.
+     */
     public function fetchBottlingInfoForWine(Wine $wine): bool
     {
         $bottles = $this->db->table("BOTTLING")
@@ -127,9 +167,15 @@ final class WineRepository
         return true;
     }
     
+    /**
+     * Create a Wine object from a database row.
+     *
+     * @param Nette\Database\Table\ActiveRow $row
+     * @return Wine
+     */
     public function createWineFromRow($row): Wine
     {
-        // Fetch associated image (via foreign key ID_PICTURE)
+        // fetch associated image (via foreign key ID_PICTURE)
         $image = null;
         if ($row->ID_PICTURE !== null) {
             $image = $this->imageRepository->fetchImageById((int) $row->ID_PICTURE);
@@ -187,9 +233,15 @@ final class WineRepository
         );
     }
 
+    /**
+     * Update wine details in the database.
+     *
+     * @param Wine $wine
+     * @return bool True on success, false on failure.
+     */
     public function updateWine(Wine $wine): bool
     {
-        try {
+        try { // run within transaction
             return $this->db->transaction(function () use ($wine) {
                 $this->db->table('WINE')
                     ->where('ID', $wine->id)
@@ -213,6 +265,12 @@ final class WineRepository
         }
     }
     
+    /**
+     * Get total bottle count for a given wine.
+     * 
+     * @param int $idWine
+     * @return int
+     */
     public function getWineAllBottleCount(int $idWine) {
         $result = $this->btlRep->fetchByWineId($idWine);
         $count = 0;
@@ -222,6 +280,14 @@ final class WineRepository
         return $count;
     }
     
+    /**
+     * Update the number of free bottles for a given wine.
+     * 
+     * @param int $idWine
+     * @param int $amount
+     * @param bool $add True to add bottles, false to remove bottles
+     * @return bool True on success, false on failure
+     */
     public function updateWineFreeBottles(int $idWine, int $amount, bool $add): bool {
 
         $wine = $this->fetchWineById($idWine);        
@@ -258,6 +324,14 @@ final class WineRepository
         return true;
     }
     
+    /**
+     * Update the price of a given wine.
+     * 
+     * @param int $idWine
+     * @param float $newValue
+     * @param bool $current True to update current price, false to update bottle price
+     * @return bool True on success, false on failure
+     */
     public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
         
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
@@ -280,6 +354,13 @@ final class WineRepository
         return true;
     }
     
+    /**
+     * Update the state of a given wine.
+     * 
+     * @param int $idWine
+     * @param string $newState
+     * @return bool True on success, false on failure
+     */
     public function setWineState(int $idWine, string $newState): bool {
 
         $wine = $this->fetchWineById($idWine);
@@ -302,6 +383,13 @@ final class WineRepository
         }
     }
     
+    /**
+     * Update the state of a given wine.
+     * 
+     * @param int $idWine
+     * @param string $newDescription
+     * @return bool True on success, false on failure
+     */
     public function setWineDescription(int $idWine, string $newDescription): bool {
 
         $wine = $this->fetchWineById($idWine);
@@ -329,11 +417,11 @@ final class WineRepository
      *
      * @param Wine $wine
      * @param Harvest[] $harvests
-     * @return boolean
+     * @return boolean True on success, false on failure.
      */
     public function produceWine(Wine $wine, array $harvests): bool
     {
-        try {
+        try { // run within transaction
             $this->db->transaction(function () use ($wine, $harvests) {
                 // check that all harvests are correct and ready for PRODUCTION
                 foreach ($harvests as $harvest) {
@@ -374,8 +462,6 @@ final class WineRepository
                 }
 
                 return true;
-                
-
             });
         } catch (\Exception $e) {
             Debugger::log('Failed to produce wine: ' . $e->getMessage() . ' | Wine: ' . $wine->getName(), ILogger::ERROR);
@@ -385,6 +471,13 @@ final class WineRepository
         return true;
     }
 
+    /**
+     * Liquidate a wine.
+     *
+     * @param int $wineId
+     * @param int $userId
+     * @return boolean True on success, false on failure.
+     */
     public function liquidateWine(int $wineId, int $userId): bool
     {
         try {
@@ -419,26 +512,33 @@ final class WineRepository
         return true;
     }
 
+    /**
+     * Update the image associated with a wine.
+     *
+     * @param int $wineId
+     * @param Image|null $image
+     * @return bool True on success, false on failure.
+     */
     public function updateWineImage(int $wineId, ?Image $image): bool
     {
-        try {
+        try { // run within transaction
             return $this->db->transaction(function () use ($wineId, $image) {
                 $row = $this->db->table('WINE')->get($wineId);
                 if ($row === null) {
                     throw new \Exception('Wine not found with ID ' . $wineId);
                 }
-               // Handle picture update or insertion
+               // handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;
                 if ($image !== null) {
                     if ($pictureId !== null) {
-                        // Update existing picture
+                        // update existing picture
                         $this->db->table('PICTURE')->where('ID', $pictureId)->update([
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
                             'DESCRIPTION' => $image->description
                         ]);
                     } else {
-                        // Insert new picture
+                        // insert new picture
                         $pictureData = [
                             'LINK' => $image->src,
                             'IMAGE_NAME' => $image->name,
@@ -448,13 +548,13 @@ final class WineRepository
                         $pictureId = $picture->ID;
                     }
                 } else {
-                    // If no image provided, remove existing picture reference
+                    // if no image was provided, remove existing picture reference
                     if ($pictureId !== null) {
                         $this->db->table('PICTURE')->where('ID', $pictureId)->delete();
                         $pictureId = null;
                     }
                 }
-                // Update wine record
+                // update wine record
                 $row->update([
                     'ID_PICTURE' => $pictureId
                 ]);
