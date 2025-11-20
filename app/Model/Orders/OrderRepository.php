@@ -308,6 +308,14 @@ final class OrderRepository
         ]);
     }
 
+    /**
+     * Update the Delivery address of an order 
+     *
+     * @param integer $userId
+     * @param string $type
+     * @param string|null $address
+     * @return boolean
+     */
     public function updateDeliveryAddress(int $userId, string $type, ?string $address): bool 
     {
         $this->db->beginTransaction();
@@ -351,7 +359,13 @@ final class OrderRepository
             throw $e;
         }
     }
-                
+               
+    /**
+     * Mark the payment of an order 
+     *
+     * @param integer $userid
+     * @return boolean
+     */
     public function clientpayfororder(int $userid): bool {
         $order = $this->fetchcustomerorder($userid);
         if (!$order) {
@@ -376,6 +390,13 @@ final class OrderRepository
         }
     }
 
+    /**
+     * Change the state of an clients order
+     *
+     * @param integer $orderId
+     * @param string $newState
+     * @return boolean
+     */
     public function changeClientOrderStatus(int $orderId, string $newState): bool {
         $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId)->fetch();
         if (!$row) {
