@@ -16,6 +16,7 @@ use App\Model\Wine\WineColor;
 use App\Presentation\BasePresenter;
 use App\Model\Orders\OrderRepository;
 use Tracy\Debugger;
+use App\Model\Security\Role;
 
 /**
  * ShopPresenter
@@ -94,9 +95,21 @@ final class ShopPresenter extends  BasePresenter
     public function handleAddToCart(int $wineId, int $count = 1): void
     {
         Debugger::log("got this much in the form: $count");
-        if (!$this->user->id) {
+
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
             return;
         }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
+
         if (!$this->orderRep->addToCart($this->user->id, $wineId, $count)) {
             $this->flashMessage("Nepovedlo se uložení do košíku", FlashMsgType::ERROR->value);
         } else {
@@ -133,6 +146,19 @@ final class ShopPresenter extends  BasePresenter
      */
     public function addToCartFormSucceeded(\Nette\Application\UI\Form $form, \stdClass $values): void
     {
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
         $this->handleAddToCart((int)$values->wineId, (int)$values->count);
     }
 }

@@ -10,6 +10,8 @@ declare(strict_types=1);
 namespace App\Presentation\Payment;
 use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
+use App\Model\Security\Role;
+use App\Model\FlashMsgType;
 
 /**
  * Presenter for payment processing
@@ -34,9 +36,15 @@ final class PaymentPresenter extends BasePresenter
     public function renderDefault(): void 
     {
         $user = $this->user;
-
         if (!$user->isLoggedIn()) {
-            $this->redirect("Sign:in");
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
             return;
         }
        
@@ -59,14 +67,26 @@ final class PaymentPresenter extends BasePresenter
     public function actionConfirm(): void {
 
         $user = $this->user;
-
         if (!$user->isLoggedIn()) {
-            $this->redirect("Sign:in");
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
             return;
         }
        
         $userId = $user->getId();
         $result = $this->orderRep->clientPayForOrder($userId);
+        if ($result) {
+            $this->flashMessage("Nákup zaplacen!", FlashMsgType::SUCCESS->value);
+        } else {
+            $this->flashMessage("Nákup nebyl zaplacen!", FlashMsgType::ERROR->value);
+        }
+
         $this->redirect("Shop:default");
     }
 }

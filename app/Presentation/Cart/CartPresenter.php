@@ -17,6 +17,7 @@ use App\Model\Image\ImageRepository;
 use App\Model\Orders\Order;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
+use App\Model\Security\Role;
 
 /**
  * Presenter for shopping cart management.
@@ -52,6 +53,14 @@ final class CartPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
+
 
         /** @var int $userId ID of the current user. */
         $userId = $user->getId();
@@ -92,6 +101,20 @@ final class CartPresenter extends BasePresenter
      */
     public function handleRemoveItem(int $wineId): void
     {
+        
+        // Check if the user is logged in
+        if (!$this->user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$this->user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
+        
         /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
 
@@ -116,6 +139,18 @@ final class CartPresenter extends BasePresenter
      */
     public function handleChangeAmount(int $wineId, bool $add): void
     {   
+        // Check if the user is logged in
+        if (!$this->user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$this->user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
         /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
         /** @var bool $success Flag of success for changing item amount. */
@@ -180,6 +215,18 @@ final class CartPresenter extends BasePresenter
      */
     public function deliveryFormSucceeded(\Nette\Application\UI\Form $form, \stdClass $values): void
     {
+        // Check if the user is logged in
+        if (!$this->user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$this->user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
+            return;
+        }
         /** @var string $type Delivery type from the form. */
         $type= $values->deliveryType;
         /** @var string|null $address Delivery address from the form. */

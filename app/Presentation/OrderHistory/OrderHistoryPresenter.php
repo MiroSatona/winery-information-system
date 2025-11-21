@@ -13,6 +13,8 @@ namespace App\Presentation\OrderHistory;
 use App\Model\Orders\OrderRepository;
 use App\Model\Orders\OrderState;
 use App\Presentation\BasePresenter;
+use App\Model\Security\Role;
+use App\Model\FlashMsgType;
 
 /**
  * Presenter for order history management
@@ -37,9 +39,16 @@ final class OrderHistoryPresenter extends BasePresenter
     public function renderDefault(): void 
     {
         $user = $this->user;
-
+        // Check if the user is logged in
         if (!$user->isLoggedIn()) {
-            $this->redirect(":Sign:in");
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::USER->value)) {
+            $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:default");
             return;
         }
         
