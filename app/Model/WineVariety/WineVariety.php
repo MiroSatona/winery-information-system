@@ -99,7 +99,6 @@ final class WineVariety
         return $this->image;
     }
 
-
     /**
      * Set the image of the wine variety
      *
@@ -111,7 +110,6 @@ final class WineVariety
         $this->image = $image;
     }
 
-
     /**
      * Get the description of the wine variety
      *
@@ -121,7 +119,6 @@ final class WineVariety
     {
         return $this->description;
     }
-
 
     /**
      * Set the description of the wine variety

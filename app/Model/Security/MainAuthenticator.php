@@ -100,12 +100,13 @@ class MainAuthenticator implements Authenticator, IdentityHandler
     /**
      * Sleep user identity
      * 
+     * We do not need this function, but it is required by IdentityHandler interface.
+     * 
      * @param IIdentity $identity
      * @return IIdentity
      */
     public function sleepIdentity(IIdentity $identity): IIdentity
     {
-        /* Do not modify for sleep */
         return $identity;
     }
 

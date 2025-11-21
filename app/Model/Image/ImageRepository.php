@@ -12,6 +12,8 @@ namespace App\Model\Image;
 
 use Nette\Database\Explorer;
 use Nette\Http\FileUpload;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 /**
  * Handles DB operations related to Images
@@ -118,7 +120,7 @@ final class ImageRepository
         }
         return '';
         } catch (\Exception $e) {
-            // log error or handle it as needed
+            Debugger::log("Image upload failed: " . $e->getMessage(), ILogger::ERROR);
             return '';
         }
     }

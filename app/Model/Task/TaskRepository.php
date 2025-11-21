@@ -20,7 +20,7 @@ use App\Model\Task\Treatment\TreatmentRepository;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Task\Harvest\HarvestRepository;
 use App\Model\Task\TaskData;
-use App\Model\Image\Image as ImageEntity;
+use App\Model\Image\Image;
 use App\Model\Validation\ValidationDefinitions;
 use App\Model\WineRow\WineRow;
 use App\Model\User\User;
@@ -48,14 +48,11 @@ class TaskRepository{
     /**
      * TaskRepository constructor
      * 
-     * Initializes the TaskRepository with database connection and sub-repositories
-     * for handling different task types (Harvest, Treatment, Bottling) and vineyard operations.
-     * 
-     * @param Explorer $database Database explorer instance for database operations
-     * @param TreatmentRepository $treatmentRepository Repository for treatment-related operations
-     * @param BottlingRepository $bottlingRepository Repository for bottling-related operations
-     * @param HarvestRepository $harvestRepository Repository for harvest-related operations
-     * @param VineyardRepository $vineyardRepository Repository for vineyard-related operations
+     * @param Explorer $database
+     * @param TreatmentRepository $treatmentRepository
+     * @param BottlingRepository $bottlingRepository
+     * @param HarvestRepository $harvestRepository
+     * @param VineyardRepository $vineyardRepository
      */
     public function __construct(
         Explorer $database,
@@ -144,7 +141,6 @@ class TaskRepository{
         }
 
         return null;
-
     }
    
     /**
@@ -327,7 +323,7 @@ class TaskRepository{
                 ->fetch();
             
             if (!$harvest) continue;
-                // Get the task details (dates)
+            // Get the task details (dates)
             $task = $this->database->table('TASK')
                 ->where('ID', $taskId)
                 ->fetch();
@@ -411,7 +407,6 @@ class TaskRepository{
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
             $bottlesCount = 0;
             if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
-                // assume VOLUME is in same units as bottleVolume (best-effort)
                 $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
             }
 
@@ -448,7 +443,7 @@ class TaskRepository{
             // handle optional image: insert into PICTURE and update wine picture
             $pictureId = null;
             $img = $data->getImg();
-            if ($img instanceof ImageEntity) {
+            if ($img instanceof Image) {
                 $picture = $this->database->table('PICTURE')->insert([
                     'IMAGE_NAME' => $img->name,
                     'LINK' => $img->src,
@@ -492,7 +487,6 @@ class TaskRepository{
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
-                // ignore
                 bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             bdump('Failed to create bottling task: ' . $e->getMessage());
@@ -640,7 +634,6 @@ class TaskRepository{
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
-                // ignore
                 bdump("Failed to do a db rollback: " . $t->getMessage());
             }
 
@@ -869,7 +862,7 @@ class TaskRepository{
      */
     public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
     {   
-        bdump($taskId,);
+        bdump($taskId);
         bdump($vineyardId);
         bdump($wineVarietyId);
 
@@ -1162,7 +1155,6 @@ class TaskRepository{
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
-                // ignore
                 bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             bdump("failed with error: $e");
@@ -1234,11 +1226,11 @@ class TaskRepository{
      * 
      * @param int $taskId Task ID
      * @param \stdClass $values Object containing fields to update
-     * @param ImageEntity|null $img Optional new image for the wine
+     * @param Image|null $img Optional new image for the wine
      * @return void
      * @throws \Exception If task not found or validation fails
      */
-    public function updateBottlingTask(int $taskId, \stdClass $values, ?ImageEntity $img): void
+    public function updateBottlingTask(int $taskId, \stdClass $values, ?Image $img): void
     {
         try {
             $this->database->beginTransaction();
@@ -1287,7 +1279,7 @@ class TaskRepository{
             ]);
 
             // handle image: if provided, insert into PICTURE and update wine
-            if ($img instanceof ImageEntity) {
+            if ($img instanceof Image) {
                 $picture = $this->database->table('PICTURE')->insert([
                     'IMAGE_NAME' => $img->name,
                     'LINK' => $img->src,
@@ -1383,7 +1375,6 @@ class TaskRepository{
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
-                // ignore
                 bdump("Failed to do a db rollback: " . $t->getMessage());
             }
             Debugger::log('Failed to update treatment task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);

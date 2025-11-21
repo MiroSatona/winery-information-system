@@ -9,13 +9,9 @@
 declare(strict_types=1);
 
 namespace App\Model\Orders;
+
 /**
- * States:
- *  - RESERVED: Order has been reserved and awaits payment or confirmation.
- *  - PAID:     Payment has been received for the order.
- *  - CANCELLED: Order has been cancelled and will not be fulfilled.
- *  - DELIVERED: Order has been delivered to the customer.
- *
+ * Order states
  */
 enum OrderState: string
 {
@@ -24,4 +20,3 @@ enum OrderState: string
     case CANCELLED = "CANCELLED";
     case DELIVERED = "DELIVERED";
 }
-

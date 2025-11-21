@@ -25,9 +25,10 @@ final class ProductRepository
      * @param Explorer $database
      * @param WineRepository $wineRep
      */
-    public function __construct(private Explorer $database, private WineRepository $wineRep)
-    {
-        $this->database = $database; 
+    public function __construct(
+        private Explorer $database,
+        private WineRepository $wineRep
+    ) {
     }
    
     /**

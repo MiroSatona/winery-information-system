@@ -366,8 +366,8 @@ final class OrderRepository
      * @param integer $userid
      * @return boolean
      */
-    public function clientpayfororder(int $userid): bool {
-        $order = $this->fetchcustomerorder($userid);
+    public function clientPayForOrder(int $userid): bool {
+        $order = $this->fetchCustomerOrder($userid);
         if (!$order) {
             return false;
         }

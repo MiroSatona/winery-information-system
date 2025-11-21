@@ -9,7 +9,6 @@
 
 namespace App\Model\User;
 
-use Nette;
 use Nette\Database\Explorer;
 use App\Model\User\User;
 use App\Model\Security\Role;
