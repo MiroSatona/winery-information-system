@@ -138,7 +138,7 @@ DESC:     Latte template for order detail page in the IS module.
                                         <div class="d-flex align-items-center">
                                             <!-- Wine image and name with link to wine detail -->
                                             {if $item->wine->getImage() !== null}
-                                                <img src="{asset $imageRepository->getPathForImage($item->wine->getImage())}"
+                                                <img src="{asset $imgRep->getPathForImage($item->wine->getImage())}"
                                                     alt="{$item->wine->name}" 
                                                     class="img-fluid rounded shadow-sm"
                                                     style="max-height: 200px; object-fit: cover;">

@@ -247,6 +247,26 @@ DESC:     Latte template for displaying wine detail in IS
                                         </label>
                                         <p class="text-dark mb-2">{$wine->getProductionNote()}</p>
                                     </div>
+
+                                    {if $sellApprover !== null}
+                                        {* Sale approver info if available *}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-user-check me-2"></i>Prodej schválil
+                                            </label>
+                                            <p class="text-dark mb-2">{$sellApprover->getFullName()}</p>
+                                        </div>
+                                    {/if}
+
+                                    {if $liquidator !== null}
+                                        {* Liquidator info if available *}
+                                        <div class="mb-3">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-user-slash me-2"></i>Zlikvidoval
+                                            </label>
+                                            <p class="text-dark mb-2">{$liquidator->getFullName()}</p>
+                                        </div>
+                                    {/if}
                                 </div>
                             </div>
 

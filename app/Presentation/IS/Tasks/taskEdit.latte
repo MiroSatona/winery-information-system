@@ -31,7 +31,7 @@ DESC:     Latte template for editing a task in the IS module.
                     </h4>
 
                     {* Back button to dashboard *}
-                    <a href="{link dashboard}" class="btn btn-outline-light btn-sm d-flex align-items-center">
+                    <a href="{link details! $task->getId() }" class="btn btn-outline-light btn-sm d-flex align-items-center">
                         <i class="fas fa-arrow-left me-2"></i>
                         Zpět
                     </a>
@@ -94,7 +94,7 @@ DESC:     Latte template for editing a task in the IS module.
                     {if $task instanceof App\Model\Task\Bottling\Bottling}
                         {* Bottling-specific form section *}
                         <h5 class="mb-3 fw-semibold text-primary">
-                            <i class="fas fa-wine-bottle me-2"></i>Údaje o láhvování
+                            <i class="fas fa-wine-bottle me-2"></i>Údaje o lahvování
                         </h5>
                         
                         {* Display wine info and image for bottling task *}

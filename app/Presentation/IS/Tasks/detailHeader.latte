@@ -26,7 +26,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                     Detaily o ošetření
                                 {else}
                                     <i class="fas fa-wine-bottle me-2"></i>
-                                    Detaily o láhvování
+                                    Detaily o lahvování
                                 {/if}
                             </h4>
                             <!-- Task state badge -->
@@ -57,7 +57,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                         </div>
                         <!-- Action buttons for editing, marking as done, or confirming harvest -->
                         <div class="d-flex gap-2 flex-wrap">
-                            {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                            {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                 <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
                                     <i class="fas fa-edit me-1"></i> Upravit
                                 </a>
@@ -109,7 +109,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                             {elseif $task instanceof App\Model\Task\Treatment\Treatment}
                                                 Ošetření
                                             {elseif $task instanceof App\Model\Task\Bottling\Bottling}
-                                                Stáčení
+                                                Lahvování
                                             {/if}
                                         </p>
                                     </div>
@@ -214,7 +214,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                             <i class="fas fa-users me-2"></i>Seznam pracovníků
                                         </label>
 
-                                        {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                        {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                             {form addWorkersForm}
                                                 <div class="d-flex gap-2 align-items-end">
                                                     {input worker}
@@ -239,7 +239,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                                     {foreach $taskWorkers as $worker}
                                                         <tr>
                                                             <td>{$worker->getFullName()}</td>
-                                                             {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                             {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                 <td class="text-center">
                                                                     <!-- Button to remove worker from task (only if planned) -->
                                                                     <a n:href="deleteUserFromTask! $worker->getId()" 

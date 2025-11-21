@@ -56,9 +56,11 @@ DESC:     Latte template for displaying the dashboard of tasks in the IS module.
                                 <a href="{link createNonExistentTask!}" class="btn btn-outline-primary btn-sm">
                                     <i class="fas fa-clipboard me-2"></i>Zaznamenat neex.
                                 </a>
-                                <a href="{link addTask1}" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-clipboard me-2"></i>Naplánovat
-                                </a>
+                                {if $userVintner}
+                                    <a href="{link addTask1}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-clipboard me-2"></i>Naplánovat
+                                    </a>
+                                {/if}
                             </div>
                         </div>
                         <div class="d-flex justify-content-between align-items-center mt-2">

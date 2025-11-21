@@ -90,7 +90,7 @@ DESC:     Latte template for displaying details of vineyard treatment task.
                                                     </h5>
 
                                                     {* Show add-row form only if task is in PLANNED state *}
-                                                    {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                    {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                         {form addRowForm}
                                                             <div class="d-flex align-items-end gap-2">
                                                                 {input rowCode}
@@ -141,7 +141,7 @@ DESC:     Latte template for displaying details of vineyard treatment task.
                                                                         </td>
 
                                                                         {* Allow row removal if task is planned *}
-                                                                        {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                        {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                             <td class="text-center">
                                                                                 <a n:href="deleteTaskRows! $wineRow->getId()"
                                                                                 class="btn btn-sm btn-outline-danger">

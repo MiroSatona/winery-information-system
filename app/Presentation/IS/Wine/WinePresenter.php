@@ -20,6 +20,7 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\Task\Bottling\BottlingRepository;
 use App\Model\Wine\WineProduceData;
 use App\Model\WineVariety\WineVarietyType;
+use App\Model\User\UserRepository;
 use App\Model\Wine\WineState;
 use App\Model\Wine\WineGrade;
 use App\Model\Wine\WineType;
@@ -47,13 +48,15 @@ final class WinePresenter extends BasePresenter
      * @param WineRepository $wineRepository 
      * @param ImageRepository $imageRepository 
      * @param HarvestRepository $harvestRepository 
-     * @param BottlingRepository $bottlingRepository 
+     * @param BottlingRepository $bottlingRepository
+     * @param UserRepository $userRepository
      */
     public function __construct(
         private WineRepository $wineRepository,
         private ImageRepository $imageRepository,
         private HarvestRepository $harvestRepository,
-        private BottlingRepository $bottlingRepository
+        private BottlingRepository $bottlingRepository,
+        private UserRepository $userRepository,
     ) {
         parent::__construct();
     }
@@ -179,6 +182,21 @@ final class WinePresenter extends BasePresenter
         $this->template->unfinishedBottlingTask = null;
         if ($bottling !== null) {
             $this->template->unfinishedBottlingTask = $bottling;
+        }
+
+        // fetch sell approver and liquidator
+        if ($wine->getIdSellApprover() !== null) {
+            $sellApprover = $this->userRepository->getUserById($wine->getIdSellApprover());
+            $this->template->sellApprover = $sellApprover;
+        } else {
+            $this->template->sellApprover = null;
+        }
+
+        if ($wine->getIdLiquidator() !== null) {
+            $liquidator = $this->userRepository->getUserById($wine->getIdLiquidator());
+            $this->template->liquidator = $liquidator;
+        } else {
+            $this->template->liquidator = null;
         }
 
         $this->template->wine = $wine;
@@ -344,7 +362,8 @@ final class WinePresenter extends BasePresenter
         $result = true;
         if ($wine->state == WineState::BOTTLED) {
             $result = $this->wineRepository->updateWinePrice($wineId, $price, false);
-            $this->wineRepository->setWineState($wineId, WineState::SALE->value);
+            $result &= $this->wineRepository->setWineState($wineId, WineState::SALE->value);
+            $result &= $this->wineRepository->setSellApprover($wineId, $this->user->getId());
         }
         $result2 = $this->wineRepository->updateWinePrice($wineId, $price, true);
         $result3 = $this->wineRepository->setWineDescription($wineId, $description);

@@ -1536,6 +1536,16 @@ final class TasksPresenter extends BasePresenter
     {
         $id = (int)$this->getParameter('id');
 
+        // only vintners can mark tasks as done
+        // and workers assigned to the task 
+        if (!$this->user->isInRole(Role::VINTNER->name) &&
+            !($this->user->isInRole(Role::WORKER->name) &&
+            $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id))) {
+            $this->flashMessage('K označení úkonu jako dokončeného nemáte oprávnění.', FlashMsgType::ERROR->value);
+            $this->redirect('Tasks:dashboard');
+            return;
+        }
+
         /** @var Task $task */
         $task = $this->taskRepository->fetchById($id);
         if ($task === null) {
@@ -1682,6 +1692,12 @@ final class TasksPresenter extends BasePresenter
      */
     public function addWorkerFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K přidání pracovníka k úkolu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
         $taskId = (int)$this->getParameter('id');
         $workerId = (int)$values->worker;
 
@@ -1694,7 +1710,7 @@ final class TasksPresenter extends BasePresenter
         $error = $this->taskRepository->addWorkerToTask($taskId, $workerId);
         
         if ($error === '') {
-            $this->flashMessage('Pracovník byl úspěšně přidán k úkolu.', 'success');
+            $this->flashMessage('Pracovník byl úspěšně přidán k úkonu.', 'success');
         } else {
             $this->flashMessage($error, 'error');
         }
@@ -1711,7 +1727,22 @@ final class TasksPresenter extends BasePresenter
      */
     public function handleDeleteUserFromTask(int $workerId):void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K odstranění pracovníka z úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
         $taskId = (int)$this->getParameter('id');
+
+        // do not remove last worker assigned to the task
+        $assignedWorkers = $this->taskRepository->fetchTaskWorkers($taskId);
+
+        if (count($assignedWorkers) <= 1) {
+            $this->flashMessage('Nelze odstranit posledního přiřazeného pracovníka z úkolu.', 'error');
+            $this->redirect('this');
+            return;
+        }
 
         $result = $this->taskRepository->removeWorkerFromTask($taskId, $workerId);
 
@@ -1731,6 +1762,12 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function renderTaskEdit(int $taskId) {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
         $task = $this->taskRepository->fetchById($taskId);
         if (!$task) {
             $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
@@ -1820,6 +1857,12 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function submitBasicTaskEdit(Form $form, \stdClass $values) {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
+        
         $taskId = (int)$this->getParameter("taskId");
         
         try {
@@ -1868,6 +1911,11 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function submitBottlingTaskEdit(Form $form, \stdClass $values) {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
         
         $taskId = (int)$this->getParameter("taskId");
         /** @var Bottling */
@@ -1954,6 +2002,11 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function submitTreatmentTaskEdit(Form $form, \stdClass $values) {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
 
         $taskId = (int)$this->getParameter("taskId");
         
@@ -2039,6 +2092,12 @@ final class TasksPresenter extends BasePresenter
      */
     public function addRowsFormSucceeded(Form $form, \stdClass $values): void
     {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
         $taskId = (int)$this->getParameter('id');
         $rowCode = (int)$values->rowCode;
         
@@ -2078,7 +2137,12 @@ final class TasksPresenter extends BasePresenter
      * @return void
      */
     public function handleDeleteTaskRows(int $rowId): void
-    { 
+    {
+        if (!$this->user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage('K editaci úkonu nemáte oprávnění.', 'error');
+            $this->redirect('this');
+            return;
+        }
 
         $taskId = (int)$this->getParameter('id');
 
@@ -2086,6 +2150,15 @@ final class TasksPresenter extends BasePresenter
         
         if ($task === null) {
             $this->flashMessage('Úkon nebyl nalezen.', 'error');
+            $this->redirect('this');
+            return;
+        }
+
+        // do not allow removal of last row
+        $taskRows = $this->taskRepository->fetchTaskRows($taskId);
+
+        if (count($taskRows) <= 1) {
+            $this->flashMessage('Úkon musí mít alespoň jeden řádek.', 'error');
             $this->redirect('this');
             return;
         }

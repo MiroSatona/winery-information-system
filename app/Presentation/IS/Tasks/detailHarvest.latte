@@ -140,7 +140,7 @@ DESC:     Latte template for displaying detailed information about harvest task
                                                 </h5>
 
                                                 {* Show add row form only if task is in PLANNED state *}
-                                                {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                     {form addRowForm}
                                                         <div class="d-flex align-items-end gap-2">
                                                             {input rowCode}
@@ -190,7 +190,7 @@ DESC:     Latte template for displaying detailed information about harvest task
                                                                     </td>
 
                                                                     {* Show delete button for rows if task is planned *}
-                                                                    {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                    {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                         <td class="text-center">
                                                                             <a n:href="deleteTaskRows! $wineRow->getId()"
                                                                             class="btn btn-sm btn-outline-danger">

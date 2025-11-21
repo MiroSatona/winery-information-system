@@ -265,6 +265,30 @@ final class WineRepository
             return false;
         }
     }
+
+    /**
+     * Set the sell approver for a given wine.
+     *
+     * @param int $wineId
+     * @param int $userId
+     * @return bool True on success, false on failure.
+     */
+    public function setSellApprover(int $wineId, int $userId): bool
+    {
+        try { // run within transaction
+            return $this->db->transaction(function () use ($wineId, $userId) {
+                $this->db->table('WINE')
+                    ->where('ID', $wineId)
+                    ->update([
+                        'ID_SELL_APPROVER' => $userId,
+                    ]);
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to set sell approver: ' . $e->getMessage() . ' | Wine ID: ' . $wineId, ILogger::ERROR);
+            return false;
+        }
+    }
     
     /**
      * Get total bottle count for a given wine.

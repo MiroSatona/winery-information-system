@@ -219,16 +219,20 @@ final class VineyardRepository
                 // handle picture update or insertion
                 $pictureId = $row->ID_PICTURE;
                 $image = $vineyard->getImage();
+
                 if ($image !== null) {
                     if ($pictureId !== null) {
-                        // delete previous image data
-                        $this->imageRepository->deleteImageFromUploads($row->ref('PICTURE')->LINK);
-                        // update existing picture
-                        $this->database->table('PICTURE')->where('ID', $pictureId)->update([
-                            'LINK' => $image->src,
-                            'IMAGE_NAME' => $image->name,
-                            'DESCRIPTION' => $image->description
-                        ]);
+                        // do not change image if it stayed the same
+                        if ($image->id !== $pictureId) {
+                            // delete previous image data
+                            $this->imageRepository->deleteImageFromUploads($row->ref('PICTURE')->LINK);
+                            // update existing picture
+                            $this->database->table('PICTURE')->where('ID', $pictureId)->update([
+                                'LINK' => $image->src,
+                                'IMAGE_NAME' => $image->name,
+                                'DESCRIPTION' => $image->description
+                            ]);
+                        }
                     } else {
                         // or insert new picture
                         $pictureData = [
