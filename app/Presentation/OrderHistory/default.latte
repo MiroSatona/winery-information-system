@@ -38,7 +38,7 @@ DESC:     latte template for displaying user order history
                                 <div>
                                     <h5 class="card-title mb-0">
                                         <i class="fa-solid fa-box me-2 text-primary"></i>
-                                        Order number: {$order->id}
+                                        Číslo objednávky: {$order->id}
                                     </h5>
                                     <small class="text-muted">
                                         <i class="fa-regular fa-calendar-days me-1"></i>
@@ -50,23 +50,23 @@ DESC:     latte template for displaying user order history
                                     {switch $order->state}
                                         {case $OrderState::RESERVED->value}
                                             <span class="badge bg-warning text-dark">
-                                                <i class="fa-solid fa-clock me-1"></i> Reserved
+                                                <i class="fa-solid fa-clock me-1"></i> Rezervováno
                                             </span>
                                         {case $OrderState::PAID->value}
                                             <span class="badge bg-success">
-                                                <i class="fa-solid fa-check me-1"></i> Paid
+                                                <i class="fa-solid fa-check me-1"></i> Zaplaceno
                                             </span>
                                         {case $OrderState::CANCELLED->value}
                                             <span class="badge bg-danger">
-                                                <i class="fa-solid fa-xmark me-1"></i> Cancelled
+                                                <i class="fa-solid fa-xmark me-1"></i> Zrušeno
                                             </span>
                                         {case $OrderState::DELIVERED->value}
                                             <span class="badge bg-success">
-                                                <i class="fa-solid fa-check me-1"></i> Delivered
+                                                <i class="fa-solid fa-check me-1"></i> Doručeno
                                             </span>
                                         {default}
                                             <span class="badge bg-secondary">
-                                                <i class="fa-solid fa-question me-1"></i> Unknown state
+                                                <i class="fa-solid fa-question me-1"></i> Neznámý stav
                                             </span>
                                     {/switch}
                                 </div>
@@ -78,16 +78,16 @@ DESC:     latte template for displaying user order history
                                 <!-- Delivery info -->
                                 <div class="col-md-6">
                                     <p class="mb-1">
-                                        <strong><i class="fa-solid fa-truck me-1"></i>Delivery:</strong>
+                                        <strong><i class="fa-solid fa-truck me-1"></i>Doprava:</strong>
                                         {if $order->deliveryType}
                                             {switch $order->deliveryType}
-                                                {case 'PICKUP'} Personal pickup 
-                                                {case 'COURIER'} Courier 
-                                                {case 'POST'} Post 
-                                                {default} Other method 
+                                                {case 'PICKUP'} Osobní odběr
+                                                {case 'COURIER'} Kurýr
+                                                {case 'POST'} Pošta
+                                                {default} Jiný způsob
                                             {/switch}
                                         {else}
-                                            <span class="text-muted">Not specified</span>
+                                            <span class="text-muted">Nespecifikováno</span>
                                         {/if}
                                     </p>
                                     <p class="mb-0 text-muted small">
@@ -99,7 +99,7 @@ DESC:     latte template for displaying user order history
                                 <div class="col-md-6 text-md-end mt-3 mt-md-0">
                                     <h5 class="mb-1">
                                         <i class="fa-solid fa-money-bill-wave me-1 text-success"></i>
-                                        Total: <strong>{$order->totalPrice} Kč</strong>
+                                        Celkem: <strong>{$order->totalPrice} Kč</strong>
                                     </h5>
                                 </div>
                             </div>
@@ -107,7 +107,7 @@ DESC:     latte template for displaying user order history
                             {if !empty($order->items)}
                                 <hr class="my-3">
                                 <!-- List of order items -->
-                                <p class="fw-bold mb-2"><i class="fa-solid fa-wine-bottle me-1"></i>Order items:</p>
+                                <p class="fw-bold mb-2"><i class="fa-solid fa-wine-bottle me-1"></i>Položky objednávky:</p>
                                 <ul class="list-group list-group-flush">
                                     {foreach $order->items as $item}
                                         <li class="list-group-item d-flex justify-content-between align-items-center">
