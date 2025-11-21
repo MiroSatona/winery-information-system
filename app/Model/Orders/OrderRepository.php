@@ -154,7 +154,7 @@ final class OrderRepository
             "ID_CUSTOMER" => $userId,
             "TOTAL_PRICE" => 0.00,
             "STATE" => OrderState::RESERVED,
-            "DELIVERY_TYPE" => "PICKUP",      // Required (no default)
+            "DELIVERY_TYPE" => "PICKUP",      
             "DELIVERY_DATA" => "",
         ];
         $this->db->beginTransaction();

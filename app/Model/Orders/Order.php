@@ -26,7 +26,7 @@ final class CustomerOrder
      * @param int|null $idCustomer
      * @param float $totalPrice
      * @param string $state           // RESERVED | PAID | CANCELLED
-     * @param string|null $deliveryType   // PICKUP | COURIER | POST | NULL
+     * @param string $deliveryType   // PICKUP | COURIER | POST 
      * @param string $orderTimestamp  // store as string (from DB)
      * @param string $deliveryData
      * @param OrderItem[] $items        // optional list of related items
@@ -36,7 +36,7 @@ final class CustomerOrder
         public ?int $idCustomer,
         public float $totalPrice,
         public string $state,
-        public ?string $deliveryType,
+        public string $deliveryType,
         public string $orderTimestamp,
         public string $deliveryData,
         /** @var OrderItem[] */

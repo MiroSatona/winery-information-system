@@ -1034,9 +1034,10 @@ class TaskRepository{
                     throw new \Exception('Neplatná jednotka');
                 }
             }
-
-            if( ($amount === null && $unit !== null) || ($amount !== null && $unit === null) ) {
-                throw new \Exception('Musíte přidat jak množství tak jednotku nebo ani jedno z nich!');
+                
+            if ((!$unit || $unit == 0) || !$amount) {
+                $unit = null;
+                $amount = null; 
             }
                 
             // Validate each row: exists, belongs to vineyard, is active
