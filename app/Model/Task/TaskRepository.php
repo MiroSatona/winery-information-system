@@ -164,10 +164,9 @@ class TaskRepository{
         $taskRows = $this->fetchTaskRows($oneTask->getId());
        
         foreach($taskRows as $row) {
-            if ($row->isInConflict()) {
-                $oneTask->setInConflict();
-                return;
-            }
+            if (!$row->isInConflict()) continue;
+            $oneTask->setInConflict();
+            return;
         }
     }
 
@@ -277,24 +276,22 @@ class TaskRepository{
                 ->where('ID_VINEYARD', $vineyardId)
                 ->fetch();
             
-            if ($treatment) {
-                // Get the task details (dates)
-                $task = $this->database->table('TASK')
-                    ->where('ID', $taskId)
-                    ->fetch();
-                
-                if ($task) {
-                    $sprayingDate = $task->EXECUTION_TIMESTAMP 
-                        ? DateTime::from($task->EXECUTION_TIMESTAMP)
-                        : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-                    
-                    $daysDifference = $sprayingDate->diff($harvestDate)->days;
-                    
-                    if ($daysDifference < 14) {
-                        return false; 
-                    }
-                }
-            }
+            if (!$treatment) continue;
+
+            // Get the task details (dates)
+            $task = $this->database->table('TASK')
+                ->where('ID', $taskId)
+                ->fetch();
+            
+            if (!$task) continue;
+
+            $sprayingDate = $task->EXECUTION_TIMESTAMP 
+                ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+            
+            $daysDifference = $sprayingDate->diff($harvestDate)->days;
+            
+            if ($daysDifference < 14) return false; 
         }
         
         return true; 
@@ -329,25 +326,22 @@ class TaskRepository{
                 ->where('ID_VINEYARD', $vineyardId)
                 ->fetch();
             
-            if ($harvest) {
+            if (!$harvest) continue;
                 // Get the task details (dates)
-                $task = $this->database->table('TASK')
-                    ->where('ID', $taskId)
-                    ->fetch();
-                
-                if ($task) {
-                    $harvestDate = $task->EXECUTION_TIMESTAMP 
-                        ? DateTime::from($task->EXECUTION_TIMESTAMP)
-                        : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-                    
-                    // Calculate days difference (absolute value since treatment could be before or after harvest)
-                    $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
-                    
-                    if ($daysDifference < 14) {
-                        return false; 
-                    }
-                }
-            }
+            $task = $this->database->table('TASK')
+                ->where('ID', $taskId)
+                ->fetch();
+            
+            if (!$task) continue;
+
+            $harvestDate = $task->EXECUTION_TIMESTAMP 
+                ? DateTime::from($task->EXECUTION_TIMESTAMP)
+                : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
+            
+            // Calculate days difference (absolute value since treatment could be before or after harvest)
+            $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
+            
+            if ($daysDifference < 14) return false; 
         }
         
         return true; 
@@ -670,7 +664,7 @@ class TaskRepository{
             ->fetchAll();
 
         $usersObjects = [];
-                foreach ($users as $user) {
+        foreach ($users as $user) {
             $usersObjects[] = new User(
                 (int)$user->ID,
                 (string)$user->NAME,
@@ -828,34 +822,35 @@ class TaskRepository{
                 ->where('CODE', $taskRow->CODE_ROW)
                 ->fetch();
             
-            if ($wineRow) {
-                $row = new WineRow(
-                    (int)$wineRow->CODE,
-                    (bool)$wineRow->ACTIVE,
-                    (int)$wineRow->ID_VINEYARD,
-                    (int)$wineRow->ID_WINE_VARIETY,
-                    (int)$wineRow->HEAD_COUNT,
-                    (int)$wineRow->PLANTING_YEAR
-                );
-                if ($task instanceof Harvest) {
-                    if (!$this->rowIsSafeForHarvest(
-                        $task->getVineyard()->getId(),
-                        $row->getId(),
-                        $planedDate                 
-                        )) {
-                            $row->setInConflict();
-                        }
-                } else if ($task instanceof Treatment && $task->getType() == TreatmentType::SPRAYING) {
-                    if (!$this->rowIsSafeForSprayingTreatment(
-                        $task->getVineyard()->getId(),
-                        $row->getId(),
-                        $planedDate
+            if (!$wineRow) continue;
+
+            $row = new WineRow(
+                (int)$wineRow->CODE,
+                (bool)$wineRow->ACTIVE,
+                (int)$wineRow->ID_VINEYARD,
+                (int)$wineRow->ID_WINE_VARIETY,
+                (int)$wineRow->HEAD_COUNT,
+                (int)$wineRow->PLANTING_YEAR
+            );
+
+            if ($task instanceof Harvest) {
+                if (!$this->rowIsSafeForHarvest(
+                    $task->getVineyard()->getId(),
+                    $row->getId(),
+                    $planedDate                 
                     )) {
                         $row->setInConflict();
                     }
+            } else if ($task instanceof Treatment && $task->getType() == TreatmentType::SPRAYING) {
+                if (!$this->rowIsSafeForSprayingTreatment(
+                    $task->getVineyard()->getId(),
+                    $row->getId(),
+                    $planedDate
+                )) {
+                    $row->setInConflict();
                 }
-                $wineRowObjects[] = $row;
             }
+            $wineRowObjects[] = $row;
         }
         
         return $wineRowObjects;
