@@ -33,9 +33,9 @@ class ProfilePresenter extends BasePresenter
 
     /**
      * ProfilePresenter constructor
-     * @param UserRepository $userRepository Repository used to fetch user data
-     * @param ValidationDefinitions $validationDefinitions Repository used for validation definitions
-     * @param ProfileModel $profileModel Model used for profile operations
+     * @param UserRepository $userRepository 
+     * @param ValidationDefinitions $validationDefinitions 
+     * @param ProfileModel $profileModel 
      */
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions, ProfileModel $profileModel)
     {

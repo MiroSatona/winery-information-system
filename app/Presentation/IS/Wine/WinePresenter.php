@@ -44,10 +44,10 @@ final class WinePresenter extends BasePresenter
 
     /**
      * Constructor for WinePresenter
-     * @param WineRepository $wineRepository Repository for wines
-     * @param ImageRepository $imageRepository Repository for images
-     * @param HarvestRepository $harvestRepository Repository for harvests
-     * @param BottlingRepository $bottlingRepository Repository for bottling tasks
+     * @param WineRepository $wineRepository 
+     * @param ImageRepository $imageRepository 
+     * @param HarvestRepository $harvestRepository 
+     * @param BottlingRepository $bottlingRepository 
      */
     public function __construct(
         private WineRepository $wineRepository,

@@ -32,9 +32,9 @@ final class WineVarietiesPresenter extends BasePresenter
 
     /**
      * Constructor for WineVarietiesPresenter
-     * @param WineVarietyRepository $wineVarietyRepository Repository for wine varieties
-     * @param ImageRepository $imageRepository Repository for images
-     * @param ValidationDefinitions $validationDefinitions Validation rules
+     * @param WineVarietyRepository $wineVarietyRepository 
+     * @param ImageRepository $imageRepository 
+     * @param ValidationDefinitions $validationDefinitions 
      */
     public function __construct(
         private WineVarietyRepository $wineVarietyRepository,

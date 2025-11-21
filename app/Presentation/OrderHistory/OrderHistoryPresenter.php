@@ -22,7 +22,7 @@ final class OrderHistoryPresenter extends BasePresenter
 {
     /**
      * Constructor for OrderHistoryPresenter
-     * @param OrderRepository $orderRepository Repository for accessing order data
+     * @param OrderRepository $orderRepository 
      */
     public function __construct(
         private OrderRepository $orderRepository

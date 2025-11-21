@@ -17,8 +17,21 @@ use App\Presentation\BasePresenter;
 use App\Model\Orders\OrderRepository;
 use Tracy\Debugger;
 
+/**
+ * ShopPresenter
+ *
+ * Presenter for the online wine shop. Handles displaying products, filtering, sorting,
+ * and cart operations for the shop section of the application.
+ */
 final class ShopPresenter extends  BasePresenter
 {
+    /**
+     * ShopPresenter constructor
+     *
+     * @param ProductRepository $wineRepository 
+     * @param OrderRepository $orderRep 
+     * @param ImageRepository $imageRepository 
+     */
     public function __construct(private ProductRepository $wineRepository, private OrderRepository $orderRep, private ImageRepository $imageRepository) 
     {
         parent::__construct();

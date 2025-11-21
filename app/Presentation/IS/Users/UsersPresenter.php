@@ -37,8 +37,8 @@ final class UsersPresenter extends BasePresenter
 
     /**
      * Constructor for UsersPresenter
-     * @param UserRepository $userRepository Repository for managing users
-     * @param ValidationDefinitions $validationDefinitions Validation rules for user input
+     * @param UserRepository $userRepository 
+     * @param ValidationDefinitions $validationDefinitions 
      */
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions)
     {
@@ -511,9 +511,6 @@ final class UsersPresenter extends BasePresenter
         } else {
             $this->flashMessage('Údaje uživatele se nepodařilo upravit.', 'error');
         }
-        
-
-    
     }
 
     /**
@@ -555,5 +552,4 @@ final class UsersPresenter extends BasePresenter
             $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', 'error');
         }
    }
-
 }

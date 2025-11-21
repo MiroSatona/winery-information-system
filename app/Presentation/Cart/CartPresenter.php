@@ -26,8 +26,8 @@ final class CartPresenter extends BasePresenter
 {
     /**
      * Constructor for CartPresenter
-     * @param OrderRepository $orderRepository Repository for managing orders and cart operations.
-     * @param ImageRepository $imageRepository Repository for accessing product images.
+     * @param OrderRepository $orderRepository 
+     * @param ImageRepository $imageRepository 
      */
     public function __construct(
         private OrderRepository $orderRepository,

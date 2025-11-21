@@ -46,13 +46,13 @@ final class TasksPresenter extends BasePresenter
     /**
      * Constructor for class TasksPresenter.
      *
-     * @param UserRepository $userRepository Repository for managing user model operations.
-     * @param TaskRepository $taskRepository Repository for managing task model operations.
-     * @param BottlingRepository $bottlingRepository  Repository for managing bottling model operations.
-     * @param HarvestRepository $harvestRepository Repository for managing harvest model operations.
-     * @param WineRepository $wineRep Repository for managing wine model operations.
-     * @param ImageRepository $imgRep Repository for managing image model operations.
-     * @param VineyardRepository $vineyardRep Repository for managing vineyard model operations.
+     * @param UserRepository $userRepository 
+     * @param TaskRepository $taskRepository 
+     * @param BottlingRepository $bottlingRepository  
+     * @param HarvestRepository $harvestRepository 
+     * @param WineRepository $wineRep 
+     * @param ImageRepository $imgRep 
+     * @param VineyardRepository $vineyardRep 
      */
     public function __construct(
         private UserRepository $userRepository,

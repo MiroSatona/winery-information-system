@@ -28,9 +28,9 @@ final class WinePresenter extends BasePresenter
 
     /**
      * Constructor for WinePresenter
-     * @param ProductRepository $items Product repository for accessing wine products
-     * @param ImageRepository $imageRepository Image repository for accessing wine images
-     * @param OrderRepository $ordRep Order repository for managing cart operations
+     * @param ProductRepository $items 
+     * @param ImageRepository $imageRepository 
+     * @param OrderRepository $ordRep 
      */
     public function __construct(ProductRepository $items, ImageRepository $imageRepository, private OrderRepository $ordRep)
     {

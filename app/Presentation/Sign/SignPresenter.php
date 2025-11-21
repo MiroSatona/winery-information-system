@@ -27,8 +27,8 @@ final class SignPresenter extends BasePresenter
 {
     /**
      * Constructor for SignPresenter
-     * @param SignUpWorker $signUpWorker Worker for handling user registration
-     * @param ValidationDefinitions $validationDefinitions Validation rules and patterns
+     * @param SignUpWorker $signUpWorker 
+     * @param ValidationDefinitions $validationDefinitions 
      */
     public function __construct(private SignUpWorker $signUpWorker, private ValidationDefinitions $validationDefinitions)
     {

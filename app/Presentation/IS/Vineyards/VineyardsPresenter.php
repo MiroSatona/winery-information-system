@@ -44,10 +44,10 @@ final class VineyardsPresenter extends BasePresenter
 
     /**
      * Constructor for VineyardsPresenter
-     * @param VineyardRepository $vineyardRepository Repository for vineyards
-     * @param ImageRepository $imageRepository Repository for images
-     * @param ValidationDefinitions $validationDefinitions Validation rules
-     * @param WineVarietyRepository $wineVarietyRepository Repository for wine varieties
+     * @param VineyardRepository $vineyardRepository 
+     * @param ImageRepository $imageRepository 
+     * @param ValidationDefinitions $validationDefinitions 
+     * @param WineVarietyRepository $wineVarietyRepository 
      */
     public function __construct(
         private VineyardRepository $vineyardRepository,

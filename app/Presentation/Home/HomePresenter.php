@@ -31,9 +31,9 @@ final class HomePresenter extends BasePresenter
 
     /**
      * Constructor for HomePresenter
-     * @param VineyardRepository $vineyardRepository Repository for accessing vineyard data
-     * @param WineVarietyRepository $wineVarietyRepository Repository for accessing wine variety data
-     * @param ImageRepository $imageRepository Repository for accessing image data
+     * @param VineyardRepository $vineyardRepository 
+     * @param WineVarietyRepository $wineVarietyRepository 
+     * @param ImageRepository $imageRepository 
      */
     public function __construct(VineyardRepository $vineyardRepository, WineVarietyRepository $wineVarietyRepository, ImageRepository $imageRepository)
     {
