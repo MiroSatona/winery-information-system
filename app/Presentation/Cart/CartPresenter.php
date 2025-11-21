@@ -55,7 +55,7 @@ final class CartPresenter extends BasePresenter
         }
         
         // user is a customer 
-        if (!$user->isInRole(Role::USER->value)) {
+        if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
@@ -109,7 +109,7 @@ final class CartPresenter extends BasePresenter
         }
         
         // user is a customer 
-        if (!$this->user->isInRole(Role::USER->value)) {
+        if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
@@ -146,7 +146,7 @@ final class CartPresenter extends BasePresenter
         }
         
         // user is a customer 
-        if (!$this->user->isInRole(Role::USER->value)) {
+        if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
@@ -222,7 +222,7 @@ final class CartPresenter extends BasePresenter
         }
         
         // user is a customer 
-        if (!$this->user->isInRole(Role::USER->value)) {
+        if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
