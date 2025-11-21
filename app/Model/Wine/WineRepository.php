@@ -11,6 +11,7 @@ namespace App\Model\Wine;
 use App\Model\Image\ImageRepository;
 use App\Model\Wine\Wine;
 use App\Model\WineVariety\WineVariety;
+use App\Model\Wine\WineState;
 use App\Model\Bottle\BottleRepository;
 use App\Model\Image\Image;
 use App\Model\Task\Harvest\Harvest;
@@ -318,8 +319,16 @@ final class WineRepository
             return false;
         }
         
+        $newState = null;
+        if ($newAmount == 0) {
+           $newState = WineState::SOLD->value;
+        } else {
+            $newState = WineState::SALE->value;
+        }
+        
         $this->db->table("WINE")->where("ID", $idWine)->update([
-           "BOTTLES_LEFT" => $newAmount,
+            "BOTTLES_LEFT" => $newAmount,
+            "STATE" => $newState
         ]);
         return true;
     }
