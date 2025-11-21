@@ -46,7 +46,7 @@ DESC:     Layout template for the IS section. Defines the structure, navigation,
 				</div>
 				<nav class="sidebar-nav flex-grow-1 p-2">
 					{* Show dashboard link for all IS roles *}
-					{if $userWorker || $userVintner || $userAdmin}
+					{if $userWorker || $userVintner}
 						<a href="{link Dashboard:view}" class="is-nav-btn">
 							<i class="fas fa-tachometer-alt me-2"></i>Přehled
 						</a>

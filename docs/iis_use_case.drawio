@@ -162,6 +162,18 @@
         <mxCell id="LapN3B0Qs1bzDbfsEOKu-82" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="LapN3B0Qs1bzDbfsEOKu-8" target="LapN3B0Qs1bzDbfsEOKu-80" edge="1">
           <mxGeometry relative="1" as="geometry" />
         </mxCell>
+        <mxCell id="jmF6VSChtiFX__W7TtaR-1" value="Správa objednávek" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="360" width="246" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="jmF6VSChtiFX__W7TtaR-2" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.75;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-19" target="jmF6VSChtiFX__W7TtaR-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="jmF6VSChtiFX__W7TtaR-3" value="Může si zobrazit interní informace o vinařství" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="230" y="320" width="300" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="jmF6VSChtiFX__W7TtaR-4" style="rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="LapN3B0Qs1bzDbfsEOKu-19" target="jmF6VSChtiFX__W7TtaR-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
