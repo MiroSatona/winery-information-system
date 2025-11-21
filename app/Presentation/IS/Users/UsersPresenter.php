@@ -18,8 +18,9 @@ use App\Model\Validation\ValidationDefinitions;
 use App\Model\FlashMsgType;
 
 /**
- * Presenter for administration of users
- * Handles user listing, filtering, creation, editing, activation, and deactivation
+ * Class UsersPresenter
+ * Presenter for administration of users.
+ * Handles user listing, filtering, creation, editing, activation, and deactivation.
  */
 final class UsersPresenter extends BasePresenter
 {   
@@ -47,6 +48,7 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
+     * startup
      * Startup method called before any action
      * Checks admin role and redirects if unauthorized
      * @return void
@@ -61,7 +63,8 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * Creates the user filter form component
+     * createComponentFilterForm
+     * Method for creating the user filter form component.
      * @return Form Form for filtering users
      */
     public function createComponentFilterForm(): Form
@@ -120,8 +123,9 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * Creates the add user form component
-     * @return Form Form for adding a new user
+     * createComponentAddUserForm
+     * Creates the add user form component.
+     * @return Form Form for adding a new user.
      */
     public function createComponentAddUserForm(): Form
     {   
@@ -208,7 +212,8 @@ final class UsersPresenter extends BasePresenter
         return $form;
     }
     /**
-     * Renders the user dashboard
+     * renderDashboard
+     * Renders the user dashboard.
      * @return void
      */
     public function renderDashboard(): void
@@ -217,9 +222,10 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
-     * Callback for successful user filter form submission
-     * @param Form $form The submitted filter form
-     * @param \stdClass $values Filter values submitted by the user
+     * filterFormSucceeded
+     * Callback for successful user filter form submission.
+     * @param Form $form The submitted filter form.
+     * @param \stdClass $values Filter values submitted by the user.
      * @return void
      */
     public function filterFormSucceeded(Form $form, \stdClass $values): void
@@ -231,13 +237,15 @@ final class UsersPresenter extends BasePresenter
 
     
     /**
-     * Callback for successful add user form submission
-     * @param Form $form The submitted add user form
-     * @param \stdClass $values User details submitted by the form
+     * addFormSucceeded
+     * Callback for successful add user form submission.
+     * @param Form $form The submitted add user form.
+     * @param \stdClass $values User details submitted by the form.
      * @return void
      */
     public function addFormSucceeded(Form $form, \stdClass $values): void
     {   
+        // Check if at least one role is selected
         if(!$values->isUser && !$values->isWorker && !$values->isVintner && !$values->isAdmin) {
             $form->addError('Je potřeba vybrat alespoň jednu roli.');
             $this->flashMessage('Je potřeba vybrat alespoň jednu roli.', 'error');
@@ -247,6 +255,7 @@ final class UsersPresenter extends BasePresenter
         /** @var bool $active New user is always active */
         $active = true;
 
+        // Create a new user with the provided values from the form
         $this->userRepository->addUser(
             $values->name,
             $values->surname,
@@ -270,6 +279,7 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
+     * handleDeactivateUser
      * Handles deactivation of a user
      * @param int $userId Id of the user to deactivate
      * @return void
@@ -294,7 +304,7 @@ final class UsersPresenter extends BasePresenter
     public function handleActivateUser(int $userId): void{
         /** @var string $activateResult Result of the activate operation */
         $activateResult = $this->userRepository->activateUser($userId);
-
+        // Give message about the result of the operation
         if(!$activateResult) {
             $this->flashMessage('Uživatel byl úspěšně aktivován.', 'success');
         } else {
@@ -316,9 +326,10 @@ final class UsersPresenter extends BasePresenter
             $this->flashMessage('Uživatel nebyl nalezen.', 'error');
             $this->redirect('Users:dashboard');
         } else {
+            // Give the user to the template
             $this->template->userEntity = $user;
             // Prefill edit form with existing values (if form component exists)
-            /** @var Form|null $form */
+            /** @var Form|null $form Form for editing user */
             $form = $this->getComponent('editUserForm');
             if ($form instanceof Form) {
                 $form->setDefaults([
@@ -341,11 +352,13 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
+     * createComponentEditUserForm
      * Creates the edit user form component
      * @return Form Form with edited user data
      */
     public function createComponentEditUserForm(): Form
-    {
+    {   
+        /** @var Form  $form Form for editing user */
         $form = new Form();
 
         // Name of the user
@@ -426,6 +439,7 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
+     * editFormSucceeded
      * Callback for successful edit user form submission
      * @param Form $form The submitted edit user form
      * @param array $values User details submitted by the form
@@ -444,6 +458,7 @@ final class UsersPresenter extends BasePresenter
             $this->redirect('Users:dashboard');
         }
 
+        // Old user data
         $oldUserData = [ 
             'NAME'        => $oldUser->getName(),
             'SURNAME'     => $oldUser->getSurname(),
@@ -460,6 +475,7 @@ final class UsersPresenter extends BasePresenter
             'ROLE_ADMIN'  => $oldUser->isAdmin(),
         ];
 
+        // New user data from the form
         $newUserData = [ 
             'NAME'        => $values['name'],
             'SURNAME'     => $values['surname'],
@@ -476,9 +492,10 @@ final class UsersPresenter extends BasePresenter
             'ROLE_ADMIN'  => (bool)$values['isAdmin'],
         ];
 
-
+        // Get only the real changes made by the admin
         $realChanges = array_diff_assoc($newUserData, $oldUserData);
 
+        // If there are no changes
         if(empty($realChanges)) {
             $this->flashMessage('Nebyly provedeny žádné změny.', 'info');
             $this->redirect('Users:dashboard');
@@ -487,6 +504,7 @@ final class UsersPresenter extends BasePresenter
         /** @var string $editResult Result of the edit operation */
         $editResult = $this->userRepository->editUserByAdmin($id, $realChanges);
 
+        // Check the result of the edit operation
         if(!$editResult) {
             $this->flashMessage('Údaje uživatele byly úspěšně upraveny.', 'success');
             $this->redirect('Users:dashboard');
@@ -499,6 +517,7 @@ final class UsersPresenter extends BasePresenter
     }
 
     /**
+     * resetPassword
      * Handles password reset for a user
      * @return void
      */
@@ -510,6 +529,7 @@ final class UsersPresenter extends BasePresenter
         /** @var string $returnMsg Result message of the password reset.*/
         $returnMsg = $this->userRepository->resetPasswordByAdmin($id);
 
+        // Check the result of the password reset operation
         if(!$returnMsg) {
             $this->flashMessage('Heslo bylo úspěšně resetováno. Nové heslo bylo odesláno.', 'success');
         } else {
@@ -520,6 +540,7 @@ final class UsersPresenter extends BasePresenter
    }
 
     /**
+     * formError
      * Handles form errors by displaying them as flash messages
      * @param Form $form Form where the error was detected
      * @return void
