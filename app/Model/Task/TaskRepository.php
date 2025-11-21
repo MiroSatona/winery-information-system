@@ -741,10 +741,9 @@ class TaskRepository{
     {   
         /** @var string $error Error message */
         $error='';
-        $this->database->beginTransaction();
-
         try 
         {
+            $this->database->beginTransaction();
             $this->database->table('WORKER')->insert([
                 'ID_TASK' => $taskId,
                 'ID_USER' => $workerId,
@@ -776,10 +775,11 @@ class TaskRepository{
     {
          /** @var string $error Error message */
         $error='';
-        $this->database->beginTransaction();
 
         try 
-        {   $this->database->table('WORKER')->where('ID_TASK', $taskId)->where('ID_USER', $workerId)->delete();
+        {   
+            $this->database->beginTransaction();
+            $this->database->table('WORKER')->where('ID_TASK', $taskId)->where('ID_USER', $workerId)->delete();
             $this->database->commit();
             return $error;
         }
@@ -955,7 +955,6 @@ class TaskRepository{
     public function removeTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {
         $error = '';
-
         try
         {   
             $this->database->beginTransaction();
@@ -1210,7 +1209,9 @@ class TaskRepository{
             // always update last change timestamp when something changed
             if (!empty($update)) {
                 $update['LAST_CHANGE_TIMESTAMP'] = (new DateTime())->format('Y-m-d H:i:s');
+                $this->database->beginTransaction();
                 $this->database->table('TASK')->where('ID', $taskId)->update($update);
+                $this->database->commit();
             }
 
         } catch (\Exception $e) {

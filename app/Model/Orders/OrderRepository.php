@@ -157,8 +157,8 @@ final class OrderRepository
             "DELIVERY_TYPE" => "PICKUP",      
             "DELIVERY_DATA" => "",
         ];
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $newRow = $this->db->table("CUSTOMER_ORDER")->insert($insertData);
             $this->db->commit();
         } catch (\Exception $e) {
@@ -186,8 +186,8 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
             if ($result) {
                 $this->updateOrderPrice($order->id);
@@ -224,8 +224,8 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $result = $this->orderItemRepository->changeItemAmount($wineId, $order->id, $diff, $add);
             if ($result) {
                 $this->updateOrderPrice($order->id);
@@ -239,7 +239,6 @@ final class OrderRepository
             }
             $this->db->commit();
             return $result;
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             return false;
@@ -259,8 +258,8 @@ final class OrderRepository
         if ($order == null) {
             return false;
         }
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $result = $this->orderItemRepository->addItem($order->id, $wineId, $amount);
             if ($result) {
                 $this->updateOrderPrice($order->id);
@@ -291,8 +290,8 @@ final class OrderRepository
         }
         $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId);
         if ($doTransaction) {
-            $this->db->beginTransaction();
             try {
+                $this->db->beginTransaction();
                 $row->update([
                     "TOTAL_PRICE" => $totalPrice,
                 ]);
@@ -318,8 +317,8 @@ final class OrderRepository
      */
     public function updateDeliveryAddress(int $userId, string $type, ?string $address): bool 
     {
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $order = $this->fetchCustomerOrder($userId);
             if (!$order) {
                 $this->db->commit();
@@ -376,8 +375,8 @@ final class OrderRepository
         ->where("ID", $order->id)
         ->fetch(); 
         
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $row->update(
             [
                 "STATE" => "PAID"
@@ -402,8 +401,8 @@ final class OrderRepository
         if (!$row) {
             return false;
         }
-        $this->db->beginTransaction();
         try {
+            $this->db->beginTransaction();
             $row->update([
                 "STATE" => $newState
             ]);
