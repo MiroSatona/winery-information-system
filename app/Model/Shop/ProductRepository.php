@@ -13,13 +13,29 @@ use App\Model\Wine\Wine;
 use App\Model\Wine\WineRepository;
 use App\Model\Wine\WineState;
 
+/**
+ * Repository of products, allows for searching in products
+ */
 final class ProductRepository
 {
+    
+    /**
+     * Constructor for Product repository
+     *
+     * @param Explorer $database
+     * @param WineRepository $wineRep
+     */
     public function __construct(private Explorer $database, private WineRepository $wineRep)
     {
-    $this->database = $database; 
+        $this->database = $database; 
     }
-    
+   
+    /**
+     * Get all the available products with an option for a search query
+     * 
+     * @param string $searchTerm
+     * @return array
+     */
     public function getAllProducts(string $searchTerm = ''): array
     {
         // Start the query
@@ -46,6 +62,12 @@ final class ProductRepository
         return $wines;
     }
 
+    /**
+     * Find a product by product ID
+     * 
+     * @param integer $id
+     * @return Wine|null
+     */
     public function findById(int $id): ?Wine 
     {
         return $this->wineRep->fetchById($id);

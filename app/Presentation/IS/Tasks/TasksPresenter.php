@@ -204,7 +204,7 @@ final class TasksPresenter extends BasePresenter
     }
    
     /**
-     * Method for creating a form for assigning workers to the task.
+     * Method for creating a form for assigning workers to a task.
      * 
      * @return Form
      */
