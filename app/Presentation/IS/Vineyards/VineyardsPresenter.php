@@ -436,6 +436,7 @@ final class VineyardsPresenter extends BasePresenter
                 $form->addError('Obrázek se nepodařilo nahrát.');
                 return;
             }
+
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek vinohradu ' . $values->name);
         }
         // Handle description

@@ -629,47 +629,6 @@ final class WinePresenter extends BasePresenter
     }
 
     /**
-     * Handles removing the wine image
-     * @param Button $button The button clicked
-     * @param \stdClass $values Form values
-     * @return void
-     */
-    public function removeWineImage(Button $button, \stdClass $values): void
-    {
-        if (!$this->user->isInRole(Role::VINTNER->name)) {
-            $this->flashMessage("Jen Vinař může měnit obrázek vína!", FlashMsgType::ERROR->value);
-            $this->redirect(":IS:Wine:dashboard");
-            return;
-        }
-
-        $wineId = (int) $this->getParameter('wineId');
-        /** @var Wine $wine */
-        $wine = $this->wineRepository->fetchById($wineId);
-        if ($wine === null) {
-            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
-            $this->redirect('Wine:dashboard');
-            return;
-        }
-
-        if ($wine->getImage() === null) {
-            $this->flashMessage("Víno nemá přiřazený obrázek", FlashMsgType::ERROR->value);
-            $this->redirect('Wine:show', $wineId);
-            return;
-        }
-
-        $this->imageRepository->removeImage($wine->getImage()->id);
-
-        $result = $this->wineRepository->updateWineImage($wineId, null);
-        if ($result) {
-            $this->flashMessage("Obrázek vína byl úspěšně odstraněn", FlashMsgType::SUCCESS->value);
-            $this->redirect('Wine:show', $wineId);
-        } else {
-            $this->flashMessage("Obrázek vína se nepodařilo odstranit", FlashMsgType::ERROR->value);
-            $this->redirect('Wine:changeImage', $wineId);
-        }
-    }
-
-    /**
      * Handles removing the wine image by wine ID
      * @param int $wineId ID of the wine
      * @return void
@@ -695,10 +654,7 @@ final class WinePresenter extends BasePresenter
             $this->redirect('changeImage', $wineId);
             return;
         }
-
-        // Remove the physical file
-        $this->imageRepository->removeImage($wine->getImage()->id);
-
+        
         // Update the wine record to remove image reference
         $result = $this->wineRepository->updateWineImage($wineId, null);
         if ($result) {

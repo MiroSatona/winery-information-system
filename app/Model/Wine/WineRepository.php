@@ -335,23 +335,21 @@ final class WineRepository
     public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
         
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
-        
-        if (!$this->fetchById($idWine)) {
+
+        try { // run within transaction
+            return $this->db->transaction(function () use ($idWine, $newValue, $param) {
+                $this->db->table("WINE")
+                ->where("ID", $idWine)
+                ->update([
+                    $param => $newValue
+                ]);
+                return true;
+                
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to update wine price: ' . $e->getMessage() . ' | Wine ID: ' . $idWine, ILogger::ERROR);
             return false;
         }
-        $this->db->beginTransaction();
-        try {
-            $this->db->table("WINE")
-            ->where("ID", $idWine)
-            ->update([
-                $param => $newValue
-            ]);
-            $this->db->commit();
-        } catch(\Exception $e) {
-            $this->db->rollBack();
-            throw $e;
-        }
-        return true;
     }
     
     /**
@@ -363,23 +361,18 @@ final class WineRepository
      */
     public function setWineState(int $idWine, string $newState): bool {
 
-        $wine = $this->fetchById($idWine);
-        if (!$wine) {
-            return false;
-        }
-        
-        $this->db->beginTransaction();
-        try {
-            $this->db->table("WINE")
-            ->where("ID", $idWine)
-            ->update([
-                "STATE" => $newState
-            ]);
-            $this->db->commit();
-            return true;
+        try { // run within transaction
+            return $this->db->transaction(function () use ($idWine, $newState) {
+                $this->db->table("WINE")
+                ->where("ID", $idWine)
+                ->update([
+                    "STATE" => $newState
+                ]);
+                return true;
+            });
         } catch (\Exception $e) {
-            $this->db->rollBack();
-            throw $e;
+            Debugger::log('Failed to update wine state: ' . $e->getMessage() . ' | Wine ID: ' . $idWine, ILogger::ERROR);
+            return false;
         }
     }
     
@@ -392,23 +385,18 @@ final class WineRepository
      */
     public function setWineDescription(int $idWine, ?string $newDescription): bool {
 
-        $wine = $this->fetchById($idWine);
-        if (!$wine) {
+        try { // run within transaction
+            return $this->db->transaction(function () use ($idWine, $newDescription) {
+                $this->db->table("WINE")
+                ->where("ID", $idWine)
+                ->update([
+                    "SALES_DESCRIPTION" => $newDescription
+                ]);
+                return true;
+            });
+        } catch (\Exception $e) {
+            Debugger::log('Failed to update wine description: ' . $e->getMessage() . ' | Wine ID: ' . $idWine, ILogger::ERROR);
             return false;
-        }
-        
-        $this->db->beginTransaction();
-        try {
-            $this->db->table("WINE")
-            ->where("ID", $idWine)
-            ->update([
-               "SALES_DESCRIPTION" => $newDescription
-            ]);
-            $this->db->commit();
-            return true; 
-        } catch(\Exception $e) {
-            $this->db->rollBack();
-            throw $e;
         }
     }
 
@@ -422,7 +410,7 @@ final class WineRepository
     public function produceWine(Wine $wine, array $harvests): bool
     {
         try { // run within transaction
-            $this->db->transaction(function () use ($wine, $harvests) {
+            return $this->db->transaction(function () use ($wine, $harvests) {
                 // check that all harvests are correct and ready for PRODUCTION
                 foreach ($harvests as $harvest) {
                     $harvestNew = $this->db->table('HARVEST')
@@ -467,8 +455,6 @@ final class WineRepository
             Debugger::log('Failed to produce wine: ' . $e->getMessage() . ' | Wine: ' . $wine->getName(), ILogger::ERROR);
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -480,8 +466,8 @@ final class WineRepository
      */
     public function liquidateWine(int $wineId, int $userId): bool
     {
-        try {
-            $this->db->transaction(function () use ($wineId, $userId) {
+        try { // run within transaction
+            return $this->db->transaction(function () use ($wineId, $userId) {
                 // check wine exists and is in production state
                 $wine = $this->db->table('WINE')
                     ->where('ID', $wineId)
@@ -508,8 +494,6 @@ final class WineRepository
             Debugger::log('Failed to liquidate wine ID ' . $wineId . ': ' . $e->getMessage(), ILogger::ERROR);
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -531,6 +515,8 @@ final class WineRepository
                 $pictureId = $row->ID_PICTURE;
                 if ($image !== null) {
                     if ($pictureId !== null) {
+                        // delete old image data
+                        $this->imageRepository->deleteImageFromUploads($row->ref('PICTURE')->LINK);
                         // update existing picture
                         $this->db->table('PICTURE')->where('ID', $pictureId)->update([
                             'LINK' => $image->src,
@@ -550,9 +536,9 @@ final class WineRepository
                 } else {
                     // if no image was provided, remove existing picture reference
                     if ($pictureId !== null) {
-                        $this->db->table('PICTURE')->where('ID', $pictureId)->delete();
-                        $pictureId = null;
+                        $this->imageRepository->removeImage($pictureId);
                     }
+                    $pictureId = null;
                 }
                 // update wine record
                 $row->update([

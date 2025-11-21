@@ -12,6 +12,8 @@ namespace App\Model\Security;
 
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
+use Tracy\Debugger;
+use Tracy\ILogger;
 
 /**
  * Handles sign up process for new users
@@ -38,40 +40,47 @@ class SignUpWorker
      */
     public function signUp(SignUpData $data): bool
     {
-        // check if username or email already exists
-        $existingUser = $this->database->table('USER')
-            ->where('username', $data->getUsername())
-            ->where('email', $data->getEmail())
-            ->fetch();
+        try { // run within transaction
+            return $this->database->transaction(function () use ($data) {
+                // check if username or email already exists
+                $existingUser = $this->database->table('USER')
+                    ->where('username', $data->getUsername())
+                    ->where('email', $data->getEmail())
+                    ->fetch();
 
-        if ($existingUser) {
-            return false; // username or email already taken
+                if ($existingUser) { // username or email already taken
+                    throw new \Exception('Username or email already taken');
+                }
+
+                // generate salt and hash the password
+                $salt = bin2hex(random_bytes(16));
+                $saltedPassword = $data->getPassword() . $salt;
+                $hashedPassword = $this->passwords->hash($saltedPassword);
+
+                // insert new user into the database
+                $this->database->table('USER')->insert([
+                    'name' => $data->getName(),
+                    'surname' => $data->getSurname(),
+                    'email' => $data->getEmail(),
+                    'phone_number' => $data->getPhone(),
+                    'username' => $data->getUsername(),
+                    'city' => $data->getCity(),
+                    'post_code' => $data->getPostalCode(),
+                    'street' => $data->getStreet(),
+                    'house_number' => $data->getHouseNumber(),
+                    'pswd_salt' => $salt,
+                    'pswd_hash' => $hashedPassword,
+                    'role_user' => true, // default role
+                    'role_admin' => false,
+                    'role_worker' => false,
+                    'role_vintner' => false,
+                ]);
+
+                return true; // registration successful
+            });
+        } catch (\Exception $e) {
+            Debugger::log($e, ILogger::ERROR);
+            return false; // transaction failed
         }
-
-        // generate salt and hash the password
-        $salt = bin2hex(random_bytes(16));
-        $saltedPassword = $data->getPassword() . $salt;
-        $hashedPassword = $this->passwords->hash($saltedPassword);
-
-        // insert new user into the database
-        $this->database->table('USER')->insert([
-            'name' => $data->getName(),
-            'surname' => $data->getSurname(),
-            'email' => $data->getEmail(),
-            'phone_number' => $data->getPhone(),
-            'username' => $data->getUsername(),
-            'city' => $data->getCity(),
-            'post_code' => $data->getPostalCode(),
-            'street' => $data->getStreet(),
-            'house_number' => $data->getHouseNumber(),
-            'pswd_salt' => $salt,
-            'pswd_hash' => $hashedPassword,
-            'role_user' => true, // default role
-            'role_admin' => false,
-            'role_worker' => false,
-            'role_vintner' => false,
-        ]);
-
-        return true; // registration successful
     }
 }

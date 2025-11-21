@@ -190,6 +190,8 @@ final class WineVarietyRepository
                 
                 if ($image !== null) {
                     if ($pictureId !== null) {
+                        // delete old image data
+                        $this->imageRepository->deleteImageFromUploads($row->ref('PICTURE')->LINK);
                         // update existing picture
                         $this->database->table('PICTURE')->get($pictureId)->update([
                             'LINK' => $image->src,

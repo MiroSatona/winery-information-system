@@ -47,21 +47,6 @@ final class ImageRepository
         $imgRow = $this->db->table("PICTURE")->where("ID", $imgId)->fetch();
         return $this->createImageFromRow($imgRow);
     }
-    
-    /**
-     * Fetch all images from the database
-     *
-     * @return Image[]
-     */
-    public function fetchAllImages(): array
-    {
-        $rows = $this->db->table("PICTURE");
-        $return = [];
-        foreach ($rows as $row) {
-           $return[] = $this->createImageFromRow($row);
-        }
-        return $return;
-    }
 
     /**
      * Create Image object from DB row

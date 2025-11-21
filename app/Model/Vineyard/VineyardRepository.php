@@ -11,6 +11,7 @@ declare(strict_types=1);
 namespace App\Model\Vineyard;
 
 use App\Model\Image\Image;
+use App\Model\Image\ImageRepository;
 use App\Model\WineRow\WineRow;
 use App\Model\WineVariety\WineVariety;
 use App\Model\WineVariety\WineVarietyRepository;
@@ -28,10 +29,12 @@ final class VineyardRepository
      *
      * @param Explorer $database
      * @param WineVarietyRepository $wineVarietyRepository
+     * @param ImageRepository $imageRepository
      */
     public function __construct(
         private Explorer $database,
-        private WineVarietyRepository $wineVarietyRepository
+        private WineVarietyRepository $wineVarietyRepository,
+        private ImageRepository $imageRepository
     ) {
     }
 
@@ -218,6 +221,8 @@ final class VineyardRepository
                 $image = $vineyard->getImage();
                 if ($image !== null) {
                     if ($pictureId !== null) {
+                        // delete previous image data
+                        $this->imageRepository->deleteImageFromUploads($row->ref('PICTURE')->LINK);
                         // update existing picture
                         $this->database->table('PICTURE')->where('ID', $pictureId)->update([
                             'LINK' => $image->src,
@@ -237,9 +242,9 @@ final class VineyardRepository
                 } else {
                     // if no image provided, remove existing picture reference
                     if ($pictureId !== null) {
-                        $this->database->table('PICTURE')->where('ID', $pictureId)->delete();
-                        $pictureId = null;
+                        $this->imageRepository->removeImage($pictureId);
                     }
+                    $pictureId = null;
                 }
                 // update vineyard record
                 $row->update([
