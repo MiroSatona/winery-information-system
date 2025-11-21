@@ -260,10 +260,12 @@ class UserRepository
     $hashedPassword = $generatePasswordData['hashedPassword'];
 
 
-    // Begin transaction for inserting new user to the database
-    $this->database->beginTransaction();
+    
     try 
-    {
+    {   
+        // Begin transaction for inserting new user to the database
+        $this->database->beginTransaction();
+
         // Insert new user to the database
         $this->database->table('USER')->insert([
             'NAME' => $name,
@@ -311,10 +313,10 @@ class UserRepository
         /** @var string $error Error message */
         $error='';
 
-        // Begin transaction for deactivating user
-        $this->database->beginTransaction();
         try 
-        {
+        {   
+            // Begin transaction for deactivating user
+            $this->database->beginTransaction();
             
             /** @var T[] $adminUsers Array of all admins in the sytem. */
             $adminUsers = $this->database->table('USER')->where('ROLE_ADMIN', true)->fetchAll();
@@ -351,11 +353,12 @@ class UserRepository
     {   
         /** @var string $error Error message */
         $error='';
-        // Begin transaction for activate user
-        $this->database->beginTransaction();
-
+        
         try 
         {
+            // Begin transaction for activate user
+            $this->database->beginTransaction();
+
             // Activate user 
             $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
             $this->database->commit();
@@ -436,10 +439,12 @@ class UserRepository
     public function editUserByAdmin(int $userId, array $data): string{
         /** @var string $error Error message */
         $error = '';
-
-        // Begin transaction for update user
-        $this->database->beginTransaction();
+        
         try{
+
+            // Begin transaction for update user
+            $this->database->beginTransaction();
+
             // Update user
             $this->database->table('USER')->where('ID', $userId)->update($data);
             $this->database->commit();
@@ -468,11 +473,12 @@ class UserRepository
             return 'Chyba při načítání uživatele, heslo nebylo resetováno.';
         }
 
-        // Begin transaction for password reset
-        $this->database->beginTransaction();
         try{
             /** @var string[] $newLoginData New password, salt and hashed password.*/
             $newLoginData = $this->createNewPassword();
+
+            // Begin transaction for password reset
+            $this->database->beginTransaction();
 
             // Update user hashed password and salt in the database
             $this->database->table('USER')->where('ID', $userId)->update([

@@ -46,11 +46,12 @@ class ProfileModel
     public function editUserBySelf(array $newData, int $id): string{
         /** @var string $resultMessage Message with error message, or empty if everything will be right during the run method. */
         $resultMessage = '';
-
-        // Begin transaction for updating user profile
-        $this->database->beginTransaction();
+        
         try 
         {   
+            // Begin transaction for updating user profile
+            $this->database->beginTransaction();
+
             // Update user by provided data
             $this->database->table('USER')->where('ID', $id)->update($newData);
             $this->database->commit();
@@ -88,8 +89,7 @@ class ProfileModel
             return $resultMessage;
         }
 
-        // Begin transaction for 
-        $this->database->beginTransaction();
+        
         try
         {
             /** @var string $newSalt New salt for the new password. */
@@ -98,6 +98,9 @@ class ProfileModel
             $saltedNewPassword = $newPassword . $newSalt;
             /** @var string $hashedNewPassword Hashed new password with salt. */
             $hashedNewPassword = $this->password->hash($saltedNewPassword);
+            
+            // Begin transaction for password reset
+            $this->database->beginTransaction();
 
             // Update the users password in the database
             $this->database->table('USER')->where('ID', $id)->update([
