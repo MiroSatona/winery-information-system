@@ -283,6 +283,15 @@ html {
     z-index: 3;
 }
 
+/* Wine card hover effect */ 
+.card {
+    transition: all 0.2s ease-in-out;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.08);
+}
+
 /* Footer styling */
 .site-footer {
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);

@@ -39,7 +39,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Name input -->
                                     <div class="col-md-6 mb-3">
-                                        {label name /} *
+                                        {label name /} <span class="text-danger">*</span>
                                         {input name}
                                         <span class="invalid-feedback">
                                             {inputError name}
@@ -47,7 +47,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Surname input -->
                                     <div class="col-md-6 mb-3">
-                                        {label surname /} *
+                                        {label surname /} <span class="text-danger">*</span>
                                         {input surname}
                                         <span class="invalid-feedback">
                                             {inputError surname}
@@ -55,7 +55,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Email input -->
                                     <div class="col-md-6 mb-3">
-                                        {label email /} *
+                                        {label email /} <span class="text-danger">*</span>
                                         {input email}
                                         <span class="invalid-feedback">
                                             {inputError email}
@@ -121,7 +121,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Username input -->
                                     <div class="col-12 mb-3">
-                                        {label username /} *
+                                        {label username /} <span class="text-danger">*</span>
                                         {input username}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError username}
@@ -129,7 +129,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Password input -->
                                     <div class="col-md-6 mb-3">
-                                        {label password /} *
+                                        {label password /} <span class="text-danger">*</span>
                                         {input password}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError password}
@@ -137,7 +137,7 @@ DESC:     Latte template for user registration page
                                     </div>
                                     <!-- Password confirmation input -->
                                     <div class="col-md-6 mb-3">
-                                        {label passwordConfirm /} *
+                                        {label passwordConfirm /} <span class="text-danger">*</span>
                                         {input passwordConfirm}
                                         <span class="invalid-feedback fw-bold">
                                             {inputError passwordConfirm}
@@ -150,12 +150,12 @@ DESC:     Latte template for user registration page
                                     <h6 class="fw-bold mb-2">
                                         <i class="fas fa-info-circle me-2"></i>Informace k registraci
                                     </h6>
-                                    <small class="mb-0">
-                                        • Heslo musí mít minimálně 8 znaků<br>
-                                        • Uživatelské jméno musí být dlouhé 4 - 30 znaků<br>
-                                        • Uživatelské jméno může obsahovat pouze písmena, číslice a podtržítka<br>
-                                        • Adresní údaje lze vynechat a doplnit později v profilu
-                                    </small>
+                                    <ul class="mb-0">
+                                        <li>Heslo musí mít minimálně 8 znaků.</li>
+                                        <li>Uživatelské jméno musí být dlouhé 4 - 30 znaků.</li>
+                                        <li>Uživatelské jméno může obsahovat pouze písmena, číslice a podtržítka.</li>
+                                        <li>Adresní údaje lze vynechat a doplnit později v profilu</li>
+                                    </ul>
                                 </div>
 
                                 <!-- Submit button -->

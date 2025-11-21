@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Presentation\Sign;
 
-use Nette;
 use App\Model\FlashMsgType;
 use App\Presentation\BasePresenter;
 use App\Model\Security\SignUpData;
@@ -46,33 +45,6 @@ final class SignPresenter extends BasePresenter
     }
 
     /**
-     * Renders the default sign page
-     * @return void
-     */
-    public function renderDefault(): void
-    {
-
-    }
-
-    /**
-     * Renders the sign in page
-     * @return void
-     */
-    public function renderIn(): void
-    {
-
-    }
-
-    /**
-     * Renders the sign up page
-     * @return void
-     */
-    public function renderUp(): void
-    {
-        
-    }
-
-    /**
      * Creates the sign in form component
      * @return Form Form for user authentication
      */
@@ -80,13 +52,13 @@ final class SignPresenter extends BasePresenter
     {
         $form = new Form;
 
-        $form->addText('username', 'Uživatelské jméno:')
+        $form->addText('username', 'Uživatelské jméno')
             ->addRule($form::Pattern, 'Zadejte prosím platné uživatelské jméno.', $this->validationDefinitions::USERNAME_PATTERN)
             ->setRequired('Zadejte prosím své uživatelské jméno.')
             ->setHtmlAttribute('class', 'form-control form-control-lg')
             ->setHtmlAttribute('placeholder', 'Zadejte uživatelské jméno');
 
-        $form->addPassword('password', 'Heslo:')
+        $form->addPassword('password', 'Heslo')
             ->addRule($form::MinLength, 'Heslo musí mít alespoň %d znaků.', $this->validationDefinitions::PASSWORD_LENGTH_MIN)
             ->setRequired('Zadejte prosím své heslo.')
             ->setHtmlAttribute('class', 'form-control form-control-lg')

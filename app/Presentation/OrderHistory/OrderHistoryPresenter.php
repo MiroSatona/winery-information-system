@@ -10,11 +10,9 @@ declare(strict_types=1);
 
 namespace App\Presentation\OrderHistory;
 
-use Nette;
 use App\Model\Orders\OrderRepository;
 use App\Model\Orders\OrderState;
 use App\Presentation\BasePresenter;
-use App\Model\Image\ImageRepository;
 
 /**
  * Presenter for order history management
@@ -25,11 +23,9 @@ final class OrderHistoryPresenter extends BasePresenter
     /**
      * Constructor for OrderHistoryPresenter
      * @param OrderRepository $orderRepository Repository for accessing order data
-     * @param ImageRepository $imgRepository Repository for accessing product images
      */
     public function __construct(
-        private OrderRepository $orderRepository,
-        private ImageRepository $imgRepository
+        private OrderRepository $orderRepository
     ) {}
 
     /**

@@ -4,14 +4,11 @@ AUTHORS:  Martin Zůbek [C]
           Otakar Kočí
           Martin Mendl
 YEAR:     2025
-DESC:     Layout template for the IS (Information System) section. Defines the structure, navigation, and content blocks for IS-related pages.
+DESC:     Layout template for the IS section. Defines the structure, navigation, and content blocks for IS-related pages.
 *}
 
-{* Use the main layout as a base *}
 {layout '../@layout.latte'}
 
-
-{* Page title block *}
 {block title}
 	IS
 {/block}
@@ -31,7 +28,7 @@ DESC:     Layout template for the IS (Information System) section. Defines the s
 			<i class="fas fa-cogs me-2"></i>Informační systém
 		</a>
 		{block topMenuISAdditional}
-
+			{* Place for additional content in subcomponents *}
 		{/block topMenuISAdditional}
 {/block topMenuCenter}
 

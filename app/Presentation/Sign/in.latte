@@ -35,7 +35,7 @@ DESC:     Latte template for user sign-in page
                         {form signInForm}
                             <!-- Username input field -->
                             <div class="mb-3">
-                                {label username /}
+                                {label username /} <span class="text-danger">*</span>
                                 {input username}
                                 <span class="invalid-feedback">
                                     {inputError username}
@@ -43,7 +43,7 @@ DESC:     Latte template for user sign-in page
                             </div>
                             <!-- Password input field -->
                             <div class="mb-4">
-                                {label password /}
+                                {label password /} <span class="text-danger">*</span>
                                 {input password}
                                 <span class="invalid-feedback">
                                     {inputError password}

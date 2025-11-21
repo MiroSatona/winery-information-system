@@ -9,8 +9,6 @@ declare(strict_types=1);
 
 namespace App\Presentation\Home;
 
-
-use Nette;
 use App\Model\Vineyard\VineyardRepository;
 use App\Model\WineVariety\WineVarietyRepository;
 use App\Presentation\BasePresenter;

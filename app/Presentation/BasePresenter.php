@@ -4,7 +4,8 @@
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	A base presenter class 
+//DESC:    	A base presenter class
+
 declare(strict_types=1);
 
 namespace App\Presentation;
@@ -12,13 +13,26 @@ namespace App\Presentation;
 use Nette\Application\UI\Presenter;
 use App\Model\Security\Role;
 
+/**
+ * Base Presenter class that setups user roles for templates
+ */
 class BasePresenter extends Presenter
 {
+    /**
+     * Base Presenter constructor
+     */
     public function __construct()
     {
         parent::__construct();
     }
 
+    /**
+     * Base Presenter startup method
+     * 
+     * Configures user roles for template usage
+     *
+     * @return void
+     */
     public function startup(): void
     {
         parent::startup();

@@ -11,8 +11,6 @@ namespace App\Presentation\Payment;
 use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
 
-use Nette;
-
 /**
  * Presenter for payment processing
  * Handles payment display and order confirmation
@@ -72,4 +70,3 @@ final class PaymentPresenter extends BasePresenter
         $this->redirect("Shop:default");
     }
 }
-

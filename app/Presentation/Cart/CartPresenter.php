@@ -14,9 +14,9 @@ use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
 use App\Model\FlashMsgType;
 use App\Model\Image\ImageRepository;
-use App\Model\User\User;
 use App\Model\Orders\Order;
 use Nette\Application\UI\Form;
+use Nette\Security\User;
 
 /**
  * Presenter for shopping cart management.

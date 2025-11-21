@@ -9,7 +9,6 @@ declare(strict_types=1);
 
 namespace App\Presentation\IS\Orders;
 
-use Nette;
 use App\Presentation\BasePresenter;
 use App\Model\Security\Role;
 use App\Model\Orders\OrderRepository;
@@ -25,8 +24,8 @@ final class OrdersPresenter extends BasePresenter
 
     /**
      * Constructor for OrdersPresenter
-     * @param OrderRepository $ordRepository Repository for managing orders
-     * @param ImageRepository $imgRep Repository for accessing product images
+     * @param OrderRepository $ordRepository
+     * @param ImageRepository $imgRep
      */
     public function __construct(private OrderRepository $ordRepository, private ImageRepository $imgRep)
     {

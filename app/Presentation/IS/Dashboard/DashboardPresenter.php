@@ -1,5 +1,5 @@
 <?php
-//FILE:     DashBoardPresenter.php
+//FILE:     DashboardPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
@@ -29,8 +29,8 @@ final class DashboardPresenter extends BasePresenter
 
     /**
      * Constructor for DashboardPresenter
-     * @param TaskRepository $taskRepository Repository for accessing task data
-     * @param OrderRepository $orderRepository Repository for accessing order data
+     * @param TaskRepository $taskRepository
+     * @param OrderRepository $orderRepository
      */
     public function __construct(
         private TaskRepository $taskRepository,
@@ -78,7 +78,7 @@ final class DashboardPresenter extends BasePresenter
     }
 
     /**
-     * Gets the next 10 upcoming planned tasks with a planned timestamp
+     * Gets first 10 upcoming planned tasks with a planned timestamp
      * @return array List of upcoming tasks
      */
     private function getUpcomingTasks(): array
@@ -107,7 +107,7 @@ final class DashboardPresenter extends BasePresenter
     }
 
     /**
-     * Gets the next 10 ready orders (paid state) sorted by timestamp
+     * Gets first 10 ready orders (paid state) sorted by timestamp
      * @return array List of ready orders
      */
     private function getReadyOrders(): array

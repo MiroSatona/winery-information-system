@@ -33,14 +33,14 @@ final class ShopPresenter extends  BasePresenter
         parent::startup();
     }
    
-   /**
-    * method to render the shop 
-    *
+    /**
+     * method to render the shop 
+     *
     * @return void
     */ 
     public function renderDefault(): void
     {
-            // Get filter params from GET query
+        // Get filter params from GET query
         $search = $this->getParameter('search');
         $type = $this->getParameter('type');
         $sort = $this->getParameter('sort');
@@ -112,7 +112,7 @@ final class ShopPresenter extends  BasePresenter
     }
 
     /**
-     * method for handling add to card functino 
+     * method for handling add to card function
      *
      * @param \Nette\Application\UI\Form $form
      * @param \stdClass $values
@@ -122,6 +122,4 @@ final class ShopPresenter extends  BasePresenter
     {
         $this->handleAddToCart((int)$values->wineId, (int)$values->count);
     }
-
-
-} 
+}

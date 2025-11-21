@@ -294,7 +294,6 @@ class ProfilePresenter extends BasePresenter
      */
     public function resetPassword(Form $form, \stdClass $values): void
     {   
-
         if ($this->userId === null) {
             $this->flashMessage('Uživatel není přihlášen.', 'danger');
             $this->redirect('Sign:in');

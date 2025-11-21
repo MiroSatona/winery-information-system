@@ -1,4 +1,7 @@
 <?php
+//FILE:     Error4xxPresenter.php
+//This file is part of the Nette Framework (https://nette.org)
+
 
 declare(strict_types=1);
 
