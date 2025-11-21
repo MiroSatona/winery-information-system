@@ -375,5 +375,4 @@ final class WineVarietiesPresenter extends BasePresenter
         
         $this->redirect('WineVarieties:edit', ['id' => $id]);
     }
-
 }

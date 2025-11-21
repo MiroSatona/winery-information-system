@@ -134,7 +134,7 @@ final class VineyardsPresenter extends BasePresenter
             $wineVarietiesCount = count($this->vineyardRepository->getUniqueWineVarietiesOnVineyard($vineyardId));
             $vineyard->setWineVarietiesCount($wineVarietiesCount);
         }
-        // Give all vineyard and images to the tamplate
+        // Give all vineyard and images to the template
         $this->template->vineyards = $vineyards;
         $this->template->imageRepository = $this->imageRepository;
     }
@@ -158,7 +158,6 @@ final class VineyardsPresenter extends BasePresenter
         } else {
             $this->flashMessage('Vinohrad se nepodařilo smazat.', FlashMsgType::ERROR->value);
         }
-        
     }
 
     /**
@@ -180,7 +179,6 @@ final class VineyardsPresenter extends BasePresenter
         } else {
             $this->flashMessage('Vinohrad se nepodařilo obnovit.', FlashMsgType::ERROR->value);
         }
-        
     }
 
     /**
@@ -273,7 +271,7 @@ final class VineyardsPresenter extends BasePresenter
             $imageEntity = new Image(null, $imagePath, $values->name, 'Obrázek vinohradu ' . $values->name);
         }
 
-        // Handle unputed description
+        // Handle description
         $description = null;
         if ($values->description !== null && strlen($values->description) > 0) {
             $description = $values->description;
@@ -302,8 +300,6 @@ final class VineyardsPresenter extends BasePresenter
             $this->flashMessage('Vinohrad se nepodařilo přidat.', FlashMsgType::ERROR->value);
         }
     }
-
-    
 
     /**
      * Renders the edit vineyard form

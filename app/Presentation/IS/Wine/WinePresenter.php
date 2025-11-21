@@ -235,7 +235,7 @@ final class WinePresenter extends BasePresenter
 
         $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
-           $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+           $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
            $this->redirect(":IS:Wine:dashboard");
            return;
         }
@@ -266,7 +266,7 @@ final class WinePresenter extends BasePresenter
         
         $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
-           $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+           $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
            $this->redirect(":IS:Wine:dashboard");
            return;
         }
@@ -334,7 +334,7 @@ final class WinePresenter extends BasePresenter
         $wine = $this->wineRepository->fetchById($wineId);
         
         if (!$wine) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);            
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);            
             $this->redirect('Wine:dashboard');
             return; 
         }
@@ -348,7 +348,7 @@ final class WinePresenter extends BasePresenter
         $result3 = $this->wineRepository->setWineDescription($wineId, $description);
         
         if (!$result || !$result2 || !$result3) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepodařilo se uložit cenu nebo popis vína.", FlashMsgType::ERROR->value);
         } else {
             $this->flashMessage("Cena uložena", FlashMsgType::SUCCESS->value);
         }
@@ -471,7 +471,7 @@ final class WinePresenter extends BasePresenter
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
             return;
         }
@@ -591,7 +591,7 @@ final class WinePresenter extends BasePresenter
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
             return;
         }
@@ -639,7 +639,7 @@ final class WinePresenter extends BasePresenter
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
             return;
         }
@@ -678,7 +678,7 @@ final class WinePresenter extends BasePresenter
         /** @var Wine $wine */
         $wine = $this->wineRepository->fetchById($wineId);
         if ($wine === null) {
-            $this->flashMessage("Něco se pokazilo", FlashMsgType::ERROR->value);
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
             return;
         }

@@ -4,7 +4,7 @@
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	A presenter for the IS, designed to present information about tasks int the IS as well as allow for edit, creation and deletion of tasks.
+//DESC:    	Task Presenter handling everything related to task presentation, creation and editing in the IS module.
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Tasks;
@@ -63,7 +63,6 @@ final class TasksPresenter extends BasePresenter
         private ImageRepository $imgRep,
         private VineyardRepository $vineyardRep
     ) {
-        // Call parent constructor
         parent::__construct();
     }
 
@@ -86,7 +85,7 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
-     * Method for rendering the DashBoard
+     * Method for rendering the Dashboard
      * @return void
      */
     public function renderDashboard(): void
@@ -121,7 +120,7 @@ final class TasksPresenter extends BasePresenter
     }
    
     /**
-     * Method to create part 1 of an N part formular for creating tasks.
+     * Method to create part 1 of an N part form for creating tasks.
      * 
      * @return void
      */
@@ -531,7 +530,6 @@ final class TasksPresenter extends BasePresenter
         $form->onError[] = [$this, 'formError'];
 
         return $form;
-        
     }
 
     /**
@@ -553,7 +551,6 @@ final class TasksPresenter extends BasePresenter
 
         // Set filtered tasks to template
         $this->template->tasks = $tasks;
-
     }
 
     /**
@@ -686,7 +683,6 @@ final class TasksPresenter extends BasePresenter
             : null;
 
         $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($bottling->getId());
-
     }
 
 
@@ -736,11 +732,11 @@ final class TasksPresenter extends BasePresenter
     {
         $errors = $form->getErrors();
  
-            if (!empty($errors)) {
-                $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
-            } else {
-                $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
-            }
+        if (!empty($errors)) {
+            $this->flashMessage($errors[0], FlashMsgType::ERROR->value);
+        } else {
+            $this->flashMessage('Došlo k neznámé chybě při odesílání formuláře.', FlashMsgType::ERROR->value);
+        }
     }
 
     
@@ -980,7 +976,6 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-secondary w-100 fw-bold')
             ->onClick[] = [$this, "treatmentGoBackToRowsSelection"];
 
-        
         return $form;
     }
 
@@ -1113,7 +1108,6 @@ final class TasksPresenter extends BasePresenter
             }
         }
         $this->template->selectedRows = $selectedRows;
-       
     }
     
     /**
@@ -1143,7 +1137,6 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'btn btn-primary');
 
         $form->onSuccess[] = [$this, "selectVineyard"];
-
         
         return $form;
     }
@@ -1576,7 +1569,7 @@ final class TasksPresenter extends BasePresenter
     public function renderMarkTaskDone(int $id): void
     {
         // all vintners can mark tasks as done
-        // only workers assigned to the task can mark it as done
+        // also workers assigned to the task can mark it as done
         if (!$this->user->isInRole(Role::VINTNER->name) &&
             !($this->user->isInRole(Role::WORKER->name) &&
             $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id))) {
@@ -1910,39 +1903,39 @@ final class TasksPresenter extends BasePresenter
     public function createComponentEditTreatment() {
         $form = new Form();
         $form->addSelect("type", "Typ ošetření", [
-                TreatmentType::SPRAYING->value => "Postřik",
-                TreatmentType::FERTILIZING->value => "Hnojení",
-                TreatmentType::CUTTING->value => "Řez",
-                TreatmentType::WEEDING->value => "Odplevelení",
-                TreatmentType::OTHER->value => "Ostatní",
-            ])
-                ->setHtmlAttribute('class', 'form-select')
-                ->setDefaultValue(TreatmentType::SPRAYING->value)
-                ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
-            
-            $form->addText('name', 'Název ošetření')
-                ->addRule(Form::MinLength, 'Název ošetření musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MIN)
-                ->addRule(Form::MaxLength, 'Název ošetření může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MAX)
-                ->setHtmlAttribute("class", "form-control")
-                ->setHtmlAttribute("placeholder", "Zadejte název ošetření ...");
-            
-            $form->addFloat('amount', 'Množství')
-                ->addRule(Form::Min, 'Množství použitých prostředků musí být alespoň %d.', ValidationDefinitions::TREATMENT_QUANTITY_MIN)
-                ->addRule(Form::Max, 'Množství použitých prostředků může být maximálně %d.', ValidationDefinitions::TREATMENT_QUANTITY_MAX)
-                ->setHtmlAttribute('class', 'form-control')
-                ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
+            TreatmentType::SPRAYING->value => "Postřik",
+            TreatmentType::FERTILIZING->value => "Hnojení",
+            TreatmentType::CUTTING->value => "Řez",
+            TreatmentType::WEEDING->value => "Odplevelení",
+            TreatmentType::OTHER->value => "Ostatní",
+        ])
+            ->setHtmlAttribute('class', 'form-select')
+            ->setDefaultValue(TreatmentType::SPRAYING->value)
+            ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
+        
+        $form->addText('name', 'Název ošetření')
+            ->addRule(Form::MinLength, 'Název ošetření musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Název ošetření může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MAX)
+            ->setHtmlAttribute("class", "form-control")
+            ->setHtmlAttribute("placeholder", "Zadejte název ošetření ...");
+        
+        $form->addFloat('amount', 'Množství')
+            ->addRule(Form::Min, 'Množství použitých prostředků musí být alespoň %d.', ValidationDefinitions::TREATMENT_QUANTITY_MIN)
+            ->addRule(Form::Max, 'Množství použitých prostředků může být maximálně %d.', ValidationDefinitions::TREATMENT_QUANTITY_MAX)
+            ->setHtmlAttribute('class', 'form-control')
+            ->setHtmlAttribute('placeholder', 'Zadejte množství použitých prostředků ...');
 
-            $form->addText("unit", "Jednotka množství")
-                ->addRule(Form::MinLength, 'Jednotka množství musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MIN)
-                ->addRule(Form::MaxLength, 'Jednotka množství může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX)
-                ->setHtmlAttribute("class", "form-control")
-                ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
+        $form->addText("unit", "Jednotka množství")
+            ->addRule(Form::MinLength, 'Jednotka množství musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MIN)
+            ->addRule(Form::MaxLength, 'Jednotka množství může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_UNIT_LENGTH_MAX)
+            ->setHtmlAttribute("class", "form-control")
+            ->setHtmlAttribute("placeholder", "Zadejte jednotku množství ...");
 
-            $form->addSubmit("send", "Uložit")
-                ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-                ->onClick[] = [$this, "submitTreatmentTaskEdit"];
-            
-            return $form;
+        $form->addSubmit("send", "Uložit")
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, "submitTreatmentTaskEdit"];
+        
+        return $form;
     }
     
     /**
@@ -2008,8 +2001,6 @@ final class TasksPresenter extends BasePresenter
             );
         }
 
-        
-        
         $rowOptions = [];
         foreach ($availableRows as $row) {
             $rowOptions[$row->getId()] = "Řádek {$row->getId()}";
@@ -2109,9 +2100,5 @@ final class TasksPresenter extends BasePresenter
         }
 
         $this->redirect('this');
-
     }
-
 }
-
-   
