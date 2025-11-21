@@ -4,10 +4,9 @@ AUTHORS:  Martin Zůbek [C]
           Otakar Kočí
           Martin Mendl
 YEAR:     2025
-DESC:     Latte template for adding a new vineyard
+DESC:     Latte template for adding a new vineyard.
 *}
 {layout '../isLayout.latte'}
-
 
 {* Top menu navigation for vineyards section *}
 {block topMenuISAdditional}
@@ -18,8 +17,6 @@ DESC:     Latte template for adding a new vineyard
         <i class="fas fa-arrow-right me-2"></i>Přidat vinohrad
     </a>
 {/block topMenuISAdditional}
-
-
 
 {* Main panel for adding a new vineyard *}
 {block isMainPanel}
@@ -35,7 +32,7 @@ DESC:     Latte template for adding a new vineyard
                 <div class="card-body p-4">
                     {* Vineyard add form *}
                     {form addVineyardForm}
-                        {* Name input field (required) *}
+                        {* Required name input field  *}
                         <div class="mb-3">
                             <label for="name" class="form-label fw-semibold">
                                 <i class="fas fa-tag me-2 text-muted"></i>{label name /}
@@ -47,7 +44,7 @@ DESC:     Latte template for adding a new vineyard
                             </span>
                         </div>
 
-                        {* Location input field (required) *}
+                        {* Required location input field  *}
                         <div class="mb-3">
                             <label for="location" class="form-label fw-semibold">
                                 <i class="fas fa-map-marker-alt me-2 text-muted"></i>{label location /}
@@ -59,7 +56,7 @@ DESC:     Latte template for adding a new vineyard
                             </span>
                         </div>
                         
-                        {* Year input field (required) *}
+                        {* Required year input field  *}
                         <div class="mb-3">
                             <label for="year" class="form-label fw-semibold">
                                 <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
@@ -71,7 +68,7 @@ DESC:     Latte template for adding a new vineyard
                             </span>
                         </div>
                         
-                        {* Description input field (optional) *}
+                        {* Optional description input field  *}
                         <div class="mb-3">
                             <label for="description" class="form-label fw-semibold">
                                 <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
@@ -82,7 +79,7 @@ DESC:     Latte template for adding a new vineyard
                             </span>
                         </div>
                         
-                        {* Image upload field (optional) *}
+                        {* Optional image upload field  *}
                         <div class="mb-3">
                             <label for="image" class="form-label fw-semibold">
                                 <i class="fas fa-image me-2 text-muted"></i>{label image /}
