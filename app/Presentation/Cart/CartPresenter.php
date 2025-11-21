@@ -55,7 +55,7 @@ final class CartPresenter extends BasePresenter
 
         /** @var int $userId ID of the current user. */
         $userId = $user->getId();
-        /** @var Order[] $order Array of orders for the user. */
+        /** @var Order|null $order Array of orders for the user. */
         $order = $this->orderRepository->fetchCustomerOrder($userId);
 
         // Check if the order exists
