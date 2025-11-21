@@ -4,7 +4,7 @@ AUTHORS:  Martin Zůbek [C]
           Otakar Kočí
           Martin Mendl
 YEAR:     2025
-DESC:     latte template for vineyards dashboard overview
+DESC:     Latte template for vineyards dashboard overview.
 *}
 {layout '../isLayout.latte'}
 
@@ -46,7 +46,7 @@ DESC:     latte template for vineyards dashboard overview
                                 {/form}
                             </div>
 
-                            <!-- Navigation and add vineyard button (for vintners) -->
+                            <!-- Navigation and add vineyard button. -->
                             <div class="d-flex gap-2">
                                 <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
                                     <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
@@ -138,7 +138,7 @@ DESC:     latte template for vineyards dashboard overview
                                                             <i class="fas fa-bars me-1"></i>Detail
                                                         </a>
                                                     {/if}
-                                                    <!-- Show delete/reactivate buttons for vintner users -->
+                                                    <!-- Show delete/reactivate buttons for users with vintner role -->
                                                     {if $userVintner}
                                                         {if $vineyard->isActive()}
                                                             <button type="button" 
