@@ -8,6 +8,7 @@
 
 namespace App\Presentation\Profile;
 
+use App\Model\FlashMsgType;
 use App\Presentation\BasePresenter;
 use App\Model\User\User;
 use App\Model\User\UserRepository;
@@ -64,6 +65,7 @@ class ProfilePresenter extends BasePresenter
     public function renderDefault(): void
     {
         if ($this->userId === null) {
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
@@ -71,6 +73,7 @@ class ProfilePresenter extends BasePresenter
         $currentUser = $this->userRepository->getUserById((int) $this->userId);
 
         if ($currentUser === null) {
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
@@ -86,6 +89,7 @@ class ProfilePresenter extends BasePresenter
     {
 
         if ($this->userId === null) {
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
@@ -93,6 +97,7 @@ class ProfilePresenter extends BasePresenter
 
         $user = $this->userRepository->getUserById((int)$this->userId);
         if ($user === null) {
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
         
@@ -234,7 +239,7 @@ class ProfilePresenter extends BasePresenter
     public function editDetailsByUser(Form $form, \stdClass $values): void
     {
         if ($this->userId === null) {
-            $this->flashMessage('Uživatel není přihlášen.', 'danger');
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
@@ -242,7 +247,7 @@ class ProfilePresenter extends BasePresenter
         $oldUser = $this->userRepository->getUserById($this->userId);
 
         if(!$oldUser) {
-            $this->flashMessage('Chyba nalezení  uživatele v databázi.', 'error');
+            $this->flashMessage("Nezdařilo se najít uživatele v databázi.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
@@ -275,7 +280,7 @@ class ProfilePresenter extends BasePresenter
         $returnMessage = $this->profileModel->editUserBySelf($realChanges, $this->userId);
 
         if ($returnMessage === '') {
-            $this->flashMessage('Změny byly úspěšně uloženy.', 'success');
+            $this->flashMessage('Změny byly úspěšně uloženy.', FlashMsgType::SUCCESS->value);
             $this->redirect('default');
         }
 
@@ -295,13 +300,13 @@ class ProfilePresenter extends BasePresenter
     public function resetPassword(Form $form, \stdClass $values): void
     {   
         if ($this->userId === null) {
-            $this->flashMessage('Uživatel není přihlášen.', 'danger');
+            $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
         /** @var string $resultMessage Message with error message, or empty string if everything is OK. */
         $resultMessage = $this->profileModel->resetPasswordByUser($values->oldPassword, $values->newPassword, $this->userId);
         if ($resultMessage === '') {
-            $this->flashMessage('Heslo bylo úspěšně změněno.', 'success');
+            $this->flashMessage('Heslo bylo úspěšně změněno.', FlashMsgType::SUCCESS->value);
             $this->redirect('default');
         }
 
