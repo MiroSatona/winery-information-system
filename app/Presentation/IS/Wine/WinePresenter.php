@@ -303,8 +303,7 @@ final class WinePresenter extends BasePresenter
         $form ->addTextArea("popis", "Prodejní popis")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', '3')
-            ->setHtmlAttribute('placeholder', 'Poznámka zobrazená k vínu v obchodě...')
-            ->setRequired("Zadejte prodejní popis");
+            ->setHtmlAttribute('placeholder', 'Poznámka zobrazená k vínu v obchodě...');
 
         $form->addSubmit('send', 'Potvrdit')
             ->setHtmlAttribute('class', 'btn btn-primary');

@@ -1836,6 +1836,7 @@ final class TasksPresenter extends BasePresenter
         $form = new Form();
         
         $form->addFloat("volume", "Objem lahve")
+        ->setRequired("Zadejte objem lahve")
         ->addRule(Form::Min, "minimum", ValidationDefinitions::VOLUME_MIN)
         ->addRule(Form::Max, "maximum", ValidationDefinitions::VOLUME_MAX)
         ->setHtmlAttribute('class', 'form-control')
