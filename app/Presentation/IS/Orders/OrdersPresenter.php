@@ -52,6 +52,20 @@ final class OrdersPresenter extends BasePresenter
      */
     public function renderDashboard(): void
     {
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:IS:Dashboard:view");
+            return;
+        }
+
         $search = $this->getParameter("search");
         $state = $this->getParameter("state");
         $orders = $this->ordRepository->fetchAllOrders(true, $search ?? "");
@@ -70,6 +84,19 @@ final class OrdersPresenter extends BasePresenter
      * @return void
      */
     public function handleChangeOrderState(int $orderId, string $newState) {
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:IS:Dashboard:view");
+            return;
+        }
         /** @var bool $result Flag indicating success of state change */
         $result = $this->ordRepository->changeClientOrderStatus($orderId, $newState);
         // Provide feedback to the user based on the result of the state change
@@ -86,6 +113,19 @@ final class OrdersPresenter extends BasePresenter
       * @return void
       */
      public function renderOrderDetail(int $orderId) {
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:IS:Dashboard:view");
+            return;
+        }
          $this->template->order = $this->ordRepository->fetchOrderById($orderId, true);
      }
     
@@ -97,6 +137,19 @@ final class OrdersPresenter extends BasePresenter
      */
     public function actionChangeOrderState(int $orderId, string $newState): void
     {
+        $user = $this->user;
+        // Check if the user is logged in
+        if (!$user->isLoggedIn()) {
+            $this->redirect(':Sign:in');
+            return;
+        }
+        
+        // user is a customer 
+        if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
+            $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
+            $this->redirect(":Home:IS:Dashboard:view");
+            return;
+        }
         $this->handleChangeOrderState($orderId, $newState);
         $this->redirect('dashboard');
     }
