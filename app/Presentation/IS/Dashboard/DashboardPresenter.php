@@ -47,9 +47,13 @@ final class DashboardPresenter extends BasePresenter
     public function startup(): void
     {
         parent::startup();
+
         if (!(  $this->user->isInRole(Role::WORKER->name) ||
-                $this->user->isInRole(Role::VINTNER->name) || 
-                $this->user->isInRole(Role::ADMIN->name))) {
+                $this->user->isInRole(Role::VINTNER->name))) {
+            
+            if ($this->user->isInRole(Role::ADMIN->name)) {
+                $this->redirect(':IS:Users:dashboard');
+            }
             $this->redirect(':Home:default');
         }
 
