@@ -328,7 +328,10 @@ final class WinePresenter extends BasePresenter
 
         $wineId = (int) $this->getParameter('wineId');
         $price = (float) $values->price;
-        $description = (string) $values->popis;
+        $description = null;
+        if (!empty($values->popis)) {
+            $description = (string) $values->popis;
+        }
         
         $wine = $this->wineRepository->fetchById($wineId);
         
@@ -475,6 +478,11 @@ final class WinePresenter extends BasePresenter
             return;
         }
 
+        $productionNote = null;
+        if (!empty($values->productionNote)) {
+            $productionNote = (string) $values->productionNote;
+        }
+
         /** @var Wine $newWine */
         $newWine = new Wine(
             $wine->getId(),
@@ -493,7 +501,7 @@ final class WinePresenter extends BasePresenter
             $values->leftSugar,
             $values->acidContents,
             $wine->getSalesDescription(),
-            $values->productionNote,
+            $productionNote,
             $values->name,
             $wine->getImage(),
             [],
@@ -1092,6 +1100,11 @@ final class WinePresenter extends BasePresenter
             $this->redirect('this');
         }
 
+        $productionNote = null;
+        if (!empty($values->productionNote)) {
+            $productionNote = (string) $values->productionNote;
+        }
+
         /** @var Wine $wine */
         $wine = new Wine(
             id: null,
@@ -1110,7 +1123,7 @@ final class WinePresenter extends BasePresenter
             leftSugar: (int) $values->leftSugar,
             acidContents: (int) $values->acidContents,
             salesDescription: null,
-            productionNote: (string) $values->productionNote,
+            productionNote: $productionNote,
             name: (string) $values->name,
             img: null,
             variety: [],

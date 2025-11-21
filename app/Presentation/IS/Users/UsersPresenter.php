@@ -133,21 +133,21 @@ final class UsersPresenter extends BasePresenter
 
         // Information fields about the new user
         $form->addText('name', 'Jméno')
-            ->setRequired()
+            ->setRequired("Zadejte jméno uživatele.")
             ->addRule($form::MinLength, 'Jméno musí mít alespoň %d znaky.', $this->validationDefinitions::NAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Jméno nesmí mít více než %d znaků.', $this->validationDefinitions::NAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Jméno uživatele');
 
         $form->addText('surname', 'Příjmení')
-            ->setRequired()
+            ->setRequired("Zadejte příjmení uživatele.")
             ->addRule($form::MinLength, 'Příjmení musí mít alespoň %d znaky.', $this->validationDefinitions::SURNAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Příjmení nesmí mít více než %d znaků.', $this->validationDefinitions::SURNAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Příjmení uživatele');
 
         $form->addText('email', 'E-mail')
-            ->setRequired()
+            ->setRequired("Zadejte e-mail uživatele.")
             ->addRule($form::Email, 'Zadejte platnou e-mailovou adresu.', $this->validationDefinitions::EMAIL_PATTERN)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'E-mail uživatele');
@@ -184,7 +184,7 @@ final class UsersPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', '12345');
 
         $form->addText('username', 'Uživatelské jméno')
-            ->setRequired()
+            ->setRequired("Zadejte uživatelské jméno.")
             ->addRule($form::MinLength, 'Uživatelské jméno musí mít alespoň %d znaky.', $this->validationDefinitions::USERNAME_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Uživatelské jméno nesmí mít více než %d znaků.', $this->validationDefinitions::USERNAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
@@ -362,27 +362,26 @@ final class UsersPresenter extends BasePresenter
 
         // Name of the user
         $form->addText('name', 'Jméno')
-              ->setRequired()
+              ->setRequired("Zadejte jméno uživatele.")
               ->addRule($form::MinLength, 'Jméno musí mít alespoň %d znaky.', $this->validationDefinitions::NAME_LENGTH_MIN)
               ->addRule($form::MaxLength, 'Jméno nesmí mít více než %d znaků.', $this->validationDefinitions::NAME_LENGTH_MAX)
               ->setHtmlAttribute('class', 'form-control');
 
         // Surname of the user
         $form->addText('surname', 'Příjmení')
-              ->setRequired()
+              ->setRequired("Zadejte příjmení uživatele.")
               ->addRule($form::MinLength, 'Příjmení musí mít alespoň %d znaky.', $this->validationDefinitions::SURNAME_LENGTH_MIN)
               ->addRule($form::MaxLength, 'Příjmení nesmí mít více než %d znaků.', $this->validationDefinitions::SURNAME_LENGTH_MAX)
               ->setHtmlAttribute('class', 'form-control');
 
         // Email of the user
         $form->addText('email', 'E-mail')
-              ->setRequired()
+              ->setRequired("Zadejte e-mail uživatele.")
               ->addRule($form::Email, 'Zadejte platnou e-mailovou adresu.', $this->validationDefinitions::EMAIL_PATTERN)
               ->setHtmlAttribute('class', 'form-control');
 
         // Phone number of the user
         $form->addText('phone', 'Telefon')
-              ->setRequired()
               ->addRule($form::MinLength, 'Telefonní číslo musí mít alespoň %d znaky.', $this->validationDefinitions::PHONE_LENGTH_MIN)
               ->addRule($form::MaxLength, 'Telefonní číslo nesmí mít více než %d znaků.', $this->validationDefinitions::PHONE_LENGTH_MAX)
               ->setHtmlAttribute('class', 'form-control');
@@ -408,7 +407,7 @@ final class UsersPresenter extends BasePresenter
 
         // Login details and roles
         $form->addText('username', 'Uživatelské jméno')
-              ->setRequired()
+              ->setRequired("Zadejte uživatelské jméno.")
               ->addRule($form::MinLength, 'Uživatelské jméno musí mít alespoň %d znaky.', $this->validationDefinitions::USERNAME_LENGTH_MIN)
               ->addRule($form::MaxLength, 'Uživatelské jméno nesmí mít více než %d znaků.', $this->validationDefinitions::USERNAME_LENGTH_MAX)
               ->setHtmlAttribute('class', 'form-control');

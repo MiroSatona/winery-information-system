@@ -137,10 +137,18 @@ DESC:     Latte template for order detail page in the IS module.
                                     <td class="text-start">
                                         <div class="d-flex align-items-center">
                                             <!-- Wine image and name with link to wine detail -->
-                                            <img src="{asset $imgRep->getPathForImage($item->wine->getImage())}"
-                                                alt="{$item->wine->getName()}" 
-                                                class="img-thumbnail me-2"
-                                                style="width: 60px; height: auto; border-radius: 6px;">
+                                            {if $item->wine->getImage() !== null}
+                                                <img src="{asset $imageRepository->getPathForImage($item->wine->getImage())}"
+                                                    alt="{$item->wine->name}" 
+                                                    class="img-fluid rounded shadow-sm"
+                                                    style="max-height: 200px; object-fit: cover;">
+                                            {else}
+                                                {* Placeholder if no image is available *}
+                                                <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded"
+                                                    style="height: 200px;">
+                                                    <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+                                                </div>
+                                            {/if}
                                             <a href="{link :IS:Wine:show $item->wine->getId()}" 
                                             class="fw-semibold text-decoration-none text-primary hover-underline"
                                             style="font-size: 0.95rem;">

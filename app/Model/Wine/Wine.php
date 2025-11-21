@@ -43,7 +43,7 @@ class Wine
      * @param float|null $leftSugar
      * @param float|null $acidContents
      * @param string|null $salesDescription
-     * @param string $productionNote
+     * @param string|null $productionNote
      * @param string $name
      * @param Image|null $img
      * @param array $variety
@@ -66,7 +66,7 @@ class Wine
         public ?float $leftSugar,
         public ?float $acidContents,
         public ?string $salesDescription,
-        public string $productionNote,
+        public ?string $productionNote,
         public string $name,
         public ?Image $img,
         public array $variety,
@@ -271,9 +271,9 @@ class Wine
     /**
      * Get the production note for the wine
      *
-     * @return string
+     * @return string|null
      */
-    public function getProductionNote(): string
+    public function getProductionNote(): ?string
     {
         return $this->productionNote;
     }

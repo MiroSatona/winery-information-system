@@ -387,10 +387,10 @@ final class WineRepository
      * Update the state of a given wine.
      * 
      * @param int $idWine
-     * @param string $newDescription
+     * @param string|null $newDescription
      * @return bool True on success, false on failure
      */
-    public function setWineDescription(int $idWine, string $newDescription): bool {
+    public function setWineDescription(int $idWine, ?string $newDescription): bool {
 
         $wine = $this->fetchById($idWine);
         if (!$wine) {

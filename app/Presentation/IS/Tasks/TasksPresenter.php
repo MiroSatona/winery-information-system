@@ -1784,6 +1784,9 @@ final class TasksPresenter extends BasePresenter
         $form = new Form();
 
         $form->addText("name", "Název úkonu")
+            ->setRequired("Zadejte název úkonu")
+            ->addRule(Form::Min, "Název musí mít minimálně %d znaků", ValidationDefinitions::TASK_NAME_LENGTH_MIN)
+            ->addRule(Form::Max, "Název může mít maximálně %d znaků", ValidationDefinitions::TASK_NAME_LENGTH_MAX)
             ->setHtmlAttribute("class", "form-control")
             ->setHtmlAttribute("placeholder", "Zadejte název úkolu ...");
        
@@ -1793,6 +1796,7 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
     
         $form->addDateTime('planned_date', 'Datum plánovaného provedení')
+            ->setRequired('Zadejte plánované datum provedení.')
             ->setValue(new DateTime('now'))
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('style', 'width: 200px;');
@@ -1910,11 +1914,13 @@ final class TasksPresenter extends BasePresenter
             TreatmentType::WEEDING->value => "Odplevelení",
             TreatmentType::OTHER->value => "Ostatní",
         ])
+            ->setRequired("Zvolte typ ošetření")
             ->setHtmlAttribute('class', 'form-select')
             ->setDefaultValue(TreatmentType::SPRAYING->value)
             ->setHtmlAttribute('placeholder', 'Zvolte typ ošetření');
         
         $form->addText('name', 'Název ošetření')
+            ->setRequired('Zadejte název ošetření')
             ->addRule(Form::MinLength, 'Název ošetření musí mít alespoň %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MIN)
             ->addRule(Form::MaxLength, 'Název ošetření může mít maximálně %d znaků.', ValidationDefinitions::TREATMENT_NAME_LENGTH_MAX)
             ->setHtmlAttribute("class", "form-control")
