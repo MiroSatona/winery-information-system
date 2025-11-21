@@ -591,8 +591,6 @@ final class TasksPresenter extends BasePresenter
 
         $this->flashMessage('Chyba při načítání úkonu z databáze, zkuste to prosím znovu.', FlashMsgType::ERROR->value);
         $this->redirect('dashboard');
-
-
     }
 
     /**
@@ -770,7 +768,7 @@ final class TasksPresenter extends BasePresenter
     }
 
     /**
-     * Method for c
+     * Method for creating wine select form 
      *
      * @return void
      */
@@ -1077,7 +1075,6 @@ final class TasksPresenter extends BasePresenter
 
         $this->template->vineyard = $vineyard;
         $this->template->task = $task;
-        // todo
     }
 
     
@@ -1988,7 +1985,7 @@ final class TasksPresenter extends BasePresenter
 
 
         if(!($task instanceof Treatment) && !($task instanceof Harvest)) {
-            // TODO: How hadnle this?
+            bdump("something went wrong");
             return $form;
         }
 
@@ -2051,7 +2048,7 @@ final class TasksPresenter extends BasePresenter
         
         if ($task === null) {
             $this->flashMessage('Úkon nebyl nalezen.', 'error');
-            $this->redirect('this'); //TODO: redirect
+            $this->redirect('this'); 
             return;
         }
         
