@@ -254,6 +254,11 @@ final class UsersPresenter extends BasePresenter
         /** @var bool $active New user is always active */
         $active = true;
 
+        $phoneNumber = null;
+        if(!empty($values->phone) && (intval($values->phone) !== 0)) {
+            $phoneNumber = $values->phone;
+        }
+
         // Create a new user with the provided values from the form
         $this->userRepository->addUser(
             $values->name,
@@ -261,7 +266,7 @@ final class UsersPresenter extends BasePresenter
             $values->username,
             $active,
             $values->email,
-            $values->phone,
+            $phoneNumber,
             $values->city ?: null,
             $values->postalCode ?: null,
             $values->street ?: null,

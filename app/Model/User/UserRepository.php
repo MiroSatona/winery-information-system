@@ -270,7 +270,7 @@ class UserRepository
         $this->database->table('USER')->insert([
             'NAME' => $name,
             'SURNAME' => $surname,
-            'STATE' => $state,
+            'ACTIVE' => $state,
             'USERNAME' => $username,
             'EMAIL' => $email,
             'PHONE_NUMBER' => $phoneNumber,
