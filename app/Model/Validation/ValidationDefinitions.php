@@ -43,7 +43,7 @@ final class ValidationDefinitions
     public const PICTURE_NAME_LENGTH_MIN = 1;
     public const PICTURE_NAME_LENGTH_MAX = 30;
     public const WINE_NAME_LENGTH_MIN = 1;
-    public const WINE_NAME_LENGTH_MAX = 50;
+    public const WINE_NAME_LENGTH_MAX = 30;
     public const VINEYARD_NAME_LENGTH_MIN = 1;
     public const VINEYARD_NAME_LENGTH_MAX = 30;
     public const YEAR_MIN = 0;
