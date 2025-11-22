@@ -169,7 +169,7 @@ DESC:     Latte template for displaying the dashboard of tasks in the IS module.
                                                 <a n:href="details! $task->getId()" class="btn btn-sm btn-outline-secondary">
                                                     Detail
                                                 </a>
-                                                {if $task->getState() === $TaskStateType::PLANNED}
+                                                {if $task->getState() === $TaskStateType::PLANNED && $userCanConfirmTask && ($userVintner || $taskRepository->isUserAssignedToTask($user->getId(), $task->getId()))}
                                                     <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
                                                         <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
                                                     </a>

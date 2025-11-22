@@ -109,7 +109,7 @@ DESC:     Latte template for displaying details of vineyard treatment task.
                                                                     <th><i class="fas fa-seedling me-2"></i>Počet keřů</th>
                                                                     <th><i class="fas fa-calendar-alt me-2"></i>Rok výsadby</th>
                                                                     <th><i class="fas fa-check-circle me-2"></i>Aktivní</th>
-                                                                    {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                    {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                                         <th><i class="fas fa-cog me-2"></i>Akce</th>
                                                                     {/if}
                                                                 </tr>

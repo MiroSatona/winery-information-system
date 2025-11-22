@@ -103,6 +103,11 @@ final class TasksPresenter extends BasePresenter
         $this->template->roleType = TaskState::class;
         // Give template current date and time
         $this->template->currentDateTime = new DateTime('now');
+        // Check if user can confirm tasks (vintner or worker)
+        $this->template->userCanConfirmTask = $this->user->isInRole(Role::VINTNER->name) || $this->user->isInRole(Role::WORKER->name);
+        // Give TaskRepository to the user 
+        $this->template->taskRepository = $this->taskRepository; 
+
     }
    
     /**
@@ -674,6 +679,11 @@ final class TasksPresenter extends BasePresenter
         
         $this->template->wineRows = $this->taskRepository->fetchTaskRows($harvest->getId());
         $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($harvest->getId());
+        
+        // Check if user can confirm task (vintner or assigned worker)
+        $this->template->userCanConfirmTask = $this->user->isInRole(Role::VINTNER->name) ||
+            ($this->user->isInRole(Role::WORKER->name) && 
+             $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id));
     }   
 
 
@@ -707,6 +717,11 @@ final class TasksPresenter extends BasePresenter
             : null;
 
         $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($bottling->getId());
+        
+        // Check if user can confirm task (vintner or assigned worker)
+        $this->template->userCanConfirmTask = $this->user->isInRole(Role::VINTNER->name) ||
+            ($this->user->isInRole(Role::WORKER->name) && 
+             $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id));
     }
 
 
@@ -742,6 +757,11 @@ final class TasksPresenter extends BasePresenter
 
         $this->template->wineRows = $this->taskRepository->fetchTaskRows($treatment->getId());
         $this->template->taskWorkers = $this->taskRepository->fetchTaskWorkers($treatment->getId());
+        
+        // Check if user can confirm task (vintner or assigned worker)
+        $this->template->userCanConfirmTask = $this->user->isInRole(Role::VINTNER->name) ||
+            ($this->user->isInRole(Role::WORKER->name) && 
+             $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id));
     }
 
 
@@ -1604,7 +1624,8 @@ final class TasksPresenter extends BasePresenter
     {
         // all vintners can mark tasks as done
         // also workers assigned to the task can mark it as done
-        if (!$this->user->isInRole(Role::VINTNER->name) &&
+        if (
+            !$this->user->isInRole(Role::VINTNER->name) &&
             !($this->user->isInRole(Role::WORKER->name) &&
             $this->taskRepository->isUserAssignedToTask($this->user->getId(), $id))) {
             $this->flashMessage('K označení úkonu jako dokončeného nemáte oprávnění.', FlashMsgType::ERROR->value);

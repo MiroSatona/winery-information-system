@@ -62,7 +62,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                     <i class="fas fa-edit me-1"></i> Upravit
                                 </a>
                             {/if}
-                            {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                            {if $task->getState() === App\Model\Task\TaskState::PLANNED && $userCanConfirmTask}
                                 <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
                                     <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
                                 </a>
@@ -230,7 +230,7 @@ DESC:     Latte template for displaying the header and main information of a tas
                                                 <thead class="table-light">
                                                     <tr>
                                                         <th><i class="fas fa-user me-2"></i>Jméno pracovníka</th>
-                                                         {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                         {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
                                                             <th class="text-center"><i class="fas fa-cog me-2"></i>Akce</th>
                                                         {/if}
                                                     </tr>
