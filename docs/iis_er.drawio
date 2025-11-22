@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/28.2.5 Chrome/138.0.7204.251 Electron/37.6.1 Safari/537.36" version="28.2.5">
   <diagram name="Page-1" id="7yT-161jvmABjz4D29Jq">
-    <mxGraphModel dx="2346" dy="2002" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="2916" dy="2335" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -452,7 +452,7 @@
         <mxCell id="kMA51GPcW9HnWir6xo-C-27" value="salt hesla" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="OYKwE_3VJjKlAQ0eTgSA-110" vertex="1">
           <mxGeometry y="210" width="140" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="tg0topIz3YH-CBbdt2d3-1" value="cas registrace" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="OYKwE_3VJjKlAQ0eTgSA-110">
+        <mxCell id="tg0topIz3YH-CBbdt2d3-1" value="cas registrace" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="OYKwE_3VJjKlAQ0eTgSA-110" vertex="1">
           <mxGeometry y="240" width="140" height="30" as="geometry" />
         </mxCell>
         <mxCell id="OYKwE_3VJjKlAQ0eTgSA-119" value="email" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="OYKwE_3VJjKlAQ0eTgSA-110" vertex="1">
@@ -566,7 +566,7 @@
         <mxCell id="fViaiibMq6njDmeIwlWS-23" value="&amp;lt;pk&amp;gt; id" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="fViaiibMq6njDmeIwlWS-22" vertex="1">
           <mxGeometry y="30" width="160" height="30" as="geometry" />
         </mxCell>
-        <mxCell id="tg0topIz3YH-CBbdt2d3-2" value="jmeno vina" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" vertex="1" parent="fViaiibMq6njDmeIwlWS-22">
+        <mxCell id="tg0topIz3YH-CBbdt2d3-2" value="jmeno vina" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="fViaiibMq6njDmeIwlWS-22" vertex="1">
           <mxGeometry y="60" width="160" height="30" as="geometry" />
         </mxCell>
         <mxCell id="4LADGEVoFYsZQnkmb67A-18" value="rocnik" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="fViaiibMq6njDmeIwlWS-22" vertex="1">
@@ -746,6 +746,31 @@
         </mxCell>
         <mxCell id="kMA51GPcW9HnWir6xo-C-109" value="jednotka" style="text;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;spacingLeft=4;spacingRight=4;overflow=hidden;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;rotatable=0;whiteSpace=wrap;html=1;" parent="kMA51GPcW9HnWir6xo-C-82" vertex="1">
           <mxGeometry y="120" width="140" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="IB3lfvnQfDMArWHbUkLa-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;endArrow=none;endFill=0;" edge="1" parent="1" target="OYKwE_3VJjKlAQ0eTgSA-5">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="70" y="760" as="sourcePoint" />
+            <Array as="points">
+              <mxPoint x="-210" y="760" />
+              <mxPoint x="-210" y="60" />
+              <mxPoint x="370" y="60" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IB3lfvnQfDMArWHbUkLa-2" value="Výběr řádku v rámci&amp;nbsp;&lt;div&gt;konkrétního vinhoradu&lt;/div&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="IB3lfvnQfDMArWHbUkLa-1">
+          <mxGeometry x="-0.1241" y="2" relative="1" as="geometry">
+            <mxPoint x="-68" y="82" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IB3lfvnQfDMArWHbUkLa-3" value="0...N" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="IB3lfvnQfDMArWHbUkLa-1">
+          <mxGeometry x="-0.9544" y="3" relative="1" as="geometry">
+            <mxPoint x="16" y="-13" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="IB3lfvnQfDMArWHbUkLa-4" value="1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="IB3lfvnQfDMArWHbUkLa-1">
+          <mxGeometry x="0.9152" y="2" relative="1" as="geometry">
+            <mxPoint x="54" y="11" as="offset" />
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>
