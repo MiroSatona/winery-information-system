@@ -340,9 +340,33 @@ final class TasksPresenter extends BasePresenter
             }
         }
         $newTask->setPlannedTimestamp($planned);
-        
+       
+        // type of task has changed
         if (isset($values->type)) {
-            $newTask->setType(TaskType::from((string) $values->type));
+            
+            $newTaskType = TaskType::from((string) $values->type);
+            
+            // the task was other type before the change, reset values
+            if ($newTask->getType() && $newTask->getType() !==  $newTaskType) {
+                // Harvest 
+                $newTask->setIdWineYard(null);
+                $newTask->setIdWineVariety(null);
+
+                // Bottling 
+                $newTask->setIdWine(null);
+                $newTask->setBottleVolume(null);
+                $newTask->setImg(null);
+
+                // Treatment
+                $newTask->setTreatmentName("");
+                $newTask->setAmount(null);
+                $newTask->setUnit(null);
+
+                // common 
+                $newTask->setIdRows([]);
+            }
+
+            $newTask->setType($newTaskType);
         }
 
         // persist updated TaskData back into session
@@ -2182,3 +2206,4 @@ final class TasksPresenter extends BasePresenter
         $this->redirect('this');
     }
 }
+
