@@ -1009,18 +1009,18 @@ final class WinePresenter extends BasePresenter
             ->setHtmlAttribute('rows', '3')
             ->setHtmlAttribute('placeholder', 'Volitelná poznámka k výrobnímu procesu...');
 
-        $form->addSubmit('backToDashboard', 'Zrušit')
-            ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
-            ->setValidationScope([])
-            ->onClick[] = [$this, 'backToDashboardProduce'];
+        $form->addSubmit('produce', 'Vyrobit víno')
+            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
+            ->onClick[] = [$this, 'produceWineFormSucceeded'];
 
         $form->addSubmit('back', 'Zpět na krok 1')
             ->setHtmlAttribute('class', 'btn btn-outline-primary w-100 fw-bold')
             ->onClick[] = [$this, 'backToProduceP1'];
 
-        $form->addSubmit('produce', 'Vyrobit víno')
-            ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
-            ->onClick[] = [$this, 'produceWineFormSucceeded'];
+        $form->addSubmit('backToDashboard', 'Zrušit')
+            ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
+            ->setValidationScope([])
+            ->onClick[] = [$this, 'backToDashboardProduce'];
 
         return $form;
     }
