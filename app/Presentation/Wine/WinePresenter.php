@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     WinePresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for WineDetail 
+//DESC:     Presenter for WineDetail
 declare(strict_types=1);
 
 namespace App\Presentation\Wine;
@@ -22,21 +23,21 @@ use App\Model\Security\Role;
  * Presenter for wine detail page
  * Handles wine display and adding wines to shopping cart
  */
-final class WinePresenter extends BasePresenter 
+final class WinePresenter extends BasePresenter
 {
     private ProductRepository $items;
     private ImageRepository $imageRepository;
 
     /**
      * Constructor for WinePresenter
-     * @param ProductRepository $items 
-     * @param ImageRepository $imageRepository 
-     * @param OrderRepository $ordRep 
+     * @param ProductRepository $items
+     * @param ImageRepository $imageRepository
+     * @param OrderRepository $ordRep
      */
     public function __construct(ProductRepository $items, ImageRepository $imageRepository, private OrderRepository $ordRep)
     {
         parent::__construct();
-        $this->items = $items; 
+        $this->items = $items;
         $this->imageRepository = $imageRepository;
     }
 
@@ -48,18 +49,18 @@ final class WinePresenter extends BasePresenter
     {
         parent::startup();
     }
-    
+
     /**
      * Renders the wine detail page
      * @param int $id ID of the wine to display
      * @return void
      */
-    public function renderDetail(int $id): void 
+    public function renderDetail(int $id): void
     {
-        $this->template->wine = $this->items->findById($id); 
+        $this->template->wine = $this->items->findById($id);
         $this->template->imageRepository = $this->imageRepository;
     }
-    
+
     /**
      * Handles adding a wine to the shopping cart
      * @param int $wineId ID of the wine to add
@@ -74,8 +75,8 @@ final class WinePresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
@@ -87,17 +88,17 @@ final class WinePresenter extends BasePresenter
         } else {
             $this->flashMessage("Položka přidána do košíku", FlashMsgType::SUCCESS->value);
         }
-        
+
         $this->redirect('this');
     }
-    
+
     /**
      * Creates the add to cart form component
      * @return \Nette\Application\UI\Form Form for adding wine to cart
      */
     protected function createComponentAddToCartForm(): \Nette\Application\UI\Form
     {
-        $form = new \Nette\Application\UI\Form;
+        $form = new \Nette\Application\UI\Form();
         $form->addHidden('wineId');
         $form->addInteger('count')
             ->setDefaultValue(1)
@@ -122,8 +123,8 @@ final class WinePresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");

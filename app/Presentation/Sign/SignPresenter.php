@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     SignPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Presenter for sing in operation	
+//DESC:     Presenter for sing in operation
 declare(strict_types=1);
 
 namespace App\Presentation\Sign;
@@ -27,8 +28,8 @@ final class SignPresenter extends BasePresenter
 {
     /**
      * Constructor for SignPresenter
-     * @param SignUpWorker $signUpWorker 
-     * @param ValidationDefinitions $validationDefinitions 
+     * @param SignUpWorker $signUpWorker
+     * @param ValidationDefinitions $validationDefinitions
      */
     public function __construct(private SignUpWorker $signUpWorker, private ValidationDefinitions $validationDefinitions)
     {
@@ -50,7 +51,7 @@ final class SignPresenter extends BasePresenter
      */
     public function createComponentSignInForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addText('username', 'Uživatelské jméno')
             ->addRule($form::Pattern, 'Zadejte prosím platné uživatelské jméno.', $this->validationDefinitions::USERNAME_PATTERN)
@@ -70,8 +71,10 @@ final class SignPresenter extends BasePresenter
         // Add Bootstrap classes to the form
         $form->onRender[] = function ($form) {
             foreach ($form->getControls() as $control) {
-                if ($control instanceof TextInput || 
-                    $control instanceof TextArea) {
+                if (
+                    $control instanceof TextInput ||
+                    $control instanceof TextArea
+                ) {
                     $control->getLabelPart()->addAttributes(['class' => 'form-label fw-semibold']);
                 }
             }
@@ -105,7 +108,7 @@ final class SignPresenter extends BasePresenter
      */
     public function createComponentSignUpForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         // Personal information section
         $form->addText('name', 'Jméno')
@@ -128,7 +131,7 @@ final class SignPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'name@example.com')
             ->setHtmlAttribute('type', 'email');
-        
+
         $form->addText('phone', 'Telefon')
             ->addRule($form::MinLength, 'Telefonní číslo musí mít alespoň %d znaků.', $this->validationDefinitions::PHONE_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Telefonní číslo může mít maximálně %d znaků.', $this->validationDefinitions::PHONE_LENGTH_MAX)
@@ -148,13 +151,13 @@ final class SignPresenter extends BasePresenter
             ->addRule($form::MaxLength, 'Ulice může mít maximálně %d znaků.', $this->validationDefinitions::STREET_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte ulici');
-        
+
         $form->addText('houseNumber', 'Číslo popisné:')
             ->addRule($form::MinLength, 'Číslo popisné musí mít alespoň %d znaků.', $this->validationDefinitions::HOUSE_NUMBER_LENGTH_MIN)
             ->addRule($form::MaxLength, 'Číslo popisné může mít maximálně %d znaků.', $this->validationDefinitions::HOUSE_NUMBER_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', '123');
-        
+
         $form->addText('postalCode', 'PSČ')
             ->addRule($form::MinLength, 'PSČ musí mít alespoň %d znaků.', $this->validationDefinitions::POSTAL_CODE_LENGTH_MIN)
             ->addRule($form::MaxLength, 'PSČ může mít maximálně %d znaků.', $this->validationDefinitions::POSTAL_CODE_LENGTH_MAX)
@@ -192,8 +195,10 @@ final class SignPresenter extends BasePresenter
         // Add Bootstrap classes to labels
         $form->onRender[] = function ($form) {
             foreach ($form->getControls() as $control) {
-                if ($control instanceof TextInput || 
-                    $control instanceof TextArea) {
+                if (
+                    $control instanceof TextInput ||
+                    $control instanceof TextArea
+                ) {
                     $control->getLabelPart()->addAttributes(['class' => 'form-label fw-semibold']);
                 }
             }

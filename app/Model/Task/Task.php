@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     Task.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Base class for all task types. Internal representation.
+//DESC:     Base class for all task types. Internal representation.
 
 declare(strict_types=1);
 
@@ -47,34 +48,35 @@ class Task
         private bool $inConflict = false
     ) {
     }
-    
+
     /**
      * Check if the task is in conflict
      *
      * @return bool
      */
-    public function isInConflict(): bool 
+    public function isInConflict(): bool
     {
         return $this->inConflict;
     }
-    
+
     /**
      * Set the task as in conflict
      */
-    public function setInConflict() {
+    public function setInConflict()
+    {
         $this->inConflict = true;
     }
 
     /**
      * Get the ID of the task
-     * 
+     *
      * @return int
      */
     public function getId(): int
     {
         return $this->id;
     }
-    
+
     /**
      * Get the name of the task
      *

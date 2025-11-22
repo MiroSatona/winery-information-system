@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     OrderItemRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -20,11 +21,12 @@ final class OrderItemRepository
     public function __construct(
         private Explorer $db,
         private WineRepository $wineRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Fetch all items belonging to a specific order
-     * 
+     *
      * @param int $orderId
      * @return OrderItem[]
      */
@@ -42,7 +44,7 @@ final class OrderItemRepository
 
     /**
      * Fetch one item by order ID and wine ID (composite key)
-     * 
+     *
      * @param int $wineId
      * @param int $orderId
      * @return OrderItem|null
@@ -59,7 +61,7 @@ final class OrderItemRepository
 
     /**
      * Create an OrderItem object from a DB row
-     * 
+     *
      * @param \Nette\Database\Table\ActiveRow $row
      * @return OrderItem
      */
@@ -74,60 +76,63 @@ final class OrderItemRepository
             pricePerBottle: (float) $row->PRICE_PER_BOTTLE
         );
     }
-    
+
     /**
      * Fetch the DB row for a specific order item
-     * 
+     *
      * @param int $wineId
      * @param int $orderId
      * @return \Nette\Database\Table\ActiveRow|null
      */
-    private function fetchItemRow(int $wineId, int $orderId) {
+    private function fetchItemRow(int $wineId, int $orderId)
+    {
         return $this->db->table('ORDER_ITEM')
             ->where('ID_ORDER', $orderId)
             ->where('ID_WINE', $wineId)
             ->fetch();
     }
-    
+
     /**
      * Delete an order item by its composite key (wine ID and order ID)
-     * 
+     *
      * @param int $wineId
      * @param int $orderId
      * @return bool True on success, false if item not found
      */
-    public function deleteOrderItemById(int $wineId, int $orderId): bool {
+    public function deleteOrderItemById(int $wineId, int $orderId): bool
+    {
         $row = $this->fetchItemRow($wineId, $orderId);
         if ($row == null) {
             return false;
         }
-        
+
         $row->delete();
         return $this->wineRepository->updateWineFreeBottles($wineId, $row->BOTTLES_COUNT, true);
     }
 
     /**
      * Change the amount of bottles for a specific order item
-     * 
+     *
      * @param int $wineId
      * @param int $orderId
      * @param int $amount
      * @param bool $add true to add, false to subtract
      * @return bool True on success, false on failure
      */
-    public function changeItemAmount(int $wineId, int $orderId, int $amount, bool $add): bool {
+    public function changeItemAmount(int $wineId, int $orderId, int $amount, bool $add): bool
+    {
         $row = $this->fetchItemRow($wineId, $orderId);
         bdump($row);
         if ($row == null) {
             return false;
-        }       
+        }
 
         if ($add) {
             $newAmount = $row->BOTTLES_COUNT + $amount;
         } else {
-            $newAmount = $row->BOTTLES_COUNT - $amount;            
+            $newAmount = $row->BOTTLES_COUNT - $amount;
         }
-        
+
         bdump($newAmount);
         if ($newAmount < 0) {
             return false;
@@ -140,7 +145,7 @@ final class OrderItemRepository
         if ($newAmount > $this->wineRepository->getWineAllBottleCount($wineId)) {
             return false;
         }
- 
+
         $row->update([
             "BOTTLES_COUNT" => $newAmount
         ]);
@@ -150,20 +155,21 @@ final class OrderItemRepository
 
     /**
      * Add a new item to an order
-     * 
+     *
      * @param int $orderId
      * @param int $wineId
      * @param int $amount
      * @return bool True on success, false on failure
      */
-    public function addItem(int $orderId, int $wineId, int $amount): bool {
-        // get all the items in the order 
+    public function addItem(int $orderId, int $wineId, int $amount): bool
+    {
+        // get all the items in the order
         $wine = $this->wineRepository->fetchById($wineId);
         if ($wine == null) {
             return false;
         }
-        
-        // find out if an order already exists, if so, just change the amount ... 
+
+        // find out if an order already exists, if so, just change the amount ...
         $orderItem = $this->fetchItem($wineId, $orderId);
         if ($orderItem !== null) {
             return $this->changeItemAmount($wineId, $orderId, $amount, true);
@@ -176,5 +182,5 @@ final class OrderItemRepository
         ];
         $this->db->table("ORDER_ITEM")->insert($row);
         return $this->wineRepository->updateWineFreeBottles($wineId, $amount, false);
-    }    
-} 
+    }
+}

@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     VineyardRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -40,7 +41,7 @@ final class VineyardRepository
 
     /**
      * Fetch all vineyards from the database
-     * 
+     *
      * @return Vineyard[]
      */
     public function fetchAll(): array
@@ -265,7 +266,7 @@ final class VineyardRepository
             return false;
         }
     }
-    
+
     /**
      * Set the active status of a vineyard
      *
@@ -298,10 +299,11 @@ final class VineyardRepository
 
     /**
      * Join vineyards with their wine varieties
-     * 
+     *
      * @return array Array of vineyards with their associated wine varieties
      */
-    public function joinWithVarieties(): array{
+    public function joinWithVarieties(): array
+    {
 
         /** @var Vineyard $vineyards Array of all vineyards in database*/
         $vineyards = $this->fetchAll();
@@ -378,7 +380,7 @@ final class VineyardRepository
         $rowsSelection = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
             ->where('CODE LIKE ? OR PLANTING_YEAR LIKE ? OR ID_WINE_VARIETY IN ?', "%$pattern%", "%$pattern%", $this->database->table('WINE_VARIETY')->where('NAME LIKE ?', "%$pattern%")->select('ID'));
-        
+
         // filter by type
         if ($type === 'active') {
             $rowsSelection = $rowsSelection->where('ACTIVE', true);
@@ -441,7 +443,7 @@ final class VineyardRepository
     {
         /** @var WineVariety[] $wineVarieties */
         $wineVarieties = [];
-        
+
         $rows = $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
             ->select('DISTINCT ID_WINE_VARIETY')
@@ -466,7 +468,7 @@ final class VineyardRepository
      */
     public function getWineVarietiesCountOnVineyard(int $vineyardId): int
     {
-       return $this->database->table('WINE_ROW')
+        return $this->database->table('WINE_ROW')
             ->where('ID_VINEYARD', $vineyardId)
             ->select('DISTINCT ID_WINE_VARIETY')
             ->count();
@@ -513,7 +515,7 @@ final class VineyardRepository
             ->where('ID_VINEYARD', $vineyardId)
             ->where('CODE', $wineRowCode)
             ->fetch();
-            
+
         if ($row === null) {
             return null;
         }
@@ -594,7 +596,7 @@ final class VineyardRepository
 
         return (int)$totalHeadCount;
     }
-    
+
     /**
      * Get all wine rows of a specific wine variety on a vineyard
      *
@@ -602,7 +604,8 @@ final class VineyardRepository
      * @param int $wineVarietyId
      * @return WineRow[]
      */
-    public function getRowsAtVineyardWithWineVariety(int $vineyardId, int $wineVarietyId) {
+    public function getRowsAtVineyardWithWineVariety(int $vineyardId, int $wineVarietyId)
+    {
         /** @var WineRow[] $wineRows Array of wine rows matching given variety on the given vineyard */
         $wineRows = [];
         $rows = $this->database->table('WINE_ROW')

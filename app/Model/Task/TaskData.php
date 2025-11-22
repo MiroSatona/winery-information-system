@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     TaskData.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Data class for task information storage between form input stages.
+//DESC:     Data class for task information storage between form input stages.
 
 declare(strict_types=1);
 
@@ -41,33 +42,34 @@ class TaskData
     private ?float $amount = null;
     private ?string $unit = null;
 
-    // common 
+    // common
     private array $idRows = []; // task rows array
-    
-    // type of task 
+
+    // type of task
     private bool $isDone = false;
 
     // Generic getters/setters
-    
+
     /**
      * Check if the task is marked as done
      *
      * @return bool
      */
-    public function getIsDone(): bool 
+    public function getIsDone(): bool
     {
         return $this->isDone;
     }
-    
+
     /**
      * Mark the task as done
     *
     * @return void
     */
-    public function markAsDone(): void {
-        $this->isDone = true; 
+    public function markAsDone(): void
+    {
+        $this->isDone = true;
     }
-    
+
     /**
      * Get the type of the task
      *

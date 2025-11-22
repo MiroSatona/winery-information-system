@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     SignUpWorker.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Worker class for handling user sign-up process.
+//DESC:     Worker class for handling user sign-up process.
 
 declare(strict_types=1);
 
@@ -26,11 +27,11 @@ class SignUpWorker
      * @param Explorer $database
      * @param Passwords $passwords
      */
-	public function __construct(
-		private Explorer $database,
-		private Passwords $passwords,
-	) {
-	}
+    public function __construct(
+        private Explorer $database,
+        private Passwords $passwords,
+    ) {
+    }
 
     /**
      * Sign up a new user with the provided data

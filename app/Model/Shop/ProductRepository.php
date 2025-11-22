@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     ProductRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -18,7 +19,6 @@ use App\Model\Wine\WineState;
  */
 final class ProductRepository
 {
-    
     /**
      * Constructor for Product repository
      *
@@ -30,10 +30,10 @@ final class ProductRepository
         private WineRepository $wineRep
     ) {
     }
-   
+
     /**
      * Get all the available products with an option for a search query
-     * 
+     *
      * @param string $searchTerm
      * @return array
      */
@@ -65,11 +65,11 @@ final class ProductRepository
 
     /**
      * Find a product by product ID
-     * 
+     *
      * @param integer $id
      * @return Wine|null
      */
-    public function findById(int $id): ?Wine 
+    public function findById(int $id): ?Wine
     {
         return $this->wineRep->fetchById($id);
     }

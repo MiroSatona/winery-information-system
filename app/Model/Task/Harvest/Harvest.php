@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     Harvest.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Internal representation of a harvest task.
+//DESC:     Internal representation of a harvest task.
 declare(strict_types=1);
 
 namespace App\Model\Task\Harvest;

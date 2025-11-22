@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     OrderRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -31,8 +32,9 @@ final class OrderRepository
         private Explorer $db,
         private OrderItemRepository $orderItemRepository,
         private UserRepository $usrRep
-    ) {}
-    
+    ) {
+    }
+
     /**
      * Fetch a single order by its ID
      *
@@ -78,27 +80,26 @@ final class OrderRepository
             if ($includeItems) {
                 $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
             }
-            
+
             $order->setUser($this->usrRep->getUserById($order->idCustomer));
-            
+
             $result[] = $order;
-            
         }
         return $result;
     }
-    
+
     /**
      * Fetch all orders for a specific customer
      *
      * @param int $userId
      * @return CustomerOrder[]
      */
-    public function fetchCustomerOrders(int $userId) 
+    public function fetchCustomerOrders(int $userId)
     {
         $rows = $this->db->table("CUSTOMER_ORDER")->where("ID_CUSTOMER", $userId);
-        
+
         $returnItems = [];
-        foreach($rows as $row) {
+        foreach ($rows as $row) {
             $order = $this->createOrderFromRow($row);
             $order->items = $this->orderItemRepository->fetchItemsByOrderId($order->id);
             $returnItems[] = $order;
@@ -115,7 +116,7 @@ final class OrderRepository
     private function createOrderFromRow($row): CustomerOrder
     {
         if ($row == null) {
-            return $row; 
+            return $row;
         }
         return new CustomerOrder(
             id: (int) $row->ID,
@@ -127,7 +128,7 @@ final class OrderRepository
             deliveryData: (string) $row->DELIVERY_DATA,
         );
     }
-    
+
     /**
      * Fetch the current reserved order for a customer, creating one if it doesn't exist
      *
@@ -135,26 +136,27 @@ final class OrderRepository
      * @param bool $createIfNotfound Whether to create a new order if none is found
      * @return CustomerOrder|null
      */
-    public function fetchCustomerOrder(int $userId, bool $createIfNotfound = false) {
+    public function fetchCustomerOrder(int $userId, bool $createIfNotfound = false)
+    {
         $row = $this->db->table("CUSTOMER_ORDER")
         ->where("ID_CUSTOMER", $userId)
         ->where("STATE", OrderState::RESERVED)
         ->fetch();
-   
+
         if ($row !== null) {
             return $this->createOrderFromRow($row);
         }
-        
+
         if (!$createIfNotfound) {
             return null;
         }
-       
+
         // No existing order found -> create one
         $insertData = [
             "ID_CUSTOMER" => $userId,
             "TOTAL_PRICE" => 0.00,
             "STATE" => OrderState::RESERVED,
-            "DELIVERY_TYPE" => "PICKUP",      
+            "DELIVERY_TYPE" => "PICKUP",
             "DELIVERY_DATA" => "",
         ];
         try {
@@ -191,7 +193,7 @@ final class OrderRepository
             $result = $this->orderItemRepository->deleteOrderItemById($wineId, $order->id);
             if ($result) {
                 $this->updateOrderPrice($order->id);
-                // if there is nothing in the order, delete the order 
+                // if there is nothing in the order, delete the order
                 $order = $this->fetchCustomerOrder($userId, false);
                 if ($order && $order->totalPrice == 0) {
                     $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $order->id)->fetch();
@@ -202,7 +204,6 @@ final class OrderRepository
             }
             $this->db->commit();
             return $result;
-
         } catch (\Exception $e) {
             $this->db->rollBack();
             return false;
@@ -218,7 +219,7 @@ final class OrderRepository
      * @param bool $add
      * @return bool True on success, false on failure
      */
-    public function editAmountOrItemInOrder(int $userId, int $wineId, int $diff, bool $add): bool 
+    public function editAmountOrItemInOrder(int $userId, int $wineId, int $diff, bool $add): bool
     {
         $order = $this->fetchCustomerOrder($userId);
         if ($order == null) {
@@ -244,7 +245,7 @@ final class OrderRepository
             return false;
         }
     }
-    
+
     /**
      * Add an item to a customer's order
      *
@@ -253,7 +254,8 @@ final class OrderRepository
      * @param int $amount
      * @return bool True on success, false on failure
      */
-    public function addToCart(int $userId, int $wineId, int $amount): bool {
+    public function addToCart(int $userId, int $wineId, int $amount): bool
+    {
         $order = $this->fetchCustomerOrder($userId, true);
         if ($order == null) {
             return false;
@@ -273,18 +275,19 @@ final class OrderRepository
             return false;
         }
     }
-    
+
     /**
      * Update the total price of an order based on its items
      *
      * @param int $orderId
      * @param bool $doTransaction Whether to wrap the update in a transaction
      */
-    public function updateOrderPrice(int $orderId, bool $doTransaction = false) {
+    public function updateOrderPrice(int $orderId, bool $doTransaction = false)
+    {
         $order = $this->fetchOrderById($orderId, true);
-        
+
         $totalPrice = 0;
-        // calculate the full price of the order 
+        // calculate the full price of the order
         foreach ($order->items as $item) {
             $totalPrice += $item->wine->currentPrice * $item->bottlesCount;
         }
@@ -308,14 +311,14 @@ final class OrderRepository
     }
 
     /**
-     * Update the Delivery address of an order 
+     * Update the Delivery address of an order
      *
      * @param integer $userId
      * @param string $type
      * @param string|null $address
      * @return boolean
      */
-    public function updateDeliveryAddress(int $userId, string $type, ?string $address): bool 
+    public function updateDeliveryAddress(int $userId, string $type, ?string $address): bool
     {
         try {
             $this->db->beginTransaction();
@@ -325,12 +328,12 @@ final class OrderRepository
                 return false;
             }
 
-            // update the delivery type 
+            // update the delivery type
             $row = $this->db->table("CUSTOMER_ORDER")
             ->where("ID_CUSTOMER", $userId)
             ->where("ID", $order->id)
             ->fetch();
-        
+
             if (!$row) {
                 $this->db->commit();
                 return false;
@@ -339,7 +342,7 @@ final class OrderRepository
             $row->update(
                 ["DELIVERY_TYPE" => $type]
             );
-            
+
             if (!$address) {
                 $row->update([
                     "DELIVERY_DATA" => ""
@@ -347,7 +350,7 @@ final class OrderRepository
                 $this->db->commit();
                 return false;
             }
-            
+
             $row->update([
                 "DELIVERY_DATA" => $address
             ]);
@@ -358,14 +361,15 @@ final class OrderRepository
             throw $e;
         }
     }
-               
+
     /**
-     * Mark the payment of an order 
+     * Mark the payment of an order
      *
      * @param integer $userid
      * @return boolean
      */
-    public function clientPayForOrder(int $userid): bool {
+    public function clientPayForOrder(int $userid): bool
+    {
         $order = $this->fetchCustomerOrder($userid);
         if (!$order) {
             return false;
@@ -373,14 +377,15 @@ final class OrderRepository
         $row = $this->db->table("CUSTOMER_ORDER")
         ->where("ID_CUSTOMER", $userid)
         ->where("ID", $order->id)
-        ->fetch(); 
-        
+        ->fetch();
+
         try {
             $this->db->beginTransaction();
             $row->update(
-            [
+                [
                 "STATE" => "PAID"
-            ]);
+                ]
+            );
             $this->db->commit();
             return true;
         } catch (\Exception $e) {
@@ -396,7 +401,8 @@ final class OrderRepository
      * @param string $newState
      * @return boolean
      */
-    public function changeClientOrderStatus(int $orderId, string $newState): bool {
+    public function changeClientOrderStatus(int $orderId, string $newState): bool
+    {
         $row = $this->db->table("CUSTOMER_ORDER")->where("ID", $orderId)->fetch();
         if (!$row) {
             return false;

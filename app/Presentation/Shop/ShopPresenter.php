@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     ShopPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Presenter for the online wine shop	
+//DESC:     Presenter for the online wine shop
 
 namespace App\Presentation\Shop;
 
@@ -24,21 +25,21 @@ use App\Model\Security\Role;
  * Presenter for the online wine shop. Handles displaying products, filtering, sorting,
  * and cart operations for the shop section of the application.
  */
-final class ShopPresenter extends  BasePresenter
+final class ShopPresenter extends BasePresenter
 {
     /**
      * ShopPresenter constructor
      *
-     * @param ProductRepository $wineRepository 
-     * @param OrderRepository $orderRep 
-     * @param ImageRepository $imageRepository 
+     * @param ProductRepository $wineRepository
+     * @param OrderRepository $orderRep
+     * @param ImageRepository $imageRepository
      */
-    public function __construct(private ProductRepository $wineRepository, private OrderRepository $orderRep, private ImageRepository $imageRepository) 
+    public function __construct(private ProductRepository $wineRepository, private OrderRepository $orderRep, private ImageRepository $imageRepository)
     {
         parent::__construct();
     }
     /**
-     * startup method 
+     * startup method
      *
      * @return void
      */
@@ -46,22 +47,22 @@ final class ShopPresenter extends  BasePresenter
     {
         parent::startup();
     }
-   
+
     /**
-     * method to render the shop 
+     * method to render the shop
      *
     * @return void
-    */ 
+    */
     public function renderDefault(): void
     {
         // Get filter params from GET query
         $search = $this->getParameter('search');
         $type = $this->getParameter('type');
         $sort = $this->getParameter('sort');
-        
+
         $this->template->imageRepository = $this->imageRepository;
-       
-        // do a simple search if applicable 
+
+        // do a simple search if applicable
         $wines = $this->wineRepository->getAllProducts($search ?? "");
         /** @var WineColor|null $color */
 
@@ -71,7 +72,7 @@ final class ShopPresenter extends  BasePresenter
             $wines = array_filter($wines, fn($w) => $w->color === $color);
         }
 
-        // sort by price 
+        // sort by price
         if ($sort === 'asc') {
             usort($wines, fn($a, $b) => $a->currentPrice <=> $b->currentPrice);
         } elseif ($sort === 'desc') {
@@ -84,7 +85,7 @@ final class ShopPresenter extends  BasePresenter
         $this->template->sort = $sort;
         $this->template->wines = $wines;
     }
-   
+
     /**
      * Method to handle adding to cart
      *
@@ -102,8 +103,8 @@ final class ShopPresenter extends  BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
@@ -115,18 +116,18 @@ final class ShopPresenter extends  BasePresenter
         } else {
             $this->flashMessage("Položka přidána do košíku", FlashMsgType::SUCCESS->value);
         }
-        
+
         $this->redirect('this');
     }
-    
+
     /**
-     * method to create add to cart form  
+     * method to create add to cart form
      *
      * @return \Nette\Application\UI\Form
      */
     protected function createComponentAddToCartForm(): \Nette\Application\UI\Form
     {
-        $form = new \Nette\Application\UI\Form;
+        $form = new \Nette\Application\UI\Form();
         $form->addHidden('wineId');
         $form->addInteger('count')
             ->setDefaultValue(1)
@@ -152,8 +153,8 @@ final class ShopPresenter extends  BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");

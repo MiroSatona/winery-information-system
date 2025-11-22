@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     ValidationDefinitions.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -19,7 +20,7 @@ final class ValidationDefinitions
     public const EMAIL_PATTERN = '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
     public const POSTAL_CODE_PATTERN = '^[0-9]{5}$';
     public const PHONE_NUMBER_PATTERN = '\+?[0-9]{9}';
-    
+
     public const NAME_LENGTH_MIN = 1;
     public const NAME_LENGTH_MAX = 30;
     public const SURNAME_LENGTH_MIN = 1;

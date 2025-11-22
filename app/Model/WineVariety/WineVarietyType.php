@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineVarietyType.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí

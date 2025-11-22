@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     HomePresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for the homepage
+//DESC:     Presenter for the homepage
 declare(strict_types=1);
 
 namespace App\Presentation\Home;
@@ -19,7 +20,7 @@ use App\Model\Image\ImageRepository;
  * Handles display of vineyard and wine variety information
  */
 final class HomePresenter extends BasePresenter
-{   
+{
     /** @var VineyardRepository $vineyardRepository Repository for getting vineyard data. */
     private VineyardRepository $vineyardRepository;
     /** @var WineVarietyRepository $wineVarietyRepository Repository for getting wine variety data. */
@@ -31,9 +32,9 @@ final class HomePresenter extends BasePresenter
 
     /**
      * Constructor for HomePresenter
-     * @param VineyardRepository $vineyardRepository 
-     * @param WineVarietyRepository $wineVarietyRepository 
-     * @param ImageRepository $imageRepository 
+     * @param VineyardRepository $vineyardRepository
+     * @param WineVarietyRepository $wineVarietyRepository
+     * @param ImageRepository $imageRepository
      */
     public function __construct(VineyardRepository $vineyardRepository, WineVarietyRepository $wineVarietyRepository, ImageRepository $imageRepository)
     {
@@ -59,7 +60,7 @@ final class HomePresenter extends BasePresenter
      * @return void
      */
     public function renderDefault(): void
-    {   
+    {
         // Prepare data for the homepage template
         $this->template->homeImage = $this->homeImage;
         $this->template->vineYardsData = $this->vineyardRepository->joinWithVarieties();

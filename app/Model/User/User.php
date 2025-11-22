@@ -8,13 +8,15 @@
 //DESC:     Class for internal representation of the user in the system.
 
 namespace App\Model\User;
+
 use DateTimeInterface;
 
 /**
  * Class User
  * Class for internal representation of User for database.
  */
-class User{
+class User
+{
     /** @var int $id ID of user in the database. */
     private int $id;
     /** @var string $name Name of the user. */
@@ -49,7 +51,7 @@ class User{
     private bool $isVinter;
     /** @var bool $isAdmin Flag of admin role. */
     private bool $isAdmin;
-    
+
     /**
      * Constructor of the User class.
      *
@@ -146,7 +148,8 @@ class User{
         return $this->name;
     }
 
-    public function getState(): bool {
+    public function getState(): bool
+    {
         return $this->state;
     }
 

@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     VineyardsPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for administration of vineyards
+//DESC:     Presenter for administration of vineyards
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Vineyards;
@@ -32,7 +33,6 @@ use Tracy\ILogger;
  */
 final class VineyardsPresenter extends BasePresenter
 {
-
     /** @var string $patternVineyards Pattern for searching vineyards */
     private string $patternVineyards = '';
     /** @var string $patternWineRows Pattern for searching wine rows */
@@ -44,10 +44,10 @@ final class VineyardsPresenter extends BasePresenter
 
     /**
      * Constructor for VineyardsPresenter
-     * @param VineyardRepository $vineyardRepository 
-     * @param ImageRepository $imageRepository 
-     * @param ValidationDefinitions $validationDefinitions 
-     * @param WineVarietyRepository $wineVarietyRepository 
+     * @param VineyardRepository $vineyardRepository
+     * @param ImageRepository $imageRepository
+     * @param ValidationDefinitions $validationDefinitions
+     * @param WineVarietyRepository $wineVarietyRepository
      */
     public function __construct(
         private VineyardRepository $vineyardRepository,
@@ -78,7 +78,7 @@ final class VineyardsPresenter extends BasePresenter
      * @return Form Form for searching vineyards
      */
     public function createComponentSearchVineyardsForm(): Form
-    {   
+    {
         /** @var Form $form Form for searching vineyards */
         $form = new Form();
 
@@ -151,7 +151,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění smazat vinohrad.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
         }
-        
+
         // Deactivate vineyard
         if ($this->vineyardRepository->setVineyardActiveStatus($vineyardId, false)) {
             $this->flashMessage('Vinohrad byl úspěšně smazán.', FlashMsgType::SUCCESS->value);
@@ -172,7 +172,7 @@ final class VineyardsPresenter extends BasePresenter
             $this->flashMessage('Nemáte oprávnění obnovit vinohrad.', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
         }
-        
+
         // Reactivate the vineyard
         if ($this->vineyardRepository->setVineyardActiveStatus($vineyardId, true)) {
             $this->flashMessage('Vinohrad byl úspěšně obnoven.', FlashMsgType::SUCCESS->value);
@@ -201,7 +201,7 @@ final class VineyardsPresenter extends BasePresenter
     {
         /** @var Form $form Form for adding a new vineyard */
         $form = new Form();
-        
+
         // Input field for name of vineyard
         $form->addText('name', 'Název vinohradu')
             ->addRule(Form::MinLength, "Název vinohradu musí mít alespoň %d znaků.", $this->validationDefinitions::VINEYARD_NAME_LENGTH_MIN)
@@ -248,7 +248,7 @@ final class VineyardsPresenter extends BasePresenter
      * @return void
      */
     public function addVineyardFormSucceeded(Form $form, \stdClass $values): void
-    {   
+    {
         // Check the role for this action
         if (!$this->user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage('Nemáte oprávnění přidat vinohrad.', FlashMsgType::ERROR->value);
@@ -345,7 +345,7 @@ final class VineyardsPresenter extends BasePresenter
      * @return Form Form for editing a vineyard
      */
     public function createComponentEditVineyardForm(): Form
-    {   
+    {
         /** @var Form $form Form for editing a vineyard */
         $form = new Form();
 
@@ -377,7 +377,7 @@ final class VineyardsPresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte rok založení vinohradu');
 
-        // Upload field for vineyard image 
+        // Upload field for vineyard image
         $form->addUpload('image', 'Obrázek')
             ->addRule($form::Image, "Nahrajte prosím platný obrázek.")
             ->setHtmlAttribute('class', 'form-control')
@@ -386,7 +386,7 @@ final class VineyardsPresenter extends BasePresenter
         // Submit button for editing vineyard
         $form->addSubmit('send', 'Upravit vinohrad')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
-        
+
         $form->onSuccess[] = [$this, 'editVineyardFormSucceeded'];
 
         return $form;
@@ -408,7 +408,7 @@ final class VineyardsPresenter extends BasePresenter
 
         /** @var int $vineyardId ID of actual vineyard which will be edited. */
         $vineyardId = (int)$this->getParameter('vineyardId');
-        
+
         /** @var Vineyard|null $vineyard Fetched vineyard for edit. */
         $vineyard = $this->vineyardRepository->fetchById($vineyardId);
         if ($vineyard === null) {
@@ -426,8 +426,8 @@ final class VineyardsPresenter extends BasePresenter
         /** @var FileUpload $image Uploaded new image.*/
         $image = $values->image;
         // Keep existing image by default
-        $imageEntity = $vineyard->getImage(); 
-        
+        $imageEntity = $vineyard->getImage();
+
         // Handle new image upload
         if ($image->hasFile()) {
             $imagePath = $this->imageRepository->uploadImage($image);
@@ -585,7 +585,7 @@ final class VineyardsPresenter extends BasePresenter
     public function createComponentAddWineRowForm(): Form
     {
         /** @var Form  Form for add wine row to vineyard. */
-        $form = new Form;
+        $form = new Form();
 
         // Input field for row number
         $form->addInteger("rowNumber", "Číslo řádku")
@@ -688,7 +688,7 @@ final class VineyardsPresenter extends BasePresenter
      */
     public function createComponentEditWineRowForm(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addInteger("rowNumber", "Číslo řádku")
             ->setDisabled(true)

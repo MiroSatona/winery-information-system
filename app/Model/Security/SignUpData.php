@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     SignUpData.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Data class for user sign-up information.
+//DESC:     Data class for user sign-up information.
 
 declare(strict_types=1);
 

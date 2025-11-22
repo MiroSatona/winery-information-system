@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     Wine.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -23,7 +24,7 @@ class Wine
     private int $bottlesTotal;
     // volume of a single bottle (set separately)
     private float $bottleVolume;
-      
+
     /**
      * Wine constructor
      *

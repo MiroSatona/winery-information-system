@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -28,7 +29,7 @@ final class WineRepository
 {
     /**
      * Repository constructor
-     * 
+     *
      * Arguments provided by Nette DI container
      *
      * @param Explorer $db
@@ -39,7 +40,8 @@ final class WineRepository
         private Explorer $db,
         private ImageRepository $imageRepository,
         private BottleRepository $btlRep
-    ) {}
+    ) {
+    }
 
     /**
      * Fetch a wine by its ID.
@@ -69,7 +71,7 @@ final class WineRepository
 
         return $wines;
     }
-    
+
     /**
      * Fetch all wines that are in PRODUCTION state and not yet assigned to any bottling task.
      *
@@ -112,15 +114,15 @@ final class WineRepository
             $varietyIds = $this->db->table('WINE_VARIETY')
                 ->where('NAME LIKE ?', $like)
                 ->select('ID');
-            
+
             $wineIdsFromVarieties = $this->db->table('HARVEST')
                 ->where('ID_WINE_VARIETY IN ?', $varietyIds)
                 ->select('DISTINCT ID_WINE');
-            
+
             $query = $query->where(
-                'WINE_NAME LIKE ? OR YEAR LIKE ? OR ID IN ?', 
-                $like, 
-                $like, 
+                'WINE_NAME LIKE ? OR YEAR LIKE ? OR ID IN ?',
+                $like,
+                $like,
                 $wineIdsFromVarieties
             );
         }
@@ -167,7 +169,7 @@ final class WineRepository
         $wine->setBottleVolume($bottles->BOTTLE_VOLUME);
         return true;
     }
-    
+
     /**
      * Create a Wine object from a database row.
      *
@@ -181,7 +183,7 @@ final class WineRepository
         if ($row->ID_PICTURE !== null) {
             $image = $this->imageRepository->fetchImageById((int) $row->ID_PICTURE);
         }
-        
+
         $varieties = $this->db->table("HARVEST")
             ->where("ID_WINE", $row->ID)
             ->select("DISTINCT WINE_VARIETY.NAME, WINE_VARIETY.ID_PICTURE AS VARIETY_ID_PICTURE, WINE_VARIETY.COLOR, WINE_VARIETY.DESCRIPTION, WINE_VARIETY.ID")
@@ -206,7 +208,7 @@ final class WineRepository
         }
 
         $varietyNames = array_map(fn($v) => $v->NAME, $varieties);
-        
+
         Debugger::log("varieties: " . implode(", ", $varietyNames));
 
         return new Wine(
@@ -289,84 +291,87 @@ final class WineRepository
             return false;
         }
     }
-    
+
     /**
      * Get total bottle count for a given wine.
-     * 
+     *
      * @param int $idWine
      * @return int
      */
-    public function getWineAllBottleCount(int $idWine) {
+    public function getWineAllBottleCount(int $idWine)
+    {
         $result = $this->btlRep->fetchByWineId($idWine);
         $count = 0;
-        foreach($result as $oneItem) {
+        foreach ($result as $oneItem) {
             $count += $oneItem->bottlesCount;
         }
         return $count;
     }
-    
+
     /**
      * Update the number of free bottles for a given wine.
-     * 
+     *
      * @param int $idWine
      * @param int $amount
      * @param bool $add True to add bottles, false to remove bottles
      * @return bool True on success, false on failure
      */
-    public function updateWineFreeBottles(int $idWine, int $amount, bool $add): bool {
+    public function updateWineFreeBottles(int $idWine, int $amount, bool $add): bool
+    {
 
-        $wine = $this->fetchById($idWine);        
+        $wine = $this->fetchById($idWine);
         if ($wine == null) {
             Debugger::log('Failed to find specified wine');
             return false;
         }
-        
+
         $currentCount = $wine->bottlesLeft;
-        
+
         if ($add) {
             $newAmount = $currentCount + $amount;
         } else {
             $newAmount = $currentCount - $amount;
         }
-        
+
         if ($newAmount < 0) {
             Debugger::log('the new amount < 0');
             return false;
         }
-       
+
         $maxVal = $this->getWineAllBottleCount($idWine);
-            
+
         if ($newAmount > $maxVal) {
             Debugger::log("the new amount is: $newAmount");
             Debugger::log("the max amount is : $maxVal");
             Debugger::log('the amount is > than max');
             return false;
         }
-        
+
         $newState = null;
         if ($newAmount == 0) {
-           $newState = WineState::SOLD->value;
+            $newState = WineState::SOLD->value;
         } else {
             $newState = WineState::SALE->value;
         }
-        
+
         $this->db->table("WINE")->where("ID", $idWine)->update([
             "BOTTLES_LEFT" => $newAmount,
             "STATE" => $newState
         ]);
         return true;
     }
-    
+
     /**
      * Update the price of a given wine.
-     * 
+     *
      * @param int $idWine
      * @param float $newValue
      * @param bool $current True to update current price, false to update bottle price
      * @return bool True on success, false on failure
      */
-    public function updateWinePrice(int $idWine, float $newValue, bool $current): bool {
-        
+    public function updateWinePrice(int $idWine, float $newValue, bool $current): bool
+    {
+
         $param = $current ? "CURRENT_PRICE" : "BOTTLE_PRICE";
 
         try { // run within transaction
@@ -377,22 +382,22 @@ final class WineRepository
                     $param => $newValue
                 ]);
                 return true;
-                
             });
         } catch (\Exception $e) {
             Debugger::log('Failed to update wine price: ' . $e->getMessage() . ' | Wine ID: ' . $idWine, ILogger::ERROR);
             return false;
         }
     }
-    
+
     /**
      * Update the state of a given wine.
-     * 
+     *
      * @param int $idWine
      * @param string $newState
      * @return bool True on success, false on failure
      */
-    public function setWineState(int $idWine, string $newState): bool {
+    public function setWineState(int $idWine, string $newState): bool
+    {
 
         try { // run within transaction
             return $this->db->transaction(function () use ($idWine, $newState) {
@@ -408,15 +413,16 @@ final class WineRepository
             return false;
         }
     }
-    
+
     /**
      * Update the state of a given wine.
-     * 
+     *
      * @param int $idWine
      * @param string|null $newDescription
      * @return bool True on success, false on failure
      */
-    public function setWineDescription(int $idWine, ?string $newDescription): bool {
+    public function setWineDescription(int $idWine, ?string $newDescription): bool
+    {
 
         try { // run within transaction
             return $this->db->transaction(function () use ($idWine, $newDescription) {
@@ -505,7 +511,7 @@ final class WineRepository
                 $wine = $this->db->table('WINE')
                     ->where('ID', $wineId)
                     ->fetch();
-                
+
                 if ($wine === null || $wine->STATE !== 'PRODUCTION') {
                     throw new \Exception('Wine not found or not in production state.');
                 }

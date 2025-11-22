@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     Image.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -11,7 +12,7 @@ namespace App\Model\Image;
 /**
  * Represents a single Image entity in the system
  */
-final class Image 
+final class Image
 {
     /**
      * Image constructor
@@ -22,9 +23,9 @@ final class Image
      * @param string $description
      */
     public function __construct(
-        public ?int $id, 
+        public ?int $id,
         public string $src,
-        public string $name, 
+        public string $name,
         public string $description,
     ) {
     }

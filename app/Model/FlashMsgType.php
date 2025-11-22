@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     FlashMessageType.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí

@@ -12,7 +12,6 @@ namespace App\Model\Profile;
 use Nette\Database\Explorer;
 use Nette\Security\Passwords;
 
-
 /**
  * Repository for handling user profiles
  */
@@ -34,7 +33,7 @@ class ProfileModel
         $this->database = $database;
         $this->password = $passwords;
     }
-    
+
     /**
      * editUserBySelf
      * Method for model handle update with database for user change of his profile.
@@ -43,20 +42,19 @@ class ProfileModel
      * @param int $id Id of the user whose profile will be updated.
      * @return string Empty string if everything is OK, else error message.
      */
-    public function editUserBySelf(array $newData, int $id): string{
+    public function editUserBySelf(array $newData, int $id): string
+    {
         /** @var string $resultMessage Message with error message, or empty if everything will be right during the run method. */
         $resultMessage = '';
-        
-        try 
-        {   
+
+        try {
             // Begin transaction for updating user profile
             $this->database->beginTransaction();
 
             // Update user by provided data
             $this->database->table('USER')->where('ID', $id)->update($newData);
             $this->database->commit();
-        } catch (\Exception $databaseException) 
-        {
+        } catch (\Exception $databaseException) {
             $this->database->rollBack();
             $resultMessage = 'Změnu se nepodařilo provést v databázi.';
         }
@@ -72,7 +70,7 @@ class ProfileModel
      * @return string Empty string if everything is OK, else error message.
      */
     public function resetPasswordByUser(string $oldPassword, string $newPassword, int $id): string
-    {   
+    {
         /** @var string $resultMessage Message with error message, or empty if everything will be right during the run method. */
         $resultMessage = '';
 
@@ -89,16 +87,15 @@ class ProfileModel
             return $resultMessage;
         }
 
-        
-        try
-        {
+
+        try {
             /** @var string $newSalt New salt for the new password. */
             $newSalt = bin2hex(random_bytes(16));
             /** @var string $saltedNewPassword New password salted with new salt. */
             $saltedNewPassword = $newPassword . $newSalt;
             /** @var string $hashedNewPassword Hashed new password with salt. */
             $hashedNewPassword = $this->password->hash($saltedNewPassword);
-            
+
             // Begin transaction for password reset
             $this->database->beginTransaction();
 
@@ -109,8 +106,7 @@ class ProfileModel
             ]);
 
             $this->database->commit();
-        } catch (\Exception $databaseException) 
-        {
+        } catch (\Exception $databaseException) {
             $this->database->rollBack();
             $resultMessage = 'Změnu hesla se nepodařilo provést v databázi.';
         }

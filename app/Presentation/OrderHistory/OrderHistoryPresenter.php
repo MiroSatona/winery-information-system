@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     OrderHistoryPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Presenter for Order History  
+//DESC:     Presenter for Order History
 
 declare(strict_types=1);
 
@@ -20,15 +21,16 @@ use App\Model\FlashMsgType;
  * Presenter for order history management
  * Displays customer's past orders and their details
  */
-final class OrderHistoryPresenter extends BasePresenter 
+final class OrderHistoryPresenter extends BasePresenter
 {
     /**
      * Constructor for OrderHistoryPresenter
-     * @param OrderRepository $orderRepository 
+     * @param OrderRepository $orderRepository
      */
     public function __construct(
         private OrderRepository $orderRepository
-    ) {}
+    ) {
+    }
 
     /**
      * Renders the order history page
@@ -36,7 +38,7 @@ final class OrderHistoryPresenter extends BasePresenter
      * Redirects to sign-in if user is not authenticated
      * @return void
      */
-    public function renderDefault(): void 
+    public function renderDefault(): void
     {
         $user = $this->user;
         // Check if the user is logged in
@@ -44,14 +46,14 @@ final class OrderHistoryPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
         }
-        
+
         $userId = $user->getId();
         $orders = $this->orderRepository->fetchCustomerOrders($userId);
 
@@ -60,10 +62,9 @@ final class OrderHistoryPresenter extends BasePresenter
             $this->template->message = "Nemáte dosud žádné objednávky!";
             return;
         }
-        
+
         $this->template->orders = $orders;
         $this->template->message = '';
         $this->template->OrderState = OrderState::class;
     }
 }
-

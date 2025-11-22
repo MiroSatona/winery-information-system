@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     AuthorizatorFactory.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Factory for creating the ACL authorizator.
+//DESC:     Factory for creating the ACL authorizator.
 
 declare(strict_types=1);
 
@@ -23,9 +24,9 @@ class AuthorizatorFactory
      *
      * @return Permission object with the definitions
      */
-	public static function create(): Permission
-	{
-		$acl = new Permission;
+    public static function create(): Permission
+    {
+        $acl = new Permission();
 
         // define roles
         $acl->addRole(Role::GUEST->name);
@@ -48,6 +49,6 @@ class AuthorizatorFactory
         $acl->allow(Role::VINTNER->name, Resource::VINTNER_PAGE->name);
         $acl->allow(Role::ADMIN->name, Resource::ADMIN_PAGE->name);
 
-		return $acl;
-	}
+        return $acl;
+    }
 }

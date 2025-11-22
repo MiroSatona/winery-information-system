@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     Bottling.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Internal representation of a bottling task.
+//DESC:     Internal representation of a bottling task.
 
 declare(strict_types=1);
 
@@ -60,8 +61,7 @@ class Bottling extends Task
         ?int $idWine,
         int $bottlesCount,
         float $bottleVolume
-    )
-    {
+    ) {
         parent::__construct(
             $id,
             $name,

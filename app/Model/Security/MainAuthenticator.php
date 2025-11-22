@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     MainAuthenticator.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Main authenticator for user login and identity handling.
+//DESC:     Main authenticator for user login and identity handling.
 
 declare(strict_types=1);
 
@@ -30,11 +31,11 @@ class MainAuthenticator implements Authenticator, IdentityHandler
      * @param Explorer $database
      * @param Passwords $passwords
      */
-	public function __construct(
-		private Explorer $database,
-		private Passwords $passwords,
-	) {
-	}
+    public function __construct(
+        private Explorer $database,
+        private Passwords $passwords,
+    ) {
+    }
 
     /**
      * Authenticate user with given username and password
@@ -44,16 +45,16 @@ class MainAuthenticator implements Authenticator, IdentityHandler
      * @return SimpleIdentity of the authenticated user
      * @throws AuthenticationException when authentication fails
      */
-	public function authenticate(string $username, string $password): SimpleIdentity
-	{
+    public function authenticate(string $username, string $password): SimpleIdentity
+    {
         // fetch user row from db
-		$row = $this->database->table('USER')
-			->where('username', $username)
-			->fetch();
+        $row = $this->database->table('USER')
+            ->where('username', $username)
+            ->fetch();
 
-		if (!$row) {
-			throw new AuthenticationException('User not found.');
-		}
+        if (!$row) {
+            throw new AuthenticationException('User not found.');
+        }
 
         if (!$row->ACTIVE) {
             throw new AuthenticationException('User account is inactive.');
@@ -62,9 +63,9 @@ class MainAuthenticator implements Authenticator, IdentityHandler
         $saltedPassword = $password . $row->PSWD_SALT;
 
         // verify password
-		if (!$this->passwords->verify($saltedPassword, $row->PSWD_HASH)) {
-			throw new AuthenticationException('Invalid password.');
-		}
+        if (!$this->passwords->verify($saltedPassword, $row->PSWD_HASH)) {
+            throw new AuthenticationException('Invalid password.');
+        }
 
         $roles = [];
 
@@ -85,23 +86,23 @@ class MainAuthenticator implements Authenticator, IdentityHandler
             $roles[] = Role::VINTNER->name;
         }
 
-		return new SimpleIdentity(
-			$row->ID,
-			$roles,
-			[
+        return new SimpleIdentity(
+            $row->ID,
+            $roles,
+            [
                 'name' => $row->NAME,
                 'surname' => $row->SURNAME,
                 'email' => $row->EMAIL,
                 'username' => $row->USERNAME
             ],
-		);
-	}
+        );
+    }
 
     /**
      * Sleep user identity
-     * 
+     *
      * We do not need this function, but it is required by IdentityHandler interface.
-     * 
+     *
      * @param IIdentity $identity
      * @return IIdentity
      */
@@ -112,21 +113,22 @@ class MainAuthenticator implements Authenticator, IdentityHandler
 
     /**
      * Wakeup user identity
-     * 
+     *
      * Each time user queries the Nette server -> recheck their roles and activity
-     * 
+     *
      * @param IIdentity $identity
      * @return IIdentity
      */
     public function wakeupIdentity(IIdentity $identity): ?IIdentity
-    {   
+    {
         $userRow = $this->database->table('USER')
             ->where('ID', $identity->getId())
             ->fetch();
-        
+
         // if user not found, return null
-        if (!$userRow)
+        if (!$userRow) {
             return null;
+        }
 
         if (!$userRow->ACTIVE) {
             return null;
@@ -157,9 +159,9 @@ class MainAuthenticator implements Authenticator, IdentityHandler
         }
 
         return new SimpleIdentity(
-			$userRow->ID,
-			$roles,
-			$userData,
-		);
+            $userRow->ID,
+            $roles,
+            $userData,
+        );
     }
 }

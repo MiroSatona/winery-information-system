@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     TreatmentRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Repository for Treatment tasks.
+//DESC:     Repository for Treatment tasks.
 
 declare(strict_types=1);
 
@@ -21,7 +22,8 @@ use App\Model\Vineyard\VineyardRepository;
  * Handles treatment related DB operations
  */
 class TreatmentRepository
-{   /** @var Explorer $database Database explorer. */
+{
+   /** @var Explorer $database Database explorer. */
     private Explorer $database;
     private VineyardRepository $vineyardRepository;
 
@@ -35,7 +37,7 @@ class TreatmentRepository
     {
         $this->database = $database;
         $this->vineyardRepository = $vineyardRepository;
-    }   
+    }
 
     /**
      * fetchById
@@ -82,7 +84,7 @@ class TreatmentRepository
 
         return $treatment;
     }
-    
+
     /**
      * fetchTreatments
      * Method to fetch treatments based on pattern and state.
@@ -91,7 +93,8 @@ class TreatmentRepository
      * @param string $state State to filter by.
      * @return Treatment[] Array of Treatment objects.
      */
-    public function fetchTreatments(string $pattern, string $state): array{
+    public function fetchTreatments(string $pattern, string $state): array
+    {
 
         // Fetch joined table of tasks and treatments
         $mainQuery = $this->database->table('TREATMENT')

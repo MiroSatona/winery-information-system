@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     ImageRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -18,7 +19,7 @@ use Tracy\ILogger;
 /**
  * Handles DB operations related to Images
  */
-final class ImageRepository 
+final class ImageRepository
 {
     /**
      * Repository constructor
@@ -35,7 +36,7 @@ final class ImageRepository
         private Explorer $db
     ) {
     }
-    
+
     /**
      * Fetch image by its ID
      *
@@ -54,14 +55,14 @@ final class ImageRepository
      * @param \Nette\Database\Table\ActiveRow $imgRow
      * @return Image
      */
-    private function createImageFromRow($imgRow) 
+    private function createImageFromRow($imgRow)
     {
         return new Image(
             $imgRow->ID,
             $imgRow->LINK,
             $imgRow->IMAGE_NAME,
             $imgRow->DESCRIPTION
-        ); 
+        );
     }
 
     /**
@@ -94,16 +95,16 @@ final class ImageRepository
         try {
             if ($file->isOk() && $file->isImage()) {
             // generate a safe filename (e.g., unique hash + original extension)
-            $extension = strtolower(pathinfo($file->getSanitizedName(), PATHINFO_EXTENSION));
-            $timestamp = (new \DateTime())->format('YmdHis');
-            $name = "img_" . $timestamp;
-            $name = uniqid($name, true) . '.' . $extension;
+                $extension = strtolower(pathinfo($file->getSanitizedName(), PATHINFO_EXTENSION));
+                $timestamp = (new \DateTime())->format('YmdHis');
+                $name = "img_" . $timestamp;
+                $name = uniqid($name, true) . '.' . $extension;
 
             // move the uploaded file
-            $file->move($this->uploadsDir . '/' . $name);
-            return $name;
-        }
-        return '';
+                $file->move($this->uploadsDir . '/' . $name);
+                return $name;
+            }
+            return '';
         } catch (\Exception $e) {
             Debugger::log("Image upload failed: " . $e->getMessage(), ILogger::ERROR);
             return '';
@@ -124,7 +125,7 @@ final class ImageRepository
             return $this->tmpImage . "/" . "tempImage.png";
         }
     }
-    
+
     /**
      * Get the temporary wine image path
      *

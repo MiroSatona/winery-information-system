@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     TaskCreateStateEnum.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Enumeration of task creation operation statuses.
+//DESC:     Enumeration of task creation operation statuses.
 
 declare(strict_types=1);
 

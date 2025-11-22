@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     WinePresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for administration of wine 
+//DESC:     Presenter for administration of wine
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Wine;
@@ -45,9 +46,9 @@ final class WinePresenter extends BasePresenter
 
     /**
      * Constructor for WinePresenter
-     * @param WineRepository $wineRepository 
-     * @param ImageRepository $imageRepository 
-     * @param HarvestRepository $harvestRepository 
+     * @param WineRepository $wineRepository
+     * @param ImageRepository $imageRepository
+     * @param HarvestRepository $harvestRepository
      * @param BottlingRepository $bottlingRepository
      * @param UserRepository $userRepository
      */
@@ -253,9 +254,9 @@ final class WinePresenter extends BasePresenter
 
         $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
-           $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
-           $this->redirect(":IS:Wine:dashboard");
-           return;
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
         }
 
         if ($wine->state !== WineState::BOTTLED) {
@@ -263,12 +264,12 @@ final class WinePresenter extends BasePresenter
             $this->redirect(":IS:Wine:dashboard");
             return;
         }
-        
+
         $this->template->imageRepository = $this->imageRepository;
         $this->template->wine = $wine;
     }
-    
- 
+
+
     /**
      * Renders the change price form for a wine
      * @param int $wineId ID of the wine to change price
@@ -281,12 +282,12 @@ final class WinePresenter extends BasePresenter
             $this->redirect(":IS:Wine:dashboard");
             return;
         }
-        
+
         $wine = $this->wineRepository->fetchById($wineId);
         if (!$wine) {
-           $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
-           $this->redirect(":IS:Wine:dashboard");
-           return;
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
+            $this->redirect(":IS:Wine:dashboard");
+            return;
         }
 
         if ($wine->state !== WineState::SALE) {
@@ -294,15 +295,15 @@ final class WinePresenter extends BasePresenter
             $this->redirect(":IS:Wine:dashboard");
             return;
         }
-        
+
         $form = $this->getComponent("setWinePriceForm");
         $form["price"]->setValue($wine->getCurrentPrice());
         $form["popis"]->setValue($wine->getSalesDescription());
-        
+
         $this->template->imageRepository = $this->imageRepository;
         $this->template->wine = $wine;
     }
-    
+
     /**
      * Creates the set wine price form component
      * @return Form Form for setting wine price
@@ -350,15 +351,15 @@ final class WinePresenter extends BasePresenter
         if (!empty($values->popis)) {
             $description = (string) $values->popis;
         }
-        
+
         $wine = $this->wineRepository->fetchById($wineId);
-        
+
         if (!$wine) {
-            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);            
+            $this->flashMessage("Nepodařilo se načíst potřebná data.", FlashMsgType::ERROR->value);
             $this->redirect('Wine:dashboard');
-            return; 
+            return;
         }
-        
+
         $result = true;
         if ($wine->state == WineState::BOTTLED) {
             $result = $this->wineRepository->updateWinePrice($wineId, $price, false);
@@ -367,7 +368,7 @@ final class WinePresenter extends BasePresenter
         }
         $result2 = $this->wineRepository->updateWinePrice($wineId, $price, true);
         $result3 = $this->wineRepository->setWineDescription($wineId, $description);
-        
+
         if (!$result || !$result2 || !$result3) {
             $this->flashMessage("Nepodařilo se uložit cenu nebo popis vína.", FlashMsgType::ERROR->value);
         } else {
@@ -391,7 +392,7 @@ final class WinePresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název vína...')
             ->setRequired('Zadejte název vína.');
-        
+
         $form->addInteger('year', 'Ročník')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. ' . date('Y'))
@@ -399,7 +400,7 @@ final class WinePresenter extends BasePresenter
             ->setValue(date('Y'))
             ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, 'Ročník nemůže být větší než aktuální rok', date('Y'));
-        
+
         $form->addFloat('alcoholPercentage', 'Obsah alkoholu (%)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 13.5')
@@ -426,7 +427,7 @@ final class WinePresenter extends BasePresenter
             ->setValue(WineColor::WHITE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte barvu vína.');
-        
+
         $form->addSelect('grade', 'Přívlastek vína', [
             WineGrade::NONE->value => 'Bez přívlastku',
             WineGrade::CABINET->value => 'Kabinetní víno',
@@ -439,14 +440,14 @@ final class WinePresenter extends BasePresenter
             ->setValue(WineGrade::NONE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte přívlastek vína.');
-        
+
         $form->addInteger('volume', 'Objem výroby (litry)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 500')
             ->setRequired('Zadejte objem výroby vína v litrech.')
             ->addRule(Form::Min, 'Objem výroby nemůže být menší než %d litrů.', ValidationDefinitions::VOLUME_MIN)
             ->addRule(Form::Max, 'Objem výroby nemůže být větší než %d litrů.', ValidationDefinitions::VOLUME_MAX);
-        
+
         $form->addFloat('leftSugar', 'Zbytkový cukr (g/l)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 4.5')
@@ -465,7 +466,7 @@ final class WinePresenter extends BasePresenter
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', '3')
             ->setHtmlAttribute('placeholder', 'Volitelná poznámka k výrobnímu procesu...');
-        
+
         $form->addSubmit('send', 'Uložit změny')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
 
@@ -556,7 +557,7 @@ final class WinePresenter extends BasePresenter
             $this->flashMessage('Víno nebylo nalezeno', FlashMsgType::ERROR->value);
             $this->redirect('dashboard');
         }
-        
+
         // Populate form with current values
         $form = $this->getComponent('editWineForm');
         $form['name']->setValue($wine->getName());
@@ -586,16 +587,16 @@ final class WinePresenter extends BasePresenter
             ->addRule(Form::Image, 'Vložte platný obrázek.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('accept', 'image/*');
-        
+
         $form->addSubmit('send', 'Uložit obrázek')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'changeWineImage'];
-        
+
         $form->addSubmit('cancel', 'Zrušit')
             ->setHtmlAttribute('class', 'btn btn-outline-secondary w-100 fw-bold')
             ->setValidationScope([])
             ->onClick[] = [$this, 'backToDashboardImage'];
-        
+
         return $form;
     }
 
@@ -673,7 +674,7 @@ final class WinePresenter extends BasePresenter
             $this->redirect('changeImage', $wineId);
             return;
         }
-        
+
         // Update the wine record to remove image reference
         $result = $this->wineRepository->updateWineImage($wineId, null);
         if ($result) {
@@ -734,7 +735,7 @@ final class WinePresenter extends BasePresenter
         if ($harvestsSelected === null) {
             $harvestsSelected = [];
         }
-        
+
         foreach ($harvests as $harvest) {
             /** @var Harvest $harvest */
             foreach ($harvestsSelected as $selectedHarvest) {
@@ -743,8 +744,8 @@ final class WinePresenter extends BasePresenter
                 }
             }
 
-            $harvestOptions[$harvest->getId()] = 
-            "Sklizeň " . $harvest->getWineVariety()->getName() . 
+            $harvestOptions[$harvest->getId()] =
+            "Sklizeň " . $harvest->getWineVariety()->getName() .
             " | " . $harvest->getVineyard()->getName() .
             " | " . $harvest->getExecutionTimestamp()->format('d.m.Y') .
             " | " . ($harvest->getWeight()) . " kg" .
@@ -763,7 +764,7 @@ final class WinePresenter extends BasePresenter
         $form->addSubmit('addHarvest', 'Přidat sklizeň')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'harvestSelectionFormSucceeded'];
-        
+
         $form->addSubmit('toStep2', 'Pokračovat k výrobě')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold')
             ->onClick[] = [$this, 'redirectToProduceP2'];
@@ -840,8 +841,10 @@ final class WinePresenter extends BasePresenter
             return;
         }
 
-        if ($this->getSession('wineIS')->get('harvestsInProduction') === null ||
-            count($this->getSession('wineIS')->get('harvestsInProduction')) === 0) {
+        if (
+            $this->getSession('wineIS')->get('harvestsInProduction') === null ||
+            count($this->getSession('wineIS')->get('harvestsInProduction')) === 0
+        ) {
             $this->flashMessage('Pro pokračování do kroku 2 musíte vybrat alespoň jednu sklizeň.', FlashMsgType::ERROR->value);
             $this->redirect('this');
         }
@@ -942,7 +945,7 @@ final class WinePresenter extends BasePresenter
             ->setValue(date('Y'))
             ->addRule(Form::Min, 'Ročník nemůže být menší než %d.', ValidationDefinitions::YEAR_MIN)
             ->addRule(Form::Max, 'Ročník nemůže být větší než aktuální rok', date('Y'));
-        
+
         $form->addFloat('alcoholPercentage', 'Obsah alkoholu (%)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 13.5')
@@ -969,7 +972,7 @@ final class WinePresenter extends BasePresenter
             ->setValue(WineColor::WHITE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte barvu vína.');
-        
+
         $form->addSelect('grade', 'Přívlastek vína', [
             WineGrade::NONE->value => 'Bez přívlastku',
             WineGrade::CABINET->value => 'Kabinetní víno',
@@ -982,14 +985,14 @@ final class WinePresenter extends BasePresenter
             ->setValue(WineGrade::NONE->value)
             ->setHtmlAttribute('class', 'form-select')
             ->setRequired('Vyberte přívlastek vína.');
-        
+
         $form->addInteger('volume', 'Objem výroby (litry)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 500')
             ->setRequired('Zadejte objem výroby vína v litrech.')
             ->addRule(Form::Min, 'Objem výroby nemůže být menší než %d litrů.', ValidationDefinitions::VOLUME_MIN)
             ->addRule(Form::Max, 'Objem výroby nemůže být větší než %d litrů.', ValidationDefinitions::VOLUME_MAX);
-        
+
         $form->addFloat('leftSugar', 'Zbytkový cukr (g/l)')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'např. 4.5')

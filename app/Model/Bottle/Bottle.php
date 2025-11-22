@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     Bottle.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -11,8 +12,8 @@ namespace App\Model\Bottle;
 /**
  * Represents a Bottle entity for shop purposes
  */
-final class Bottle {
-    
+final class Bottle
+{
     /**
      * Bottle constructor
      *
@@ -26,5 +27,6 @@ final class Bottle {
         public int $wineId,
         public int $bottlesCount,
         public float $bottleVolume,
-    ) {}
+    ) {
+    }
 }

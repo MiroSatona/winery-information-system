@@ -1,12 +1,14 @@
 <?php
+
 //FILE:     CartPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:     Presenter for users shopping carts. 	
+//DESC:     Presenter for users shopping carts.
 
 declare(strict_types=1);
+
 namespace App\Presentation\Cart;
 
 use Nette;
@@ -23,12 +25,12 @@ use App\Model\Security\Role;
  * Presenter for shopping cart management.
  * Handles cart display, item management, and delivery options.
  */
-final class CartPresenter extends BasePresenter 
+final class CartPresenter extends BasePresenter
 {
     /**
      * Constructor for CartPresenter
-     * @param OrderRepository $orderRepository 
-     * @param ImageRepository $imageRepository 
+     * @param OrderRepository $orderRepository
+     * @param ImageRepository $imageRepository
      */
     public function __construct(
         private OrderRepository $orderRepository,
@@ -44,7 +46,7 @@ final class CartPresenter extends BasePresenter
      * @return void
      */
     public function renderDefault(): void
-    {   
+    {
         /** @var User $user Actual user. */
         $user = $this->user;
 
@@ -53,8 +55,8 @@ final class CartPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
@@ -101,20 +103,20 @@ final class CartPresenter extends BasePresenter
      */
     public function handleRemoveItem(int $wineId): void
     {
-        
+
         // Check if the user is logged in
         if (!$this->user->isLoggedIn()) {
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
         }
-        
+
         /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
 
@@ -138,14 +140,14 @@ final class CartPresenter extends BasePresenter
      * @return void
      */
     public function handleChangeAmount(int $wineId, bool $add): void
-    {   
+    {
         // Check if the user is logged in
         if (!$this->user->isLoggedIn()) {
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
@@ -160,21 +162,21 @@ final class CartPresenter extends BasePresenter
         if ($success) {
             $this->flashMessage('Změna počtu položky uložena', FlashMsgType::SUCCESS->value);
         } else {
-            $this->flashMessage('Uložení se nepovedlo', FlashMsgType::ERROR->value); 
+            $this->flashMessage('Uložení se nepovedlo', FlashMsgType::ERROR->value);
         }
 
         $this->redirect('this');
     }
-    
+
     /**
      * Creates the delivery options form component
      * Form allows selecting delivery type and entering delivery address
      * @return Form Form for delivery options
      */
     protected function createComponentDeliveryForm(): Form
-    {   
+    {
         /** @var Form $form Form for delivery options. */
-        $form = new Form;
+        $form = new Form();
 
         /** @var int $userId ID of the current user. */
         $userId = $this->getUser()->getId();
@@ -182,9 +184,9 @@ final class CartPresenter extends BasePresenter
         $order = $this->orderRepository->fetchCustomerOrder($userId);
 
         /** @var string|null $deliveryType Delivery type of the current order. */
-        $deliveryType = $order->deliveryType?? 'PICKUP';
+        $deliveryType = $order->deliveryType ?? 'PICKUP';
         /** @var string|null $address Delivery address of the current order. */
-        $address = $order->deliveryData?? null;
+        $address = $order->deliveryData ?? null;
 
         // Form for delivery options
         $form->addRadioList('deliveryType', 'Způsob doručení', [
@@ -220,15 +222,15 @@ final class CartPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$this->user->isInRole(Role::USER->name)) {
             $this->flashMessage("Nejste zákazníkem !", FlashMsgType::ERROR->value);
             $this->redirect(":Home:default");
             return;
         }
         /** @var string $type Delivery type from the form. */
-        $type= $values->deliveryType;
+        $type = $values->deliveryType;
         /** @var string|null $address Delivery address from the form. */
         $address = $values->address ?: null;
         /** @var int $userId ID of the current user. */
@@ -247,7 +249,7 @@ final class CartPresenter extends BasePresenter
         } else {
             $this->flashMessage("Způsob doručení byl uložen", FlashMsgType::ERROR->value);
         }
-        
+
         $this->redirect('this');
     }
 }

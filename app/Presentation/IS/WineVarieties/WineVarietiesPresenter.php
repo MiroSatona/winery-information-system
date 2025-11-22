@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     WineVarietiesPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for administration of wine varieties
+//DESC:     Presenter for administration of wine varieties
 declare(strict_types=1);
 
 namespace App\Presentation\IS\WineVarieties;
@@ -29,12 +30,11 @@ use Tracy\ILogger;
  */
 final class WineVarietiesPresenter extends BasePresenter
 {
-
     /**
      * Constructor for WineVarietiesPresenter
-     * @param WineVarietyRepository $wineVarietyRepository 
-     * @param ImageRepository $imageRepository 
-     * @param ValidationDefinitions $validationDefinitions 
+     * @param WineVarietyRepository $wineVarietyRepository
+     * @param ImageRepository $imageRepository
+     * @param ValidationDefinitions $validationDefinitions
      */
     public function __construct(
         private WineVarietyRepository $wineVarietyRepository,
@@ -98,13 +98,13 @@ final class WineVarietiesPresenter extends BasePresenter
             $this->flashMessage('Odrůda vína nebyla nalezena.', FlashMsgType::ERROR->value);
             $this->redirect('WineVarieties:dashboard');
         }
-        
+
         // Populate form with current values
         $form = $this->getComponent('editWineVariety');
         $form['name']->setValue($wineVariety->getName());
         $form['color']->setValue($wineVariety->getColor()->value);
         $form['description']->setValue($wineVariety->getDescription());
-        
+
         $this->template->wineVariety = $wineVariety;
         if ($wineVariety->getImage() !== null) {
             $this->template->imagePath = $this->imageRepository->getPathForImage($wineVariety->getImage());
@@ -117,7 +117,7 @@ final class WineVarietiesPresenter extends BasePresenter
      */
     public function createComponentAddWineVariety(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addText('name', 'Název odrůdy')
             ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
@@ -125,7 +125,7 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setRequired('Zadejte prosím název odrůdy vína.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
-        
+
         $form->addSelect('color', 'Barva bobulí', [
             WineVarietyType::WHITE->value => 'Bílé',
             WineVarietyType::RED->value => 'Červené',
@@ -137,17 +137,17 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setRequired('Zadejte prosím barvu bobulí.')
             ->setHtmlAttribute('class', 'form-select')
             ->setHtmlAttribute('placeholder', 'Zadejte barvu bobulí.');
-        
+
         $form->addTextArea('description', 'Popis odrůdy')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis odrůdy vína');
-        
+
         $form->addUpload('image', 'Obrázek odrůdy vína')
             ->addRule($form::Image, 'Nahrajte prosím platný obrázek.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Nahrajte obrázek odrůdy vína');
-        
+
         $form->addSubmit('send', 'Přidat odrůdu vína')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold');
 
@@ -237,7 +237,7 @@ final class WineVarietiesPresenter extends BasePresenter
      */
     public function createComponentEditWineVariety(): Form
     {
-        $form = new Form;
+        $form = new Form();
 
         $form->addText('name', 'Název odrůdy')
             ->addRule($form::MinLength, 'Název odrůdy musí mít alespoň %d znaků.', $this->validationDefinitions::WINE_VARIETY_NAME_LENGTH_MIN)
@@ -245,7 +245,7 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setRequired('Zadejte prosím název odrůdy vína.')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Zadejte název odrůdy vína');
-        
+
         $form->addSelect('color', 'Barva bobulí', [
             WineVarietyType::WHITE->value => 'Bílé',
             WineVarietyType::RED->value => 'Červené',
@@ -256,16 +256,16 @@ final class WineVarietiesPresenter extends BasePresenter
             ->setRequired('Zadejte prosím barvu bobulí.')
             ->setHtmlAttribute('class', 'form-select')
             ->setHtmlAttribute('placeholder', 'Zadejte barvu bobulí.');
-        
+
         $form->addTextArea('description', 'Popis odrůdy')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('rows', 4)
             ->setHtmlAttribute('placeholder', 'Zadejte popis odrůdy vína');
-        
+
         $form->addUpload('image', 'Obrázek odrůdy vína')
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('accept', 'image/*');
-        
+
         $form->addSubmit('send', 'Uložit změny')
             ->setHtmlAttribute('class', 'btn btn-primary w-100 fw-bold text-white');
 
@@ -302,7 +302,7 @@ final class WineVarietiesPresenter extends BasePresenter
         }
 
         $imageEntity = $wineVariety->getImage();
-        
+
         /** @var FileUpload $newImage */
         $newImage = $values->image;
         if ($newImage->hasFile()) {
@@ -372,7 +372,7 @@ final class WineVarietiesPresenter extends BasePresenter
         } else {
             $this->flashMessage('Odstranění obrázku se nezdařilo.', FlashMsgType::ERROR->value);
         }
-        
+
         $this->redirect('WineVarieties:edit', ['id' => $id]);
     }
 }

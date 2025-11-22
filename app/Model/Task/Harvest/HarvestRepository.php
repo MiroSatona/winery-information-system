@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     HarvestRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Repository for Harvest tasks.
+//DESC:     Repository for Harvest tasks.
 
 declare(strict_types=1);
 
@@ -51,7 +52,7 @@ final class HarvestRepository
             ->joinWhere('TASK', 'TASK.ID = ID_TASK')
             ->select('HARVEST.*, TASK.*')
             ->fetch();
-        
+
         if ($row === null) {
             return null;
         }
@@ -133,7 +134,7 @@ final class HarvestRepository
                 ($row->SUGAR_CONTENT !== null) ? (float)$row->SUGAR_CONTENT : null
             );
         }
-    
+
         return $harvests;
     }
 
@@ -160,13 +161,13 @@ final class HarvestRepository
         if ($state !== '') {
             $mainQuery->where('state = ?', $state);
         }
-        
+
         // Fetch all filtered data
         $mainQuery->fetchAll();
 
         /** @var Harvest[] */
         $harvests = [];
-        
+
         // Construct Harvest objects one by one
         foreach ($mainQuery as $row) {
             $vineyard = $this->vineyardRepository->fetchById((int)$row->ID_VINEYARD);
@@ -226,7 +227,7 @@ final class HarvestRepository
                     ->update([
                         'LAST_CHANGE_TIMESTAMP' => new \DateTime()
                     ]);
-                
+
                 return true;
             });
         } catch (\Exception $e) {

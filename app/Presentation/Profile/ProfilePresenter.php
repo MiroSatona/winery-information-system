@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     ProfilePresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for the User Profile
+//DESC:     Presenter for the User Profile
 
 namespace App\Presentation\Profile;
 
@@ -34,9 +35,9 @@ class ProfilePresenter extends BasePresenter
 
     /**
      * ProfilePresenter constructor
-     * @param UserRepository $userRepository 
-     * @param ValidationDefinitions $validationDefinitions 
-     * @param ProfileModel $profileModel 
+     * @param UserRepository $userRepository
+     * @param ValidationDefinitions $validationDefinitions
+     * @param ProfileModel $profileModel
      */
     public function __construct(UserRepository $userRepository, ValidationDefinitions $validationDefinitions, ProfileModel $profileModel)
     {
@@ -79,13 +80,13 @@ class ProfilePresenter extends BasePresenter
 
         $this->template->currentUser = $currentUser;
     }
-    
+
     /**
      * Renders the profile edit view
      * Loads user data and populates the edit form with current values
      * @return void
      */
-    public function renderEdit():void
+    public function renderEdit(): void
     {
 
         if ($this->userId === null) {
@@ -100,7 +101,7 @@ class ProfilePresenter extends BasePresenter
             $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
-        
+
         // Set values of user before edit
         $this['editProfileByUserForm']->setDefaults([
             'name'        => $user->getName(),
@@ -169,7 +170,7 @@ class ProfilePresenter extends BasePresenter
             ->addRule($form::MaxLength, 'Číslo popisné nesmí mít více než %d znaků.', $this->validationDefinitions::HOUSE_NUMBER_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', '123');
-        
+
         $form->addText('postalCode', 'PSČ')
             ->addRule($form::MinLength, 'PSČ musí mít alespoň %d znaky.', $this->validationDefinitions::POSTAL_CODE_LENGTH_MIN)
             ->addRule($form::MaxLength, 'PSČ nesmí mít více než %d znaků.', $this->validationDefinitions::POSTAL_CODE_LENGTH_MAX)
@@ -183,11 +184,11 @@ class ProfilePresenter extends BasePresenter
             ->addRule($form::MaxLength, 'Uživatelské jméno nesmí mít více než %d znaků.', $this->validationDefinitions::USERNAME_LENGTH_MAX)
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('placeholder', 'Uživatelské jméno');
-       
+
         // Button for submitting the form
         $form->addSubmit('send', 'Změnit údaje')
             ->setHtmlAttribute('class', 'btn btn-primary');
-    
+
         $form->onSuccess[] = [$this, 'editDetailsByUser'];
         $form->onError[] = [$this, 'formError'];
 
@@ -225,7 +226,7 @@ class ProfilePresenter extends BasePresenter
 
         $form->onSuccess[] = [$this, 'resetPassword'];
         $form->onError[] = [$this, 'formError'];
-    
+
         return $form;
     }
 
@@ -246,31 +247,31 @@ class ProfilePresenter extends BasePresenter
         /** @var User|null $oldUser User before edit */
         $oldUser = $this->userRepository->getUserById($this->userId);
 
-        if(!$oldUser) {
+        if (!$oldUser) {
             $this->flashMessage("Nezdařilo se najít uživatele v databázi.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');
         }
 
-        
-        $oldUserData = [ 
+
+        $oldUserData = [
             'NAME'        => $oldUser->getName(),
             'SURNAME'     => $oldUser->getSurname(),
-            'PHONE_NUMBER'=> $oldUser->getPhoneNumber(),
+            'PHONE_NUMBER' => $oldUser->getPhoneNumber(),
             'CITY'        => $oldUser->getCity(),
             'STREET'      => $oldUser->getStreet(),
-            'HOUSE_NUMBER'=> $oldUser->getHouseNumber(),
+            'HOUSE_NUMBER' => $oldUser->getHouseNumber(),
             'POST_CODE'   => $oldUser->getPostcode(),
             'USERNAME'    => $oldUser->getUsername(),
         ];
 
-        $newUserData = [ 
+        $newUserData = [
             'NAME'        => $values->name,
             'SURNAME'     => $values->surname,
             'EMAIL'       => $values->email,
-            'PHONE_NUMBER'=> $values->phone,
+            'PHONE_NUMBER' => $values->phone,
             'CITY'        => $values->city,
             'STREET'      => $values->street,
-            'HOUSE_NUMBER'=> $values->houseNumber,
+            'HOUSE_NUMBER' => $values->houseNumber,
             'POST_CODE'   => $values->postalCode,
             'USERNAME'    => $values->username,
         ];
@@ -287,7 +288,6 @@ class ProfilePresenter extends BasePresenter
         // If there was an error while saving changes, attach it to the form so it is
         // shown to the user next to the form instead of redirecting away.
         $form->addError($returnMessage);
-
     }
 
     /**
@@ -298,7 +298,7 @@ class ProfilePresenter extends BasePresenter
      * @return void
      */
     public function resetPassword(Form $form, \stdClass $values): void
-    {   
+    {
         if ($this->userId === null) {
             $this->flashMessage("Nejste přihlášeni.", FlashMsgType::WARNING->value);
             $this->redirect('Sign:in');

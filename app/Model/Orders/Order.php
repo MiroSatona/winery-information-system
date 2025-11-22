@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     Order.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -26,7 +27,7 @@ final class CustomerOrder
      * @param int|null $idCustomer
      * @param float $totalPrice
      * @param string $state           // RESERVED | PAID | CANCELLED
-     * @param string $deliveryType   // PICKUP | COURIER | POST 
+     * @param string $deliveryType   // PICKUP | COURIER | POST
      * @param string $orderTimestamp  // store as string (from DB)
      * @param string $deliveryData
      * @param OrderItem[] $items        // optional list of related items
@@ -41,23 +42,26 @@ final class CustomerOrder
         public string $deliveryData,
         /** @var OrderItem[] */
         public array $items = [],
-    ) {}
-    
+    ) {
+    }
+
     /**
      * Setter for user
      *
      * @param User $user
      */
-    public function setUser(User $user) {
-        $this->user = $user;    
+    public function setUser(User $user)
+    {
+        $this->user = $user;
     }
-    
+
     /**
      * Getter for user
      *
      * @return User
      */
-    public function getUser()  {
+    public function getUser()
+    {
         return $this->user;
     }
 }

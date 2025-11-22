@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineVarietyRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -19,14 +20,14 @@ use Tracy\ILogger;
 
 /**
  * Repository for tasks related to wine varieties
- * 
+ *
  * Handles CRUD operations on the DB for wine varieties, as well as other operations.
  */
 final class WineVarietyRepository
 {
     /**
      * Repository constructor
-     * 
+     *
      * Arguments provided by Nette DI container
      *
      * @param Explorer $database
@@ -40,7 +41,7 @@ final class WineVarietyRepository
 
     /**
      * Fetch all wine varieties from the database
-     * 
+     *
      * @return WineVariety[]
      */
     public function fetchAll(): array
@@ -48,7 +49,7 @@ final class WineVarietyRepository
         /** @var WineVariety[] $wineVarieties */
         $wineVarieties = [];
         $rows = $this->database->table('WINE_VARIETY')->fetchAll();
-        
+
         // assemble WineVariety objects one by one
         foreach ($rows as $row) {
             // access PICTURE data by left join
@@ -62,7 +63,7 @@ final class WineVarietyRepository
                     $picture->DESCRIPTION
                 );
             }
-            
+
             $wineVarieties[] = new WineVariety(
                 $row->ID,
                 $row->NAME,
@@ -73,10 +74,10 @@ final class WineVarietyRepository
         }
         return $wineVarieties;
     }
-    
+
     /**
      * Fetch single wine variety by its ID
-     * 
+     *
      * @param int $id
      * @return WineVariety|null
      */
@@ -119,11 +120,11 @@ final class WineVarietyRepository
         $count = $this->database->table('WINE_ROW')
             ->where('ID_WINE_VARIETY', $id)
             ->count();
-       
+
         $count += $this->database->table("HARVEST")
             ->where('ID_WINE_VARIETY', $id)
             ->count();
-        
+
         return $count > 0;
     }
 
@@ -131,7 +132,7 @@ final class WineVarietyRepository
      * Add given Wine Variety to the database
      *
      * Return value indicates success or failure
-     * 
+     *
      * @param WineVariety $wineVariety
      * @return boolean
      */
@@ -171,7 +172,7 @@ final class WineVarietyRepository
      * Update given Wine Variety in the database
      *
      * Return value indicates success or failure
-     * 
+     *
      * @param WineVariety $wineVariety
      * @return boolean
      */
@@ -187,7 +188,7 @@ final class WineVarietyRepository
                 // handle picture update
                 $pictureId = $row->ID_PICTURE;
                 $image = $wineVariety->getImage();
-                
+
                 if ($image !== null) {
                     if ($pictureId !== null) {
                         if ($image->id !== $pictureId) {
@@ -225,7 +226,7 @@ final class WineVarietyRepository
                     'ID_PICTURE' => $pictureId,
                     'DESCRIPTION' => $wineVariety->getDescription()
                 ];
-                
+
                 $row->update($data);
                 return true;
             });
@@ -239,7 +240,7 @@ final class WineVarietyRepository
      * Delete wine variety with given ID from the database
      *
      * Return value indicates success or failure
-     * 
+     *
      * @param int $id
      * @return boolean
      */
@@ -253,14 +254,13 @@ final class WineVarietyRepository
                 }
 
                 $pictureId = $row->ID_PICTURE;
-                
+
                 // delete wine variety record
                 $row->delete();
-                
+
                 // delete picture as well
                 if ($pictureId !== null) {
                     $this->imageRepository->removeImage($pictureId);
-
                 }
                 return true;
             });

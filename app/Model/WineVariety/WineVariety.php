@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineVariety.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -39,7 +40,7 @@ final class WineVariety
 
     /**
      * Get ID of the wine variety
-     * 
+     *
      * @return int|null
      */
     public function getId(): ?int

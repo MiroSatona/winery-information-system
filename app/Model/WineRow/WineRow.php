@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineRow.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -41,7 +42,7 @@ final class WineRow
         private bool $inConflict = false
     ) {
     }
-    
+
     /**
      * Mark this wine row as being in conflict (harvest - treatment)
      *
@@ -51,7 +52,7 @@ final class WineRow
     {
         $this->inConflict = true;
     }
-    
+
     /**
      * Check if this wine row is in conflict (harvest - treatment)
      *

@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     OrdersPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for administration of customer orders
+//DESC:     Presenter for administration of customer orders
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Orders;
@@ -21,7 +22,6 @@ use App\Model\Image\ImageRepository;
  */
 final class OrdersPresenter extends BasePresenter
 {
-
     /**
      * Constructor for OrdersPresenter
      * @param OrderRepository $ordRepository
@@ -58,8 +58,8 @@ final class OrdersPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
             $this->redirect(":Home:IS:Dashboard:view");
@@ -76,22 +76,23 @@ final class OrdersPresenter extends BasePresenter
         $this->template->state = $state;
         $this->template->orders = $orders;
     }
-    
+
     /**
      * Handles changing the state of an order
      * @param int $orderId ID of the order to change
      * @param string $newState New state to set for the order
      * @return void
      */
-    public function handleChangeOrderState(int $orderId, string $newState) {
+    public function handleChangeOrderState(int $orderId, string $newState)
+    {
         $user = $this->user;
         // Check if the user is logged in
         if (!$user->isLoggedIn()) {
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
             $this->redirect(":Home:IS:Dashboard:view");
@@ -106,29 +107,30 @@ final class OrdersPresenter extends BasePresenter
             $this->flashMessage("Změny uloženy", FlashMsgType::SUCCESS->value);
         }
     }
-    
+
      /**
       * Renders the detail view for a specific order
       * @param int $orderId ID of the order to display
       * @return void
       */
-     public function renderOrderDetail(int $orderId) {
+    public function renderOrderDetail(int $orderId)
+    {
         $user = $this->user;
         // Check if the user is logged in
         if (!$user->isLoggedIn()) {
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
             $this->redirect(":Home:IS:Dashboard:view");
             return;
         }
-         $this->template->order = $this->ordRepository->fetchOrderById($orderId, true);
-     }
-    
+        $this->template->order = $this->ordRepository->fetchOrderById($orderId, true);
+    }
+
     /**
      * Action for changing order state and redirecting to dashboard
      * @param int $orderId ID of the order to change
@@ -143,8 +145,8 @@ final class OrdersPresenter extends BasePresenter
             $this->redirect(':Sign:in');
             return;
         }
-        
-        // user is a customer 
+
+        // user is a customer
         if (!$user->isInRole(Role::WORKER->name) && !$user->isInRole(Role::VINTNER->name)) {
             $this->flashMessage("Nemáte dostatečné oprávnění!", FlashMsgType::ERROR->value);
             $this->redirect(":Home:IS:Dashboard:view");

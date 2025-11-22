@@ -1,13 +1,13 @@
 <?php
+
 //FILE:     TaskRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	An interface between user actions and DB Actions involving Tasks.
+//DESC:     An interface between user actions and DB Actions involving Tasks.
 
 declare(strict_types=1);
-
 
 namespace App\Model\Task;
 
@@ -33,12 +33,13 @@ use Tracy\ILogger;
 
 /**
  * TaskRepository
- * 
+ *
  * An interface between user actions and database operations involving Tasks.
  * Handles creation, retrieval, updating, and management of tasks (Harvests, Treatments, Bottlings),
  * including worker assignments, vineyard rows, and conflict detection.
  */
-class TaskRepository{
+class TaskRepository
+{
     private Explorer $database;
     private TreatmentRepository $treatmentRepository;
     private BottlingRepository $bottlingRepository;
@@ -47,7 +48,7 @@ class TaskRepository{
 
     /**
      * TaskRepository constructor
-     * 
+     *
      * @param Explorer $database
      * @param TreatmentRepository $treatmentRepository
      * @param BottlingRepository $bottlingRepository
@@ -70,10 +71,10 @@ class TaskRepository{
 
     /**
      * Fetch tasks based on filters
-     * 
+     *
      * Retrieves tasks from the database filtered by name pattern, type, and state.
      * Updates conflict information for retrieved tasks.
-     * 
+     *
      * @param string $pattern Pattern to match task names
      * @param string $type Task type to filter by (HARVEST, TREATMENT, BOTTLING, or empty for all)
      * @param string $state Task state to filter by (PLANNED, FINISHED, or empty for all)
@@ -110,17 +111,17 @@ class TaskRepository{
 
     /**
      * Fetch a task by its ID
-     * 
+     *
      * Retrieves a task joined with its specific table (Bottling, Harvest, or Treatment).
      * Optionally checks and updates conflict status.
-     * 
+     *
      * @param int $id ID of the task
      * @param bool $updateConflicts Whether to check and update conflict status (default: true)
      * @return Task|null Returns the corresponding Task object, or null if not found
      */
     public function fetchById(int $id, bool $updateConflicts = true): ?Task
     {
-       
+
         $bottling = $this->bottlingRepository->fetchById($id);
         if ($bottling !== null) {
             return $bottling;
@@ -142,25 +143,28 @@ class TaskRepository{
 
         return null;
     }
-   
+
     /**
      * Update conflict information for a single task
-     * 
+     *
      * Checks if any vineyard rows associated with the task are in conflict
      * and marks the task accordingly.
-     * 
+     *
      * @param Task $oneTask The task to check for conflicts
      * @return void
      */
-    private function updateTaskConflicts(Task $oneTask) {
-       
+    private function updateTaskConflicts(Task $oneTask)
+    {
+
         /**
         * @var WineRow[]
         */
         $taskRows = $this->fetchTaskRows($oneTask->getId());
-       
-        foreach($taskRows as $row) {
-            if (!$row->isInConflict()) continue;
+
+        foreach ($taskRows as $row) {
+            if (!$row->isInConflict()) {
+                continue;
+            }
             $oneTask->setInConflict();
             return;
         }
@@ -168,24 +172,25 @@ class TaskRepository{
 
     /**
      * Update conflict information for multiple tasks
-     * 
+     *
      * Iterates through an array of tasks and updates conflict information for each one.
-     * 
+     *
      * @param Task[] $tasks Array of tasks to check for conflicts
      * @return void
      */
-    private function updateTasksConflicts(array $tasks) {
+    private function updateTasksConflicts(array $tasks)
+    {
         foreach ($tasks as $task) {
-           $this->updateTaskConflicts($task);
+            $this->updateTaskConflicts($task);
         }
     }
 
     /**
      * Mark a task as complete
-     * 
+     *
      * Updates the task state to FINISHED, sets the confirmer and execution timestamp.
      * For Bottling tasks, also updates the wine state to BOTTLED.
-     * 
+     *
      * @param Task $task The task to mark as done
      * @param int $confirmerId ID of the user confirming the task completion
      * @param DateTime $executionDate Date when the task was executed
@@ -225,9 +230,9 @@ class TaskRepository{
 
     /**
      * Check if a user is assigned to a task
-     * 
+     *
      * Verifies if a user is listed as a worker for the specified task.
-     * 
+     *
      * @param int $userId ID of the user
      * @param int $taskId ID of the task
      * @return bool True if user is assigned to the task, false otherwise
@@ -244,10 +249,10 @@ class TaskRepository{
 
     /**
      * Check if a vineyard row is safe for harvest
-     * 
+     *
      * Verifies that no spraying treatment has been applied within 14 days before harvest.
      * This ensures compliance with safety regulations for pesticide application.
-     * 
+     *
      * @param int $vineyardId Vineyard ID
      * @param int $rowCode Row code
      * @param DateTime $harvestDate Planned harvest date
@@ -260,45 +265,51 @@ class TaskRepository{
             ->where('CODE_ROW', $rowCode)
             ->where('ID_VINEYARD', $vineyardId)
             ->fetchAll();
-        
+
         // For each task row, check if it's a SPRAYING treatment
         foreach ($taskRowsForThisRow as $taskRow) {
             $taskId = $taskRow->ID_TASK;
-            
+
             // Check if this task is a SPRAYING treatment
             $treatment = $this->database->table('TREATMENT')
                 ->where('ID_TASK', $taskId)
                 ->where('TYPE', 'SPRAYING')
                 ->where('ID_VINEYARD', $vineyardId)
                 ->fetch();
-            
-            if (!$treatment) continue;
+
+            if (!$treatment) {
+                continue;
+            }
 
             // Get the task details (dates)
             $task = $this->database->table('TASK')
                 ->where('ID', $taskId)
                 ->fetch();
-            
-            if (!$task) continue;
 
-            $sprayingDate = $task->EXECUTION_TIMESTAMP 
+            if (!$task) {
+                continue;
+            }
+
+            $sprayingDate = $task->EXECUTION_TIMESTAMP
                 ? DateTime::from($task->EXECUTION_TIMESTAMP)
                 : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-            
+
             $daysDifference = $sprayingDate->diff($harvestDate)->days;
-            
-            if ($daysDifference < 14) return false; 
+
+            if ($daysDifference < 14) {
+                return false;
+            }
         }
-        
-        return true; 
+
+        return true;
     }
 
     /**
      * Check if a vineyard row is safe for spraying treatment
-     * 
+     *
      * Verifies that no harvest is planned within 14 days before or after the treatment.
      * This ensures compliance with safety regulations for pesticide application.
-     * 
+     *
      * @param int $vineyardId Vineyard ID
      * @param int $rowCode Row code
      * @param DateTime $treatmentDate Planned treatment date
@@ -311,50 +322,57 @@ class TaskRepository{
             ->where('CODE_ROW', $rowCode)
             ->where('ID_VINEYARD', $vineyardId)
             ->fetchAll();
-        
+
         // For each task row, check if it's a harvest
         foreach ($taskRowsForThisRow as $taskRow) {
             $taskId = $taskRow->ID_TASK;
-            
+
             // Check if this task is a harvest
             $harvest = $this->database->table('HARVEST')
                 ->where('ID_TASK', $taskId)
                 ->where('ID_VINEYARD', $vineyardId)
                 ->fetch();
-            
-            if (!$harvest) continue;
+
+            if (!$harvest) {
+                continue;
+            }
             // Get the task details (dates)
             $task = $this->database->table('TASK')
                 ->where('ID', $taskId)
                 ->fetch();
-            
-            if (!$task) continue;
 
-            $harvestDate = $task->EXECUTION_TIMESTAMP 
+            if (!$task) {
+                continue;
+            }
+
+            $harvestDate = $task->EXECUTION_TIMESTAMP
                 ? DateTime::from($task->EXECUTION_TIMESTAMP)
                 : DateTime::from($task->PLANNED_EXECUTION_TIMESTAMP);
-            
+
             // Calculate days difference (absolute value since treatment could be before or after harvest)
             $daysDifference = abs($treatmentDate->diff($harvestDate)->days);
-            
-            if ($daysDifference < 14) return false; 
+
+            if ($daysDifference < 14) {
+                return false;
+            }
         }
-        
-        return true; 
+
+        return true;
     }
 
     /**
      * Create a new bottling task
-     * 
+     *
      * Creates a task for bottling wine, including validation of wine, bottle volume,
      * worker assignments, and optional image upload.
-     * 
+     *
      * @param TaskData $data Task data containing all necessary information
      * @param int $userId ID of the user creating the task
      * @return void
      * @throws \Exception If validation fails or database operation fails
      */
-    public function createBottlingTask(TaskData $data, int $userId): void {
+    public function createBottlingTask(TaskData $data, int $userId): void
+    {
 
         // Basic validation
         try {
@@ -393,11 +411,11 @@ class TaskRepository{
                     ->where('ID', $workerId)
                     ->where('ACTIVE', true)
                     ->fetch();
-                
+
                 if ($userRow === null) {
                     throw new \Exception('Invalid or inactive user: ' . $workerId);
                 }
-                
+
                 if (!$userRow->ROLE_WORKER) {
                     throw new \Exception('User ' . $workerId . ' does not have worker role');
                 }
@@ -407,7 +425,7 @@ class TaskRepository{
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
             $bottlesCount = 0;
             if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
-                $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
+                $bottlesCount = (int) floor($wineVolume * 1000 / ($bottleVolume));
             }
 
             if ($bottlesCount <= 0) {
@@ -419,7 +437,7 @@ class TaskRepository{
 
             // insert task row
             $now = new DateTime();
-            
+
             $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
 
             $taskRow = $this->database->table('TASK')->insert([
@@ -427,7 +445,7 @@ class TaskRepository{
                 'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp,
                 'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
@@ -482,7 +500,6 @@ class TaskRepository{
             }
 
             $this->database->commit();
-
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
@@ -493,22 +510,23 @@ class TaskRepository{
             throw $e;
         }
     }
-    
+
     /**
      * Create a new harvest task
-     * 
+     *
      * Creates a task for harvesting grapes from vineyard rows, with validation
      * and conflict detection for spraying treatments.
-     * 
+     *
      * @param TaskData $data Task data containing vineyard, rows, variety, and other information
      * @param int $userId ID of the user creating the task
      * @return TaskOperationStatus Operation status (SUCCESS or CONFLICT_WITH_TREATMENT)
      * @throws \Exception If validation fails or database operation fails
      */
-    public function createHarvestTask(TaskData $data, int $userId): TaskOperationStatus {
-        
+    public function createHarvestTask(TaskData $data, int $userId): TaskOperationStatus
+    {
+
         $currentStatus = TaskOperationStatus::SUCCESS;
-        
+
         try {
             // validate basic fields
             $name = trim($data->getName());
@@ -551,11 +569,11 @@ class TaskRepository{
                     ->where('ID', $workerId)
                     ->where('ACTIVE', true)
                     ->fetch();
-                
+
                 if ($userRow === null) {
                     throw new \Exception('Neplatný nebo neaktivní uživatel: ' . $workerId);
                 }
-                
+
                 if (!$userRow->ROLE_WORKER) {
                     throw new \Exception('Uživatel ' . $workerId . ' nemá roli pracovníka');
                 }
@@ -563,10 +581,10 @@ class TaskRepository{
 
             // start transaction
             $this->database->beginTransaction();
-            
+
             $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
             $harvestDate = $data->getPlannedTimestamp() ?? new DateTime();
-            
+
             // Check each row for the closest SPRAYING treatment
             // to make sure the harvest takes place at least 14 days after the closest treatment on each row
             foreach ($idRows as $code) {
@@ -581,7 +599,7 @@ class TaskRepository{
                 'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp,
                 'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
@@ -629,7 +647,6 @@ class TaskRepository{
 
             $this->database->commit();
             return $currentStatus;
-
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
@@ -644,9 +661,9 @@ class TaskRepository{
 
     /**
      * Fetch all workers assigned to a task
-     * 
+     *
      * Retrieves all users assigned as workers to the specified task.
-     * 
+     *
      * @param int $id Task ID
      * @return User[] Array of User objects representing workers of the task
      */
@@ -682,13 +699,14 @@ class TaskRepository{
 
     /**
      * Fetch all workers not assigned to a task
-     * 
+     *
      * Retrieves all active users with worker role who are not currently assigned to the specified task.
-     * 
+     *
      * @param int $id Task ID
      * @return User[] Array of User objects representing available workers
      */
-    public function fetchAllNotSetWorkers(int $id): array{
+    public function fetchAllNotSetWorkers(int $id): array
+    {
         $assignedWorkerIds = $this->database->table('WORKER')
             ->where('ID_TASK', $id)
             ->select('ID_USER')
@@ -725,24 +743,23 @@ class TaskRepository{
                 (bool)$user->ROLE_ADMIN
             );
         }
-        return $usersObjects; 
+        return $usersObjects;
     }
 
     /**
      * Add a worker to a task
-     * 
+     *
      * Assigns a worker to the specified task by creating a WORKER record.
-     * 
+     *
      * @param int $taskId Task ID
      * @param int $workerId Worker ID
      * @return string Empty string on success, error message on failure
      */
     public function addWorkerToTask(int $taskId, int $workerId): string
-    {   
+    {
         /** @var string $error Error message */
-        $error='';
-        try 
-        {
+        $error = '';
+        try {
             $this->database->beginTransaction();
             $this->database->table('WORKER')->insert([
                 'ID_TASK' => $taskId,
@@ -750,8 +767,7 @@ class TaskRepository{
             ]);
             $this->database->commit();
             return $error;
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             try {
                 $this->database->rollBack();
             } catch (\Throwable $t) {
@@ -764,9 +780,9 @@ class TaskRepository{
 
     /**
      * Remove a worker from a task
-     * 
+     *
      * Unassigns a worker from the specified task by deleting the WORKER record.
-     * 
+     *
      * @param int $taskId Task ID
      * @param int $workerId Worker ID
      * @return string Empty string on success, error message on failure
@@ -774,16 +790,14 @@ class TaskRepository{
     public function removeWorkerFromTask(int $taskId, int $workerId): string
     {
          /** @var string $error Error message */
-        $error='';
+        $error = '';
 
-        try 
-        {   
+        try {
             $this->database->beginTransaction();
             $this->database->table('WORKER')->where('ID_TASK', $taskId)->where('ID_USER', $workerId)->delete();
             $this->database->commit();
             return $error;
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             $error = 'Chyba při odebírání pracovníka:' . $exception->getMessage();
             return $error;
@@ -792,9 +806,9 @@ class TaskRepository{
 
     /**
      * Fetch vineyard rows associated with a task
-     * 
+     *
      * Retrieves all vineyard rows linked to the specified task and checks for conflicts.
-     * 
+     *
      * @param int $taskId Task ID
      * @return WineRow[] Array of WineRow objects associated with the task
      */
@@ -808,14 +822,16 @@ class TaskRepository{
             ->fetchAll();
 
         $wineRowObjects = [];
-        
+
         foreach ($taskRows as $taskRow) {
             $wineRow = $this->database->table('WINE_ROW')
                 ->where('ID_VINEYARD', $taskRow->ID_VINEYARD)
                 ->where('CODE', $taskRow->CODE_ROW)
                 ->fetch();
-            
-            if (!$wineRow) continue;
+
+            if (!$wineRow) {
+                continue;
+            }
 
             $row = new WineRow(
                 (int)$wineRow->CODE,
@@ -827,51 +843,54 @@ class TaskRepository{
             );
 
             if ($task instanceof Harvest) {
-                if (!$this->rowIsSafeForHarvest(
-                    $task->getVineyard()->getId(),
-                    $row->getId(),
-                    $planedDate                 
-                    )) {
+                if (
+                    !$this->rowIsSafeForHarvest(
+                        $task->getVineyard()->getId(),
+                        $row->getId(),
+                        $planedDate
+                    )
+                ) {
                         $row->setInConflict();
-                    }
-            } else if ($task instanceof Treatment && $task->getType() == TreatmentType::SPRAYING) {
-                if (!$this->rowIsSafeForSprayingTreatment(
-                    $task->getVineyard()->getId(),
-                    $row->getId(),
-                    $planedDate
-                )) {
+                }
+            } elseif ($task instanceof Treatment && $task->getType() == TreatmentType::SPRAYING) {
+                if (
+                    !$this->rowIsSafeForSprayingTreatment(
+                        $task->getVineyard()->getId(),
+                        $row->getId(),
+                        $planedDate
+                    )
+                ) {
                     $row->setInConflict();
                 }
             }
             $wineRowObjects[] = $row;
         }
-        
+
         return $wineRowObjects;
     }
 
     /**
      * Fetch vineyard rows not assigned to a task
-     * 
+     *
      * Retrieves all vineyard rows that are not currently assigned to the specified task.
      * Can be filtered by wine variety if provided.
-     * 
+     *
      * @param int $taskId Task ID
      * @param int $vineyardId Vineyard ID
      * @param int|null $wineVarietyId Optional wine variety ID for filtering
      * @return WineRow[] Array of WineRow objects not assigned to the task
      */
     public function fetchAllNotSetRows(int $taskId, int $vineyardId, ?int $wineVarietyId = null): array
-    {   
+    {
         bdump($taskId);
         bdump($vineyardId);
         bdump($wineVarietyId);
 
         /** @var WineRow[] $allRows */
         $allRows = [];
-        if($wineVarietyId === null){ 
+        if ($wineVarietyId === null) {
             $allRows = $this->vineyardRepository->getWineRowsOnVineyard($vineyardId);
-        }
-        else{
+        } else {
             $allRows = $this->vineyardRepository->getRowsAtVineyardWithWineVariety($vineyardId, $wineVarietyId);
         }
 
@@ -891,7 +910,6 @@ class TaskRepository{
             if (!in_array($code, $assignedRowCodes, true)) {
                 $filteredRows[] = $row;
             }
-
         }
 
         return $filteredRows;
@@ -900,21 +918,20 @@ class TaskRepository{
 
     /**
      * Add a vineyard row to a task
-     * 
+     *
      * Links a vineyard row to the specified task by creating a TASK_ROW record.
-     * 
+     *
      * @param int $taskId Task ID
      * @param int $vineyardId Vineyard ID
      * @param int $codeRow Row code
      * @return string Empty string on success, error message on failure
      */
     public function addTaskRow(int $taskId, int $vineyardId, int $codeRow): string
-    {   
+    {
         $error = '';
-        try
-        {   
+        try {
             $this->database->beginTransaction();
-            
+
             bdump('Before insert - taskId: ' . $taskId);
             bdump('Before insert - vineyardId: ' . $vineyardId);
             bdump('Before insert - codeRow: ' . $codeRow);
@@ -926,14 +943,11 @@ class TaskRepository{
             ]);
 
             bdump('After insert - success');
-            
+
             $this->database->commit();
-            
+
             bdump('After commit - transaction completed');
-             
-        }
-        catch(\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             bdump('Exception caught: ' . $exception->getMessage());
             return 'Chyba při přidávání řádku úkonu:' . $exception->getMessage();
@@ -944,9 +958,9 @@ class TaskRepository{
 
     /**
      * Remove a vineyard row from a task
-     * 
+     *
      * Unlinks a vineyard row from the specified task by deleting the TASK_ROW record.
-     * 
+     *
      * @param int $taskId Task ID
      * @param int $vineyardId Vineyard ID
      * @param int $codeRow Row code
@@ -955,8 +969,7 @@ class TaskRepository{
     public function removeTaskRow(int $taskId, int $vineyardId, int $codeRow): string
     {
         $error = '';
-        try
-        {   
+        try {
             $this->database->beginTransaction();
 
             $this->database->table('TASK_ROW')
@@ -966,9 +979,7 @@ class TaskRepository{
                 ->delete();
 
             $this->database->commit();
-        }
-        catch(\Exception $exception)
-        {
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             return 'Chyba při odebírání řádku úkonu:' . $exception->getMessage();
         }
@@ -978,10 +989,10 @@ class TaskRepository{
 
     /**
      * Create a new treatment task
-     * 
+     *
      * Creates a task for treating vineyard rows (e.g., spraying), with validation
      * and conflict detection for harvest tasks.
-     * 
+     *
      * @param TaskData $data Task data containing vineyard, rows, treatment details
      * @param int $userId ID of the user creating the task
      * @return TaskOperationStatus Operation status (SUCCESS or CONFLICT_WITH_HARVEST)
@@ -1020,11 +1031,13 @@ class TaskRepository{
 
             /** @var float|null  */
             $amount = $data->getAmount();
-            
-            if ($amount !== null && ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
-                    $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX)) {
+
+            if (
+                $amount !== null && ($amount < ValidationDefinitions::TREATMENT_QUANTITY_MIN ||
+                    $amount > ValidationDefinitions::TREATMENT_QUANTITY_MAX)
+            ) {
                     throw new \Exception('Neplatné množství');
-                }
+            }
 
             $unit = $data->getUnit();
             if ($unit !== null) {
@@ -1033,12 +1046,12 @@ class TaskRepository{
                     throw new \Exception('Neplatná jednotka');
                 }
             }
-                
+
             if ((!$unit || $unit == 0) || !$amount) {
                 $unit = null;
-                $amount = null; 
+                $amount = null;
             }
-                
+
             // Validate each row: exists, belongs to vineyard, is active
             foreach ($idRows as $code) {
                 $row = $this->database->table('WINE_ROW')
@@ -1067,11 +1080,11 @@ class TaskRepository{
                     ->where('ID', $workerId)
                     ->where('ACTIVE', true)
                     ->fetch();
-                
+
                 if ($userRow === null) {
                     throw new \Exception('Neplatný nebo neaktivní uživatel: ' . $workerId);
                 }
-                
+
                 if (!$userRow->ROLE_WORKER) {
                     throw new \Exception('Uživatel ' . $workerId . ' nemá roli pracovníka');
                 }
@@ -1079,10 +1092,10 @@ class TaskRepository{
 
             // Start transaction
             $this->database->beginTransaction();
-            
+
             $timeStamp = $data->getPlannedTimestamp()?->format('Y-m-d H:i:s');
             $treatmentDate = $data->getPlannedTimestamp() ?? new DateTime();
-            
+
             // Check each row for any harvest tasks
             // to make sure the treatment is at least 14 days away from any harvest on each row
             // Only check if this is a SPRAYING treatment
@@ -1102,7 +1115,7 @@ class TaskRepository{
                 'STATE' => $data->getIsDone() ? TaskState::FINISHED : TaskState::PLANNED->value,
                 'CREATION_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
                 'LAST_CHANGE_TIMESTAMP' => $now->format('Y-m-d H:i:s'),
-                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp, 
+                'PLANNED_EXECUTION_TIMESTAMP' => $timeStamp,
                 'EXECUTION_TIMESTAMP' => $data->getIsDone() ? $timeStamp : null,
                 'NOTE' => $data->getNote(),
                 'ID_TASK_ISSUER' => $userId,
@@ -1149,7 +1162,6 @@ class TaskRepository{
 
             $this->database->commit();
             return $currentState;
-
         } catch (\Exception $e) {
             bdump($e);
             try {
@@ -1161,12 +1173,12 @@ class TaskRepository{
             throw $e;
         }
     }
-   
+
     /**
      * Update base task information
-     * 
+     *
      * Updates common task fields such as name, note, and planned execution date.
-     * 
+     *
      * @param int $taskId Task ID
      * @param \stdClass $values Object containing fields to update
      * @return void
@@ -1213,19 +1225,17 @@ class TaskRepository{
                 $this->database->table('TASK')->where('ID', $taskId)->update($update);
                 $this->database->commit();
             }
-
         } catch (\Exception $e) {
             Debugger::log('Failed to update base task ID ' . $taskId . ': ' . $e->getMessage(), ILogger::ERROR);
             throw $e;
         }
-
     }
-   
+
     /**
      * Update bottling task information
-     * 
+     *
      * Updates bottling-specific fields such as bottle volume and wine picture.
-     * 
+     *
      * @param int $taskId Task ID
      * @param \stdClass $values Object containing fields to update
      * @param Image|null $img Optional new image for the wine
@@ -1270,7 +1280,7 @@ class TaskRepository{
             $wineVolume = isset($wineRow->VOLUME) ? (float) $wineRow->VOLUME : 0.0;
             $bottlesCount = $bottlingRow->BOTTLES_COUNT;
             if ($wineVolume > 0.0 && $bottleVolume > 0.0) {
-                $bottlesCount = (int) floor($wineVolume*1000 / ($bottleVolume));
+                $bottlesCount = (int) floor($wineVolume * 1000 / ($bottleVolume));
             }
 
             // update bottling row
@@ -1298,7 +1308,6 @@ class TaskRepository{
             }
 
             $this->database->commit();
-
         } catch (\Exception $e) {
             try {
                 $this->database->rollBack();
@@ -1309,12 +1318,12 @@ class TaskRepository{
             throw $e;
         }
     }
-    
+
     /**
      * Update treatment task information
-     * 
+     *
      * Updates treatment-specific fields such as type, name, quantity, and unit.
-     * 
+     *
      * @param int $taskId Task ID
      * @param \stdClass $values Object containing fields to update
      * @return void
@@ -1348,12 +1357,12 @@ class TaskRepository{
             if (property_exists($values, 'treatmentName')) {
                 $treatmentUpdates['TREAT_NAME'] = (string) $values->treatmentName;
             }
-            
+
             $hasValue = property_exists($values, "amount") && $values->amount != 0;
             $hasUnit = property_exists($values, "unit") && $values->unit != "";
-            
+
             if (!$hasValue || !$hasUnit) {
-                $treatmentUpdates['UNIT'] = null; 
+                $treatmentUpdates['UNIT'] = null;
                 $treatmentUpdates['QUANTITY'] = null;
             } else {
                 if ($values->amount !== null) {
@@ -1367,7 +1376,7 @@ class TaskRepository{
                     $treatmentUpdates['UNIT'] = (string) $values->unit;
                 }
             }
-            
+
             if (!empty($treatmentUpdates)) {
                 $this->database->table('TREATMENT')->where('ID_TASK', $taskId)->update($treatmentUpdates);
             }

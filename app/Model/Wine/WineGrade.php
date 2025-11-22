@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineGrade.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí

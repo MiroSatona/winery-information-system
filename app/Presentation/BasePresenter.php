@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     TaskRepository.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	A base presenter class
+//DESC:     A base presenter class
 
 declare(strict_types=1);
 
@@ -28,7 +29,7 @@ class BasePresenter extends Presenter
 
     /**
      * Base Presenter startup method
-     * 
+     *
      * Configures user roles for template usage
      *
      * @return void

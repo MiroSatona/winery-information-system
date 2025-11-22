@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     DashboardPresenter.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Presenter for the IS dashboard
+//DESC:     Presenter for the IS dashboard
 declare(strict_types=1);
 
 namespace App\Presentation\IS\Dashboard;
@@ -26,7 +27,6 @@ use Nette\Utils\DateTime;
  */
 final class DashboardPresenter extends BasePresenter
 {
-
     /**
      * Constructor for DashboardPresenter
      * @param TaskRepository $taskRepository
@@ -48,9 +48,10 @@ final class DashboardPresenter extends BasePresenter
     {
         parent::startup();
 
-        if (!(  $this->user->isInRole(Role::WORKER->name) ||
-                $this->user->isInRole(Role::VINTNER->name))) {
-            
+        if (
+            !(  $this->user->isInRole(Role::WORKER->name) ||
+                $this->user->isInRole(Role::VINTNER->name))
+        ) {
             if ($this->user->isInRole(Role::ADMIN->name)) {
                 $this->redirect(':IS:Users:dashboard');
             }
@@ -73,10 +74,10 @@ final class DashboardPresenter extends BasePresenter
     {
         // Fetch upcoming tasks (limit 10, planned state, ordered by planned timestamp)
         $upcomingTasks = $this->getUpcomingTasks();
-        
+
         // Fetch ready orders (limit 10, paid state, ordered by timestamp)
         $readyOrders = $this->getReadyOrders();
-        
+
         $this->template->upcomingTasks = $upcomingTasks;
         $this->template->readyOrders = $readyOrders;
     }
@@ -88,24 +89,30 @@ final class DashboardPresenter extends BasePresenter
     private function getUpcomingTasks(): array
     {
         $allTasks = $this->taskRepository->fetchTasks('', '', TaskState::PLANNED->value);
-        
+
         // Filter tasks that have a planned timestamp
-        $tasksWithTimestamp = array_filter($allTasks, function($task) {
+        $tasksWithTimestamp = array_filter($allTasks, function ($task) {
             return $task->getPlannedTimestamp() !== null;
         });
-        
+
         // Sort by planned timestamp (earliest first)
-        usort($tasksWithTimestamp, function($a, $b) {
+        usort($tasksWithTimestamp, function ($a, $b) {
             $timestampA = $a->getPlannedTimestamp();
             $timestampB = $b->getPlannedTimestamp();
-            
-            if ($timestampA === null && $timestampB === null) return 0;
-            if ($timestampA === null) return 1;
-            if ($timestampB === null) return -1;
-            
+
+            if ($timestampA === null && $timestampB === null) {
+                return 0;
+            }
+            if ($timestampA === null) {
+                return 1;
+            }
+            if ($timestampB === null) {
+                return -1;
+            }
+
             return $timestampA <=> $timestampB;
         });
-        
+
         // Return first 10
         return array_slice($tasksWithTimestamp, 0, 10);
     }
@@ -117,17 +124,17 @@ final class DashboardPresenter extends BasePresenter
     private function getReadyOrders(): array
     {
         $allOrders = $this->orderRepository->fetchAllOrders(true);
-        
+
         // Filter orders awaiting delivery
-        $readyOrders = array_filter($allOrders, function($order) {
+        $readyOrders = array_filter($allOrders, function ($order) {
             return $order->state === OrderState::PAID->value;
         });
-        
+
         // Sort by timestamp
-        usort($readyOrders, function($a, $b) {
+        usort($readyOrders, function ($a, $b) {
             return strtotime($a->orderTimestamp) <=> strtotime($b->orderTimestamp);
         });
-        
+
         // Return first 10
         return array_slice($readyOrders, 0, 10);
     }

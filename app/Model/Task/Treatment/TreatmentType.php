@@ -1,10 +1,11 @@
 <?php
+
 //FILE:     TreatmentType.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
 //          Martin Mendl
 //YEAR:     2025
-//DESC:    	Enumeration of treatment types.
+//DESC:     Enumeration of treatment types.
 
 declare(strict_types=1);
 

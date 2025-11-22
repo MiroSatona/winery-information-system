@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     OrderItem.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí
@@ -28,5 +29,6 @@ final class OrderItem
         public Wine $wine,
         public int $bottlesCount,
         public float $pricePerBottle
-    ) {}
+    ) {
+    }
 }

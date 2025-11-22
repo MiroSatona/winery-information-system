@@ -1,4 +1,5 @@
 <?php
+
 //FILE:     WineColor.php
 //AUTHORS:  Martin Zůbek [C]
 //          Otakar Kočí

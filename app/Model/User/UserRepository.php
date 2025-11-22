@@ -24,7 +24,7 @@ use Nette\Utils\DateTime;
  * Class for managing operations related to the internal representation of User in the system.
  */
 class UserRepository
-{   
+{
     /** @var Explorer Instance of the database explorer */
     private Explorer $database;
     /** @var Passwords Instance of Nette Passwords class */
@@ -38,7 +38,7 @@ class UserRepository
      * @param Explorer $database Database of the system.
      * @param Passwords $passwords Nette Passwords class.
      * @param Mailer $mailer Nette Mailer class.
-     * 
+     *
      */
     public function __construct(Explorer $database, Passwords $passwords, Mailer $mailer)
     {
@@ -91,7 +91,7 @@ class UserRepository
      * @return User|null Instance of User or null if not found.
      */
     public function getUserById(int $id): ?User
-    {   
+    {
         /** @var  T|null $user  Fetch user row by ID */
         $user = $this->database->table('USER')->get($id);
 
@@ -124,19 +124,20 @@ class UserRepository
     /**
      * fetchByAdmin
      * Method for fetching users based on role, state and search pattern from form in the admin space in the system
-     * 
+     *
      * @param string $role Filtering role.
      * @param string $pattern Search pattern for full name or login.
      * @param string $state Filtering by state -> active/inactive users.
      * @return User[] Array of instances of user.
      */
-    public function fetchByAdmin(string $role, string $pattern, string $state): array{
-        
+    public function fetchByAdmin(string $role, string $pattern, string $state): array
+    {
+
         /** @var string|null $roleColumn Role column name for where in SQL query */
         $roleColumn = null;
 
         // Get know if role was provided or not and set the role column
-        switch($role){
+        switch ($role) {
             case Role::USER->value:
                 $roleColumn = 'ROLE_USER';
                 break;
@@ -156,17 +157,14 @@ class UserRepository
         /** @var Row[] $queryResult Result of the database query */
         $queryResult = [];
 
-        if(!$pattern && !$roleColumn){ // Any filtering is not provided -> fetch all users
+        if (!$pattern && !$roleColumn) { // Any filtering is not provided -> fetch all users
             $queryResult = $this->database->table('USER');
-        }
-        else if(!$pattern && $roleColumn){ // Fetch independently by role
+        } elseif (!$pattern && $roleColumn) { // Fetch independently by role
             $queryResult = $this->database->table('USER')->where($roleColumn, true);
-        }
-        else if($pattern && !$roleColumn){ // Fetch independently by pattern from searchbar
+        } elseif ($pattern && !$roleColumn) { // Fetch independently by pattern from searchbar
             $regex = '%' . $pattern . '%';
             $queryResult = $this->database->table('USER')->where('NAME LIKE ? OR SURNAME LIKE ? OR USERNAME LIKE ?', $regex, $regex, $regex);
-        }
-        else{ // Fetch independently on the pattern and role
+        } else { // Fetch independently on the pattern and role
             $regex = '%' . $pattern . '%';
             $queryResult = $this->database->table('USER')
                 ->where($roleColumn, true)
@@ -174,10 +172,9 @@ class UserRepository
         }
 
         // Further filter by state if provided
-        if($state === 'active'){
+        if ($state === 'active') {
             $queryResult = $queryResult->where('ACTIVE', true);
-        }
-        else if($state === 'inactive'){
+        } elseif ($state === 'inactive') {
             $queryResult = $queryResult->where('ACTIVE', false);
         }
 
@@ -231,7 +228,7 @@ class UserRepository
      * @param bool $isAdmin Flag for add role of admin.
      * @return void
      */
-    public function addUser (
+    public function addUser(
         string $name,
         string $surname,
         string $username,
@@ -246,28 +243,26 @@ class UserRepository
         bool $isWorker,
         bool $isVinter,
         bool $isAdmin
-    ) :void
-    {   
+    ): void {
 
     /** @var array $generatePasswordData array of new user password data */
-    $generatePasswordData = $this->createNewPassword();
+        $generatePasswordData = $this->createNewPassword();
 
     /** @var string $password Password for the new user */
-    $password = $generatePasswordData['password'];
+        $password = $generatePasswordData['password'];
     /** @var string $salt Salt of the password for the new user */
-    $salt = $generatePasswordData['salt'];
+        $salt = $generatePasswordData['salt'];
     /** @var string $hashedPassword Hashed password for the new user */
-    $hashedPassword = $generatePasswordData['hashedPassword'];
+        $hashedPassword = $generatePasswordData['hashedPassword'];
 
 
-    
-    try 
-    {   
-        // Begin transaction for inserting new user to the database
-        $this->database->beginTransaction();
 
-        // Insert new user to the database
-        $this->database->table('USER')->insert([
+        try {
+            // Begin transaction for inserting new user to the database
+            $this->database->beginTransaction();
+
+            // Insert new user to the database
+            $this->database->table('USER')->insert([
             'NAME' => $name,
             'SURNAME' => $surname,
             'ACTIVE' => $state,
@@ -286,19 +281,17 @@ class UserRepository
             'ROLE_WORKER' => $isWorker,
             'ROLE_VINTNER' => $isVinter,
             'ROLE_ADMIN' => $isAdmin
-        ]);
+            ]);
 
-        // Commit changes to database
-        $this->database->commit();
-    }
-    catch (\Exception $exception) {
-        $this->database->rollBack();
-        throw $exception;
-    }
+            // Commit changes to database
+            $this->database->commit();
+        } catch (\Exception $exception) {
+            $this->database->rollBack();
+            throw $exception;
+        }
 
     // Send email to the new user by method sendAddUserMail
-    $this->sendAddUserMail($name, $email, $username, $password);
-
+        $this->sendAddUserMail($name, $email, $username, $password);
     }
 
     /**
@@ -309,20 +302,19 @@ class UserRepository
      * @return string Error message or empty string on success.
      */
     public function deactivateUser(int $userId): string
-    {   
+    {
         /** @var string $error Error message */
-        $error='';
+        $error = '';
 
-        try 
-        {   
+        try {
             // Begin transaction for deactivating user
             $this->database->beginTransaction();
-            
+
             /** @var T[] $adminUsers Array of all admins in the sytem. */
             $adminUsers = $this->database->table('USER')->where('ROLE_ADMIN', true)->fetchAll();
             /** @var T|null $deletedUser User to be deactivated. */
             $deletedUser = $this->database->table('USER')->where('ID', $userId)->where('ROLE_ADMIN', true)->fetch();
-            
+
             // Check if the deactivated user is not last admin. If yes, return error.
             if (count($adminUsers) === 1 && $deletedUser) {
                 $error = 'Nelze deaktivovat jediného administrátora.';
@@ -330,12 +322,11 @@ class UserRepository
                 return $error;
             }
 
-            // Deactivate user 
+            // Deactivate user
             $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => false]);
             $this->database->commit();
             return $error;
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             $error = 'Chyba při deaktivaci uživatele: ' . $exception->getMessage();
             return $error;
@@ -350,21 +341,19 @@ class UserRepository
      * @return string Error message or empty string on success.
      */
     public function activateUser(int $userId): string
-    {   
+    {
         /** @var string $error Error message */
-        $error='';
-        
-        try 
-        {
+        $error = '';
+
+        try {
             // Begin transaction for activate user
             $this->database->beginTransaction();
 
-            // Activate user 
+            // Activate user
             $this->database->table('USER')->where('ID', $userId)->update(['ACTIVE' => true]);
             $this->database->commit();
             return $error;
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             $error = 'Chyba při aktivaci uživatele: ' . $exception->getMessage();
             return $error;
@@ -374,7 +363,7 @@ class UserRepository
     /**
      * sendAddUserMail
      * Method for send email to the new user with his login information.
-     * 
+     *
      * @param string $name Name of the user.
      * @param string $email Email of the user.
      * @param string $username Login of the user.
@@ -402,7 +391,7 @@ class UserRepository
         try {
             $this->mailer->send($mail);
         } catch (SendException $emailException) {
-           throw $emailException;
+            throw $emailException;
         }
 
         return;
@@ -414,7 +403,8 @@ class UserRepository
      *
      * @return string[] Array containing 'password', 'salt' and 'hashedPassword'
      */
-    public function createNewPassword() : array{
+    public function createNewPassword(): array
+    {
         /** @var string $password Generated random password. */
         $password = bin2hex(random_bytes(4));
         /** @var string $salt Generated random salt for password hashing. */
@@ -436,20 +426,19 @@ class UserRepository
      * @param array $data Array of data to edit the user.
      * @return string Empty string on success or error message.
      */
-    public function editUserByAdmin(int $userId, array $data): string{
+    public function editUserByAdmin(int $userId, array $data): string
+    {
         /** @var string $error Error message */
         $error = '';
-        
-        try{
 
+        try {
             // Begin transaction for update user
             $this->database->beginTransaction();
 
             // Update user
             $this->database->table('USER')->where('ID', $userId)->update($data);
             $this->database->commit();
-        }
-        catch(\Exception $exception){
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             $error = 'Chyba při úpravě uživatele: ' . $exception->getMessage();
         }
@@ -463,7 +452,8 @@ class UserRepository
      * @param integer $userId Id of the user for password reset.
      * @return string Empty string on success or error message.
      */
-    public function resetPasswordByAdmin(int $userId): string{
+    public function resetPasswordByAdmin(int $userId): string
+    {
 
         /** @var User|null $foundUser User found by ID */
         $foundUser = $this->getUserById($userId);
@@ -473,7 +463,7 @@ class UserRepository
             return 'Chyba při načítání uživatele, heslo nebylo resetováno.';
         }
 
-        try{
+        try {
             /** @var string[] $newLoginData New password, salt and hashed password.*/
             $newLoginData = $this->createNewPassword();
 
@@ -495,12 +485,10 @@ class UserRepository
             );
 
             $this->database->commit();
-        }
-        catch(\Exception $exception){
+        } catch (\Exception $exception) {
             $this->database->rollBack();
             return 'Chyba při resetování hesla: ' . $exception->getMessage();
-        }
-        catch(SendException $emailException){
+        } catch (SendException $emailException) {
             $this->database->rollBack();
             return 'Chyba při odesílání e-mailu: ' . $emailException->getMessage();
         }
@@ -517,7 +505,8 @@ class UserRepository
      * @param string $password New password of the user.
      * @return void
      */
-    private function sendResetPasswordMail(string $name, string $email, string $username, string $password): void{
+    private function sendResetPasswordMail(string $name, string $email, string $username, string $password): void
+    {
         /** @var string $textBody Text body of the email message. */
         $textBody = "Dobrý den {$name},\n\n" .
             "Vaše heslo bylo úspěšně resetováno administrátorem v Andrej Vinářství systému.\n\n" .
