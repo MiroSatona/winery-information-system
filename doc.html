@@ -41,38 +41,47 @@
 </dl>
 
 <h2>Uživatelé systému pro testování</h2>
-<p>Uveďte prosím existující zástupce <strong>všech rolí uživatelů</strong>.</p>
+<p>V našem sytému, <strong>může mít uživatel vícero rolí.</strong>
+	Vícero rolí bylo přidáno, z důvodu toho aby například vinař si nemusel dělat nový účet pro nákup vína. 
+	Přidávání a odebírání rolí zůstává umožňuje pouze <strong>role Admin.</strong></p>
 <table>
 <tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
-<tr><td>admin</td><td>admin</td><td>Administrátor</td></tr>
-<tr><td>prodavac</td><td>prodavac</td><td>Prodavač</td></tr>
-<tr><td>franta</td><td>franta</td><td>Zákazník</td></tr>
+<tr><td>andrej</td><td>111111111</td><td>Admin, Vinař, Pracovník, Uživatel</td></tr>
+<tr><td>josef</td><td>111111111</td><td>Uživatel, Pracovník, Vinař</td></tr>
+<tr><td>pecinka</td><td>111111111</td><td>Pracovník, Vinař</td></tr>
+<tr><td>bohumil</td><td>111111111</td><td>Uživatel</td></tr>
+<tr><td>vacha</td><td>111111111</td><td>Uživatel</td></tr>
+<tr><td>tabula</td><td>111111111</td><td>Pracovník, Uživatel</td></tr>
+<tr><td>frejlich</td><td>111111111</td><td>Uživatel</td></tr>
 </tbody></table>
 
-<p>(Diagram případů užití není nutné vkládat, pokud IS implementuje role a případy užití definované zadáním.)</p> 
+<h3 style="margin-top: 2em;">Diagram případů užití</h3>
+<img src="docs/iis_use_case.svg" alt="use_case_diagram" style="max-width:100%;height:auto;margin-top:2em;"> 
 
-<h3>Video</h3>
+<h3>Video</h3> <!-- TODO: MR.M-->
 
 <p>Přiložte odkaz na komentované video demostrující použití informačního
  systému. Zaměřte se na případy užití definované zadáním (např. 
 registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). 
 Video nahrajte například na VUT Google Drive, kde ho bude možné přímo 
-spustit z odkazu.</p>
+spustit z odkazu -> MY VÁM TY VIDEA PŘIVEZEME.</p>
 
-<h2>Rozšíření</h2>
-<p>
-	TODO
-</p>
+<h2>Rozšíření</h2> <!-- TODO: Vsichni-->
+<ul><li></li></ul>
 
-<h2>Implementace</h2>
+<h2>Implementace</h2> <!-- TODO: OTA-->
 <p>Stručná dokumentace k implementaci, která popisuje, které části 
 projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
 
 <h3>Databáze</h3>
 
-Zde vložte grafické schéma relační databáze (tabulek v databázi).
+<h4>ER diagram</h4>
+<img src="docs/iis_er.svg" alt="er_diagram" style="max-width:100%;height:auto;margin-top:2em;"> 
 
-<h2>Instalace</h2>
+<h4>Normalizované schéma databáze</h4>
+<img src="docs/iis_transform.svg" alt="normalized_schema" style="max-width:100%;height:auto;margin-top:2em;"> 
+
+<h2>Instalace</h2> <!-- TODO: OTA -->
 
 Stručně popište: 
 <ul>
@@ -80,13 +89,5 @@ Stručně popište:
 <li>softwarové požadavky (verze PHP apod.),</li>
 <li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
 </ul>
-
-<h2>Známé problémy</h2>
-<p>Zde popište, které body zadání nejsou implementovány a z jakého 
-důvodu. Např. &#8222;Z časových důvodů nebyla implementována správa 
-uživatelů.&#8221; Pomůžete tím zrychlit hodnocení, když neimplementované 
-funkce nebudeme muset dlouze hledat.</p>
-
-
 
 </body></html>
