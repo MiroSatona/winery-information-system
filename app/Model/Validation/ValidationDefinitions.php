@@ -74,4 +74,6 @@ final class ValidationDefinitions
     public const ACID_CONTENTS_MAX = 999.99;
     public const BOTTLE_VOLUME_MIN = 1;
     public const BOTTLE_VOLUME_MAX = 9999.99;
+    public const DATE_TIME_MIN = '1970-01-01 00:00:00'; // taken from mariadb documentation
+    public const DATE_TIME_MAX = '2106-02-07 06:28:15';
 }

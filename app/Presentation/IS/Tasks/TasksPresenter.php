@@ -177,6 +177,8 @@ final class TasksPresenter extends BasePresenter
     
         $form->addDateTime('planned_date', $newTask->getIsDone() ? "Termín dokončení" : "Plánovaný termín")
             ->setValue(new DateTime('now'))
+            ->addRule(Form::Min, 'Datum musí být po %d.', new DateTime(ValidationDefinitions::DATE_TIME_MIN))
+            ->addRule(Form::Max, 'Datum musí být před %d.', new DateTime(ValidationDefinitions::DATE_TIME_MAX))
             ->setRequired($newTask->getIsDone() ? "Zadejte termín dokončení" : "Zadejte plánovaný termín")
             ->setHtmlAttribute('class', 'form-control')
             ->setHtmlAttribute('style', 'width: 200px;');
@@ -1556,6 +1558,8 @@ final class TasksPresenter extends BasePresenter
         $form = new Form();
 
         $form->addDateTime('execution_date', 'Datum provedení')
+            ->addRule(Form::Min, 'Datum musí být po %d.', new DateTime(ValidationDefinitions::DATE_TIME_MIN))
+            ->addRule(Form::Max, 'Datum musí být před %d.', new DateTime(ValidationDefinitions::DATE_TIME_MAX))
             ->setValue(new DateTime('now'))
             ->setRequired('Zadejte datum provedení.')
             ->setHtmlAttribute('class', 'form-control');
@@ -1878,6 +1882,8 @@ final class TasksPresenter extends BasePresenter
             ->setHtmlAttribute('placeholder', 'Zadejte poznámku');
     
         $form->addDateTime('planned_date', 'Datum plánovaného provedení')
+            ->addRule(Form::Min, 'Datum musí být po %d.', new DateTime(ValidationDefinitions::DATE_TIME_MIN))
+            ->addRule(Form::Max, 'Datum musí být před %d.', new DateTime(ValidationDefinitions::DATE_TIME_MAX))
             ->setRequired('Zadejte plánované datum provedení.')
             ->setValue(new DateTime('now'))
             ->setHtmlAttribute('class', 'form-control')
