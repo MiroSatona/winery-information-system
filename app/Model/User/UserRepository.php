@@ -509,14 +509,14 @@ class UserRepository
     {
         /** @var string $textBody Text body of the email message. */
         $textBody = "Dobrý den {$name},\n\n" .
-            "Vaše heslo bylo úspěšně resetováno administrátorem v Andrej Vinářství systému.\n\n" .
+            "Vaše heslo bylo úspěšně resetováno administrátorem v IS Andrejova Vinařství.\n\n" .
             "Nové přihlašovací údaje:\n" .
             "Uživatelské jméno: {$username}\n" .
             "Heslo: {$password}\n\n" .
             "S pozdravem,\nAndrejovo Vinářství\n";
         /** @var Message $mail Email which will be sent. */
         $mail = (new Message())
-            ->setFrom('no-reply@andrejvinarstvi.cz', 'Andrej Vinářství')
+            ->setFrom('no-reply@andrejvinarstvi.cz', 'Vinářství Andrej')
             ->addTo($email, $name)
             ->setSubject('Vaše heslo bylo resetováno')
             ->setBody($textBody);

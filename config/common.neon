@@ -3,7 +3,7 @@
 parameters:
 	uploadsDir: 'assets/uploads'
 	uploadsDirWeb: '/uploads'
-	tmpImage: '/images'	
+	tmpImage: '/images'
 
 application:
 	errorPresenter:
@@ -17,6 +17,14 @@ database:
 	user: iis_winery
 	password: password
 
+
+mail:
+	smtp: true
+	host: 'smtp.gmail.com'
+	port: 587
+	username: 'iis.vinarstvi@gmail.com'
+	password: 'heslo'
+	secure: 'tls'
 
 latte:
 	strictTypes: yes
