@@ -1008,6 +1008,7 @@ final class TasksPresenter extends BasePresenter
 
         $form->addSubmit("cancel", "Zrušit")
             ->setHtmlAttribute('class', 'btn btn-danger w-100 fw-bold')
+            ->setValidationScope([])
             ->onClick[] = [$this, "handleClearForm"];
 
         $form->addSubmit("back", "Zpět")
