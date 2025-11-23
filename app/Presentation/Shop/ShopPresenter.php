@@ -65,7 +65,6 @@ final class ShopPresenter extends BasePresenter
         // do a simple search if applicable
         $wines = $this->wineRepository->getAllProducts($search ?? "");
         
-        // Filter by wine color/type if specified and not "ALL"
         bdump($type);
         if ($type !== null && $type !== 'ALL') {
             $wines = array_filter($wines, fn($w) => $w->color->value === $type);
