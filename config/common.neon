@@ -22,8 +22,8 @@ mail:
 	smtp: true
 	host: 'smtp.gmail.com'
 	port: 587
-	username: 'iis.vinarstvi@gmail.com'
-	password: 'REMOVED'
+	username: ''
+	password: ''
 	secure: 'tls'
 
 latte:
