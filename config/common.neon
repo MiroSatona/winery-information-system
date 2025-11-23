@@ -46,6 +46,8 @@ di:
 		tags: no
 
 session:
+	savePath: "%tempDir%/sessions"
+	cookiePath: /
 	expiration: 30 minutes
 
 security:

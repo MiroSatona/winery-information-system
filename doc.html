@@ -58,20 +58,91 @@
 <h3 style="margin-top: 2em;">Diagram případů užití</h3>
 <img src="docs/iis_use_case.jpg" alt="use_case_diagram" style="max-width:100%;height:auto;margin-top:2em;"> 
 
-<h3>Video</h3> <!-- TODO: MR.M-->
-
-<p>Přiložte odkaz na komentované video demostrující použití informačního
- systému. Zaměřte se na případy užití definované zadáním (např. 
-registrace uživatele, správa uživatelů a činnosti jednotlivých rolí). 
-Video nahrajte například na VUT Google Drive, kde ho bude možné přímo 
-spustit z odkazu -> MY VÁM TY VIDEA PŘIVEZEME.</p>
-
-<h2>Rozšíření</h2> <!-- TODO: Vsichni-->
+<h3>Video</h3>
 <ul>
-	<li></li>
+	<li><a href="https://www.youtube.com/watch?v=6O83srVxGUU" target="_blank">Video na YouTube</a></li>
+</ul>
+<h2>Rozšíření</h2>
+<ul>
+	<li>Odrůdy jsou samostatné entity</li>
+	<li>Všechny akce (lahvování, sklizně, ošetření) zobecněny na úkony</li>
+	<li>Ošetření má vícero typů (postřik, hnojení, řez, odplevelení a ostatní)</li>
+	<li>Víno může být vyrobeno z vícero sklizní (spojování sklizní, tvorba cuveé)</li>
+	<li>Lahvování vína jako samostatný krok</li>
+	<li>Zasílání resetovaných hesel a hesel k nově vytvořeným uživatelům e-mailem</li>
+	<li>Správa objednávek v IS</li>
+	<li>Nahrávání a správa obrázků k vínům, vinohradům a odrůdám</li>
 </ul>
 
-<h2>Implementace</h2> <!-- TODO: OTA-->
+<h3>Poznámky k návrhu</h3>
+<ul>
+	<li>Sklizeň musí být prvně zaznamenána (může i pracovník) a poté potvrzena vinařem (vložení cukernatosti a hmotnosti)</li>
+	<li>Výroba vína se skládá z posloupnosti úloh:
+		<ul>
+			<li>Naplánování sklizně (sklizní)</li>
+			<li>Zaznamenání provedení sklizně (sklizní)</li>
+			<li>Potvrzení sklizně (sklizní) vinařem</li>
+			<li>Vyrobení vína ze sklizní</li>
+			<li>Naplánování lahvování vína</li>
+			<li>Provedení lahvování vína</li>
+			<li>Zařazení vína do prodeje</li>
+		</ul>
+	</li>
+	<li>Většina entit v naší aplikaci nemá umožněno plnohodnotné smazání. Místo toho je lze označit jako neaktivní (nelze s nimi pracovat, ale jejich provázání na ostatní entity zůstává).
+		Tento přístup byl zvolen aby nedocházelo k nekonzistencím v datech a hlavně aby pokud možno vzdy v systému zůstala historie všech entit, u kterých je to vhodné.
+		(Pravděpodobně nechceme aby zmizely objednávky na vína, která vznikla ze sklizní nad vinohrady, které už neexistují apod.)
+	</li>
+</ul>
+
+<h2>Implementace</h2>
+<p>Jak je zmíněno níže, projekt je implementován ve frameworku Nette a v zásadě dodržuje výchozí adresářovou strukturu
+	a architekturu použitou v tomto frameworku (MVC, Repozitáře, ...).</p>
+
+<p>V adresáři <code>www</code> se nachází veřejně přístupná sekce se vstupním skriptem <code>index.php</code>, který inicializuje
+	framework Nette a následně dojde k přeroutování na příslušné kontrolery a šablony. Dále se zde nachází složka <code>assets</code> s dalšími zdroji (obrázky, styly, ...).
+	Nejdůležitější je v ní složka <code>uploads</code>, do které jsou nahrávány uživateli spravováné obrázky.</p>
+
+<p>V adresáři <code>app</code> je vlastní implementace aplikace. V ní nacházející se soubor <code>Bootstrap.php</code> inicializuje prostředí a nastavuje konfiguraci. V souboru
+<code>Core/RouterFactory.php</code> je implementace routeru. Tyto dva soubory byly převzaty z výchozího projektu Nette a pouze minimálně upraveny. Dále se zde nacházejí dvě důležité složky
+<code>Model</code> (interní model a repozitáře komunikující s databází) a <code>Presentation</code> (prezentační logika a šablony aplikace).</p>
+
+<p>V adresáři <code>app/Model</code> se v jednotlivých jmenných prostorech nacházejí interní modely pro jednotlivé části aplikace a k nim potřebné repozitáře pro práci s databází.
+Příkladem může být složka <code>Vineyard</code>, která obsahuje soubor <code>Vineyard.php</code> obsahující interní model reprezentující jeden vinohrad v systému a k němu potřebný soubor
+realizující repozitář <code>VineyardRepository.php</code>, který umožňuje načítání vinohradů z databáze, jejich úpravu, vytváření, atd. Dalšími takovými entitami jsou Bottle, Image, OrderItem,
+Orders, Profile, Security, Shop, User, Validation, Wine, WineRow a WineVariety.</p>
+
+<p>V adresáři <code>app/Presentation</code> se nachází prezentační logika a šablony aplikace opět rozdělena do jednotlivých logických celků a jmennných prostorů. V souboru <code>@layout.latte</code>
+je základní struktura webové stránky. Následně v jednotlivých složkách jsou části implementující jednotlivé případy použití a používané komponenty. Každá tato složka (pokud se nedělí na podčásti)
+obsahuje vždy svůj presenter a k němu jeho latte šablony. Příkladem může být složka <code>Home</code>, která obsahuje latte šablonu <code>default.latte</code> a její <code>HomePresenter.php</code>
+, která implementuje domovskou stránku aplikace. Informační systém, do kterého mají přístup pouze zaměstnanci se nachází ve složce <code>IS</code>.
+</p>
+
+<h3>Hierarchie dle případů použití a komponent</h3>
+<ul>
+	<li>Cart - nákupní košík (nákup vína)</li>
+	<li>Home - domovská stránka (zobrazení základních informací o vinařství)</li>
+	<li>IS - informační systém
+		<ul>
+			<li>Dashboard - základní přehled informačního systému</li>
+			<li>Orders - správa objednávek</li>
+			<li>Tasks - správa úkonů (realizace plánování a zaznamenávání úkonů - lahvování, sklizně a ošetření)</li>
+			<li>Users - správa uživatelů (správa uživatelů a rolí administrátorem)</li>
+			<li>Vineyards - správa vinohradů (správa vinohradnických řádků, ...)</li>
+			<li>Wine - správa a výroba vína (výroba vína, zařazení do prodeje)</li>
+			<li>WineVarieties - správa odrůd vína</li>
+		</ul>
+	</li>
+	<li>OrderHistory - historie objednávek (zobrazení historie objednávek)</li>
+	<li>Payment - primitivní platební brána (nákup vína)</li>
+	<li>Profile - správa vlastního profilu</li>
+	<li>Ship - obchod s vínem (nákup vína)</li>
+	<li>Sign - registrace a přihlašování uživatelů</li>
+	<li>Wine - kartička vína do obchodu (nákup vína)</li>
+</ul>
+
+
+<p>Zbytek adresářů vychází z obvyklé struktury frameworku Nette.</p>
+
 <p>Stručná dokumentace k implementaci, která popisuje, které části 
 projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
 
@@ -83,16 +154,47 @@ projektu (např. PHP skripty) implementují jednotlivé případy použití.</p>
 <h4>Normalizované schéma databáze</h4>
 <img src="docs/iis_transform.jpg" alt="normalized_schema" style="max-width:100%;height:auto;margin-top:2em;"> 
 
-<h2>Instalace</h2> <!-- TODO: OTA -->
+<h2>Technologie</h2>
+<p>Projekt využívá framework Nette. Použitá verze Nette je 3.2.3. PHP je použito ve verzi 8.3. Pro databázi bylo využito MySQL (mariadb).
+Pro jednotné stylování aplikace byl použit framework Bootstrap ve verzi 5.3. Pro ikony byla použita knihovna Font Awesome ve verzi 7. Výchozí obrázky
+byly převzaty z internetu. Odkazy na všechny jsou uvedeny v souboru <code>images.md</code>.
+</p>
 
-<h4>Nasazení pomocí kontejneru</h4>
+<p>Naprostá většina funkcionality je napsána v rámci frameworku Nette - jazyk PHP a latte šablony. Nad rámec stylů z knihovny Bootstrap bylo
+nadefinováno i několik vlastních CSS stylů. Ojediněle byl využit i JavaScript.
+</p>
+
+<h2>Instalace</h2>
+
+<h4>Nasazení pomocí docker kontejneru</h4>
 <p>Pro testovací i produkční nasazení je možno využít <b>docker compose</b>.</p>
-<h5>Zprovoznění																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																																										</h5>
-Stručně popište: 
+<h5>Zprovoznění</h5>
 <ul>
-<li>postup instalace na server,</li>
-<li>softwarové požadavky (verze PHP apod.),</li>
-<li>jak rozbalit, konfigurovat, inicializovat databázi, ...</li>
+	<li>Nainstalujte a zprovozněte Docker Desktop dle obvyklých pokynů</li>
+	<li>(Volitelné) Vyplňte parametry poskytovale emailových služeb v <b>config/common.neon</b></li>
+	<li>Spusťte kontejner zadáním <code>docker compose up --build</code> v kořenovém adresáři projektu</li>
+	<li>Kontejner by se měl správně inicializovat i s databází</li>
+	<li>Aplikace bude dostupná na <code>https://localhost:8080</code></li>
+	<li>Dostupný je i phpMyAdmin na <code>https://localhost:8001</code></li>
 </ul>
+
+
+<h4>Nasazení na server (eva)</h4>
+<h5>Popis instalace aplikace na server</h5>
+<ul>
+	<li>Umístětě projekt (celý, případně pouze nastavte link na www složku) do WWW adresáře</li>
+	<li>Upravte kořenový <code>.htaccess</code> soubor tak, aby obsahoval správnou cestu pro přepsání všech přístupů
+		do podadresáře <code>www/</code>. Upravte <code>RewriteRule ^.*$ /~xlogin00/IIS/www/ [R=302,L]</code> například na
+		<code>RewriteRule ^.*$ /~xlogin00/IIS/www/ [R=302,L]</code>. Případně pro jiná nasazení upravte dle potřeby.</li>
+	<li>
+		Vytvořte složky <code>log</code>, <code>temp</code> a <code>temp/sessions</code> v kořenovém adresáři aplikace
+	</li>
+	<li>Nainstalujte závislosti pro Nette framework zavoláním: <code>composer install</code> v kořenovém adresáři projektu</li>
+	<li>Naimportuje výchozí data do databáze ze skriptu v <code>db/definitions.sql</code></li>
+	<li>Nastavte přístupové údaje k databázi a k poskytovali emailových služeb v <code>config/common.neon</code></li>
+	<li>Nastavte správná práva své WWW složce a složkám projektu, například pomocí: <code>chmod -R o=rX,g= ~/WWW</code></li>
+</ul>
+
+<a href="https://www.youtube.com/watch?v=gOqv-VBrXeA" target="blank">Motivace</a>
 
 </body></html>

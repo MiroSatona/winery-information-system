@@ -35,5 +35,5 @@ COPY composer.json ./
 RUN composer install
 
 # Ensure writable dirs exist
-RUN mkdir -p /var/www/html/log /var/www/html/temp
-RUN chown -R www-data:www-data /var/www/html/log /var/www/html/temp
+RUN mkdir -p /var/www/html/log /var/www/html/temp /var/www/html/temp/sessions
+RUN chown -R www-data:www-data /var/www/html/log /var/www/html/temp /var/www/html/temp/sessions
