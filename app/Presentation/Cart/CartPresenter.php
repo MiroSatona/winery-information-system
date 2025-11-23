@@ -14,8 +14,7 @@ namespace App\Presentation\Cart;
 use Nette;
 use App\Model\Orders\OrderRepository;
 use App\Presentation\BasePresenter;
-use App\Model\FlashMsgType;
-use App\Model\Image\ImageRepository;
+use App\Model\FlashMsgType; use App\Model\Image\ImageRepository;
 use App\Model\Orders\Order;
 use Nette\Application\UI\Form;
 use Nette\Security\User;
@@ -242,7 +241,11 @@ final class CartPresenter extends BasePresenter
         }
 
         /** @var bool $result Flag of success for updating delivery address. */
+        bdump($userId);
+        bdump($type);
+        bdump($address);
         $result = $this->orderRepository->updateDeliveryAddress($userId, $type, $address);
+        bdump($result);
         // Handle success or failure of updating delivery address
         if ($result) {
             $this->flashMessage("Způsob doručení byl uložen", FlashMsgType::SUCCESS->value);

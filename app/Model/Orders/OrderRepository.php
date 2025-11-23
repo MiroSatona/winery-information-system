@@ -344,11 +344,14 @@ final class OrderRepository
             );
 
             if (!$address) {
+                if ($row->DELIVERY_TYPE !== "PICKUP") {
+                    return  false;
+                }
                 $row->update([
                     "DELIVERY_DATA" => ""
                 ]);
                 $this->db->commit();
-                return false;
+                return true;
             }
 
             $row->update([
@@ -407,6 +410,37 @@ final class OrderRepository
         if (!$row) {
             return false;
         }
+        
+        // if new state is canceled, need to add items back to inventory
+        if ($newState == "CANCELLED") {
+            $order = $this->fetchOrderById($orderId, true);
+            if ($order) {
+                try {
+                    $this->db->beginTransaction();
+                    
+                    // Return each item to inventory by deleting order items
+                    foreach ($order->items as $item) {
+                        $result = $this->orderItemRepository->deleteOrderItemById($item->wine->id, $order->id);
+                        if (!$result) {
+                            throw new Exception("Failed to return item to inventory");
+                        }
+                    }
+                    
+                    // Update order state to cancelled
+                    $row->update([
+                        "STATE" => $newState
+                    ]);
+                    
+                    $this->db->commit();
+                    return true;
+                } catch (\Exception $e) {
+                    $this->db->rollBack();
+                    throw $e;
+                }
+            }
+        }
+        
+        // For other state changes, just update the state
         try {
             $this->db->beginTransaction();
             $row->update([
