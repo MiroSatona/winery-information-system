@@ -13,6 +13,7 @@ use App\Model\OrderItem\OrderItemRepository;
 use App\Model\Orders\CustomerOrder;
 use App\Model\Orders\OrderState;
 use App\Model\User\UserRepository;
+use App\Model\Wine\WineRepository;
 use Exception;
 use Nette\Database\Explorer;
 
@@ -31,7 +32,8 @@ final class OrderRepository
     public function __construct(
         private Explorer $db,
         private OrderItemRepository $orderItemRepository,
-        private UserRepository $usrRep
+        private UserRepository $usrRep,
+        private WineRepository $wineRep
     ) {
     }
 
@@ -419,10 +421,12 @@ final class OrderRepository
                     $this->db->beginTransaction();
                     
                     // Return each item to inventory by deleting order items
+                    /** @var OrderItem $item */
                     foreach ($order->items as $item) {
-                        $result = $this->orderItemRepository->deleteOrderItemById($item->wine->id, $order->id);
-                        if (!$result) {
-                            throw new Exception("Failed to return item to inventory");
+                        $wineId = $item->wine->getId();
+                        $res = $this->wineRep->updateWineFreeBottles($wineId, $item->bottlesCount, true);
+                        if (!$res) {
+                            throw new Exception("Nepovedlo se zrušit objednávku");
                         }
                     }
                     

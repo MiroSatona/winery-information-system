@@ -64,12 +64,10 @@ final class ShopPresenter extends BasePresenter
 
         // do a simple search if applicable
         $wines = $this->wineRepository->getAllProducts($search ?? "");
-        /** @var WineColor|null $color */
-
-        $color = $type->value ?? null;
-        // only allow certain types
-        if ($color !== null) {
-            $wines = array_filter($wines, fn($w) => $w->color === $color);
+        
+        bdump($type);
+        if ($type !== null && $type !== 'ALL') {
+            $wines = array_filter($wines, fn($w) => $w->color->value === $type);
         }
 
         // sort by price
