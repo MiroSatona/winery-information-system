@@ -147,20 +147,20 @@ CREATE TABLE `PICTURE` (
 --
 
 INSERT INTO `PICTURE` (`ID`, `IMAGE_NAME`, `LINK`, `DESCRIPTION`) VALUES
-(2, 'Irsai Oliver', 'img_20251119151639691ddf578164c2.16703650.webp', 'Obrázek odrůdy vína Irsai Oliver'),
+(2, 'Irsai Oliver', 'img_20251119151639691ddf578164c2.16703650.jpg', 'Obrázek odrůdy vína Irsai Oliver'),
 (3, 'Modrý Portugal', 'img_20251119151711691ddf7760b936.79538680.jpeg', 'Obrázek odrůdy vína Modrý Portugal'),
 (4, 'Tramín Červený', 'img_20251119151748691ddf9c56ebd0.82406862.jpeg', 'Obrázek odrůdy vína Tramín Červený'),
-(5, 'Ryzlink Vlašský', 'img_20251119151846691ddfd6e489f0.14956048.webp', 'Obrázek odrůdy vína Ryzlink Vlašský'),
-(6, 'Pálava', 'img_20251119151907691ddfebeb7b99.11880482.webp', 'Obrázek odrůdy vína Pálava'),
-(7, 'Müller Thurgau', 'img_20251119151930691de0023db0b0.49773505.webp', 'Obrázek odrůdy vína Müller Thurgau'),
-(8, 'Sauvignon', 'img_20251119151948691de014eaa415.67808293.webp', 'Obrázek odrůdy vína Sauvignon'),
-(9, 'Ryzlink Rýnský', 'img_20251119152008691de028948555.68413687.webp', 'Obrázek odrůdy vína Ryzlink Rýnský'),
+(5, 'Ryzlink Vlašský', 'img_20251119151846691ddfd6e489f0.14956048.jpg', 'Obrázek odrůdy vína Ryzlink Vlašský'),
+(6, 'Pálava', 'img_20251119151907691ddfebeb7b99.11880482.jpg', 'Obrázek odrůdy vína Pálava'),
+(7, 'Müller Thurgau', 'img_20251119151930691de0023db0b0.49773505.jpg', 'Obrázek odrůdy vína Müller Thurgau'),
+(8, 'Sauvignon', 'img_20251119151948691de014eaa415.67808293.jpg', 'Obrázek odrůdy vína Sauvignon'),
+(9, 'Ryzlink Rýnský', 'img_20251119152008691de028948555.68413687.jpg', 'Obrázek odrůdy vína Ryzlink Rýnský'),
 (10, 'Vinohrad U Zlaté studny', 'img_20251119153500691de3a44b7342.83006041.jpeg', 'Obrázek vinohradu Vinohrad U Zlaté studny'),
 (11, 'Vinohrad Pod Hůrkou', 'img_20251119153852691de48c9c71b0.78425762.jpeg', 'Obrázek vinohradu Vinohrad Pod Hůrkou'),
 (12, 'Vinohrad Na Stráni', 'img_20251119153931691de4b38d6d15.61980644.jpeg', 'Obrázek vinohradu Vinohrad Na Stráni'),
-(13, 'Sauvignon', 'img_202511221513416921d325c5f825.80983879.webp', 'Obrázek vína Sauvignon'),
-(14, 'Ryzlink Rýnský', 'img_202511221600236921de1708b9f0.93149591.webp', 'Obrázek vína Ryzlink Rýnský'),
-(15, 'Romantické Cuveé', 'img_202511221602216921de8d055bd9.37775723.png', 'Obrázek vína Romantické Cuveé');
+(13, 'Sauvignon', 'img_202511221513416921d325c5f825.80983879.jpg', 'Obrázek vína Sauvignon'),
+(14, 'Ryzlink Rýnský', 'img_202511221600236921de1708b9f0.93149591.jpg', 'Obrázek vína Ryzlink Rýnský'),
+(15, 'Romantické Cuveé', 'img_202511221602216921de8d055bd9.37775723.jpg', 'Obrázek vína Romantické Cuveé');
 
 -- --------------------------------------------------------
 

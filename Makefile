@@ -12,3 +12,21 @@ cs-fix:
 
 # Run all checks
 check: stan cs
+
+pack:
+	zip -r xlogin00.zip . \
+		-x "phpcs.xml" \
+		-x "phpstan.neon" \
+		-x "composer.lock" \
+		-x ".gitignore" \
+		-x ".gitattributes" \
+		-x "vendor/*" \
+		-x "temp/*" \
+		-x "log/*" \
+		-x "resources/*" \
+		-x ".git/*" \
+		-x ".devcontainer/*" \
+		-x "xlogin00.zip"
+
+
+.PHONY: stan cs cs-fix check pack

@@ -23,7 +23,7 @@ mail:
 	host: 'smtp.gmail.com'
 	port: 587
 	username: 'iis.vinarstvi@gmail.com'
-	password: 'heslo'
+	password: 'REMOVED'
 	secure: 'tls'
 
 latte:
