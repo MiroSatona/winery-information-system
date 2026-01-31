@@ -1,0 +1,208 @@
+{*
+FILE:     dashboard.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for displaying the order dashboard in the IS section.
+*}
+
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    {* Additional top menu link for Orders *}
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Objednávky
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-shopping-cart me-2"></i>
+                                Přehled objednávek
+                            </h4>
+
+                            {* Search and filter form for orders *}
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                <form method="get" class="d-flex align-items-center gap-2 mb-0" style="max-width:600px; min-width:550px;">
+                                    <input type="text" name="search" value="{$search|escape}" placeholder="Hledat objednávky..." class="form-control form-control-sm" />
+                                    
+                                    {* Filter by order state *}
+                                    <select name="state" class="form-select form-select-sm" onchange="this.form.submit()" style="min-width: 150px; max-width: 150px;">
+                                        <option value="">Všechny stavy</option>
+                                        <option value="RESERVED" {if $state === 'RESERVED'}selected{/if}>Rezervováno</option>
+                                        <option value="PAID" {if $state === 'PAID'}selected{/if}>Zaplaceno</option>
+                                        <option value="CANCELLED" {if $state === 'CANCELLED'}selected{/if}>Zrušeno</option>
+                                    </select>
+
+                                    <button type="submit" class="btn btn-primary btn-sm" style="min-width: 85px;">
+                                        <i class="fas fa-search me-1"></i>Hledat
+                                    </button>
+                                </form>
+                            </div>
+                            
+                            {* Link to return to dashboard overview *}
+                            <div class="d-flex gap-2">
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Přehled
+                                </a>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <span class="text-muted">Celkem objednávek: <strong>{count($orders)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            {* Orders table *}
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-hashtag me-1"></i>ID
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-user me-1"></i>Zákazník
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-money-bill me-1"></i>Celková cena
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-info-circle me-1"></i>Stav
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-truck me-1"></i>Způsob doručení
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-clock me-1"></i>Čas objednávky
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center" style="width: 240px;">
+                                            <i class="fas fa-cogs me-1"></i>Akce
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {* Loop through all orders *}
+                                    {foreach $orders as $order}
+                                        <tr class="align-middle">
+                                            <td>
+                                                <p class="mb-0 fw-semibold text-dark px-3 py-2">{$order->id}</p>
+                                            </td>
+
+                                            {* Customer information for the order *}
+                                            <td>
+                                                {var $user = $order->getUser()}
+                                                {if $user}
+                                                    <p class="mb-0 fw-semibold text-dark px-3 py-2">
+                                                        {$user->getName()} {$user->getSurname()}
+                                                    </p>
+                                                    <p class="mb-0 text-muted px-3 small">{$user->getEmail()}</p>
+                                                {else}
+                                                    <em class="text-muted px-3">Žádná data o uživateli</em>
+                                                {/if}
+                                            </td>
+
+                                            {* Total price of the order *}
+                                            <td>
+                                                <p class="mb-0 text-dark px-3 py-2">
+                                                    {$order->totalPrice|number:2} CZK
+                                                </p>
+                                            </td>
+
+                                            {* Order state badge *}
+                                            <td>
+                                                {switch $order->state}
+                                                    {case 'RESERVED'}<span class="badge bg-warning text-dark px-3 py-2">Rezervováno</span>
+                                                    {case 'PAID'}<span class="badge bg-success px-3 py-2">Zaplaceno</span>
+                                                    {case 'CANCELLED'}<span class="badge bg-danger px-3 py-2">Zrušeno</span>
+                                                    {case 'DELIVERED'}<span class="badge bg-primary px-3 py-2">Odesláno</span>
+                                                {/switch}
+                                            </td>
+
+                                            {* Delivery type for the order *}
+                                            <td>
+                                                <p class="mb-0 text-dark px-3 py-2">
+                                                    {switch $order->deliveryType}
+                                                        {case 'PICKUP'}Osobní odběr
+                                                        {case 'COURIER'}Kurýr
+                                                        {case 'POST'}Pošta
+                                                        {default}{$order->deliveryType}
+                                                    {/switch}
+                                                </p>
+                                            </td>
+
+                                            {* Order creation timestamp *}
+                                            <td>
+                                                <p class="mb-0 text-dark px-3 py-2">
+                                                    {$order->orderTimestamp}
+                                                </p>
+                                            </td>
+
+                                            {* Action buttons for each order *}
+                                            <td>
+                                                <div class="d-flex justify-content-around align-items-center" style="min-width: 300px;">
+                                                    {* Detail Button (always visible) *}
+                                                    <a n:href="Orders:orderDetail $order->id" 
+                                                    class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-info-circle me-1"></i>Detail
+                                                    </a>
+
+                                                    {* Ship Order Button (only if PAID) *}
+                                                    <div style="min-width: 90px; text-align: center;">
+                                                        {if $order->state === 'PAID'}
+                                                            <a n:href="changeOrderState! $order->id, 'DELIVERED'" 
+                                                            class="btn btn-outline-success btn-sm">
+                                                                <i class="fas fa-truck me-1"></i>Odeslat
+                                                            </a>
+                                                        {else}
+                                                            <span class="invisible btn btn-outline-success btn-sm">
+                                                                <i class="fas fa-truck me-1"></i>Odeslat
+                                                            </span>
+                                                        {/if}
+                                                    </div>
+
+                                                    {* Cancel Order Button (only if RESERVED or PAID) *}
+                                                    <div style="min-width: 90px; text-align: center;">
+                                                        {if $order->state === 'RESERVED' || $order->state === 'PAID'}
+                                                            <a n:href="changeOrderState! $order->id, 'CANCELLED'" 
+                                                            class="btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-times-circle me-1"></i>Zrušit
+                                                            </a>
+                                                        {else}
+                                                            <span class="invisible btn btn-outline-danger btn-sm">
+                                                                <i class="fas fa-times-circle me-1"></i>Zrušit
+                                                            </span>
+                                                        {/if}
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    {* Show message if there are no orders *}
+                                    {if count($orders) === 0}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                <i class="fas fa-shopping-cart fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné objednávky</h5>
+                                                <p>Zatím nebyly nalezeny žádné objednávky.</p>
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

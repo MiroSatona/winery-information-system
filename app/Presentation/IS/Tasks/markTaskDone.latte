@@ -1,0 +1,128 @@
+{*
+FILE:     markTaskDone.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for marking a task as done in the IS module
+*}
+
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current action *}
+    <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Potvrdit úkon
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-clipboard-check me-2"></i>Dokončení úkonu
+                    </h4>
+                </div>
+
+                <div class="card-body p-4">
+                    {* Display information about the current task, including type-specific details *}
+                    <div class="alert alert-info mb-4">
+                        <h6 class="fw-bold mb-2">
+                            <i class="fas fa-info-circle me-2"></i>Informace o úkonu
+                        </h6>
+                        <div class="mb-1">
+                            <strong>Název:</strong> {$task->getName()}
+                        </div>
+                        <div class="mb-1">
+                            <strong>Termín plánovaný:</strong> {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                        </div>
+                        
+                        {* Show details for Harvest tasks *}
+                        {if $task instanceof $HarvestType}
+                            <div class="mb-1">
+                                <strong>Typ:</strong> Sklizeň
+                            </div>
+                            <div class="mb-1">
+                                <strong>Vinohrad:</strong> {$task->getVineyard()->getName()}
+                            </div>
+                            <div>
+                                <strong>Odrůda:</strong> {$task->getWineVariety()->getName()}
+                            </div>
+                        {/if}
+                        
+                        {* Show details for Treatment tasks *}
+                        {if $task instanceof $TreatmentType}
+                            <div class="mb-1">
+                                <strong>Typ:</strong> Ošetření
+                            </div>
+                            <div class="mb-1">
+                                <strong>Vinohrad:</strong>
+                                {$task->getVineyard()->getName()}
+                            </div>
+                            <div class="mb-1">
+                                <strong>Kategorie:</strong> {$task->getTypeText()}
+                            </div>
+                            <div class="mb-1">
+                                <strong>Název ošetření:</strong> {$task->getNameTreatment()}
+                            </div>
+                            <div>
+                                <strong>Množství:</strong> {$task->getQuantity()} {$task->getUnit()}
+                            </div>
+                        {/if}
+                        
+                        {* Show details for Bottling tasks *}
+                        {if $task instanceof $BottlingType}
+                            <div class="mb-1">
+                                <strong>Typ:</strong> Lahvování
+                            </div>
+                            <div class="mb-1">
+                                <strong>Víno:</strong> {$task->getWine()->getName()}
+                            </div>
+                            <div>
+                                <strong>Počet lahví:</strong> {$task->getBottlesCount()} lahví ({$task->getBottleVolume()} ml)
+                            </div>
+                        {/if}
+                    </div>
+
+                    {* Form for marking the task as done *}
+                    {form markTaskDoneForm}
+                        <div class="mb-3">
+                            <label for="execution_date" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-check me-2 text-muted"></i>{label execution_date /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input execution_date}
+                            <span class="invalid-feedback">
+                                {inputError execution_date}
+                            </span>
+                        </div>
+
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    {* Button to return to the list of tasks *}
+                                    <a href="{link Tasks:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <i class="fas fa-arrow-left me-2"></i>Zpět na úkony
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {* Button to submit the form and mark the task as done *}
+                                    {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

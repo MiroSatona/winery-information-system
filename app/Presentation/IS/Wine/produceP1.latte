@@ -1,0 +1,159 @@
+{*
+FILE:     produceP1.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for the first step of wine production (harvest selection)
+*}
+
+{layout '../isLayout.latte'}
+
+
+{block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and wine production -->
+    <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vína
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vyrobit víno
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <!-- Main panel for wine production step 1: harvest selection -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 col-lg-9 col-xl-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-wine-glass me-2"></i>
+                        Výběr sklizní pro výrobu vína
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form harvestSelectionForm}
+                        <!-- Harvest selection input section -->
+                        <div class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-9">
+                                    <label for="harvest" class="form-label fw-semibold">
+                                        <i class="fas fa-seedling me-2 text-muted"></i>{label harvest /}
+                                    </label>
+                                    {input harvest}
+                                    <span class="invalid-feedback">
+                                        {inputError harvest}
+                                    </span>
+                                </div>
+                                <div class="col-3">
+                                    {input addHarvest}
+                                    <span class="invalid-feedback">
+                                        {inputError addHarvest}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Selected harvests table section -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold mb-3">
+                                <i class="fas fa-check-circle me-2 text-success"></i>
+                                Vybrané sklizně
+                            </h5>
+                            
+                            {if count($harvestsInProduction) > 0}
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="fw-bold">
+                                                    <i class="fas fa-seedling me-2"></i>Odrůda
+                                                </th>
+                                                <th scope="col" class="fw-bold">
+                                                    <i class="fas fa-mountain me-2"></i>Vinohrad
+                                                </th>
+                                                <th scope="col" class="fw-bold text-center">
+                                                    <i class="fas fa-calendar-alt me-2"></i>Datum sklizně
+                                                </th>
+                                                <th scope="col" class="fw-bold text-center">
+                                                    <i class="fas fa-weight-hanging me-2"></i>Hmotnost
+                                                </th>
+                                                <th scope="col" class="fw-bold text-center">
+                                                    <i class="fas fa-cube me-2"></i>Cukr
+                                                </th>
+                                                <th scope="col" class="fw-bold text-center" style="width: 120px;">
+                                                    <i class="fas fa-cogs me-2"></i>Akce
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {foreach $harvestsInProduction as $harvest}
+                                                <tr class="align-middle">
+                                                    <td class="fw-semibold">
+                                                        {$harvest->getWineVariety()->getName()}
+                                                    </td>
+                                                    <td>
+                                                        {$harvest->getVineyard()->getName()}
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="badge bg-light text-dark">
+                                                            {$harvest->getExecutionTimestamp()->format('d.m.Y')}
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="fw-semibold">{$harvest->getWeight()} kg</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span class="fw-semibold">{$harvest->getSugarContent()} °NM</span>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <!-- Remove selected harvest from production -->
+                                                        <a href="{link removeHarvestFromProduction! $harvest->getId()}" 
+                                                           class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash-alt me-1"></i>Odebrat
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {else}
+                                <!-- Info alert if no harvests are selected -->
+                                <div class="alert alert-info">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace
+                                    </h6>
+                                    <small class="mb-0">
+                                        Zatím nejsou vybrány žádné sklizně. Použijte dropdown menu výše pro výběr sklizní, které chcete použít pro výrobu vína.
+                                    </small>
+                                </div>
+                            {/if}
+                        </div>
+
+                        <!-- Action buttons for navigation -->
+                        <div class="border-top pt-4">
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    {input backToDashboard}
+                                    <span class="invalid-feedback">
+                                        {inputError backToDashboard}
+                                    </span>
+                                </div>
+                                <div class="col-6">
+                                    <div class="d-grid">
+                                        {input toStep2}
+                                        <span class="invalid-feedback">
+                                            {inputError toStep2}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

@@ -1,0 +1,125 @@
+{*
+FILE:     add.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for adding a new vineyard.
+*}
+{layout '../isLayout.latte'}
+
+{* Top menu navigation for vineyards section *}
+{block topMenuISAdditional}
+    <a href="{link :IS:Vineyards:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vinohrady
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Přidat vinohrad
+    </a>
+{/block topMenuISAdditional}
+
+{* Main panel for adding a new vineyard *}
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        Přidání vinohradu
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {* Vineyard add form *}
+                    {form addVineyardForm}
+                        {* Required name input field  *}
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">
+                                <i class="fas fa-tag me-2 text-muted"></i>{label name /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input name}
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
+                        </div>
+
+                        {* Required location input field  *}
+                        <div class="mb-3">
+                            <label for="location" class="form-label fw-semibold">
+                                <i class="fas fa-map-marker-alt me-2 text-muted"></i>{label location /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input location}
+                            <span class="invalid-feedback">
+                                {inputError location}
+                            </span>
+                        </div>
+                        
+                        {* Required year input field  *}
+                        <div class="mb-3">
+                            <label for="year" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input year}
+                            <span class="invalid-feedback">
+                                {inputError year}
+                            </span>
+                        </div>
+                        
+                        {* Optional description input field  *}
+                        <div class="mb-3">
+                            <label for="description" class="form-label fw-semibold">
+                                <i class="fas fa-file-alt me-2 text-muted"></i>{label description /}
+                            </label>
+                            {input description}
+                            <span class="invalid-feedback">
+                                {inputError description}
+                            </span>
+                        </div>
+                        
+                        {* Optional image upload field  *}
+                        <div class="mb-3">
+                            <label for="image" class="form-label fw-semibold">
+                                <i class="fas fa-image me-2 text-muted"></i>{label image /}
+                            </label>
+                            {input image}
+                            <span class="invalid-feedback">
+                                {inputError image}
+                            </span>
+                        </div>
+
+                        {* Information note for users about further editing *}
+                        <div class="alert alert-info mb-4">
+                            <h6 class="fw-bold mb-2">
+                                <i class="fas fa-info-circle me-2"></i>Informace
+                            </h6>
+                            <small class="mb-0">
+                                Přidávání a úprava řad vín a dalších podrobností bude k dispozici po vytvoření vinohradu na jeho editační stránce.
+                            </small>
+                        </div>
+
+                        {* Form action buttons: Cancel and Submit *}
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <a href="{link Vineyards:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <i class="fas fa-times me-2"></i>Zrušit
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

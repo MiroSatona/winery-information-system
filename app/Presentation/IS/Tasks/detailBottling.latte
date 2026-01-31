@@ -1,0 +1,93 @@
+{*
+FILE:     detailBottling.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for displaying the detail of a bottling task
+*}
+{layout '../isLayout.latte'}
+    
+
+{block topMenuISAdditional}
+    <!-- Navigation links for the IS Tasks dashboard and current bottling detail -->
+    <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Detail lahvování
+    </a>
+{/block topMenuISAdditional}
+
+
+{block isMainPanel}
+    <!-- Main panel for displaying bottling task details -->
+    {include 'detailHeader.latte', task: $task} <!-- Include common task header -->
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card shadow-sm">
+                    <div class="card-header text-dark p-4">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <h5 class="mb-0 fw-bold">
+                                <i class="fas fa-wine-bottle me-2"></i>Specifické informace o lahvování <!-- Bottling-specific info title -->
+                            </h5>
+                            <div class="d-flex gap-2 flex-wrap">
+                                <!-- Link to the wine detail page -->
+                                <a href="{link :IS:Wine:show $task->getIdWine()}" class="btn btn-sm btn-primary">
+                                    <i class="fas fa-wine-bottle me-1"></i>{$task->getWine()->getName()}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-12 col-md-8">
+                                <div class="mb-4">
+                                    <!-- First row: wine name and bottle count -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-wine-glass me-2"></i>Víno <!-- Wine label -->
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">
+                                                {if $task->getIdWine()}
+                                                    {$task->getWine()->getName()}
+                                                {else}
+                                                    <span class="text-muted fst-italic">Není přiřazeno</span> <!-- Not assigned -->
+                                                {/if}
+                                            </p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-sort-numeric-up me-2"></i>Počet lahví <!-- Number of bottles -->
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getBottlesCount()} ks</p>
+                                        </div>
+                                    </div>
+                                    <!-- Second row: bottle volume and total volume -->
+                                    <div class="row mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-flask me-2"></i>Objem lahve <!-- Bottle volume -->
+                                            </label>
+                                            <p class="fs-6 text-dark mb-2">{$task->getBottleVolume()} ml</p>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold text-muted">
+                                                <i class="fas fa-calculator me-2"></i>Celkový objem <!-- Total volume -->
+                                            </label>
+                                            <p class="fs-6 text mb-2">
+                                                {($task->getBottledVolume() / 1000)|number:2} l
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block isMainPanel}

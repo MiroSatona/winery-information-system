@@ -1,0 +1,204 @@
+{*
+FILE:     dashboard.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     latte template for wine varieties dashboard (overview, add/edit/delete)
+*}
+
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <!-- Top menu for wine varieties section -->
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Odrůdy vín
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <!-- Main panel for wine varieties dashboard -->
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <!-- Section title -->
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-seedling me-2"></i>
+                                Přehled odrůd vín
+                            </h4>
+                            <div class="d-flex gap-2">
+                               <!-- Placeholder for future controls -->
+                            </div>
+                            <div class="d-flex gap-2">
+                                <!-- Back to dashboard button -->
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
+                                </a>
+                                {if $userVintner}
+                                    <!-- Add new wine variety button (visible to vintners) -->
+                                    <a href="{link WineVarieties:add}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-2"></i>Přidat odrůdu
+                                    </a>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <!-- Display total number of wine varieties -->
+                                <span class="text-muted">Celkem odrůd: <strong>{count($wineVarieties)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <!-- Table of wine varieties -->
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-seedling me-2"></i>Název
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-palette me-2"></i>Barva
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-align-left me-2"></i>Popis
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-image me-2"></i>Obrázek
+                                        </th>
+                                        {if $userVintner}
+                                            <th scope="col" class="fw-bold text-center" style="width: 200px;">
+                                                <i class="fas fa-cogs me-2"></i>Akce
+                                            </th>
+                                        {/if}
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $wineVarieties as $variety}
+                                        <tr class="align-middle">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <!-- Wine variety name -->
+                                                        <h6 class="mb-0 fw-semibold text-dark">{$variety->getName()}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <!-- Display color of wine variety -->
+                                                {switch $variety->getColor()}
+                                                    {case $WineVarietyType::WHITE}
+                                                        Bílé
+                                                    {case $WineVarietyType::RED}
+                                                        Červené
+                                                    {case $WineVarietyType::PINK}
+                                                        Růžové
+                                                    {case $WineVarietyType::GREY}
+                                                        Šedé
+                                                    {case $WineVarietyType::BLUE}
+                                                        Modré
+                                                {/switch}
+                                            </td>
+                                            <td>
+                                                <!-- Truncate description if too long -->
+                                                <p class="mb-0 text-muted" >
+                                                    {if strlen($variety->getDescription()) > 80}
+                                                        {$variety->getDescription()|truncate:80}
+                                                    {else}
+                                                        {$variety->getDescription()}
+                                                    {/if}
+                                                </p>
+                                            </td>
+                                            <td class="text-center">
+                                                <!-- Show check if image exists -->
+                                                {if $variety->getImage()}
+                                                    <i class="fas fa-check me-1"></i>
+                                                {else}
+                                                    <i class="fas fa-times me-1"></i>
+                                                {/if}
+                                            </td>
+                                            {if $userVintner}
+                                                <td>
+                                                    <div class="d-flex gap-2 justify-content-center">
+                                                        <!-- Edit button for wine variety -->
+                                                        <a href="{link WineVarieties:edit, id => $variety->getId()}" 
+                                                        class="btn btn-outline-primary btn-sm" 
+                                                        title="Upravit odrůdu">
+                                                            <i class="fas fa-edit me-1"></i>Upravit
+                                                        </a>
+                                                        {if !$wineVarietyRepository->checkWineVarietyUsed($variety->getId())}
+                                                            <!-- Delete button triggers modal if variety is not used -->
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deleteModal{$variety->getId()}"
+                                                                    title="Smazat odrůdu">
+                                                                <i class="fas fa-trash me-1"></i>Smazat
+                                                            </button>
+                                                        {/if}
+                                                    </div>
+                                                </td>
+                                            {/if}
+                                        </tr>
+                                    {/foreach}
+                                    {if count($wineVarieties) === 0}
+                                        <!-- Show message if no wine varieties exist -->
+                                        <tr>
+                                            <td colspan="5" class="text-center py-5 text-muted">
+                                                <i class="fas fa-seedling fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné odrůdy vín</h5>
+                                                <p>Zatím nejsou přidány žádné odrůdy vín.</p>
+                                                <a href="{link WineVarieties:add}" class="btn btn-primary btn-sm">
+                                                    <i class="fas fa-plus me-2"></i>Přidat první odrůdu
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modals for each wine variety -->
+    {foreach $wineVarieties as $variety}
+        <div class="modal fade" id="deleteModal{$variety->getId()}" tabindex="-1" aria-labelledby="deleteModalLabel{$variety->getId()}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel{$variety->getId()}">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potvrdit smazání
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="fas fa-wine-glass fa-3x text-danger mb-3"></i>
+                            <h5>Opravdu chcete smazat odrůdu?</h5>
+                            <p class="text-muted">
+                                <strong>{$variety->getName()}</strong><br>
+                                Tato akce je nevratná. Smazat lze pouze odrůdy, které nejsou používány v systému.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Cancel and confirm delete buttons -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link delete!, $variety->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Smazat odrůdu
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/foreach}
+{/block isMainPanel}

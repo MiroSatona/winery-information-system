@@ -1,0 +1,73 @@
+{*
+FILE:     in.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for user sign-in page
+*}
+{block title}
+    Přihlášení
+{/block}
+
+
+{block content}
+
+<!-- Background image and overlay for the sign-in page -->
+<div class="auth-background position-relative">
+    <img src="{asset 'images/home_picture.jpg'}" alt="Vinařství pozadí" class="auth-bg-image">
+    <div class="auth-overlay"></div>
+    
+    <!-- Centered container for the sign-in card -->
+    <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-5 position-relative">
+        <div class="row w-100 justify-content-center">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-4">
+                <!-- Sign-in card -->
+                <div class="card shadow-lg border-0 auth-card">
+                    <!-- Card header with title -->
+                    <div class="card-header bg-primary text-white text-center py-4">
+                        <h1 class="mb-0 fs-3 fw-bold">
+                            <i class="fas fa-sign-in-alt me-2"></i>Přihlášení
+                        </h1>
+                    </div>
+                    <!-- Card body with sign-in form -->
+                    <div class="card-body p-4">
+                        {form signInForm}
+                            <!-- Username input field -->
+                            <div class="mb-3">
+                                {label username /} <span class="text-danger">*</span>
+                                {input username}
+                                <span class="invalid-feedback">
+                                    {inputError username}
+                                </span>
+                            </div>
+                            <!-- Password input field -->
+                            <div class="mb-4">
+                                {label password /} <span class="text-danger">*</span>
+                                {input password}
+                                <span class="invalid-feedback">
+                                    {inputError password}
+                                </span>
+                            </div>
+                            <!-- Submit button -->
+                            <div class="d-grid">
+                                {input send}
+                            </div>
+                        {/form}
+                    </div>
+                    <!-- Card footer with registration link -->
+                    <div class="card-footer text-center bg-light py-3">
+                        <small class="text-muted">
+                            Nemáte účet? 
+                            <a href="{link Sign:up}" class="text-primary text-decoration-none fw-bold">
+                                Registrovat se
+                            </a>
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{/block content}

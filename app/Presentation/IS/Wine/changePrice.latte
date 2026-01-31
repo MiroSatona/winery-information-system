@@ -1,0 +1,112 @@
+{*
+FILE:     changePrice.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     latte template for changing wine price
+*}
+{layout '../isLayout.latte'}
+
+
+{block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and price change -->
+    <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vína
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Změna ceny
+    </a>
+{/block topMenuISAdditional}
+
+
+{block isMainPanel}
+<!-- Main panel for changing the price of a wine -->
+<div class="d-flex justify-content-center align-items-center h-100">
+    <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-primary text-white py-3">
+                <h4 class="mb-0 fw-bold">
+                    <i class="fas fa-wine-glass me-2"></i>
+                    Změna ceny 
+                </h4>
+            </div>
+
+            <div class="card-body p-4">
+                <!-- Wine information card -->
+                <div class="mb-4">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-header bg-light py-3">
+                            <h5 class="mb-0 fw-bold text-primary">
+                                <i class="fas fa-wine-glass me-2"></i>{$wine->name}
+                            </h5>
+                        </div>
+                        <div class="card-body p-3 text-center">
+                            <div class="current-image-container">
+                                <!-- Display current wine image -->
+                                {if $wine->getImage() !== null}
+                                    <img src="{asset $imageRepository->getPathForImage($wine->getImage())}"
+                                         alt="{$wine->name}" 
+                                         class="img-fluid rounded shadow-sm"
+                                         style="max-height: 200px; object-fit: cover;">
+                                {else}
+                                    {* Placeholder if no image is available *}
+                                    <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded"
+                                         style="height: 200px;">
+                                        <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form for setting wine price -->
+                {form setWinePriceForm}
+                    <div class="mb-3">
+                        <label for="price" class="form-label fw-semibold">
+                            <i class="fas fa-coins me-2 text-muted"></i>{label price /}
+                            <span class="text-danger">*</span>
+                        </label>
+                        {input price}
+                        <span class="invalid-feedback">
+                            {inputError price}
+                        </span>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <!-- Product description input -->
+                    <div class="mb-4">
+                        <label for="popis" class="form-label fw-semibold">
+                            <i class="fas fa-file-alt me-2 text-muted"></i>{label popis /}
+                        </label>
+                        {input popis}
+                        <span class="invalid-feedback">
+                            {inputError popis}
+                        </span>
+                    </div>
+
+                    <div class="border-top pt-4">
+                        <div class="row">
+                            <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                <!-- Cancel button returns to wine dashboard -->
+                                <a href="{link Wine:dashboard}" class="btn btn-outline-secondary w-100 fw-bold">
+                                    <i class="fas fa-times me-2"></i>Zrušit
+                                </a>
+                            </div>
+                            <div class="col-12 col-md-6">
+                                <!-- Submit button for saving new price -->
+                                {input send, class => 'btn btn-primary w-100 fw-bold'}
+                                <span class="invalid-feedback">
+                                    {inputError send}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                {/form}
+            </div>
+        </div>
+    </div>
+</div>
+{/block isMainPanel}

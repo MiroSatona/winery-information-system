@@ -1,0 +1,65 @@
+{*
+FILE:     default.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for payment confirmation page
+*}
+{block content}
+<div class="container py-5"> <!-- Main container for payment page -->
+    <div class="row justify-content-center"> <!-- Centered row for card -->
+        <div class="col-md-8"> <!-- Responsive column for card -->
+            <div class="card shadow-sm border-0"> <!-- Card for payment info -->
+                <div class="card-body text-center"> <!-- Card body with centered content -->
+
+                    <!-- Payment title with icon -->
+                    <h1 class="mb-4 text-primary">
+                        <i class="fa-solid fa-coins"></i> Platba
+                    </h1>
+
+
+                    <!-- Thank you message and payment method info -->
+                    <p class="lead mb-4">
+                        Děkujeme za vaši objednávku!
+                        Přijímáme pouze <strong>DoudgeCoin</strong> jako platební metodu.
+                    </p>
+
+
+                    <!-- Payment amount and instructions -->
+                    <p class="mb-4">
+                        Prosím, pošlete <strong>{$price} Doudge</strong> na následující adresu:
+                    </p>
+
+
+                    <!-- Wallet address for payment -->
+                    <div class="alert alert-warning d-flex align-items-center justify-content-center">
+                        <i class="fa-solid fa-wallet me-2"></i>
+                        <span class="fw-bold">DGC-1234-5678-9012-ABCD</span>
+                    </div>
+
+
+                    <!-- Instructions to confirm payment after sending -->
+                    <p class="text-muted mb-4">
+                        Jakmile pošlete DoudgeCoin, klikněte na tlačítko níže a potvrďte platbu.
+                    </p>
+
+
+                    <!-- Button to confirm payment sent -->
+                    <a n:href="confirm" 
+                       class="btn btn-success btn-lg">
+                        <i class="fa-solid fa-check me-2"></i>
+                        Určitě jsem poslal peníze na uvedenou peněženku!
+                    </a>
+
+
+                    <!-- Disclaimer-->
+                    <p class="text-muted mt-3 small">
+                        Poznámka: Tento platební portál je jen školní projekt, žádné skutečné DoudgeCoiny nebudou přijaty.
+                    </p>
+                </div> 
+            </div> 
+        </div> 
+    </div> 
+</div> 
+{/block}

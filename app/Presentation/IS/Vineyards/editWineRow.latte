@@ -1,0 +1,108 @@
+{*
+FILE:     editWineRow.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for editing a wine row.
+*}
+{layout '../isLayout.latte'}
+
+
+{block topMenuISAdditional}
+    <!-- Navigation links for vineyard dashboard and current edit page -->
+    <a href="{link :IS:Vineyards:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vinohrady
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Upravit řádek vína
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <!-- Main panel for editing a wine row -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-sm">
+                <!-- Card header with page title -->
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        Úprava řádku vinné révy
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {form editWineRowForm}
+                        <!-- Row number input -->
+                        <div class="mb-3">
+                            <label for="rowNumber" class="form-label fw-semibold">
+                                <i class="fas fa-hashtag me-2 text-muted"></i>{label rowNumber /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input rowNumber}
+                            <span class="invalid-feedback">
+                                {inputError rowNumber}
+                            </span>
+                        </div>
+
+                        <!-- Variety selection input -->
+                        <div class="mb-3">
+                            <label for="variety" class="form-label fw-semibold">
+                                <i class="fas fa-seedling me-2 text-muted"></i>{label variety /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input variety}
+                            <span class="invalid-feedback">
+                                {inputError variety}
+                            </span>
+                        </div>
+                        
+                        <!-- Year input -->
+                        <div class="mb-3">
+                            <label for="year" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>{label year /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input year}
+                            <span class="invalid-feedback">
+                                {inputError year}
+                            </span>
+                        </div>
+                        
+                        <!-- Head count input -->
+                        <div class="mb-3">
+                            <label for="headCount" class="form-label fw-semibold">
+                                <i class="fas fa-calendar me-2 text-muted"></i>{label headCount /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input headCount}
+                            <span class="invalid-feedback">
+                                {inputError headCount}
+                            </span>
+                        </div>
+
+                        <!-- Form action buttons: Cancel and Save -->
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 mb-3 mb-md-0">
+                                    <!-- Cancel button returns to vineyard detail -->
+                                    <a href="{link show $vineyard->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <i class="fas fa-times me-2"></i>Zrušit
+                                    </a>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <!-- Save button for submitting the form -->
+                                    {input save}
+                                    <span class="invalid-feedback">
+                                        {inputError save}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

@@ -1,0 +1,229 @@
+{*
+FILE:     taskEdit.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for editing a task in the IS module.
+*}
+
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current edit page *}
+    <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Upravit úkon
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-lg-10 col-xl-8">
+            <div class="card border-0 shadow-lg">
+                 <div class="card-header bg-primary text-white py-3 d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-edit me-2"></i>
+                        {* Display the task ID being edited *}
+                        Úprava úkonu #{$task->getId()}
+                    </h4>
+
+                    {* Back button to dashboard *}
+                    <a href="{link details! $task->getId() }" class="btn btn-outline-light btn-sm d-flex align-items-center">
+                        <i class="fas fa-arrow-left me-2"></i>
+                        Zpět
+                    </a>
+                </div>
+
+                <div class="card-body p-4">
+                    {* Form for editing basic task information (name, date, note) *}
+                    {form basicTaskEdit}
+                        <h5 class="mb-3 fw-semibold text-primary">
+                            <i class="fas fa-info-circle me-2"></i>Základní informace
+                        </h5>
+                        
+                        <div class="mb-3">
+                            <label for="name" class="form-label fw-semibold">
+                                <i class="fas fa-tag me-2 text-muted"></i>{label name /}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input name}
+                            <span class="invalid-feedback">
+                                {inputError name}
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="planned_date" class="form-label fw-semibold">
+                                <i class="fas fa-calendar-alt me-2 text-muted"></i>{label planned_date /}
+                            </label>
+                            {input planned_date}
+                            <span class="invalid-feedback">
+                                {inputError planned_date}
+                            </span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="note" class="form-label fw-semibold">
+                                <i class="fas fa-sticky-note me-2 text-muted"></i>{label note /}
+                            </label>
+                            {input note}
+                            <span class="invalid-feedback">
+                                {inputError note}
+                            </span>
+                        </div>
+
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-12 col-md-6 ms-auto">
+                                    {* Submit button for basic info form *}
+                                    {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+
+                    <hr class="my-4">
+
+                    {* Show additional form depending on the type of task *}
+                    {if $task instanceof App\Model\Task\Bottling\Bottling}
+                        {* Bottling-specific form section *}
+                        <h5 class="mb-3 fw-semibold text-primary">
+                            <i class="fas fa-wine-bottle me-2"></i>Údaje o lahvování
+                        </h5>
+                        
+                        {* Display wine info and image for bottling task *}
+                        <div class="alert alert-info mb-3">
+                            <div class="d-flex align-items-center">
+                                <img src="{asset $image? $imageRepository->getPathForImage($image) : $imageRepository->getTmpWineImage()}" 
+                                     class="rounded shadow-sm me-3" 
+                                     width="60" 
+                                     height="60"
+                                     style="object-fit: cover;"
+                                     alt="víno">
+                                <div>
+                                    <strong class="d-block">Víno: {$task->getWine()->getName()}</strong>
+                                    <small class="text-muted">ID: {$task->getWine()->getId()}</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        {form editBottling}
+                            <div class="mb-3">
+                                <label for="volume" class="form-label fw-semibold">
+                                    <i class="fas fa-flask me-2 text-muted"></i>{label volume /}
+                                    <span class="text-danger">*</span>
+                                </label>
+                                {input volume}
+                                <span class="invalid-feedback">
+                                    {inputError volume}
+                                </span>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="image" class="form-label fw-semibold">
+                                    <i class="fas fa-camera me-2 text-muted"></i>{label image /}
+                                </label>
+                                {input image}
+                                <span class="invalid-feedback">
+                                    {inputError image}
+                                </span>
+                            </div>
+
+                            <div class="border-top pt-4">
+                                <div class="row">
+                                    <div class="col-12 col-md-6 ms-auto">
+                                        {* Submit button for bottling form *}
+                                        {input send}
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        {/form}
+
+                    {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                        {* Treatment-specific form section *}
+                        <h5 class="mb-3 fw-semibold text-primary">
+                            <i class="fas fa-flask me-2"></i>Údaje o ošetření
+                        </h5>
+
+                        {form editTreatment}
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="type" class="form-label fw-semibold">
+                                        <i class="fas fa-layer-group me-2 text-muted"></i>{label type /}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input type}
+                                    <span class="invalid-feedback">
+                                        {inputError type}
+                                    </span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="name" class="form-label fw-semibold">
+                                        <i class="fas fa-tag me-2 text-muted"></i>{label name /}
+                                        <span class="text-danger">*</span>
+                                    </label>
+                                    {input name}
+                                    <span class="invalid-feedback">
+                                        {inputError name}
+                                    </span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="amount" class="form-label fw-semibold">
+                                        <i class="fas fa-sort-numeric-up me-2 text-muted"></i>{label amount /}
+                                    </label>
+                                    {input amount}
+                                    <span class="invalid-feedback">
+                                        {inputError amount}
+                                    </span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label for="unit" class="form-label fw-semibold">
+                                        <i class="fas fa-balance-scale me-2 text-muted"></i>{label unit /}
+                                    </label>
+                                    {input unit}
+                                    <span class="invalid-feedback">
+                                        {inputError unit}
+                                    </span>
+                                </div>
+
+                                {* Info alert about optional fields for treatment *}
+                                <div class="alert alert-info mb-4">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace
+                                    </h6>
+                                    <small class="mb-0">Zadání množství a jednotky je volitelné. K jejich uložení dojde pouze při zadání obou hodnot.</small>
+                                </div>
+
+                                <div class="col-12">
+                                    <div class="border-top pt-4">
+                                        <div class="row">
+                                            <div class="col-12 col-md-6 ms-auto">
+                                                {* Submit button for treatment form *}
+                                                {input send}
+                                                <span class="invalid-feedback">
+                                                    {inputError send}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {/form}
+                    {/if}
+                </div>
+            </div>
+        </div>
+    </div>
+{/block isMainPanel}

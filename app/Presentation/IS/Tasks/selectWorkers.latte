@@ -1,0 +1,138 @@
+{*
+FILE:     selectWorkers.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for selecting workers for a task in the IS module
+*}
+
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    {* Navigation links for the IS Tasks dashboard and current page *}
+    <a href="{link :IS:Tasks:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Výběr pracovníků
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-12 col-md-10 col-lg-9 col-xl-7">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-users me-2"></i>
+                        Výběr pracovníků
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {* Form for selecting workers for a task *}
+                    {form taskWorkersForm}
+
+                        {* Section for adding a new worker to the selection *}
+                        <div class="mb-4">
+                            <div class="row g-3 align-items-end">
+                                <div class="col-9">
+                                    <label for="worker" class="form-label fw-semibold">
+                                        <i class="fas fa-user-tie me-2 text-muted"></i>{label worker /}
+                                    </label>
+                                    {input worker}
+                                    <span class="invalid-feedback">
+                                        {inputError worker}
+                                    </span>
+                                </div>
+                                <div class="col-3">
+                                    {input addWorker}
+                                    <span class="invalid-feedback">
+                                        {inputError addWorker}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {* Section displaying the list of selected workers *}
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold m-0">
+                                    <i class="fas fa-check-circle me-2 text-success"></i>
+                                    Vybraní pracovníci
+                                </h5>
+
+                                <div>
+                                    {* Show clear button only if there are selected workers *}
+                                    {if $selectedWorkers && count($selectedWorkers) > 0}
+                                        {input clearWorkers}
+                                    {/if}
+                                </div>
+                            </div>
+
+                            {if $selectedWorkers && count($selectedWorkers) > 0}
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th scope="col" class="fw-bold">Jméno</th>
+                                                <th scope="col" class="fw-bold">Login</th>
+                                                <th scope="col" class="fw-bold text-center" style="width: 120px;">Akce</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {* List each selected worker with option to remove *}
+                                            {foreach $selectedWorkers as $worker}
+                                                <tr class="align-middle">
+                                                    <td class="fw-semibold">{$worker->getFullName()}</td>
+                                                    <td>{$worker->getUsername()}</td>
+                                                    <td class="text-center">
+                                                        <a href="{link removeWorkerFromSelection! $worker->getId()}" class="btn btn-sm btn-outline-danger">
+                                                            <i class="fas fa-trash-alt me-1"></i>Odebrat
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            {/foreach}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            {else}
+                                {* Info message if no workers are selected *}
+                                <div class="alert alert-info">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace
+                                    </h6>
+                                    <small class="mb-0">Zatím nejsou vybráni žádní pracovníci. Vyberte pracovníka z dropdownu a přidejte ho.</small>
+                                </div>
+                            {/if}
+                        </div>
+                        <div class="border-top pt-4">
+                            <div class="row g-2">
+                                {* Navigation buttons for form actions *}
+                                <div class="col-12 col-md-4">
+                                    {input backToDashboard}
+                                    <span class="invalid-feedback">
+                                        {inputError backToDashboard}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input goBack}
+                                    <span class="invalid-feedback">
+                                        {inputError goBack}
+                                    </span>
+                                </div>
+                                <div class="col-12 col-md-4">
+                                    {input next}
+                                    <span class="invalid-feedback">
+                                        {inputError next}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{/block isMainPanel}

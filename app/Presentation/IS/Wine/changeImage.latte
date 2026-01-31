@@ -1,0 +1,138 @@
+{*
+FILE:     changeImage.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for changing wine image in IS
+*}
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <!-- Navigation links for wine dashboard and current page -->
+    <a href="{link :IS:Wine:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vína
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Změna obrázku vína
+    </a>
+{/block topMenuISAdditional}
+
+{block isMainPanel}
+    <!-- Main panel for changing wine image -->
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="col-10 col-md-8 col-lg-6 col-xl-5">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-image me-2"></i>
+                        Změna obrázku vína {$wine->getName()}
+                    </h4>
+                </div>
+                <div class="card-body p-4">
+                    {* Display current wine image or placeholder *}
+                    <div class="text-center">
+                        <div class="current-image-container border rounded p-3 bg-light">
+                            {if $wine->getImage()}
+                                <!-- Show current wine image with remove button -->
+                                <img src="{asset $imageRepository->getPathForImage($wine->getImage())}" 
+                                        alt="{$wine->getImage()->description}" 
+                                        class="img-fluid rounded shadow-sm current-wine-image"
+                                        style="max-height: 250px;">
+                                <div class="mt-3">
+                                    <button type="button" 
+                                            class="btn btn-outline-danger btn-sm" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#removeImageModal">
+                                        <i class="fas fa-trash me-1"></i>Odstranit obrázek
+                                    </button>
+                                </div>
+                            {else}
+                                <!-- Placeholder if no image is assigned -->
+                                <div class="no-image-placeholder">
+                                    <i class="fas fa-wine-bottle fa-4x text-muted mb-3"></i>
+                                    <h6 class="text-muted mb-2">Bez obrázku</h6>
+                                    <p class="text-muted small mb-0">
+                                        K tomuto vínu není přiřazen žádný obrázek
+                                    </p>
+                                </div>
+                            {/if}
+                        </div>
+                    </div>
+                    <hr>
+                    {* Form for uploading or changing wine image *}
+                    {form changeImageForm}
+                        <div class="mb-3">
+                            <label for="image" class="form-label fw-semibold">
+                                <i class="fas fa-image me-2 text-muted"></i>
+                                {if $wine->getImage()}
+                                    Změnit obrázek vína
+                                {else}
+                                    Přidat obrázek vína
+                                {/if}
+                                <span class="text-danger">*</span>
+                            </label>
+                            {input image}
+                            <span class="invalid-feedback">
+                                {inputError image}
+                            </span>
+                        </div>
+
+                        <div class="border-top pt-4">
+                            <div class="row">
+                                <div class="col-6">
+                                    <!-- Cancel button returns to wine detail -->
+                                    <a href="{link show, $wine->getId()}" class="btn btn-outline-secondary w-100 fw-bold">
+                                        <i class="fas fa-times me-1"></i>Zrušit
+                                    </a>
+                                </div>
+                                <div class="col-6">
+                                    <!-- Submit button for image upload/change -->
+                                    {input send}
+                                    <span class="invalid-feedback">
+                                        {inputError send}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    {/form}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {* Modal dialog for confirming image removal *}
+    {if $wine->getImage()}
+        <div class="modal fade" id="removeImageModal" tabindex="-1" aria-labelledby="removeImageModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="removeImageModalLabel">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Odstranit obrázek vína
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <i class="fas fa-wine-bottle fa-3x text-danger mb-3"></i>
+                        <h5>Opravdu chcete odstranit obrázek?</h5>
+                        <div class="mt-3 p-3 bg-light rounded">
+                            <p class="mb-1"><strong>Víno:</strong> {$wine->getName()}</p>
+                            <p class="mb-0"><strong>Ročník:</strong> {$wine->getYear()}</p>
+                        </div>
+                        <p class="text-muted mt-3 mb-0">Obrázek bude trvale odstraněn z tohoto vína.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <!-- Cancel and confirm removal buttons -->
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link removeWineImage!, $wine->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Odstranit obrázek
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/if}
+
+{/block isMainPanel}

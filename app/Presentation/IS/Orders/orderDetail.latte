@@ -1,0 +1,180 @@
+{*
+FILE:     orderDetail.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for order detail page in the IS module.
+*}
+{layout '../isLayout.latte'}
+
+{block topMenuISAdditional}
+    <!-- Navigation links for the order dashboard and current order detail -->
+    <a href="{link :IS:Orders:dashboard}" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Objednávky
+    </a>
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Detail objednávky
+    </a>
+{/block topMenuISAdditional}
+
+
+{block isMainPanel}
+<div class="container mt-4">
+
+    <!-- ORDER ACTION BAR: Shows order number, creation date, and action buttons for state changes -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h4 class="fw-bold mb-0">
+                <i class="fas fa-receipt me-2"></i>Objednávka č. {$order->id}
+            </h4>
+            <small class="text-muted">
+                Vytvořeno: {$order->orderTimestamp}
+            </small>
+        </div>
+
+        <div class="d-flex gap-2">
+            <!-- Ship Order Button: Only visible if order is PAID -->
+            {if $order->state === 'PAID'}
+                <a n:href="changeOrderState! $order->id, 'DELIVERED'"  
+                   class="btn btn-outline-success btn-sm">
+                    <i class="fas fa-truck me-1"></i>Odeslat
+                </a>
+            {/if}
+
+            <!-- Cancel Order Button: Only visible if order is RESERVED or PAID -->
+            {if $order->state === 'RESERVED' || $order->state === 'PAID'}
+                <a n:href="changeOrderState! $order->id, 'CANCELLED'" 
+                   class="btn btn-outline-danger btn-sm">
+                    <i class="fas fa-times-circle me-1"></i>Zrušit
+                </a>
+            {/if}
+
+            <!-- Back to Orders Dashboard -->
+            <a n:href="Orders:dashboard" class="btn btn-outline-secondary btn-sm">
+                <i class="fas fa-arrow-left me-1"></i>Zpět na přehled
+            </a>
+        </div>
+    </div>
+
+    <!-- ORDER INFORMATION CARD: Displays customer and order details -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">
+                <i class="fas fa-user me-2"></i>Informace o zákazníkovi
+            </h5>
+            {var $user = $order->getUser()}
+            {if $user}
+                <!-- Customer name and email -->
+                <p class="mb-1"><strong>Jméno:</strong> {$user->getName()} {$user->getSurname()}</p>
+                <p class="mb-1"><strong>Email:</strong> {$user->getEmail()}</p>
+            {else}
+                <em>Žádná data o uživateli.</em>
+            {/if}
+
+            <hr>
+
+            <!-- Order total price -->
+            <p class="mb-1"><strong>Celková cena:</strong> {$order->totalPrice},-</p>
+            <!-- Order state badge -->
+            <p class="mb-1"><strong>Stav objednávky:</strong>
+                {switch $order->state}
+                    {case 'RESERVED'}<span class="badge bg-warning text-dark">Rezervováno</span>
+                    {case 'PAID'}<span class="badge bg-success">Zaplaceno</span>
+                    {case 'CANCELLED'}<span class="badge bg-danger">Zrušeno</span>
+                    {case 'DELIVERED'}<span class="badge bg-info text-dark">Odesláno</span>
+                {/switch}
+            </p>
+
+            <!-- Delivery type badge -->
+            <p class="mb-1"><strong>Způsob doručení:</strong>
+                {switch $order->deliveryType}
+                    {case 'PICKUP'}
+                        <span class="badge bg-secondary">Osobní odběr</span>
+                    {case 'COURIER'}
+                        <span class="badge bg-primary">Kurýr</span>
+                    {case 'POST'}
+                        <span class="badge bg-success">Pošta</span>
+                    {default}
+                        <span class="badge bg-light text-dark">Neznámé</span>
+                {/switch}
+            </p>
+
+            <!-- Delivery note, only for courier or post -->
+            {if $order->deliveryType === 'COURIER' || $order->deliveryType === 'POST'}
+                <p class="mb-0">
+                    <strong>Poznámka k doručení:</strong> {$order->deliveryData|escape}
+                </p>
+            {/if}
+        </div>
+    </div>
+
+    <!-- ORDER ITEMS TABLE: Lists all wines in the order -->
+    <div class="card shadow-sm border-0">
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0 align-middle text-center small">
+                    <thead class="table-primary align-middle text-center small">
+                        <tr>
+                            <th scope="col" class="fw-bold py-2">
+                                <i class="fas fa-wine-bottle me-1"></i>Víno
+                            </th>
+                            <th scope="col" class="fw-bold py-2">
+                                <i class="fas fa-hashtag me-1"></i>Počet lahví
+                            </th>
+                            <th scope="col" class="fw-bold py-2">
+                                <i class="fas fa-coins me-1"></i>Cena za láhev
+                            </th>
+                            <th scope="col" class="fw-bold py-2">
+                                <i class="fas fa-money-bill-wave me-1"></i>Celkem
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if count($order->items) > 0}
+                            {foreach $order->items as $item}
+                                <tr>
+                                    <td class="text-start">
+                                        <div class="d-flex align-items-center">
+                                            <!-- Wine image and name with link to wine detail -->
+                                            {if $item->wine->getImage() !== null}
+                                                <img src="{asset $imgRep->getPathForImage($item->wine->getImage())}"
+                                                    alt="{$item->wine->name}" 
+                                                    class="img-fluid rounded shadow-sm"
+                                                    style="max-height: 200px; object-fit: cover;">
+                                            {else}
+                                                {* Placeholder if no image is available *}
+                                                <div class="no-image-placeholder d-flex justify-content-center align-items-center bg-light border rounded"
+                                                    style="height: 200px;">
+                                                    <i class="fas fa-wine-bottle fa-4x text-muted"></i>
+                                                </div>
+                                            {/if}
+                                            <a href="{link :IS:Wine:show $item->wine->getId()}" 
+                                            class="fw-semibold text-decoration-none text-primary hover-underline"
+                                            style="font-size: 0.95rem;">
+                                                {$item->wine->getName()}
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <!-- Number of bottles -->
+                                    <td>{$item->bottlesCount}</td>
+                                    <!-- Price per bottle -->
+                                    <td>{$item->pricePerBottle|number:2},-</td>
+                                    <!-- Total price for this item -->
+                                    <td>{($item->pricePerBottle * $item->bottlesCount)|number:2},-</td>
+                                </tr>
+                            {/foreach}
+                        {else}
+                            <tr>
+                                <td colspan="4">
+                                    <em class="text-muted">Tato objednávka neobsahuje žádné položky.</em>
+                                </td>
+                            </tr>
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{/block isMainPanel}

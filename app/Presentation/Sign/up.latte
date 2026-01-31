@@ -1,0 +1,182 @@
+{*
+FILE:     up.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for user registration page
+*}
+
+{block title}
+    Registrace
+{/block}
+
+{block content}
+    <!-- Registration page background and overlay -->
+    <div class="auth-background position-relative">
+        <img src="{asset 'images/home_picture.jpg'}" alt="Vinařství pozadí" class="auth-bg-image">
+        <div class="auth-overlay"></div>
+        
+        <!-- Centered registration card -->
+        <div class="container-fluid d-flex justify-content-center align-items-center min-vh-100 py-5 position-relative">
+            <div class="row w-100 justify-content-center">
+                <div class="col-12 col-sm-10 col-md-8 col-lg-6 col-xl-5">
+                    <div class="card shadow-lg border-0 auth-card">
+                        <!-- Card header with title -->
+                        <div class="card-header bg-primary text-white text-center py-4">
+                            <h1 class="mb-0 fs-3 fw-bold">
+                                <i class="fas fa-user-plus me-2"></i>Registrace
+                            </h1>
+                        </div>
+                        <div class="card-body p-4">
+                            {form signUpForm}
+                                <!-- Personal Information Section -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-user me-2"></i>Osobní údaje
+                                        </h5>
+                                    </div>
+                                    <!-- Name input -->
+                                    <div class="col-md-6 mb-3">
+                                        {label name /} <span class="text-danger">*</span>
+                                        {input name}
+                                        <span class="invalid-feedback">
+                                            {inputError name}
+                                        </span>
+                                    </div>
+                                    <!-- Surname input -->
+                                    <div class="col-md-6 mb-3">
+                                        {label surname /} <span class="text-danger">*</span>
+                                        {input surname}
+                                        <span class="invalid-feedback">
+                                            {inputError surname}
+                                        </span>
+                                    </div>
+                                    <!-- Email input -->
+                                    <div class="col-md-6 mb-3">
+                                        {label email /} <span class="text-danger">*</span>
+                                        {input email}
+                                        <span class="invalid-feedback">
+                                            {inputError email}
+                                        </span>
+                                    </div>
+                                    <!-- Phone input (optional) -->
+                                    <div class="col-md-6 mb-3">
+                                        {label phone /}
+                                        {input phone}
+                                        <span class="invalid-feedback">
+                                            {inputError phone}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Address Section (optional) -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Adresa
+                                        </h5>
+                                    </div>
+                                    <!-- Street input -->
+                                    <div class="col-md-8 mb-3">
+                                        {label street /}
+                                        {input street}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError street}
+                                        </span>
+                                    </div>
+                                    <!-- House number input -->
+                                    <div class="col-md-4 mb-3">
+                                        {label houseNumber /}
+                                        {input houseNumber}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError houseNumber}
+                                        </span>
+                                    </div>
+                                    <!-- City input -->
+                                    <div class="col-md-8 mb-3">
+                                        {label city /}
+                                        {input city}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError city}
+                                        </span>
+                                    </div>
+                                    <!-- Postal code input -->
+                                    <div class="col-md-4 mb-3">
+                                        {label postalCode /}
+                                        {input postalCode}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError postalCode}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Account Section -->
+                                <div class="row mb-4">
+                                    <div class="col-12">
+                                        <h5 class="text-primary fw-bold border-bottom pb-2 mb-3">
+                                            <i class="fas fa-key me-2"></i>Přihlašovací údaje
+                                        </h5>
+                                    </div>
+                                    <!-- Username input -->
+                                    <div class="col-12 mb-3">
+                                        {label username /} <span class="text-danger">*</span>
+                                        {input username}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError username}
+                                        </span>
+                                    </div>
+                                    <!-- Password input -->
+                                    <div class="col-md-6 mb-3">
+                                        {label password /} <span class="text-danger">*</span>
+                                        {input password}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError password}
+                                        </span>
+                                    </div>
+                                    <!-- Password confirmation input -->
+                                    <div class="col-md-6 mb-3">
+                                        {label passwordConfirm /} <span class="text-danger">*</span>
+                                        {input passwordConfirm}
+                                        <span class="invalid-feedback fw-bold">
+                                            {inputError passwordConfirm}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <!-- Registration information and requirements -->
+                                <div class="alert alert-info mb-4">
+                                    <h6 class="fw-bold mb-2">
+                                        <i class="fas fa-info-circle me-2"></i>Informace k registraci
+                                    </h6>
+                                    <ul class="mb-0">
+                                        <li>Heslo musí mít minimálně 8 znaků.</li>
+                                        <li>Uživatelské jméno musí být dlouhé 4 - 30 znaků.</li>
+                                        <li>Uživatelské jméno může obsahovat pouze písmena, číslice a podtržítka.</li>
+                                        <li>Adresní údaje lze vynechat a doplnit později v profilu</li>
+                                    </ul>
+                                </div>
+
+                                <!-- Submit button -->
+                                <div class="d-grid gap-2">
+                                    {input send}
+                                </div>
+                            {/form}
+                            
+                            <!-- Link to sign in page for existing users -->
+                            <div class="text-center mt-4 pt-3 border-top">
+                                <small class="text-muted">
+                                    Již máte účet? 
+                                    <a href="{link Sign:in}" class="text-primary text-decoration-none fw-bold">
+                                        Přihlásit se
+                                    </a>
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block content}

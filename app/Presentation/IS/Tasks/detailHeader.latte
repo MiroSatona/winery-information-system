@@ -1,0 +1,277 @@
+{*
+FILE:     detailHeader.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for displaying the header and main information of a task. Shared by detailed task types.
+*}
+<div class="container-fluid">
+    <!-- Main row for the task detail card -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <!-- Card containing all task detail information -->
+            <div class="card shadow-sm">
+                <!-- Card header: shows task type, state, and action buttons -->
+                <div class="card-header text-dark p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <!-- Task type and icon -->
+                            <h4 class="mb-2 fw-bold">
+                                {if $task instanceof App\Model\Task\Harvest\Harvest}
+                                    <i class="fas fa-leaf me-2"></i>
+                                    Detaily o sklizni
+                                {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                                    <i class="fas fa-flask me-2"></i>
+                                    Detaily o ošetření
+                                {else}
+                                    <i class="fas fa-wine-bottle me-2"></i>
+                                    Detaily o lahvování
+                                {/if}
+                            </h4>
+                            <!-- Task state badge -->
+                            <div>
+                                {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                    <span class="badge bg-warning text-black fs-6">
+                                        <i class="fas fa-clock me-1"></i>Plánovaný
+                                    </span>
+                                {elseif $task->getState() === App\Model\Task\TaskState::FINISHED}
+                                    <span class="badge bg-success text-white fs-6">
+                                        <i class="fas fa-check-circle me-1"></i>Dokončený
+                                    </span>
+                                {elseif $task->getState() === App\Model\Task\TaskState::CANCELED}
+                                    <span class="badge bg-secondary text-white fs-6">
+                                        <i class="fas fa-times-circle me-1"></i>Zrušený
+                                    </span>
+                                {/if}
+                            </div>
+                            {if ($task instanceof App\Model\Task\Harvest\Harvest || $task instanceof App\Model\Task\Treatment\Treatment) && $task->isInConflict() }
+                            <!-- Conflict warning badge for tasks with less than 14 days between harvest and treatment -->
+                            <div class="mt-2">
+                                <span class="badge bg-danger text-white fs-6">
+                                    <i class="fas fa-exclamation-triangle text-white ms-2"></i>
+                                    Úkon má konfliktní řádky (méně než 14 dní mezi sklizní a postřikem)
+                                </span>
+                            </div>
+                            {/if}
+                        </div>
+                        <!-- Action buttons for editing, marking as done, or confirming harvest -->
+                        <div class="d-flex gap-2 flex-wrap">
+                            {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                <a n:href="Tasks:taskEdit taskId => $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                    <i class="fas fa-edit me-1"></i> Upravit
+                                </a>
+                            {/if}
+                            {if $task->getState() === App\Model\Task\TaskState::PLANNED && $userCanConfirmTask}
+                                <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
+                                </a>
+                            {/if}
+                            {if $userVintner && $task->getState() === App\Model\Task\TaskState::FINISHED && $task instanceof App\Model\Task\Harvest\Harvest && $task->getIdHarvestConfirmer() === null}
+                                <a href="{link Tasks:markHarvestDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-check-circle me-1"></i> Potvrdit sklizeň
+                                </a>
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card body: main task information -->
+                <div class="card-body p-4">
+                    <div class="row">
+                        <div class="col-12 col-md-8">
+                            <div class="mb-4">
+                                <!-- Task ID and Name -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-hashtag me-2"></i>ID úkonu
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">{$task->getId()}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-tag me-2"></i>Název
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">{$task->getName()}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Task Type and State -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-layer-group me-2"></i>Typ
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $task instanceof App\Model\Task\Harvest\Harvest}
+                                                Sklizeň
+                                            {elseif $task instanceof App\Model\Task\Treatment\Treatment}
+                                                Ošetření
+                                            {elseif $task instanceof App\Model\Task\Bottling\Bottling}
+                                                Lahvování
+                                            {/if}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-toggle-on me-2"></i>Stav
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                Plánovaný
+                                            {elseif $task->getState() === App\Model\Task\TaskState::FINISHED}
+                                                Dokončený
+                                            {elseif $task->getState() === App\Model\Task\TaskState::CANCELED}
+                                                Zrušený
+                                            {/if}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- Creation and Last Change Timestamps -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-calendar-plus me-2"></i>Vytvořeno
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">{$task->getCreationTimestamp()|date:'d.m.Y H:i'}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-edit me-2"></i>Poslední změna
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">{$task->getLastChangeTimestamp()|date:'d.m.Y H:i'}</p>
+                                    </div>
+                                </div>
+
+                                <!-- Planned and Actual Execution Timestamps -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-clock me-2"></i>Plánované provedení
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $task->getPlannedTimestamp()}
+                                                {$task->getPlannedTimestamp()|date:'d.m.Y H:i'}
+                                            {else}
+                                                <span class="text-muted fst-italic">Neurčeno</span>
+                                            {/if}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-check me-2"></i>Skutečné provedení
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $task->getExecutionTimestamp()}
+                                                <span class="text-success fw-bold">
+                                                    {$task->getExecutionTimestamp()|date:'d.m.Y H:i'}
+                                                </span>
+                                            {else}
+                                                <span class="text-muted fst-italic">Neprovedeno</span>
+                                            {/if}
+                                        </p>
+                                    </div>
+                                </div>
+
+                                <hr>
+
+                                <!-- Task Issuer and Confirmer -->
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-user-plus me-2"></i>Zadavatel
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $taskIssuer}
+                                                {$taskIssuer->getFullName()}
+                                            {else}
+                                                <span class="text-muted fst-italic">Nepřiřazen</span>
+                                            {/if}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-user-check me-2"></i>Potvrdil
+                                        </label>
+                                        <p class="fs-6 text-dark mb-2">
+                                            {if $taskConfirmer}
+                                                {$taskConfirmer->getFullName()}
+                                            {else}
+                                                <span class="text-muted fst-italic">Nepotvrzeno</span>
+                                            {/if}
+                                        </p>
+                                    </div>
+                                </div>
+                                <hr>
+                                <!-- List of assigned workers and form to add workers if task is planned -->
+                                <div class="mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <label class="form-label fw-semibold text-muted mb-0">
+                                            <i class="fas fa-users me-2"></i>Seznam pracovníků
+                                        </label>
+
+                                        {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                            {form addWorkersForm}
+                                                <div class="d-flex gap-2 align-items-end">
+                                                    {input worker}
+                                                    {input send}
+                                                </div>
+                                            {/form}
+                                        {/if}
+                                    </div>
+                                    {if !empty($taskWorkers)}
+                                        <!-- Table of assigned workers -->
+                                        <div class="table-responsive">
+                                            <table class="table table-hover">
+                                                <thead class="table-light">
+                                                    <tr>
+                                                        <th><i class="fas fa-user me-2"></i>Jméno pracovníka</th>
+                                                         {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                            <th class="text-center"><i class="fas fa-cog me-2"></i>Akce</th>
+                                                        {/if}
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="bg-white">
+                                                    {foreach $taskWorkers as $worker}
+                                                        <tr>
+                                                            <td>{$worker->getFullName()}</td>
+                                                             {if $userVintner && $task->getState() === App\Model\Task\TaskState::PLANNED}
+                                                                <td class="text-center">
+                                                                    <!-- Button to remove worker from task (only if planned) -->
+                                                                    <a n:href="deleteUserFromTask! $worker->getId()" 
+                                                                       class="btn btn-sm btn-outline-danger">
+                                                                        <i class="fas fa-minus me-1"></i>Odebrat
+                                                                    </a>
+                                                                </td>
+                                                            {/if}
+                                                        </tr>
+                                                    {/foreach}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    {else}
+                                        <p class="fs-6 text-muted fst-italic">Žádní pracovníci nejsou přiřazeni</p>
+                                    {/if}
+                                </div>
+                                <!-- Optional note section if a note is present -->
+                                {if $task->getNote() && $task->getNote()}
+                                    <hr>
+                                    <div class="mb-3">
+                                        <label class="form-label fw-semibold text-muted">
+                                            <i class="fas fa-sticky-note me-2"></i>Poznámka
+                                        </label>
+                                        <p class="text-dark mb-2">{$task->getNote()}</p>
+                                    </div>
+                                {/if}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

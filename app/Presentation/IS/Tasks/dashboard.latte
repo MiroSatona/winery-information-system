@@ -1,0 +1,203 @@
+{*
+FILE:     dashboard.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for displaying the dashboard of tasks in the IS module.
+*}
+{layout '../isLayout.latte'}
+
+
+{block topMenuISAdditional}
+    <!-- Additional top menu item for navigation to the Tasks section -->
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Úkony
+    </a>
+{/block topMenuISAdditional}
+
+
+{block isMainPanel}
+    <!-- Main panel for displaying the list of tasks (actions) -->
+    <div class="container-fluid">
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-clipboard-list me-2"></i>
+                                Přehled úkonů <!-- Task overview title -->
+                            </h4>
+
+                            <div class="flex-fill d-flex justify-content-start px-3">
+                                <!-- Filter form for searching/filtering tasks -->
+                                {form filterForm}
+                                    <div class="d-flex gap-2 align-items-center" style="max-width:600px; width:100%;">
+                                        {input pattern} <!-- Task name or pattern input -->
+                                        {input type}    <!-- Task type input -->
+                                        {input state}   <!-- Task state input -->
+                                        {input send}    <!-- Submit button -->
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                            {inputError pattern}
+                                            {inputError type}
+                                            {inputError state}
+                                        </span>
+                                    </div>
+                                {/form}
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <!-- Navigation and action buttons -->
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Přehled
+                                </a>
+                                <a href="{link createNonExistentTask!}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-clipboard me-2"></i>Zaznamenat neex.
+                                </a>
+                                {if $userVintner}
+                                    <a href="{link addTask1}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-clipboard me-2"></i>Naplánovat
+                                    </a>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <!-- Display total number of tasks -->
+                                <span class="text-muted"><strong>Celkový počet úkonů: {count($tasks)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <!-- Table of tasks -->
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-clipboard-list me-2"></i>Název <!-- Task name -->
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-tags me-2"></i>Typ <!-- Task type -->
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-calendar-alt me-2"></i>Plánováno <!-- Planned date -->
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-calendar-alt me-2"></i>Dokončeno <!-- Execution date -->
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-toggle-on me-2"></i>Stav <!-- State -->
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-cogs me-2"></i>Akce <!-- Actions -->
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {foreach $tasks as $task}
+                                        <tr>
+                                            <td>
+                                                <!-- Task name, with warning icon if in conflict -->
+                                                {$task->getName()}
+                                                {if ($task instanceof $HarvestType || $task instanceof $TreatmentType) && $task->isInConflict()}
+                                                    <i class="fas fa-exclamation-triangle text-danger ms-2"></i>
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <!-- Task type label -->
+                                                {if $task instanceof $HarvestType}
+                                                    Sklizeň
+                                                {elseif $task instanceof $TreatmentType}
+                                                    Ošetření
+                                                {else}
+                                                    Lahvování
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <!-- Planned date, with color badge if overdue or upcoming -->
+                                                {if $task->getPlannedTimestamp()}
+                                                    {if !$task->getExecutionTimestamp()}
+                                                        {if $task->getPlannedTimestamp() < $currentDateTime}
+                                                            <span class="badge bg-danger">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {else}
+                                                            <span class="badge bg-success">
+                                                                {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                            </span>
+                                                        {/if}
+                                                    {else}
+                                                        {$task->getPlannedTimestamp()->format('d.m.Y H:i')}
+                                                    {/if}
+                                                {else}
+                                                    —
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <!-- Execution date, with badge if late or on time -->
+                                                {if $task->getExecutionTimestamp()}
+                                                    {if $task->getPlannedTimestamp() && $task->getExecutionTimestamp() > $task->getPlannedTimestamp()}
+                                                        <span class="badge bg-danger">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {else}
+                                                        <span class="badge bg-success">
+                                                            {$task->getExecutionTimestamp()->format('d.m.Y H:i')}
+                                                        </span>
+                                                    {/if}
+                                                {else}
+                                                    —
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <!-- Task state badge -->
+                                                {if $task instanceof $HarvestType && $task->getState() === $TaskStateType::FINISHED && $task->getIdHarvestConfirmer() === null}
+                                                    <span class="badge bg-info">Zbývá potvrzení</span>
+                                                {elseif $task->getState() === $TaskStateType::PLANNED}
+                                                    <span class="badge bg-warning">Plánovaný</span>
+                                                {elseif $task->getState() === $TaskStateType::FINISHED}
+                                                    <span class="badge bg-success">Dokončený</span>
+                                                {elseif $task->getState() === $TaskStateType::CANCELED}
+                                                    <span class="badge bg-secondary">Zrušený</span>
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <!-- Action buttons for each task -->
+                                                <a n:href="details! $task->getId()" class="btn btn-sm btn-outline-secondary">
+                                                    Detail
+                                                </a>
+                                                {if $task->getState() === $TaskStateType::PLANNED && $userCanConfirmTask && ($userVintner || $taskRepository->isUserAssignedToTask($user->getId(), $task->getId()))}
+                                                    <a href="{link Tasks:markTaskDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-clipboard-check me-1"></i> Zaznamenat splnění
+                                                    </a>
+                                                {/if}
+                                                {if $userVintner && $task->getState() === $TaskStateType::FINISHED && $task instanceof $HarvestType && $task->getIdHarvestConfirmer() === null}
+                                                    <a href="{link Tasks:markHarvestDone, $task->getId()}" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-check-circle me-1"></i> Potvrdit sklizeň
+                                                    </a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    {if count($tasks) === 0}
+                                        <!-- Message when there are no tasks -->
+                                        <tr>
+                                            <td colspan="6" class="text-center py-5 text-muted">
+                                                <i class="fas fa-clipboard-list fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné úkony</h5>
+                                                <p>Zatím nejsou naplánované žádné úkony.</p>
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{/block isMainPanel}

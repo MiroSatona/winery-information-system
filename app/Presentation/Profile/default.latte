@@ -1,0 +1,111 @@
+{*
+FILE:     default.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for displaying the user's profile page
+*}
+{layout ../@layout.latte}
+
+{block title}Můj profil{/block} <!-- Page title block -->
+
+{block content}
+<!-- Main container for the profile page -->
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-12 col-md-8 col-lg-6 mx-auto">
+            <!-- Profile card -->
+            <div class="card border-0 shadow-lg">
+                <!-- Card header with profile icon and title -->
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="fas fa-user-circle me-2"></i>Profil
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-4">
+                        <!-- User's first name -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-id-badge me-2"></i>Jméno
+                            </label>
+                            <div class="fw-semibold fs-5">{$currentUser->getName()}</div>
+                        </div>
+
+                        <!-- User's city -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-city me-2"></i>Město
+                            </label>
+                            <div class="fw-semibold fs-5">{$currentUser->getCity()}</div>
+                        </div>
+
+                        <!-- User's surname -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-id-card me-2"></i>Příjmení
+                            </label>
+                            <div class="fw-semibold fs-5">{$currentUser->getSurname()}</div>
+                        </div>
+
+                        <!-- User's street and house number -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-location-dot me-2"></i>Ulice a číslo popisné
+                            </label>
+                            <div class="fw-semibold">{$currentUser->getStreet()} {$currentUser->getHouseNumber()}</div>
+                        </div>
+
+                        <!-- User's login/username -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-user-lock me-2"></i>Login
+                            </label>
+                            <div class="fw-semibold">{$currentUser->getUsername()}</div>
+                        </div>
+
+                        <!-- User's email address -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-envelope me-2"></i>E-mail
+                            </label>
+                            <div class="fw-semibold">{$currentUser->getEmail()}</div>
+                        </div>
+
+                        <!-- User's phone number -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-phone me-2"></i>Telefonní číslo
+                            </label>
+                            <div class="fw-semibold">{$currentUser->getPhoneNumber()}</div>
+                        </div>
+
+                        <!-- User's postal code -->
+                        <div class="col-12 col-md-6">
+                            <label class="form-label text-muted small mb-1">
+                                <i class="fas fa-map-pin me-2"></i>PSČ
+                            </label>
+                            <div class="fw-semibold">{$currentUser->getPostCode()}</div>
+                        </div>
+
+                        <!-- Button to view order history -->
+                        <div class="col-12 col-md-6">
+                            <a href="{link OrderHistory:default}" class="btn btn-outline-secondary w-100 fw-bold">
+                                <i class="fas fa-basket-shopping me-2"></i>Zobrazit objednávky
+                            </a>
+                        </div>
+
+                        <!-- Button to edit profile details -->
+                        <div class="col-12 col-md-6">
+                            <a href="edit" class="btn btn-primary w-100 fw-bold">
+                                Změnit údaje<i class="fas fa-chevron-right me-2"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>  
+{/block}

@@ -1,5 +1,5 @@
 {
-  "name": "Nette App Dev",
+  "name": "IIS Vinařství",
   "dockerComposeFile": "../docker-compose.yml",
   "service": "web",
   "workspaceFolder": "/var/www/html",
@@ -12,10 +12,28 @@
         "GitHub.copilot-chat",
         "streetsidesoftware.code-spell-checker",
         "smuuf.latte-lang",
-        "Kasik96.latte"
+        "Kasik96.latte",
+        "streetsidesoftware.code-spell-checker-czech"
       ],
       "settings": {
-        "php.validate.executablePath": "/usr/local/bin/php"
+        "php.validate.executablePath": "/usr/local/bin/php",
+        "cSpell.language": "en,cs",
+        "cSpell.enabledFileTypes": {
+          "php": true,
+          "latte": true,
+          "html": true,
+          "javascript": true,
+          "typescript": true,
+          "json": true,
+          "markdown": true,
+          "sql": true
+        },
+        "cSpell.words": [
+          "vinařství",
+          "vinařská",
+          "odrůdy",
+          "vinohrady"
+        ]
       }
     }
   }

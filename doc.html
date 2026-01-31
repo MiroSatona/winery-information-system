@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html><head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <title>Projekt IIS</title>
+    <style type="text/css">
+    	table { border-collapse: collapse; }
+    	td, th { border: 1px solid black; padding: 0.3em 0.5em; text-align: left; }
+    	dt { font-weight: bold; margin-top: 0.5em; }
+    </style>
+</head>
+<body>
+
+<h1>Vinařství</h1> <!-- Nahradte názvem svého zadání -->
+
+<dl>
+	<dt>Autoři</dt>
+	<dd>Martin Zůbek <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xlogin00@stud.fit.vut.cz">xlogin00@stud.fit.vut.cz</a> -
+		profily, správa uživatelů, domovská stránka, správa úkonů, správa vína
+	</dd>
+	<dd>Otakar Kočí <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xlogin00@stud.fit.vut.cz">xlogin00@stud.fit.vut.cz</a> - 
+		struktura aplikace, přihlášení a registrace, správa odrůd, vinohradů, vína
+	</dd>
+  <dd>Martin Mendl <!-- Nahraďte skutečným jménem a e-mailem autora a popisem činnosti -->
+	    <a href="mailto:xlogin00@stud.fit.vut.cz">xlogin00@stud.fit.vut.cz</a> - 
+		obchod, historie objednávek, košík, správa objednávek, správa úkonů, správa vína
+	</dd>
+	<dd>
+		Návrh aplikace a databáze, dokumentace a další činnosti byly provedeny společně.
+	</dd>
+
+	<dt>URL aplikace</dt>
+	<dd><a href="https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/">https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/</a></dd>
+	<dd><a href="https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/">https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/</a></dd>
+	<dd><a href="https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/">https://www.stud.fit.vutbr.cz/~xlogin00/IIS/www/</a></dd>
+	<dd>Každá aplikace běží s vlastní databází</dd>
+</dl>
+
+<h2>Uživatelé systému pro testování</h2>
+<p>V našem sytému, <strong>může mít uživatel vícero rolí.</strong>
+	Vícero rolí bylo přidáno, z důvodu toho aby například vinař si nemusel dělat nový účet pro nákup vína. 
+	Přidávání a odebírání rolí zůstává umožňuje pouze <strong>role Admin.</strong></p>
+<table>
+<tbody><tr><th>Login</th><th>Heslo</th><th>Role</th></tr>
+<tr><td>andrej</td><td>111111111</td><td>Admin, Vinař, Pracovník, Uživatel</td></tr>
+<tr><td>navratil</td><td>111111111</td><td>Uživatel, Pracovník, Vinař</td></tr>
+<tr><td>pecinka</td><td>111111111</td><td>Uživatel, Pracovník</td></tr>
+<tr><td>bohumil</td><td>111111111</td><td>Uživatel</td></tr>
+<tr><td>vacha</td><td>111111111</td><td>Uživatel</td></tr>
+<tr><td>tabula</td><td>111111111</td><td>Pracovník, Uživatel</td></tr>
+<tr><td>frejlich</td><td>111111111</td><td>Uživatel</td></tr>
+</tbody></table>
+
+<h3 style="margin-top: 2em;">Diagram případů užití</h3>
+<img src="docs/iis_use_case.jpg" alt="use_case_diagram" style="max-width:100%;height:auto;margin-top:2em;"> 
+
+<h3>Video</h3>
+<ul>
+	<li><a href="https://www.youtube.com/watch?v=6O83srVxGUU" target="_blank">Video na YouTube</a></li>
+</ul>
+<h2>Rozšíření</h2>
+<ul>
+	<li>Odrůdy jsou samostatné entity</li>
+	<li>Všechny akce (lahvování, sklizně, ošetření) zobecněny na úkony</li>
+	<li>Ošetření má vícero typů (postřik, hnojení, řez, odplevelení a ostatní)</li>
+	<li>Víno může být vyrobeno z vícero sklizní (spojování sklizní, tvorba cuveé)</li>
+	<li>Lahvování vína jako samostatný krok</li>
+	<li>Zasílání resetovaných hesel a hesel k nově vytvořeným uživatelům e-mailem</li>
+	<li>Správa objednávek v IS</li>
+	<li>Nahrávání a správa obrázků k vínům, vinohradům a odrůdám</li>
+</ul>
+
+<h3>Poznámky k návrhu</h3>
+<ul>
+	<li>Sklizeň musí být prvně zaznamenána (může i pracovník) a poté potvrzena vinařem (vložení cukernatosti a hmotnosti)</li>
+	<li>Výroba vína se skládá z posloupnosti úloh:
+		<ul>
+			<li>Naplánování sklizně (sklizní)</li>
+			<li>Zaznamenání provedení sklizně (sklizní)</li>
+			<li>Potvrzení sklizně (sklizní) vinařem</li>
+			<li>Vyrobení vína ze sklizní</li>
+			<li>Naplánování lahvování vína</li>
+			<li>Provedení lahvování vína</li>
+			<li>Zařazení vína do prodeje</li>
+		</ul>
+	</li>
+	<li>Většina entit v naší aplikaci nemá umožněno plnohodnotné smazání. Místo toho je lze označit jako neaktivní (nelze s nimi pracovat, ale jejich provázání na ostatní entity zůstává).
+		Tento přístup byl zvolen aby nedocházelo k nekonzistencím v datech a hlavně aby pokud možno vzdy v systému zůstala historie všech entit, u kterých je to vhodné.
+		(Pravděpodobně nechceme aby zmizely objednávky na vína, která vznikla ze sklizní nad vinohrady, které už neexistují apod.)
+	</li>
+</ul>
+
+<h2>Implementace</h2>
+<p>Jak je zmíněno níže, projekt je implementován ve frameworku Nette a v zásadě dodržuje výchozí adresářovou strukturu
+	a architekturu použitou v tomto frameworku (MVC, Repozitáře, ...).</p>
+
+<p>V adresáři <code>www</code> se nachází veřejně přístupná sekce se vstupním skriptem <code>index.php</code>, který inicializuje
+	framework Nette a následně dojde k přeroutování na příslušné kontrolery a šablony. Dále se zde nachází složka <code>assets</code> s dalšími zdroji (obrázky, styly, ...).
+	Důležitou je i složka <code>uploads</code>, do které jsou nahrávány uživateli spravované obrázky.</p>
+
+<p>V adresáři <code>app</code> je vlastní implementace aplikace. V ní nacházející se soubor <code>Bootstrap.php</code> inicializuje prostředí a nastavuje konfiguraci. V souboru
+<code>Core/RouterFactory.php</code> je implementace routeru. Tyto dva soubory byly převzaty z výchozího projektu Nette a pouze minimálně upraveny. Dále se zde nacházejí dvě důležité složky
+<code>Model</code> (interní model a repozitáře komunikující s databází) a <code>Presentation</code> (prezentační logika a šablony aplikace).</p>
+
+<p>V adresáři <code>app/Model</code> se v jednotlivých jmenných prostorech nacházejí interní modely pro jednotlivé části aplikace a k nim potřebné repozitáře pro práci s databází.
+Příkladem může být složka <code>Vineyard</code>, která obsahuje soubor <code>Vineyard.php</code> obsahující interní model reprezentující jeden vinohrad v systému a k němu potřebný soubor
+realizující repozitář <code>VineyardRepository.php</code>, který umožňuje načítání vinohradů z databáze, jejich úpravu, vytváření, atd. Dalšími takovými entitami jsou Bottle, Image, OrderItem,
+Orders, Profile, Security, Shop, User, Validation, Wine, WineRow a WineVariety.</p>
+
+<p>V adresáři <code>app/Presentation</code> se nachází prezentační logika a šablony aplikace opět rozdělena do jednotlivých logických celků a jmennných prostorů. V souboru <code>@layout.latte</code>
+je základní struktura webové stránky. Následně v jednotlivých složkách jsou části implementující jednotlivé případy použití a používané komponenty. Každá tato složka (pokud se nedělí na podčásti)
+obsahuje vždy svůj presenter a k němu jeho latte šablony. Příkladem může být složka <code>Home</code>, která obsahuje latte šablonu <code>default.latte</code> a její <code>HomePresenter.php</code>
+, která implementuje domovskou stránku aplikace. Informační systém, do kterého mají přístup pouze zaměstnanci se nachází ve složce <code>IS</code>.
+</p>
+
+<h3>Hierarchie dle případů použití a komponent</h3>
+<ul>
+	<li>Cart - nákupní košík (nákup vína)</li>
+	<li>Home - domovská stránka (zobrazení základních informací o vinařství)</li>
+	<li>IS - informační systém
+		<ul>
+			<li>Dashboard - základní přehled informačního systému</li>
+			<li>Orders - správa objednávek</li>
+			<li>Tasks - správa úkonů (realizace plánování a zaznamenávání úkonů - lahvování, sklizně a ošetření)</li>
+			<li>Users - správa uživatelů (správa uživatelů a rolí administrátorem)</li>
+			<li>Vineyards - správa vinohradů (správa vinohradnických řádků, ...)</li>
+			<li>Wine - správa a výroba vína (výroba vína, zařazení do prodeje)</li>
+			<li>WineVarieties - správa odrůd vína</li>
+		</ul>
+	</li>
+	<li>OrderHistory - historie objednávek (zobrazení historie objednávek)</li>
+	<li>Payment - primitivní platební brána (nákup vína)</li>
+	<li>Profile - správa vlastního profilu</li>
+	<li>Shop - obchod s vínem (nákup vína)</li>
+	<li>Sign - registrace a přihlašování uživatelů</li>
+	<li>Wine - kartička vína do obchodu (nákup vína)</li>
+</ul>
+
+
+<p>Zbytek adresářů vychází z obvyklé struktury frameworku Nette.</p>
+
+<h3>Databáze</h3>
+
+<h4>ER diagram</h4>
+<img src="docs/iis_er.jpg" alt="er_diagram" style="max-width:100%;height:auto;margin-top:2em;"> 
+
+<h4>Normalizované schéma databáze</h4>
+<img src="docs/iis_transform.jpg" alt="normalized_schema" style="max-width:100%;height:auto;margin-top:2em;"> 
+
+<h2>Technologie</h2>
+<p>Projekt využívá framework Nette. Použitá verze Nette je 3.2.3. PHP je použito ve verzi 8.3. Pro databázi bylo využito MySQL (mariadb).
+Pro jednotné stylování aplikace byl použit framework Bootstrap ve verzi 5.3. Pro ikony byla použita knihovna Font Awesome ve verzi 7. Výchozí obrázky
+byly převzaty z internetu. Odkazy na všechny jsou uvedeny v souboru <code>images.md</code>.
+</p>
+
+<p>Naprostá většina funkcionality je napsána v rámci frameworku Nette - jazyk PHP a latte šablony. Nad rámec stylů z knihovny Bootstrap bylo
+nadefinováno i několik vlastních CSS stylů. Ojediněle byl využit i JavaScript.
+</p>
+
+<h2>Instalace</h2>
+
+<h4>Nasazení pomocí docker kontejneru</h4>
+<p>Pro testovací i produkční nasazení je možno využít <b>docker compose</b>.</p>
+<h5>Zprovoznění</h5>
+<ul>
+	<li>Nainstalujte a zprovozněte Docker Desktop dle obvyklých pokynů</li>
+	<li>(Volitelné) Vyplňte parametry poskytovale emailových služeb v <code>config/common.neon</code></li>
+	<li>Spusťte kontejner zadáním <code>docker compose up --build</code> v kořenovém adresáři projektu</li>
+	<li>Kontejner by se měl správně inicializovat i s databází</li>
+	<li>Aplikace bude dostupná na <code>https://localhost:8080</code></li>
+	<li>Dostupný je i phpMyAdmin na <code>https://localhost:8001</code></li>
+</ul>
+
+
+<h4>Nasazení na server (eva)</h4>
+<h5>Popis instalace aplikace na server</h5>
+<ul>
+	<li>Umístětě projekt (celý, případně pouze nastavte link na www složku) do WWW adresáře</li>
+	<li>Upravte kořenový <code>.htaccess</code> soubor tak, aby obsahoval správnou cestu pro přepsání všech přístupů
+		do podadresáře <code>www/</code>. Upravte <code>RewriteRule ^.*$ /~xlogin00/IIS/www/ [R=302,L]</code> například na
+		<code>RewriteRule ^.*$ /~xlogin00/IIS/www/ [R=302,L]</code>. Případně pro jiná nasazení upravte dle potřeby.</li>
+	<li>
+		Vytvořte složky <code>log</code>, <code>temp</code> a <code>temp/sessions</code> v kořenovém adresáři aplikace
+	</li>
+	<li>Nainstalujte závislosti pro Nette framework zavoláním: <code>composer install</code> v kořenovém adresáři projektu</li>
+	<li>Naimportuje výchozí data do databáze ze skriptu v <code>db/definitions.sql</code></li>
+	<li>Nastavte přístupové údaje k databázi a k poskytovali emailových služeb v <code>config/common.neon</code></li>
+	<li>Nastavte správná práva své WWW složce a složkám projektu, například pomocí: <code>chmod -R o=rX,g= ~/WWW</code></li>
+</ul>
+
+<a href="https://www.youtube.com/watch?v=gOqv-VBrXeA" target="blank">Motivace</a>
+
+</body></html>

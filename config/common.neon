@@ -1,7 +1,9 @@
 # see https://doc.nette.org/en/configuring
 
 parameters:
-
+	uploadsDir: 'assets/uploads'
+	uploadsDirWeb: '/uploads'
+	tmpImage: '/images'
 
 application:
 	errorPresenter:
@@ -15,6 +17,14 @@ database:
 	user: iis_winery
 	password: password
 
+
+mail:
+	smtp: true
+	host: 'smtp.gmail.com'
+	port: 587
+	username: ''
+	password: ''
+	secure: 'tls'
 
 latte:
 	strictTypes: yes
@@ -34,3 +44,40 @@ di:
 	export:
 		parameters: no
 		tags: no
+
+session:
+	savePath: "%tempDir%/sessions"
+	cookiePath: /
+	expiration: 30 minutes
+
+security:
+	authentication:
+		# period of inactivity after which the user will be logged out
+		expiration: 30 minutes
+
+		# where to store information about the logged-in user
+		storage: session
+
+forms:
+	messages:
+		Equal: 'Prosím zadejte %s.'
+		NotEqual: 'Tato hodnota by neměla být %s.'
+		Filled: 'Toto pole je povinné.'
+		Blank: 'Toto pole by mělo být prázdné.'
+		MinLength: 'Prosím zadejte alespoň %d znaků.'
+		MaxLength: 'Prosím zadejte maximálně %d znaků.'
+		Length: 'Prosím zadejte hodnotu mezi %d a %d znaky.'
+		Email: 'Prosím zadejte platnou e-mailovou adresu.'
+		URL: 'Prosím zadejte platnou URL.'
+		Integer: 'Prosím zadejte platné celé číslo.'
+		Float: 'Prosím zadejte platné číslo.'
+		Min: 'Prosím zadejte hodnotu větší nebo rovnu %d.'
+		Max: 'Prosím zadejte hodnotu menší nebo rovnu %d.'
+		Range: 'Prosím zadejte hodnotu mezi %d a %d.'
+		MaxFileSize: 'Velikost nahrávaného souboru může být až %d bajtů.'
+		MaxPostSize: 'Nahraná data překračují limit %d bajtů.'
+		MimeType: 'Nahraný soubor není ve očekávaném formátu.'
+		Image: 'Nahraný soubor musí být obrázek ve formátu JPEG, GIF, PNG, WebP nebo AVIF.'
+		Nette\Forms\Controls\SelectBox::Valid: 'Prosím vyberte platnou možnost.'
+		Nette\Forms\Controls\UploadControl::Valid: 'Při nahrávání souboru došlo k chybě.'
+		Nette\Forms\Controls\CsrfProtection::Protection: 'Vaše relace vypršela. Prosím vraťte se na domovskou stránku a zkuste to znovu.'

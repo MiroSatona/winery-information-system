@@ -1,0 +1,122 @@
+{*
+FILE:     detail.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     latte template for wine detail	
+*}
+{block content}
+<div class="container my-5">
+    <!-- Wine detail main container -->
+
+    <!-- Navigation buttons: Back to shop and Cart -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <!-- Back to wine list -->
+        <a n:href="Shop:default" class="btn btn-outline-primary d-inline-flex align-items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i>
+            <span>Zpět na nabídku vín</span>
+        </a>
+
+        <!-- Go to cart -->
+        <a n:href=":Cart:default" class="btn btn-primary fw-bold shadow-sm d-flex align-items-center gap-2">
+            <i class="fa-solid fa-cart-shopping"></i>
+            <span>Košík</span>
+        </a>
+    </div>
+
+    <!-- Wine detail card -->
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+        <div class="row g-4 align-items-start">
+
+            <!-- Wine image -->
+            <div class="col-12 col-md-5">
+                <img src="{asset $wine->img ? $imageRepository->getPathForImage($wine->img) : $imageRepository->getTmpWineImage()}"
+                     alt="{if $wine->img}{$wine->img->description}{else}Obrázek vína{/if}"
+                     class="img-fluid rounded-4 shadow-sm w-100"
+                     style="aspect-ratio: 3/4; object-fit: cover; background: #f7f9fc;">
+            </div>
+
+            <!-- Wine info section -->
+            <div class="col-12 col-md-7">
+                <!-- Wine name -->
+                <h1 class="fw-bold text-primary mb-3">{$wine->name}</h1>
+
+                <!-- Wine properties -->
+                <ul class="list-unstyled text-secondary mb-4">
+                    <li><strong>Rok:</strong> {$wine->year}</li>
+                    <li><strong>Typ:</strong> {$wine->getTypeText()}</li>
+                    <li><strong>Barva:</strong> {$wine->getColorText()}</li>
+                    <li><strong>Přívlastek:</strong> {$wine->getGradeText()}</li>
+                    <li><strong>Obsah alkoholu:</strong> {$wine->alcoholPercentage}%</li>
+                    <li><strong>Objem:</strong> {$wine->volume} ml</li>
+                </ul>
+                
+                <!-- Wine varieties -->
+                {if !empty($wine->variety)}
+                    <div class="d-flex flex-wrap align-items-center mb-3">
+                        {foreach $wine->variety as $v}
+                            <span class="badge bg-light text-dark border rounded-pill px-3 py-2 me-2 mb-2">
+                                {$v}
+                            </span>
+                        {/foreach}
+                    </div>
+                {/if}
+
+                <!-- Price and stock info -->
+                <div class="mb-4">
+                    {ifset $wine->currentPrice}
+                        <p class="fs-3 fw-bold text-primary mb-2">
+                            {$wine->currentPrice},-
+                        </p>
+                    {else}
+                        <p class="fs-5 text-secondary mb-2">Cena není dostupná</p>
+                    {/ifset}
+
+                    {ifset $wine->bottlesLeft}
+                        <p class="text-muted mb-3">
+                            <i class="fa-solid fa-box-open me-1"></i>
+                            Skladem: <strong>{$wine->bottlesLeft}</strong> lahví
+                        </p>
+                    {/ifset}
+                </div>
+
+                <!-- Add to cart or login -->
+                <div class="mb-4">
+                    {if $userUser}
+                        <!-- Add to cart form -->
+                        <form n:name="addToCartForm" class="text-center">
+                            <input type="hidden" n:name="wineId" value="{$wine->id}">
+                            <div class="input-group mb-2 justify-content-center">
+                                <input type="number" n:name="count" class="form-control w-50 text-center border-primary"
+                                    min="1" max="{$wine->bottlesLeft}" value="1">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-cart-plus"></i>
+                                <span>Přidat do košíku</span>
+                            </button>
+                        </form>
+                    {else}
+                        <!-- Prompt to login for purchase -->
+                        <div class="text-center">
+                            <a n:href="Sign:in" class="btn btn-outline-primary w-100 d-flex align-items-center justify-content-center gap-2">
+                                <i class="fa-solid fa-user"></i>
+                                <span>Přihlásit se pro nákup</span>
+                            </a>
+                        </div>
+                    {/if}
+                </div>
+
+                <!-- Wine description -->
+                {ifset $wine->salesDescription}
+                    <div>
+                        <h5 class="fw-semibold text-primary mb-2">Popis vína</h5>
+                        <p class="text-secondary" style="white-space: pre-line;">{$wine->salesDescription}</p>
+                    </div>
+                {/ifset}
+
+            </div>
+        </div>
+    </div>
+</div>
+{/block}

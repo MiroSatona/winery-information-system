@@ -1,0 +1,262 @@
+{*
+FILE:     dashboard.latte
+AUTHORS:  Martin Zůbek [C]
+          Otakar Kočí
+          Martin Mendl
+YEAR:     2025
+DESC:     Latte template for vineyards dashboard overview.
+*}
+{layout '../isLayout.latte'}
+
+
+{block topMenuISAdditional}
+    <!-- Top menu additional link for Vineyards section -->
+    <a href="#" class="nav-link nav-button py-2 fw-bold fs-5">
+        <i class="fas fa-arrow-right me-2"></i>Vinohrady
+    </a>
+{/block topMenuISAdditional}
+
+
+{block isMainPanel}
+    <div class="container-fluid"> 
+        <!-- Main section: Vineyard dashboard overview -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white text-dark py-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0 fw-bold">
+                                <i class="fas fa-mountain me-2"></i>
+                                Přehled vinohradů
+                            </h4>
+
+                            <!-- Search form for filtering vineyards -->
+                            <div class="flex-fill d-flex justify-content-center px-3">
+                                {form searchVineyardsForm}
+                                    <div class="d-flex gap-2 align-items-center" style="max-width:550px; min-width:550px;">
+                                        {input search}
+                                        {input type}
+                                        {input send}
+                                        <span class="invalid-feedback">
+                                            {inputError send}
+                                            {inputError search}
+                                            {inputError type}
+                                        </span>
+                                    </div>
+                                {/form}
+                            </div>
+
+                            <!-- Navigation and add vineyard button. -->
+                            <div class="d-flex gap-2">
+                                <a href="{link :IS:Dashboard:view}" class="btn btn-outline-secondary btn-sm">
+                                    <i class="fas fa-arrow-left me-2"></i>Zpět na přehled
+                                </a>
+                                {if $userVintner}
+                                    <a href="{link Vineyards:add}" class="btn btn-primary btn-sm">
+                                        <i class="fas fa-plus me-2"></i>Přidat vinohrad
+                                    </a>
+                                {/if}
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <div>
+                                <!-- Display total number of vineyards -->
+                                <span class="text-muted">Celkem vinohradů: <strong>{count($vineyards)}</strong></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <!-- Table of vineyards overview -->
+                            <table class="table table-hover mb-0">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-mountain me-2"></i>Název
+                                        </th>
+                                        <th scope="col" class="fw-bold">
+                                            <i class="fas fa-map-marker-alt me-2"></i>Lokalita
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-grip-lines me-2"></i>Řádků
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-seedling me-2"></i>Odrůd
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-calendar-alt me-2"></i>Založen
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center">
+                                            <i class="fas fa-image me-2"></i>Obrázek
+                                        </th>
+                                        <th scope="col" class="fw-bold text-center" style="width: 200px;">
+                                            <i class="fas fa-cogs me-2"></i>Akce
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Loop through all vineyards and display their data -->
+                                    {foreach $vineyards as $vineyard}
+                                        <tr class="align-middle {if !$vineyard->isActive()}table-secondary{/if}">
+                                            <td>
+                                                <div class="d-flex align-items-center">
+                                                    <div>
+                                                        <h6 class="mb-0 fw-semibold text-dark">{$vineyard->getName()}</h6>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">{$vineyard->getLocation()}</span>
+                                            </td>
+                                            <td class="text-center">
+                                                {$vineyard->getWineRowsCount()}
+                                            </td>
+                                            <td class="text-center">
+                                                {$vineyard->getWineVarietiesCount()}
+                                            </td>
+                                            <td class="text-center">
+                                                <span class="text-muted">
+                                                    {$vineyard->getYearEstablished()}
+                                                </span>
+                                            </td>
+                                            <td class="text-center">
+                                                <!-- Check if vineyard has an image -->
+                                                {if $vineyard->getImage()}
+                                                        <i class="fas fa-check me-1"></i>
+                                                {else}
+                                                        <i class="fas fa-times me-1"></i>
+                                                {/if}
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2 justify-content-center">
+                                                    <!-- Show detail button if vineyard is active -->
+                                                    {if $vineyard->isActive()}
+                                                        <a href="{link Vineyards:show $vineyard->getId()}" 
+                                                        class="btn btn-outline-primary btn-sm" 
+                                                        title="Detail vinohradu">
+                                                            <i class="fas fa-bars me-1"></i>Detail
+                                                        </a>
+                                                    {/if}
+                                                    <!-- Show delete/reactivate buttons for users with vintner role -->
+                                                    {if $userVintner}
+                                                        {if $vineyard->isActive()}
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-danger btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#deleteModal{$vineyard->getId()}"
+                                                                    title="Smazat vinohrad">
+                                                                <i class="fas fa-trash me-1"></i>Smazat
+                                                            </button>
+                                                        {else}
+                                                            <button type="button" 
+                                                                    class="btn btn-outline-success btn-sm" 
+                                                                    data-bs-toggle="modal" 
+                                                                    data-bs-target="#reactivateModal{$vineyard->getId()}"
+                                                                    title="Obnovit vinohrad">
+                                                                <i class="fas fa-eye me-1"></i>Obnovit
+                                                            </button>
+                                                        {/if}
+                                                    {/if}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {/foreach}
+                                    <!-- If there are no vineyards, show empty state -->
+                                    {if count($vineyards) === 0}
+                                        <tr>
+                                            <td colspan="7" class="text-center py-5 text-muted">
+                                                <i class="fas fa-mountain fa-3x mb-3 opacity-50"></i>
+                                                <h5>Žádné vinohrady</h5>
+                                                <p>Zatím nejsou přidány žádné vinohrady.</p>
+                                                {if $userVintner}
+                                                    <a href="{link Vineyards:add}" class="btn btn-primary btn-sm">
+                                                        <i class="fas fa-plus me-2"></i>Přidat první vinohrad
+                                                    </a>
+                                                {/if}
+                                            </td>
+                                        </tr>
+                                    {/if}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete confirmation modal for each vineyard -->
+    {foreach $vineyards as $vineyard}
+        <div class="modal fade" id="deleteModal{$vineyard->getId()}" tabindex="-1" aria-labelledby="deleteModalLabel{$vineyard->getId()}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteModalLabel{$vineyard->getId()}">
+                            <i class="fas fa-exclamation-triangle me-2"></i>Potvrdit smazání
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <i class="fas fa-mountain fa-3x text-danger mb-3"></i>
+                            <h5>Opravdu chcete smazat vinohrad?</h5>
+                            <p class="text-muted">
+                                <strong>{$vineyard->getName()}</strong><br>
+                                Lokalita: {$vineyard->getLocation()}<br>
+                                Smazáním nedojde k úplnému odstranění, ale pouze poznačení, které znemožní vinohrad dále využívat a zobrazovat na domovské stránce.
+                                Takto deaktivované vinohrady lze později zpětně obnovit.
+                            </p>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times me-1"></i>Zrušit
+                        </button>
+                        <a href="{link delete!, $vineyard->getId()}" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>Smazat vinohrad
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {/foreach}
+
+    <!-- Reactivation confirmation modal for each inactive vineyard -->
+    {foreach $vineyards as $vineyard}
+        {if !$vineyard->isActive()}
+            <div class="modal fade" id="reactivateModal{$vineyard->getId()}" tabindex="-1" aria-labelledby="reactivateModalLabel{$vineyard->getId()}" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header bg-success text-white">
+                            <h5 class="modal-title" id="reactivateModalLabel{$vineyard->getId()}">
+                                <i class="fas fa-eye me-2"></i>Potvrdit obnovení
+                            </h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center">
+                                <i class="fas fa-mountain fa-3x text-success mb-3"></i>
+                                <h5>Opravdu chcete obnovit vinohrad?</h5>
+                                <p class="text-muted">
+                                    <strong>{$vineyard->getName()}</strong><br>
+                                    Lokalita: {$vineyard->getLocation()}<br>
+                                    Obnovením se vinohrad znovu aktivuje a bude dostupný pro využívání a zobrazování na domovské stránce.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                <i class="fas fa-times me-1"></i>Zrušit
+                            </button>
+                            <a href="{link reactivate!, $vineyard->getId()}" class="btn btn-success">
+                                <i class="fas fa-eye me-1"></i>Obnovit vinohrad
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {/if}
+    {/foreach}
+
+{/block isMainPanel}
