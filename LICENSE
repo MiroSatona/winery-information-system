@@ -1,0 +1,23 @@
+Copyright (c) 2025 Martin Zůbek, Otakar Kočí, Martin Mendl
+
+All rights reserved.
+
+This repository is publicly visible for portfolio and reference purposes only.
+No permission is granted to use, copy, modify, merge, publish, distribute,
+sublicense, or sell any part of this software or its documentation, in source
+or compiled form, without prior written permission from all of the copyright
+holders listed above.
+
+Viewing the source code on GitHub and forking it within GitHub as allowed by
+the GitHub Terms of Service does not grant any of the rights listed above.
+
+Third-party components are not covered by this notice and remain under their
+own licenses and terms, in particular:
+- the Nette framework, Bootstrap, Font Awesome and other dependencies;
+- the sample images of wines, vineyards and grape varieties, whose sources
+  are listed in images.md.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY ARISING FROM, OUT OF OR IN CONNECTION WITH
+THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

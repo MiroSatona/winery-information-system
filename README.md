@@ -110,3 +110,9 @@ The application and database design and the documentation were done together.
 ## Image credits
 
 The sample pictures of wines, vineyards and grape varieties come from the internet. Their sources are listed in [images.md](images.md).
+
+## License
+
+© 2025 Martin Zůbek, Otakar Kočí, Martin Mendl. All rights reserved.
+
+The code is public for portfolio and reference purposes only. Using, copying or modifying it requires written permission from the authors. See [LICENSE](LICENSE).
